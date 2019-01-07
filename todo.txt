@@ -1,0 +1,94 @@
+REQUIRED:
+    Bold, Italic, font options for text nodes.
+
+    When editing a display box, don't allow box positions to overlap (top should never be greater than bottom, etc)
+
+    When editor gets second 'edit-data':
+        Add all editor.data as a change, filtered by 'edit-data' data
+
+    Display window - Fix:
+        Occasionally flashes white (Only when looping?).
+        When changing screens or opening, it briefly shows at smaller size before resizing to full screen.
+
+    Song library:
+        When a database change occurs, if the song the user is currently editing has changed, show notification and ask to "discard changes and reload" or "continue editing"
+    
+    Print tool:
+        Output differs to preview (extra blank pages).
+        Long paragraphs don't break over pages.
+        Add user options to filter song searching.
+    
+    Image Library:
+        Allow image renaming
+
+    FontInput item: Drop down list lags, change so that DOM only contains rows that are visible in scroll position.
+    
+    Control window:
+        Add context menu actions for all items (displays, playlist editor, etc)
+    
+    Settings "keys": Allow multiple keyboard shortcuts for actions
+
+    Installers - Windows & Mac
+
+REQUIRED - long term:
+    ColorInput item: Create custom color picker.
+
+    Layout: context menu for all items.
+    
+    Change layout.menu.add to take listener function as argument.
+    Remove layout.menu.on
+
+    Create single source for interface text (file, instead of hard coded strings), allowing for translation + Win/Mac differences
+        change keyboard shortcut display based on language, win/mac, keyboard, etc..
+        (Including stuff like ⌘)
+
+    Control window taskbar:
+        Use progress bar to show automatic advance time.
+        Use "Jumplist" (addRecentDocument) to show presentation files opened by user.
+        (Mac) Use '.setRepresentedFilename(filename)', 'setDocumentEdited(edited)' to show state of active presentation file.
+
+    Print tool:
+        Add Image option
+        Options for how columns are laid out. Currently adding extra whitespace is the only way to control where column breaks are. Specific options to move certain items to a new column, etc, are needed.
+
+    Control window song search: Add filter by group option.
+
+    Song Library:
+        Group input to change group for song.
+        Duplicate song button.
+        Remove punctuation when searching.
+
+    Song Editor:
+        For Intro, Outro, Section & End overlay nodes, show the displayed text, and then when user starts editing text switch to actual "{section}" text.
+
+    Code signing - Windows & Mac
+    Auto update?
+
+WANTED:
+    Add templates for playlists (when creating playlist from template, it gives options for 3 songs, 1 text with string insertion, etc)
+
+    Template editor: song 'show name' option should show/hide the name box
+
+    TableList item: Allow selection of multiple rows.
+        (For adding multiple songs to presentation at the same time)
+
+    DisplayEditor item:
+        Make box handles respond to background images (CSS Blending function)?
+
+    FontInput item: Option to choose style (regular/bold/italic), and filter by weight, serif, etc.
+    
+    SelectInput item:
+        Create custom drop down list.
+        Add placeholder option.
+
+CODE CHANGES:
+    Change displayEdit.add to public nodeEdits, with .add the same as block.add
+
+    Refactor variable names to be more readable (IE, no 'func')
+
+    Attempt to find, and remove memory leaks
+    Go through all event listeners (.on, .addEventListener), and make sure they aren't being excessively created
+
+    Check that no issues occur after being open for long times (leave open for 1+ weeks)
+
+    Main process - Re use editing browser windows?

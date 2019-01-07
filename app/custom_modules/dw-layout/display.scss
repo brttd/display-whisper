@@ -1,0 +1,238 @@
+.display {
+    display: inline-block;
+
+    position: relative;
+
+    overflow: hidden;
+
+    .screen {
+        position: relative;
+
+        transform-origin: top left;
+
+        /* will-change: transform; */
+
+        background-position: 50% 50%;
+        background-repeat: no-repeat;
+
+        overflow: hidden;
+    }
+}
+
+.display-node {
+    position: absolute;
+
+    display: flex;
+
+    overflow: hidden;
+
+    .text {
+        width: 100%;
+        margin: 0;
+
+        line-height: 1.5;
+
+        white-space: pre-wrap;
+
+        overflow: hidden;
+        overflow-wrap: break-word;
+        word-break: normal;
+
+        hyphens: auto;
+    }
+
+    .image {
+        position: absolute;
+
+        width: 100%;
+        height: 100%;
+
+        background-repeat: no-repeat;
+        background-position: 50% 50%;
+    }
+}
+
+$bar-padding: 10px;
+$border-size: 1px;
+$bar-size: $bar-padding * 2 + $border-size;
+$box-padding: 3px;
+$box-size: $border-size + $box-padding * 2;
+
+.display-edit {
+    display: inline-block;
+
+    position: relative;
+
+    overflow: hidden;
+    /* @extend .display; */
+
+    .screen {
+        position: relative;
+
+        /* will-change: width, height, top, left;*/
+
+        background-position: 50% 50%;
+        background-repeat: no-repeat;
+
+        overflow: hidden;
+
+        .box-edit {
+            position: absolute;
+
+            z-index: 1;
+
+            min-height: 1px;
+            min-width: 1px;
+
+            outline: $border-size dashed currentColor;
+            outline-offset: -$border-size;
+
+            &:hover {
+                .bar {
+                    &:after,
+                    &:before {
+                        opacity: 0.5;
+                    }
+                }
+            }
+
+            &.focus {
+                z-index: 3;
+
+                .bar {
+                    &:after,
+                    &:before {
+                        opacity: 1;
+                    }
+
+                    &.top {
+                        /* cursor: ns-resize; */
+                        &:after {
+                            /* cursor: nesw-resize; */
+                        }
+                    }
+                    &.right {
+                        /* cursor: ew-resize; */
+                        &:after {
+                            /* cursor: nwse-resize; */
+                        }
+                    }
+                    &.bottom {
+                        /* cursor: ns-resize; */
+                        &:after {
+                            /* cursor: nesw-resize; */
+                        }
+                    }
+                    &.left {
+                        /* cursor: ew-resize; */
+                        &:after {
+                            /* cursor: nwse-resize; */
+                        }
+                    }
+                }
+            }
+
+            .bar {
+                position: absolute;
+                /* background: white; */
+
+                z-index: 2;
+
+                &:before,
+                &:after {
+                    opacity: 0;
+                    position: absolute;
+                    content: '';
+
+                    z-index: 3;
+
+                    width: $box-size;
+                    height: $box-size;
+
+                    background: currentColor;
+                }
+            }
+            .bar.top,
+            .bar.bottom {
+                width: calc(100% + #{$bar-padding * 2});
+                height: $bar-size;
+
+                &:before,
+                &:after {
+                    top: $bar-padding - $box-padding;
+                }
+            }
+            .bar.left,
+            .bar.right {
+                width: $bar-size;
+                height: calc(100% + #{$bar-padding * 2});
+
+                &:before,
+                &:after {
+                    left: $bar-padding - $box-padding;
+                }
+            }
+            .bar.top,
+            .bar.left {
+                top: -$bar-padding;
+                left: -$bar-padding;
+            }
+            .bar.right,
+            .bar.bottom {
+                bottom: -$bar-padding;
+                right: -$bar-padding;
+            }
+            .bar.top {
+                &:before {
+                    left: calc(50% - #{$box-padding});
+                }
+                &:after {
+                    right: $bar-padding - $box-padding;
+                }
+            }
+            .bar.right {
+                &:before {
+                    top: calc(50% - #{$box-padding});
+                }
+                &:after {
+                    bottom: $bar-padding - $box-padding;
+                }
+            }
+            .bar.bottom {
+                &:before {
+                    right: calc(50% - #{$box-padding});
+                }
+                &:after {
+                    left: $bar-padding - $box-padding;
+                }
+            }
+            .bar.left {
+                &:before {
+                    bottom: calc(50% - #{$box-padding});
+                }
+                &:after {
+                    top: $bar-padding - $box-padding;
+                }
+            }
+
+            .textInput {
+                position: absolute;
+                top: 0;
+                left: 0;
+
+                width: 100%;
+                height: 100%;
+
+                border: none;
+            }
+
+            .image {
+                width: 100%;
+                height: 100%;
+
+                background-repeat: no-repeat;
+                background-position: 50% 50%;
+            }
+        }
+    }
+}

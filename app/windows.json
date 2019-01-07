@@ -1,0 +1,143 @@
+{
+    "about": {
+        "title": "About",
+
+        "modal": true,
+
+        "width": 600,
+        "height": 600,
+
+        "resizable": false,
+        "maximizable": false
+    },
+    "control": {
+        "title": "Display Whisper",
+
+        "minWidth": 800,
+        "minHeight": 400,
+
+        "maximized": true
+    },
+    "editor": {
+        "minWidth": 700,
+        "minHeight": 600,
+
+        "width": 800,
+        "height": 700
+    },
+    "help": {
+        "title": "Help",
+
+        "minWidth": 400,
+        "minHeight": 400,
+
+        "width": 890,
+        "height": 800
+    },
+    "imageDatabase": {
+        "title": "Image Library",
+
+        "minWidth": 500,
+        "minHeight": 350,
+
+        "width": 600,
+        "height": 450
+    },
+    "log": {
+        "title": "Display Whisper Debug Log",
+
+        "minWidth": 500,
+        "minHeight": 250,
+
+        "width": 600,
+        "height": 350,
+
+        "maximizable": false
+    },
+    "print": {
+        "title": "Print",
+
+        "minWidth": 850,
+        "minHeight": 600,
+
+        "width": 1000,
+        "height": 650
+    },
+    "preferences": {
+        "title": "Preferences",
+
+        "minWidth": 400,
+        "minHeight": 300,
+
+        "maxWidth": 900,
+        "maxHeight": 800,
+
+        "width": 600,
+        "height": 500,
+
+        "maximizable": false,
+        "minimizable": false
+    },
+    "songAdd": {
+        "title": "Add Song",
+
+        "minWidth": 750,
+        "minHeight": 500,
+
+        "width": 850,
+        "height": 650
+    },
+    "songDatabase": {
+        "title": "Song Library",
+
+        "minWidth": 650,
+        "minHeight": 400,
+
+        "width": 900,
+        "height": 600
+    },
+    "songImport": {
+        "title": "Import Songs",
+
+        "modal": true,
+
+        "width": 400,
+        "height": 350,
+
+        "resizable": false
+    },
+    "songExport": {
+        "title": "Export Songs",
+
+        "modal": true,
+
+        "width": 200,
+        "height": 160,
+
+        "resizable": false
+    },
+    "songCheck": {
+        "title": "Song Library Check",
+
+        "minWidth": 400,
+        "minHeight": 300,
+
+        "width": 500,
+        "height": 500
+    },
+    "templateEditor": {
+        "title": "Edit Templates",
+
+        "minWidth": 800,
+        "minHeight": 700,
+
+        "width": 1000,
+        "height": 750
+    },
+    "test": {
+        "title": "TEST",
+
+        "minWidth": 300,
+        "minHeight": 300
+    }
+}

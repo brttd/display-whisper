@@ -1,0 +1,81 @@
+{
+    "name": "Default",
+
+    "maxLines": 8,
+
+    "sectionOverlay": {
+        "show": true,
+
+        "text": "{section}",
+        "plainText": "{section}",
+
+        "font": "Arial",
+        "size": 50,
+        "color": "black",
+
+        "lineHeight": 1.5,
+
+        "align": "right",
+
+        "y": "top",
+        "x": "fill",
+
+        "top": 1,
+        "left": 65,
+        "right": 96,
+        "bottom": 11
+    },
+
+    "endOverlay": {
+        "show": true,
+
+        "text": "{copyright:Final Verse}",
+        "plainText": "{copyright:Final Verse}",
+
+        "font": "Arial",
+        "size": 50,
+        "color": "black",
+
+        "lineHeight": 1.5,
+
+        "align": "left",
+
+        "y": "center",
+        "x": "fill",
+
+        "top": 89,
+        "left": 4,
+        "right": 50,
+        "bottom": 99
+    },
+
+    "background": "white",
+    "backgroundImage": "",
+    "backgroundScale": "fill",
+
+    "font": "Arial",
+    "size": 65,
+    "color": "black",
+
+    "lineHeight": 1.5,
+
+    "align": "center",
+
+    "y": "center",
+    "x": "fill",
+
+    "scale": "fit",
+
+    "top": 12,
+    "left": 10,
+    "right": 90,
+    "bottom": 88,
+
+    "playTime": 0,
+    "autoPlay": false,
+
+    "transition": {
+        "type": "fade",
+        "time": 0
+    }
+}

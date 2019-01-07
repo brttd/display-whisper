@@ -1,0 +1,17 @@
+{
+    "nodes": [
+        {
+            "type": "image",
+            "map": "",
+            "name": "Main",
+            "properties": {
+                "scale": true,
+                "top": true,
+                "left": true,
+                "right": true,
+                "bottom": true
+            }
+        }
+    ],
+    "options": []
+}

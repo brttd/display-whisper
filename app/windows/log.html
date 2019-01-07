@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="Content-Security-Policy" content="default-src data: file: 'self' 'unsafe-inline'">
+
+        <link href="../fonts/fonts.css" rel="stylesheet">
+
+        <style>
+            body {
+                margin: 0;
+
+                height: 100vh;
+
+                font: 13px 'Inter UI';
+                text-align: left;
+
+                overflow: hidden;
+                display: flex;
+
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            button, #log {
+                margin: 4px;
+            }
+            button {
+                padding: 3px 4px;
+            }
+            #log {
+                flex: 1 1 auto;
+                align-self: stretch;
+
+                padding: 4px;
+
+                background: rgba(0, 0, 0, 0.1);
+
+                white-space: pre-wrap;
+                word-break: break-all;
+
+                overflow: auto;
+                overflow-y: scroll;
+            }
+        </style>
+    </head>
+    <body><p id="log"></p><script src="log.js"></script></body>
+</html>

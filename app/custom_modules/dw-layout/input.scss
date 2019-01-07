@@ -1,0 +1,1520 @@
+@import 'fonts';
+@import 'colors';
+@import 'all';
+
+$input_width: 6ch;
+
+$input-padding: 2px 6px;
+$label-padding: 1px 2px;
+
+$icon-size: 18px;
+
+$min-size: 24px;
+
+@function first($list) {
+    @return nth($list, 1);
+}
+
+@function last($list) {
+    @return nth($list, length($list));
+}
+
+.all {
+    @extend %all;
+
+    display: inline-flex;
+
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+
+    align-self: flex-start;
+}
+
+@mixin fonts {
+    font-size: $font-size;
+    font-family: $font-family;
+
+    line-height: 1.4em;
+}
+
+@mixin colors($options: null, $color: true) {
+    @if $options == active-highlight {
+        @if $color == true {
+            color: $text-active-highlight;
+            fill: $text-active-highlight;
+        }
+
+        background: $bkg-active-highlight;
+        border-color: $bkg-active-highlight-dark;
+
+        &::-webkit-input-placeholder {
+            color: $text;
+        }
+    } @else if $options == active {
+        @if $color == true {
+            color: $text-active;
+            fill: $text-active;
+        }
+
+        background: $bkg-active;
+        border-color: $bkg-active-dark;
+
+        &::-webkit-input-placeholder {
+            color: $text;
+        }
+    } @else if $options == disabled {
+        @if $color == true {
+            color: $text;
+            fill: $text;
+        }
+
+        background: $bkg-dark;
+        border-color: $bkg-main-dark;
+
+        cursor: default;
+    } @else if $options == hover-highlight {
+        @if $color == true {
+            color: $text;
+            fill: $text;
+        }
+
+        background: mix($bkg, $bkg-active-highlight, 50%);
+        border-color: mix($bkg-dark, $bkg-active-highlight-dark, 50%);
+
+        &::-webkit-input-placeholder {
+            color: $text-light;
+        }
+    } @else if $options == hover {
+        @if $color == true {
+            color: $text;
+            fill: $text;
+        }
+
+        background: mix($bkg, $bkg-active, 50%);
+        border-color: mix($bkg-dark, $bkg-active-dark, 50%);
+
+        &::-webkit-input-placeholder {
+            color: $text-light;
+        }
+    } @else {
+        @if $color == true {
+            color: $text;
+            fill: $text;
+        }
+
+        background: $bkg;
+        border-color: $bkg-dark;
+
+        &::-webkit-input-placeholder {
+            color: $text-light;
+        }
+    }
+}
+
+@mixin borders($radius: 2px) {
+    border: 1px solid $bkg-dark;
+    border-radius: $radius;
+
+    outline: none;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    display: none;
+}
+
+%input {
+    @extend .all;
+
+    display: inline-block;
+
+    label {
+        @include fonts;
+
+        display: block;
+    }
+
+    input {
+        @include fonts;
+        @include colors;
+        @include borders;
+
+        box-sizing: content-box;
+
+        padding: $input-padding;
+
+        /* extra 1px is to remove offset when caret is at end of input */
+        width: calc(#{$input_width} + 1px);
+
+        &[disabled] {
+            @include colors(disabled);
+        }
+
+        &:not([disabled]) {
+            &:hover {
+                @include colors(hover);
+            }
+
+            &:active,
+            &:focus,
+            &.active {
+                @include colors(active);
+            }
+        }
+    }
+
+    &.highlight {
+        input:not([disabled]) {
+            &:hover {
+                @include colors(hover-highlight);
+            }
+
+            &:active,
+            &:focus,
+            &.active {
+                @include colors(active-highlight);
+            }
+        }
+    }
+}
+
+%button {
+    @include fonts;
+    @include colors;
+    @include borders(0px);
+
+    box-sizing: border-box;
+
+    display: inline-block;
+
+    flex: 0 0 auto;
+
+    padding: first($input-padding) / 2;
+
+    min-width: $min-size;
+    min-height: $min-size;
+
+    background: $bkg-main;
+    border-color: $bkg-main-dark;
+
+    text-align: center;
+
+    cursor: pointer;
+}
+
+.input-button {
+    @extend .all;
+
+    @extend %button;
+
+    span,
+    svg {
+        vertical-align: top;
+        display: inline-block;
+        padding: 0;
+
+        &:empty {
+            display: none;
+        }
+    }
+
+    svg {
+        margin: first($input-padding) / 2 0;
+
+        width: $icon-size;
+        height: $icon-size;
+    }
+    span {
+        margin: first($input-padding) / 2 last($input-padding) -
+            first($input-padding) / 2;
+    }
+
+    &[disabled] {
+        @include colors(disabled);
+    }
+
+    &:not([disabled]) {
+        &:hover {
+            @include colors(hover);
+        }
+
+        &:active,
+        &:focus,
+        &.active {
+            @include colors(active);
+        }
+    }
+
+    &.highlight {
+        &:not([disabled]) {
+            &:hover {
+                @include colors(hover-highlight);
+            }
+
+            &:active,
+            &:focus,
+            &.active {
+                @include colors(active-highlight);
+            }
+        }
+    }
+
+    &.large {
+        padding: first($input-padding);
+
+        min-width: $min-size * 1.5;
+        min-height: $min-size * 1.5;
+
+        svg,
+        span {
+            vertical-align: middle;
+        }
+
+        svg {
+            margin: first($input-padding) / 2;
+
+            width: $icon-size * 1.5;
+            height: $icon-size * 1.5;
+        }
+    }
+}
+
+.input-drag {
+    @extend .input-button;
+
+    cursor: -webkit-grab;
+}
+
+.input-checkbox {
+    @extend .all;
+
+    input {
+        @include colors;
+        @include borders(3px);
+
+        flex: 0 0 auto;
+        align-self: center;
+
+        -webkit-appearance: none;
+
+        width: $icon-size;
+        height: $icon-size;
+
+        margin: 2px 0;
+
+        outline: none;
+
+        box-shadow: inset 0 0 0 3px $bkg;
+
+        &[disabled] {
+            @include colors(disabled);
+
+            &:not(:checked) {
+                box-shadow: none;
+            }
+        }
+        &:not([disabled]) {
+            &:hover {
+                background: mix($bkg, $bkg-active, 50%);
+                border-color: mix($bkg-dark, $bkg-active-dark, 50%);
+            }
+
+            &:checked {
+                background: $bkg-active-dark;
+                border-color: $bkg-active-dark;
+            }
+        }
+    }
+    &.highlight {
+        input:not([disabled]) {
+            &:hover {
+                background: mix($bkg, $bkg-active-highlight, 50%);
+                border-color: mix($bkg-dark, $bkg-active-highlight-dark, 50%);
+            }
+
+            &:checked {
+                background: $bkg-active-highlight-dark;
+                border-color: $bkg-active-highlight-dark;
+            }
+        }
+    }
+
+    label {
+        @include fonts;
+        display: inline-block;
+
+        flex: 0 0 auto;
+
+        padding: $label-padding;
+        margin: 2px;
+    }
+}
+
+.input-text {
+    @extend %input;
+
+    input {
+        -webkit-appearance: none;
+    }
+}
+
+.input-text-multiLine {
+    @extend .all;
+
+    display: inline-flex;
+
+    flex: 1 1 auto;
+    flex-direction: horizontal;
+
+    align-self: stretch;
+
+    textarea {
+        @include fonts;
+        @include colors;
+        @include borders;
+
+        box-sizing: border-box;
+
+        flex: 1 1 100%;
+        align-self: stretch;
+
+        padding: $input-padding;
+
+        outline: none;
+
+        resize: none;
+
+        &[disabled] {
+            @include colors(disabled);
+        }
+
+        &:not([disabled]) {
+            &:hover {
+                @include colors(hover);
+            }
+
+            &:active,
+            &:focus {
+                @include colors(active);
+            }
+        }
+    }
+    &.highlight {
+        textarea:not([disabled]) {
+            &:hover {
+                @include colors(hover-highlight);
+            }
+
+            &:active,
+            &:focus {
+                @include colors(active-highlight);
+            }
+        }
+    }
+}
+
+.input-number {
+    @extend %input;
+
+    /* If the 'unit' element is present, this stops it being wrapped to another line (only occurs when parent element doesn't have enough space */
+    white-space: nowrap;
+
+    label.unit {
+        @include fonts;
+        @include colors;
+
+        display: inline-block;
+
+        padding: first($input-padding);
+
+        border: 1px solid darken($bkg, $dark);
+        border-radius: 2px;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+
+        background: $bkg-main;
+        border-color: $bkg-main-dark;
+    }
+
+    input {
+        position: relative;
+        -webkit-appearance: none;
+    }
+
+    input:focus + label.unit {
+        border-left-color: $bkg-active-dark;
+    }
+
+    input:nth-last-child(2) {
+        padding-right: 0;
+
+        border-right: none;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    .highlight {
+        input:focus + label.unit {
+            border-left-color: $bkg-active-highlight-dark;
+        }
+    }
+}
+$slider-button-size: 12px;
+$slider-padding: 2px;
+.number-popup {
+    @include borders($slider-button-size + $slider-padding + 2px);
+
+    box-sizing: border-box;
+    position: absolute;
+
+    z-index: 10;
+
+    width: 200px;
+    height: $slider-button-size + $slider-padding * 2 + 2px;
+
+    background: $bkg;
+    border-color: $bkg-dark;
+
+    .arrow {
+        @include borders(0);
+
+        position: absolute;
+
+        left: calc(50% - 7px);
+        top: -7px;
+
+        width: 10px;
+        height: 10px;
+
+        transform: rotate(45deg);
+
+        background: $bkg;
+        border-color: $bkg-dark;
+
+        border-bottom: none;
+        border-right: none;
+    }
+
+    &.above {
+        .arrow {
+            top: auto;
+            bottom: -7px;
+
+            transform: rotate(225deg);
+        }
+    }
+
+    &:after {
+        content: '';
+        display: block;
+
+        position: absolute;
+        top: $slider-padding + $slider-button-size / 2 - 1px;
+        left: $slider-padding + $slider-button-size / 2;
+
+        width: calc(100% - #{$slider-padding + $slider-button-size + 2px});
+        height: 2px;
+
+        background: $bkg-dark;
+
+        border-radius: 2px;
+
+        z-index: -1;
+    }
+
+    &:hover {
+        .slider {
+            background: mix($bkg-main, $bkg-active, 50%);
+            border-color: mix($bkg-main-dark, $bkg-active-dark, 50%);
+        }
+    }
+
+    .slider {
+        box-sizing: border-box;
+        position: absolute;
+
+        top: 2px;
+
+        width: $slider-button-size;
+        height: $slider-button-size;
+
+        background: $bkg-main;
+        @include borders(100%);
+
+        border-color: $bkg-main-dark;
+
+        &.active {
+            background: $bkg-active;
+            border-color: $bkg-active-dark;
+        }
+    }
+
+    &.highlight {
+        &:hover {
+            .slider {
+                background: mix($bkg-main, $bkg-active-highlight, 50%);
+                border-color: mix(
+                    $bkg-main-dark,
+                    $bkg-active-highlight-dark,
+                    50%
+                );
+            }
+        }
+        .slider.active {
+            background: $bkg-active-highlight;
+            border-color: $bkg-active-highlight-dark;
+        }
+    }
+}
+.input-color {
+    @extend .all;
+
+    display: inline-block;
+
+    label {
+        @include fonts;
+        display: block;
+    }
+
+    input {
+        display: none;
+    }
+
+    button {
+        @include colors;
+        @include borders;
+
+        box-sizing: content-box;
+
+        vertical-align: top;
+
+        padding: first($input-padding) / 2;
+
+        outline: none;
+
+        div,
+        svg {
+            display: inline-block;
+
+            vertical-align: middle;
+
+            width: $icon-size;
+            height: $icon-size;
+
+            margin: first($input-padding) / 2;
+        }
+
+        div {
+            box-sizing: border-box;
+
+            border: 1px solid $bkg-dark;
+
+            background-size: 8px;
+            image-rendering: pixelated;
+        }
+
+        &[disabled] {
+            @include colors(disabled);
+
+            div {
+                opacity: 0.5;
+            }
+        }
+
+        &:not([disabled]) {
+            &:hover {
+                @include colors(hover);
+            }
+
+            &:active,
+            &:focus,
+            &.active {
+                @include colors(active);
+            }
+        }
+    }
+
+    &.highlight {
+        button:not([disabled]) {
+            &:hover {
+                @include colors(hover-highlight);
+            }
+
+            &:active,
+            &:focus,
+            &.active {
+                @include colors(active-highlight);
+            }
+        }
+    }
+}
+
+.input-select {
+    @extend .all;
+
+    display: inline-block;
+
+    cursor: pointer;
+
+    label {
+        @include fonts;
+
+        display: block;
+    }
+
+    select {
+        @include fonts;
+        @include colors;
+        @include borders;
+        -webkit-appearance: none;
+
+        box-sizing: content-box;
+
+        padding: $input-padding;
+
+        width: $input_width;
+
+        outline: none;
+
+        option {
+            background: lighten($bkg, $light);
+        }
+
+        &[disabled] {
+            @include colors(disabled);
+        }
+
+        &:not([disabled]) {
+            &:hover {
+                @include colors(hover);
+            }
+
+            &:active,
+            &:focus {
+                @include colors(active);
+            }
+        }
+    }
+    &.highlight {
+        select:not([disabled]) {
+            &:hover {
+                @include colors(hover-highlight);
+            }
+
+            &:active,
+            &:focus {
+                @include colors(active-highlight);
+            }
+        }
+    }
+}
+
+.input-font {
+    @extend .all;
+
+    display: inline-block;
+
+    width: calc(15ch + 10px);
+
+    position: relative;
+
+    label {
+        @include fonts;
+
+        display: block;
+    }
+
+    input {
+        @include fonts;
+        @include colors;
+        @include borders;
+
+        box-sizing: border-box;
+        position: relative;
+
+        width: 100%;
+
+        padding: $input-padding;
+
+        outline: none;
+
+        &[disabled] {
+            @include colors(disabled);
+        }
+
+        &:not([disabled]) {
+            &:hover {
+                @include colors(hover);
+            }
+
+            &:active,
+            &:focus,
+            &.active {
+                @include colors(active);
+            }
+        }
+    }
+    &.highlight {
+        input:not([disabled]) {
+            &:hover {
+                @include colors(hover-highlight);
+            }
+
+            &:active,
+            &:focus,
+            &.active {
+                @include colors(active-highlight);
+            }
+        }
+    }
+}
+.font-dropdown {
+    @include borders;
+
+    box-sizing: border-box;
+
+    position: absolute;
+
+    display: block;
+
+    overflow: auto;
+    overflow-x: hidden;
+
+    z-index: 10;
+
+    padding: 1px 0;
+
+    background: $bkg-main;
+    border-color: $bkg-main-dark;
+
+    &::-webkit-scrollbar {
+        width: 1ch;
+    }
+    &::-webkit-scrollbar-button {
+        display: none;
+    }
+    &::-webkit-scrollbar-track {
+        background: $bkg-main;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: $bkg-main-dark;
+    }
+
+    .list {
+        list-style: none;
+
+        margin: 0;
+        padding: 0;
+
+        font-size: 16px;
+        line-height: 1.2;
+
+        cursor: pointer;
+
+        li {
+            white-space: nowrap;
+
+            padding: 2px 4px;
+
+            &:hover {
+                background: $bkg-dark;
+            }
+        }
+    }
+}
+
+.input-key {
+    @extend .input-button;
+
+    border-radius: 3px;
+}
+
+.key-overlay {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(255, 255, 255, 0.5);
+
+    .popup {
+        @include fonts;
+        @include colors;
+        @include borders(3px);
+
+        display: block;
+
+        min-width: 30ch;
+
+        padding: 6px;
+
+        p {
+            display: block;
+
+            margin: 4px;
+
+            -webkit-margin-collapse: separate;
+        }
+
+        span {
+            @include borders(3px);
+
+            display: block;
+
+            margin: 4px;
+            padding: 4px 8px;
+
+            background: $bkg-main;
+            border-color: $bkg-main-dark;
+
+            word-break: break-all;
+        }
+    }
+}
+
+.input-file {
+    @extend .input-button;
+}
+
+.input-image {
+    @extend .all;
+
+    display: inline-block;
+
+    width: calc(15ch + 10px);
+
+    position: relative;
+
+    label {
+        @include fonts;
+
+        display: block;
+    }
+
+    button {
+        @extend %button;
+
+        position: relative;
+
+        padding: $input-padding;
+
+        width: 100%;
+
+        text-align: left;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        &[disabled] {
+            @include colors(disabled);
+        }
+
+        &:not([disabled]) {
+            &:hover {
+                @include colors(hover);
+            }
+
+            &:active,
+            &.active,
+            &:focus {
+                @include colors(active);
+            }
+        }
+    }
+
+    &.highlight {
+        button:not([disabled]) {
+            &:hover {
+                @include colors(hover-highlight);
+            }
+
+            &:active,
+            &.active,
+            &:focus {
+                @include colors(active-highlight);
+            }
+        }
+    }
+}
+$img-min-width: 4em;
+$img-max-width: 10em;
+.image-dropdown {
+    @include borders;
+    @include fonts;
+
+    box-sizing: border-box;
+
+    position: absolute;
+
+    display: flex;
+    flex-direction: column;
+
+    z-index: 10;
+
+    padding: 2px;
+
+    background: $bkg-main;
+    border-color: $bkg-main-dark;
+
+    color: $text;
+
+    button {
+        @extend .input-button;
+
+        flex: 0 0 auto;
+
+        width: auto;
+
+        margin: 2px;
+        padding: $input-padding;
+
+        align-self: flex-start;
+    }
+
+    .library {
+        display: flex;
+        flex: 0 0 auto;
+        flex-flow: row nowrap;
+
+        margin: 2px;
+        padding: $input-padding;
+
+        border-top: 1px solid $bkg-main-dark;
+
+        &.empty {
+            padding-right: 0;
+
+            span,
+            button {
+                align-self: center;
+            }
+            span {
+                margin-right: 6px;
+            }
+        }
+
+        .edit-button {
+            margin-left: auto;
+
+            cursor: pointer;
+            opacity: 0.5;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+    }
+
+    .list-scroll {
+        overflow: auto;
+
+        &::-webkit-scrollbar {
+            width: 1ch;
+        }
+        &::-webkit-scrollbar-button {
+            display: none;
+        }
+        &::-webkit-scrollbar-track {
+            background: $bkg-main;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: $bkg-main-dark;
+        }
+    }
+
+    .list {
+        display: flex;
+        flex-flow: row wrap;
+        max-width: 100%;
+        width: max-content;
+
+        div {
+            @include borders(0px);
+            @include colors;
+
+            position: relative;
+            flex: 1 1 #{$img-max-width/2 + $img-min-width/2};
+
+            min-width: $img-min-width;
+            max-width: $img-max-width;
+
+            align-self: flex-start;
+
+            margin: 2px;
+
+            cursor: pointer;
+
+            span,
+            img {
+                width: 100%;
+
+                vertical-align: top;
+            }
+
+            span {
+                display: inline-block;
+
+                box-sizing: border-box;
+
+                text-align: center;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+            }
+
+            img {
+                height: auto;
+            }
+
+            &:hover {
+                @include colors(hover);
+            }
+
+            &.active {
+                @include colors(active);
+            }
+        }
+    }
+}
+
+.input-richText {
+    @include borders(0px);
+
+    position: relative;
+
+    box-sizing: border-box;
+
+    display: inline-flex;
+
+    flex: 1 1 auto;
+    align-self: stretch;
+
+    cursor: text;
+
+    &.disabled {
+        pointer-events: none;
+        @include colors(disabled);
+    }
+
+    iframe {
+        display: inline-block;
+
+        flex: 1 1 100%;
+        align-self: stretch;
+
+        max-width: 100%;
+        max-height: 100%;
+
+        border: none;
+    }
+}
+
+.input-list {
+    @include borders;
+
+    @extend %all;
+
+    display: inline-flex;
+    overflow: hidden;
+
+    padding: 0;
+
+    border-radius: 0px;
+
+    /*
+    scrollbar
+    scrollbar-button
+    scrollbar-track
+    scrollbar-track-piece
+    scrollbar-thumb
+    scrollbar-corner
+    resizer
+    */
+
+    .list-scroll {
+        overflow: auto;
+        overflow-x: hidden;
+
+        flex: auto 1 1;
+
+        padding: 2px 4px;
+
+        &::-webkit-scrollbar {
+            width: 1ch;
+            height: 1ch;
+        }
+        &::-webkit-scrollbar-button {
+            display: none;
+        }
+        &::-webkit-scrollbar-track,
+        &::-webkit-scrollbar-corner {
+            background: $bkg-light;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: $bkg-main;
+            &:hover {
+                background: mix($bkg-main, $bkg-main-dark);
+            }
+            &:active {
+                background: $bkg-main-dark;
+            }
+        }
+    }
+
+    .add {
+        display: flex;
+
+        flex-flow: row nowrap;
+
+        flex: auto 0 0;
+
+        padding: 4px;
+
+        border-top: 1px solid $bkg-dark;
+
+        input,
+        select {
+            @include fonts;
+            @include colors;
+            @include borders;
+
+            -webkit-appearance: none;
+
+            flex: 1 1 100%;
+
+            width: 0;
+
+            margin: 0;
+            padding: $input-padding;
+
+            option {
+                background: lighten($bkg, $light);
+            }
+
+            &[disabled] {
+                @include colors(disabled);
+            }
+
+            &:not([disabled]) {
+                &:hover {
+                    @include colors(hover);
+                }
+
+                &:active,
+                &:focus {
+                    @include colors(active);
+                }
+            }
+
+            background: none;
+        }
+
+        select {
+            padding-right: 20px;
+        }
+
+        input {
+            /* Inputs width is wrong, needs to be 100% - button size (1.5em) - 2px (button left margin) - input horizontal padding*/
+            max-width: calc(100% - 1.5em - 2px - #{last($input-padding) * 2});
+        }
+
+        .icon {
+            display: inline-flex;
+
+            position: relative;
+
+            left: -$icon-size - first($input-padding) - 1px;
+            pointer-events: none;
+
+            flex: auto 0 0;
+            width: 0;
+
+            flex-direction: row;
+            align-items: center;
+
+            svg {
+                flex: auto 0 0;
+
+                width: $icon-size;
+                height: $icon-size;
+
+                fill: $text;
+            }
+        }
+
+        button {
+            display: inline-flex;
+
+            width: 1.5em;
+            height: 1.5em;
+
+            margin-left: 2px;
+            padding: 0;
+
+            flex: auto 0 0;
+
+            justify-content: center;
+            align-self: center;
+
+            background: transparent;
+            border: none;
+            outline: none;
+
+            svg {
+                flex: auto 0 0;
+
+                width: $icon-size;
+                height: $icon-size;
+
+                fill: $text;
+            }
+        }
+
+        button,
+        .icon {
+            &:hover,
+            &:focus {
+                svg {
+                    fill: $text-dark;
+                }
+            }
+        }
+    }
+
+    .item {
+        @include fonts;
+
+        display: flex;
+
+        flex-flow: row nowrap;
+
+        input {
+            @include borders;
+
+            flex-basis: 100%;
+
+            margin: 1px 2px;
+            padding: 1px 3px;
+
+            background: none;
+
+            border-color: transparent;
+
+            /* Adds elipsis when the text can't be shown in full (also makes width dynamic?) */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            /* Stops highlighting when dragging, etc */
+            &:not(:focus) {
+                pointer-events: none;
+            }
+
+            &:focus {
+                @include colors(active, $color: false);
+            }
+        }
+        button {
+            display: inline-flex;
+
+            width: 1.5em;
+            height: 1.5em;
+
+            padding: 0;
+
+            flex: 0 0 auto;
+
+            justify-content: center;
+            align-self: center;
+
+            background: transparent;
+            border: none;
+            outline: none;
+
+            svg {
+                flex: 0 0 auto;
+
+                width: $icon-size;
+                height: $icon-size;
+
+                fill: $text;
+            }
+
+            &:hover,
+            &:focus {
+                svg {
+                    fill: $text-dark;
+                }
+            }
+            &:active {
+                svg {
+                    fill: $text-active-dark;
+                }
+            }
+        }
+
+        &.active {
+            @include colors(active);
+
+            input:focus {
+                background: $bkg;
+            }
+        }
+        &.dragging {
+            background: $bkg-active-dark;
+            opacity: 0.5;
+        }
+
+        &.error {
+            background: $bkg-error;
+
+            &.dragging {
+                background: $bkg-error-dark;
+            }
+        }
+    }
+
+    &.disabled {
+        pointer-events: none;
+
+        .item.add {
+            input,
+            select {
+                @include colors(disabled);
+            }
+        }
+    }
+
+    .separator {
+        width: 100%;
+        height: 1px;
+
+        margin: 2px 0;
+
+        background: $bkg-dark;
+
+        &.active {
+            outline: 3px solid $bkg-dark;
+
+            background: $bkg-dark;
+        }
+    }
+
+    &.highlight {
+        .item {
+            &.active {
+                @include colors(active-highlight);
+            }
+            &.dragging {
+                background: $bkg-active-highlight-dark;
+                opacity: 0.5;
+            }
+        }
+
+        .add {
+            input,
+            select {
+                &:hover {
+                    @include colors(hover-highlight, $color: false);
+                }
+
+                &:active,
+                &:focus {
+                    @include colors(active-highlight, $color: false);
+                }
+            }
+        }
+    }
+}
+
+.input-tableList {
+    @extend %all;
+
+    @include fonts;
+
+    display: inline-flex;
+
+    overflow: auto;
+    overflow-y: scroll;
+
+    outline: none;
+
+    &::-webkit-scrollbar {
+        width: 1ch;
+        height: 1ch;
+    }
+    &::-webkit-scrollbar-button {
+        display: none;
+    }
+    &::-webkit-scrollbar-track,
+    &::-webkit-scrollbar-corner {
+        background: $bkg-main-light;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: $bkg-main;
+        &:active {
+            background: $bkg-main-dark;
+        }
+    }
+
+    table {
+        table-layout: fixed;
+        border-collapse: collapse;
+
+        width: 100%;
+    }
+
+    tr {
+        word-break: break-all;
+
+        td {
+            padding: 1px 3px;
+
+            border: none;
+
+            white-space: pre;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            &:nth-child(even) {
+                background: rgba(0, 0, 0, 0.05);
+            }
+        }
+
+        &.select,
+        &.drag {
+            span {
+                background: transparent;
+            }
+        }
+
+        &.select {
+            background: $bkg-active;
+        }
+        &.drag {
+            background: $bkg-active-dark;
+        }
+    }
+
+    & {
+        &.highlight {
+            tr {
+                &.select {
+                    background: $bkg-active-highlight;
+                }
+                &.drag {
+                    background: $bkg-active-highlight-dark;
+                }
+            }
+        }
+    }
+}

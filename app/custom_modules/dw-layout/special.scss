@@ -1,0 +1,448 @@
+@import 'colors';
+@import 'fonts';
+@import 'all';
+
+.playlistItem {
+    display: flex;
+    flex-direction: row;
+
+    flex: 0 0 auto;
+
+    overflow: hidden;
+
+    font-size: $font-size;
+    font-family: $font-family;
+
+    .content {
+        display: inline-flex;
+
+        flex: 1 1 auto;
+        flex-direction: column;
+
+        overflow: hidden;
+
+        .bar {
+            display: inline-flex;
+            flex-direction: row;
+
+            .title {
+                flex: 1 1 auto;
+
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+
+                padding: 2px 4px;
+
+                border-top: 1px solid $bkg-dark;
+
+                cursor: default;
+
+                &:empty {
+                    display: none;
+                }
+            }
+        }
+    }
+
+    &.error {
+        .content .bar {
+            background: $bkg-error;
+
+            .title {
+                border-color: $bkg-error-dark;
+            }
+        }
+    }
+    &.selected {
+        .content .bar {
+            background: $bkg-active;
+
+            .title {
+                border-color: $bkg-active-dark;
+            }
+        }
+    }
+
+    .section {
+        display: flex;
+        flex-direction: row;
+
+        flex: 0 0 auto;
+
+        border-color: $bkg-dark;
+
+        .info {
+            box-sizing: border-box;
+
+            flex: 1 1 auto;
+
+            border: 1px solid $bkg-dark;
+            border-left: none;
+            border-right: none;
+
+            overflow: hidden;
+
+            cursor: default;
+
+            .title,
+            .content {
+                padding: 2px 4px;
+
+                word-break: break-word;
+            }
+
+            .title {
+                border: none;
+                border-bottom: 1px solid $bkg-dark;
+
+                &:empty {
+                    display: none;
+                }
+            }
+        }
+
+        &.error {
+            background: $bkg-error;
+            .info,
+            .info .title {
+                border-color: $bkg-error-dark;
+            }
+        }
+
+        &.selected {
+            background: $bkg-active;
+            .info,
+            .info .title {
+                border-color: $bkg-active-dark;
+            }
+        }
+
+        & + .playlistItemSection {
+            .info {
+                border-top: none;
+            }
+        }
+    }
+}
+
+.notification {
+    pointer-events: none;
+    position: fixed;
+
+    z-index: 1000;
+
+    width: 100%;
+
+    text-align: center;
+
+    font-size: $font-size;
+    font-family: $font-family;
+
+    transition: top 0.2s;
+
+    .box {
+        display: inline-flex;
+
+        white-space: pre-wrap;
+
+        padding: 3px 5px;
+
+        border: 2px solid $bkg-dark;
+        border-left: none;
+        border-right: none;
+        background: $bkg;
+
+        /* box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.2); */
+
+        pointer-events: auto;
+
+        &.success {
+            border-color: $bkg-success-dark;
+            background: $bkg-success;
+        }
+        &.warning {
+            border-color: $bkg-warning-dark;
+            background: $bkg-warning;
+        }
+        &.error {
+            border-color: $bkg-error-dark;
+            background: $bkg-error;
+        }
+
+        .icon,
+        .text {
+            vertical-align: top;
+
+            cursor: default;
+        }
+
+        .icon {
+            display: inline-block;
+
+            align-self: center;
+
+            width: 18px;
+            height: 18px;
+
+            padding: 2px;
+
+            svg {
+                width: 100%;
+                height: 100%;
+            }
+        }
+        .text {
+            margin: 2px 4px;
+            height: auto;
+        }
+    }
+}
+
+.dialogWrapper {
+    display: flex;
+
+    position: absolute;
+
+    z-index: 20;
+
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    justify-content: center;
+    align-items: center;
+
+    overflow: hidden;
+
+    background: rgba(255, 255, 255, 0.5);
+
+    transition: background 0.1s;
+
+    &.hidden {
+        background: transparent;
+        pointer-events: none !important;
+    }
+}
+
+$dialog_spacing: 8px;
+$icon_size: 18px;
+
+.dialog {
+    display: flex;
+    position: relative;
+    top: 0;
+
+    flex-direction: column;
+
+    max-width: 100%;
+    max-height: 100%;
+
+    border: 1px solid $bkg-dark;
+    border-radius: 4px;
+
+    background: $bkg;
+
+    font-size: $font-size;
+    font-family: $font-family;
+
+    transition: top 0.15s;
+
+    pointer-events: auto;
+
+    .title,
+    .message,
+    .actions {
+        align-self: stretch;
+
+        margin: 0;
+        padding: $dialog_spacing;
+
+        cursor: default;
+    }
+    .title,
+    .message {
+        padding-right: $dialog_spacing * 2 + $icon_size;
+    }
+    .title {
+        flex: 0 0 auto;
+
+        border-bottom: 1px solid $bkg-dark;
+
+        &:empty {
+            display: none;
+        }
+    }
+    .close {
+        position: absolute;
+        top: $dialog_spacing;
+        right: $dialog_spacing;
+
+        padding: 0;
+
+        width: $icon_size;
+        height: $icon_size;
+
+        border: none;
+        outline: none;
+        background: transparent;
+
+        fill: rgb(128, 128, 128);
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        &:hover,
+        &:active,
+        &:focus {
+            fill: rgb(0, 0, 0);
+        }
+    }
+    .message {
+        flex: 1 0 auto;
+    }
+    .actions {
+        flex: 0 0 auto;
+
+        text-align: right;
+
+        padding: $dialog_spacing/2;
+
+        border-top: 1px solid $bkg-dark;
+
+        button {
+            margin: $dialog_spacing/2;
+
+            padding: 4px 8px;
+
+            background: $bkg-main;
+
+            border: 1px solid $bkg-main-dark;
+            border-radius: 3px;
+
+            outline: none;
+
+            font-size: $font-size;
+            font-family: $font-family;
+
+            &:focus,
+            &:hover {
+                background: mix($bkg-active-highlight, $bkg);
+                border-color: mix($bkg-active-highlight-dark, $bkg-dark);
+            }
+
+            &:active {
+                background: $bkg-active-highlight;
+                border-color: $bkg-active-highlight-dark;
+            }
+        }
+    }
+}
+
+@keyframes move {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+.loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(255, 255, 255, 0.5);
+
+    div {
+        overflow: hidden;
+
+        text-align: center;
+
+        span {
+            position: relative;
+            z-index: 5;
+
+            font-size: $font-size;
+            font-family: $font-family;
+            color: $text-main;
+
+            text-shadow: -1px 0px 0px white, 0px -1px 0px white,
+                1px 0px 0px white, -1px 1px 0px white, 1px 1px 0px white,
+                -1px 1px 0px white;
+        }
+
+        &:after {
+            content: '';
+            position: relative;
+            z-index: 1;
+
+            top: -2px;
+
+            display: block;
+
+            width: 100%;
+            height: 0.06em;
+            min-height: 1px;
+
+            background: $text-main;
+        }
+        &.animate {
+            &:after {
+                animation: move 2s ease infinite;
+            }
+        }
+    }
+}
+
+.timer {
+    @extend %all;
+
+    position: relative;
+
+    padding: 1px;
+
+    height: 24px;
+
+    border: 1px solid $bkg-main-dark;
+
+    text-align: center;
+
+    overflow: hidden;
+
+    .bar {
+        width: 0%;
+        height: 100%;
+
+        background: $bkg-active;
+    }
+    .text {
+        position: absolute;
+
+        top: 1px;
+
+        margin: 1px;
+
+        color: $text;
+    }
+
+    &.highlight .bar {
+        background: $bkg-active-highlight;
+    }
+
+    &.disabled {
+        .bar {
+            background: $bkg-dark;
+        }
+    }
+}

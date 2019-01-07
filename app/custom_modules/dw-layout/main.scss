@@ -1,0 +1,73 @@
+@import 'fonts';
+@import 'all';
+
+$cursors: (
+    none,
+    context-menu,
+    help,
+    pointer,
+    progress,
+    wait,
+    cell,
+    crosshair,
+    text,
+    vertical-text,
+    alias,
+    copy,
+    move,
+    no-drop,
+    not-allowed,
+    all-scroll,
+    col-resize,
+    row-resize,
+    n-resize,
+    e-resize,
+    s-resize,
+    w-resize,
+    ne-resize,
+    nw-resize,
+    se-resize,
+    sw-resize,
+    ew-resize,
+    ns-resize,
+    nesw-resize,
+    nwse-resize,
+    zoom-in,
+    zoom-out,
+    grab,
+    grabbing
+);
+
+@each $cursor in $cursors {
+    .cursor-#{$cursor} {
+        cursor: $cursor !important;
+    }
+}
+.hide {
+    display: none !important;
+}
+.text {
+    @extend %all;
+    flex-grow: 0;
+    margin: 0;
+    padding: 0;
+    height: fit-content;
+    word-break: break-word;
+    font-size: $font-size;
+    font-family: $font-family;
+    cursor: default;
+}
+.image {
+    display: inline-block;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.filler {
+    margin: 0 !important;
+    padding: 0 !important;
+    flex: 1 1 0;
+}
+.block {
+    @extend %block;
+}

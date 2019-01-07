@@ -1,0 +1,181 @@
+THIS IS OUTDATED....
+
+ipc commands:
+    'get-setting' (key = '', default = ?):
+        Request the value of the given key. If a the key doesn't exist, and a default is given, then the default will be set for that key, and returned.
+    
+    'set-setting' (key = '', value = ?):
+        Set the value of the given key.
+    
+    'display' (data = {}):
+        Shows the data in the display window (if open).
+    
+    'change-display' (options = {}):
+        Updates display properties.
+        Valid options:
+            screen: 0+
+            show: true/false
+        Changes will send a 'display-info' message back.
+    
+    'display-command' (command = ''):
+        Send the command to the control window (if open).
+    
+    'start-edit' (editor = '', id = '', data = {}):
+        Opens an editor window, of the given type.
+        The given id will be sent with all edits from the window.
+        The given data will be sent to the window when it opens, as 'edit-data'
+    
+
+    'open-window' (name = ''):
+        Opens the given window. If already open, focuses it.
+    
+    'show-dialog' (type = '', options = {}):
+        Displays a dialog of the given type, with given options.
+        Type can be:
+            'open'
+            'save'
+            'message'
+            'error'
+        The options are passed directly to Electron dialog.show<type>, with the exception of the error box, which will take .title & .content.
+
+
+ipc messages:
+    'setting' (key, value):
+
+    'edit' (id, data):
+
+    'display-info' (data = {}):
+        The current properties of the display.
+        bounds: {x: 0+, y: 0+, width: 0+, height: 0+}
+        screen: 0+
+        screenCount: 1+
+        show: true/false
+
+    'songs-updated' (from = ''?):
+    
+    'templates-updated' (from = ''?):
+
+
+
+Display format:
+{
+    background: 'COLOR', Shown behind all nodes.
+    backgroundImage: 'URL' Shown behind all nodes, ontop of color.
+    backgroundScale: 'Fill' 'fit' or 'Stretch'
+
+    nodes: {
+        {
+            type: 'text' or 'image',
+
+            top: NUMBER,    Top    (percentage of screen) position of bounding box.
+            left: NUMBER,   Left   (percentage of screen) position of bounding box.
+            right: NUMBER,  Right  (percentage of screen) position of bounding box.
+            bottom: NUMBER, Bottom (percentage of screen) position of bounding box.
+
+            x: 'fill' or 'left' or 'center' or 'right',
+                fill: Node content will be the height of it's left & right values.
+                
+                left: Node content will be width of content, or the width of it's left & right values, whichever is smaller.
+                Resulting content will then be aligned to the left edge of it's bounding box.
+                
+                center: Node content will be width of content, or the width of it's left & right values, whichever is smaller.
+                Resulting content will then be aligned to the (horizontal) center of it's bounding box.
+
+                right: Node content will be width of content, or the width of it's left & right values, whichever is smaller.
+                Resulting content will then be aligned to the right edge of it's bounding box.
+
+            y: 'fill' or 'top' or 'center' or 'bottom',
+                fill: Node content will be the height of it's top & bottom values.
+                
+                top: Node content will be height of content, or the height of it's top & bottom values, whichever is smaller.
+                Resulting content will then be aligned to the top edge of it's bounding box.
+                
+                center: Node content will be height of content, or the height of it's top & bottom values, whichever is smaller.
+                Resulting content will then be aligned to the (vertical) center of it's bounding box.
+
+                bottom: Node content will be height of content, or the height of it's top & bottom values, whichever is smaller.
+                Resulting content will then be aligned to the bottom edge of it's bounding box.
+
+            //text type:
+            text: 'RICH-TEXT', String shown in node
+            plainText: 'TEXT', String shown in node if 'text' value is not present (or corrupted)
+
+            font: 'FONT-NAME',
+            size: 'NUMBER',
+            color: 'COLOR',
+
+            align: 'left' or 'center' or 'right', Text justify styling (Text specific justify, not same as 'x' value)
+
+            //image type:
+            url: 'URL',
+            data: 'DATA64-URL',
+
+            scale: 'Fill' or 'Fit' or 'Stretch'
+        }
+    },
+
+    playTime: 'NUMBER', //Amount of time (in milliseconds) the section should be shown for
+    autoPlay: 'BOOLEAN',  //If true, and the play mode isn't 'Auto', then automatically move onto next section after playTime
+
+    transition: {
+        type: 'fade' or 'slide' or 'zoom',
+        origin: 'STRING', //for slide or zoom, where to start the transition
+        time: 'NUMBER' //Amount of time (in milliseconds) the transition should take
+    }
+}
+
+Templating info format:
+{
+    "nodes": [
+        {
+            "type",
+
+            //Node properties get mapped to this value:
+            //If empty, then properties are applied to base template
+            "map": '',
+
+            //List of node properties to use in template
+            "properties": [],
+
+            //Default values to use
+            "values": {},
+        }
+    ],
+    "options": [
+        {
+            "map": "",
+            "type": "boolean"/"number"/"color"/"font"/"select",
+            "property": "",
+            "label": "",
+            "value": ...,
+
+
+        }
+    ]
+}
+
+Display node text styles:
+Container {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+Text {
+    max-width: 100%;
+    white-space: pre-wrap;
+    word-break: break-all;
+
+    line-height: 1.5;
+
+    text-align: 'left' OR 'center' OR 'right';
+    align-self: 'flex-start' OR 'center' or 'flex-end';
+
+    color: '';
+    font: '';
+    size: 0;
+}

@@ -1,0 +1,22 @@
+{
+    "productName": "Display Whisper",
+    "name": "display-whisper",
+    "version": "0.12.0",
+    "icon": "icons/main",
+    "main": "main.js",
+    "dependencies": {
+        "dw-log": "file:custom_modules\\dw-log",
+        "font-list": "^1.1.0"
+    },
+    "devDependencies": {
+        "dw-color": "file:custom_modules\\dw-color",
+        "dw-database": "file:custom_modules\\dw-database",
+        "dw-editor": "file:custom_modules\\dw-editor",
+        "dw-files": "file:custom_modules\\dw-files",
+        "dw-items": "file:custom_modules\\dw-items",
+        "dw-keyboard": "file:custom_modules\\dw-keyboard",
+        "dw-layout": "file:custom_modules\\dw-layout",
+        "dw-rich-text": "file:custom_modules\\dw-rich-text",
+        "marked": "^0.3.6"
+    }
+}

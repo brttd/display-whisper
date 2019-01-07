@@ -1,0 +1,77 @@
+@import 'fonts';
+@import 'colors';
+@import 'all';
+
+.reorderable-block {
+    @extend %block;
+
+    .separator {
+        align-self: stretch;
+
+        flex: 0 0 auto;
+
+        position: relative;
+        z-index: 5;
+
+        height: 1px;
+
+        margin: 2px 0;
+
+        background: rgba(128, 128, 128, 0.4);
+
+        &.active {
+            outline: 8px solid rgba(128, 128, 128, 0.4);
+        }
+    }
+}
+
+.tab-block {
+    @extend %block;
+
+    flex-flow: column nowrap;
+
+    .tabs {
+        background: $bkg;
+
+        border-bottom: 1px solid $bkg-main-dark;
+
+        button {
+            padding: 4px 8px;
+            //margin-left: -1px;
+            margin-bottom: -1px;
+
+            background: $bkg-dark;
+
+            border: 1px solid $bkg-main-dark;
+            border-left: none;
+            outline: none;
+
+            font-size: $font-size;
+            font-family: $font-family;
+
+            &:hover {
+                background: $bkg-main;
+            }
+
+            &.active {
+                background: $bkg-main-light;
+
+                border-color: $bkg-main-dark;
+
+                border-bottom-color: $bkg-main-light;
+            }
+
+            &:active {
+                background: $bkg-main-light;
+            }
+        }
+    }
+
+    .content {
+        display: flex;
+
+        flex: 1 1 100%;
+        flex-flow: column nowrap;
+        align-items: stretch;
+    }
+}

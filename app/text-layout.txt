@@ -1,0 +1,46 @@
+//Current css rules:
+line-height: 1.5;
+                
+white-space: pre-wrap;
+
+overflow: hidden;
+overflow-wrap: break-word;
+word-break: normal;
+
+hyphens: auto;
+
+
+//Text block user set options are:
+//font-family
+//font-size
+//color
+//line-height
+//text-align
+
+//per character user set options are:
+//italic + bold
+//text-decoration
+
+
+//font-style: normal;
+//font-weight: normal;
+
+//Normal text spacing
+line-height: 1.5;
+letter-spacing: normal;
+word-spacing: normal;
+
+//This is the default value, and there's little chance of it being accidentaly changed
+//font-kerning: auto
+
+
+//All preformatted white space must be kept
+//Line breaks should be added to fit a line inside the box
+//Words should only be broken if they don't fit inside a line
+white-space: pre-wrap;
+overflow: hidden; //Anything outside the box should not be shown
+overflow-wrap: break-word; //Any words to long to fit in a single line should be broken
+word-break: normal; //But words shouldn't normally break
+
+//Not sure if this is needed, but just in case there's &shy; or something?
+hyphens: auto;

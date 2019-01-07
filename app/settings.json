@@ -1,0 +1,489 @@
+{
+    "general": {
+        "name": "General",
+
+        "control": {
+            "description": "Main",
+            "map": "general",
+
+            "entries": {
+                "autoSaveInterval": {
+                    "description": "Auto-save time",
+                    "type": "number",
+                    "unit": "seconds",
+
+                    "min": 3,
+                    "max": 3600,
+                    "step": 10,
+                    "precision": 0,
+
+                    "popupMin": 10,
+                    "popupMax": 600,
+
+                    "default": 20
+                },
+                "removeHistoryCount": {
+                    "description": "Maximum remove history count",
+                    "type": "number",
+
+                    "min": 0,
+                    "max": 100,
+                    "precision": 0,
+
+                    "popupMax": 50,
+
+                    "default": 3
+                },
+                "autoUpdateSongs": {
+                    "description": "Automatically update song search results when song library is modified",
+                    "type": "boolean",
+
+                    "default": true
+                }
+            }
+        },
+
+        "playlist": {
+            "description": "Playlist",
+            "map": "general",
+
+            "entries": {
+                "autoMinimize": {
+                    "description": "Automatically minimize multi-section items",
+                    "type": "boolean",
+
+                    "default": true
+                },
+                "showSectionWhenMinimized": {
+                    "description": "Show first section in minimized items",
+                    "type": "boolean",
+
+                    "default": true
+                },
+                "autoScroll": {
+                    "description": "Automatically scroll selected section into view",
+                    "type": "boolean",
+
+                    "default": true
+                },
+                "scrollSmooth": {
+                    "description": "Animate automatic scrolling",
+                    "type": "boolean",
+
+                    "default": true
+                }
+            }
+        },
+        "defaults": {
+            "description": "Defaults",
+            "map": "defaults",
+
+            "entries": {
+                "background": {
+                    "description": "Background color",
+                    "type": "color",
+
+                    "default": "#ffffff"
+                },
+                "backgroundScale": {
+                    "description": "Background image size",
+                    "type": "select",
+                    "options": ["fill", "fit", "stretch"],
+
+                    "default": "fill"
+                },
+                "font": {
+                    "description": "Font",
+                    "type": "font",
+
+                    "default": "Arial"
+                },
+                "size": {
+                    "description": "Text size",
+                    "type": "number",
+                    "unit": "px",
+
+                    "min": 1,
+                    "max": 999,
+                    "precision": 0,
+
+                    "popupMin": 5,
+                    "popupMax": 200,
+
+                    "default": 100
+                },
+                "color": {
+                    "description": "Text color",
+                    "type": "color",
+
+                    "default": "#000000"
+                },
+                "lineHeight": {
+                    "description": "Line height",
+                    "type": "number",
+
+                    "min": 0.1,
+                    "max": 5,
+                    "step": 0.1,
+                    "precision": 2,
+
+                    "popupMin": 1,
+                    "popupMax": 3,
+
+                    "default": 1.5
+                },
+                "transitionType": {
+                    "description": "Transition type",
+                    "type": "select",
+                    "options": ["fade"],
+
+                    "default": "fade"
+                },
+                "transitionTime": {
+                    "description": "Transition time",
+                    "type": "number",
+                    "unit": "ms",
+
+                    "min": 0,
+                    "max": 36000,
+                    "step": 0.1,
+                    "precision": 2,
+
+                    "popupMax": 100,
+
+                    "default": 0
+                }
+            }
+        },
+        "debug": {
+            "description": "Debug",
+            "map": "debug",
+
+            "entries": {
+                "enable": {
+                    "description": "Enable debug",
+                    "type": "boolean",
+
+                    "default": false
+                }
+            }
+        }
+    },
+    "songs": {
+        "name": "Songs",
+
+        "playOrder": {
+            "description": "Play Order",
+            "map": "songs",
+
+            "entries": {
+                "startBlank": {
+                    "description": "Add blank section at start",
+                    "type": "boolean",
+
+                    "default": true
+                },
+                "showIntro": {
+                    "description": "Add intro section at start",
+                    "type": "boolean",
+
+                    "default": false
+                },
+                "showOutro": {
+                    "description": "Add outro section at end",
+                    "type": "boolean",
+
+                    "default": false
+                },
+                "endBlank": {
+                    "description": "Add blank section at end",
+                    "type": "boolean",
+
+                    "default": true
+                }
+            }
+        },
+
+        "missingInfo": {
+            "description": "Missing Information",
+
+            "map": "songs",
+
+            "entries": {
+                "warnMissingInfo": {
+                    "description": "Show warning when song is added with missing information",
+                    "type": "boolean",
+
+                    "default": true
+                }
+            }
+        }
+    },
+    "control": {
+        "name": "Shortcuts",
+
+        "display": {
+            "description": "Control Keyboard Shortcuts",
+            "map": "control.keyboard",
+
+            "entries": {
+                "repeat": {
+                    "description": "Activate shortcuts repeatedly whilst pressed",
+                    "type": "boolean",
+
+                    "default": false
+                },
+                "selectNext": {
+                    "description": "Select next section",
+                    "type": "key",
+
+                    "default": "ArrowDown"
+                },
+                "selectPrevious": {
+                    "description": "Select previous section",
+                    "type": "key",
+
+                    "default": "ArrowUp"
+                },
+                "selectNextItem": {
+                    "description": "Select next item",
+                    "type": "key",
+
+                    "default": "Control+ArrowDown"
+                },
+                "selectPreviousItem": {
+                    "description": "Select previous item",
+                    "type": "key",
+
+                    "default": "Control+ArrowUp"
+                },
+                "playSelected": {
+                    "description": "Play selected section",
+                    "type": "key",
+
+                    "default": "Enter"
+                },
+                "playNext": {
+                    "description": "Play (and select) next section",
+                    "type": "key",
+
+                    "default": "Space"
+                },
+                "playPrevious": {
+                    "description": "Play (and select) previous section",
+                    "type": "key",
+
+                    "default": "Control+Space"
+                },
+                "moveSelectedDown": {
+                    "description": "Move selected item down in presentation",
+                    "type": "key",
+
+                    "default": "PageDown"
+                },
+                "moveSelectedUp": {
+                    "description": "Move selected item up in presentation",
+                    "type": "key",
+
+                    "default": "PageUp"
+                },
+                "moveSelectedBottom": {
+                    "description": "Move selected item to bottom of presentation",
+                    "type": "key",
+
+                    "default": "Control+PageDown"
+                },
+                "moveSelectedTop": {
+                    "description": "Move selected item to top of presentation",
+                    "type": "key",
+
+                    "default": "Control+PageUp"
+                },
+
+                "toggleBlank": {
+                    "description": "Toggle display blank",
+                    "type": "key",
+
+                    "default": "Period"
+                },
+                "openDisplay": {
+                    "description": "Turn display on",
+                    "type": "key",
+
+                    "default": "Shift+KeyO"
+                },
+                "closeDisplay": {
+                    "description": "Turn display off",
+                    "type": "key",
+
+                    "default": "Escape"
+                },
+                "toggleDisplay": {
+                    "description": "Toggle display on and off",
+                    "type": "key",
+
+                    "default": "Shift+KeyD"
+                },
+                "switchDisplayScreen1": {
+                    "description": "Use screen 1 for display",
+                    "type": "key",
+
+                    "default": "Alt+Shift+Digit1"
+                },
+                "switchDisplayScreen2": {
+                    "description": "Use screen 2 for display (if available)",
+                    "type": "key",
+
+                    "default": "Alt+Shift+Digit2"
+                },
+                "switchDisplayScreen3": {
+                    "description": "Use screen 3 for display (if available)",
+                    "type": "key",
+
+                    "default": "Alt+Shift+Digit3"
+                }
+            }
+        },
+        "control": {
+            "description": "Presentation Keyboard Shortcuts",
+            "map": "control.keyboard",
+
+            "entries": {
+                "newPlaylist": {
+                    "description": "New Presentation",
+                    "type": "key",
+
+                    "default": "Control+KeyN"
+                },
+                "openPlaylist": {
+                    "description": "Open Presentation",
+                    "type": "key",
+
+                    "default": "Control+KeyO"
+                },
+                "savePlaylist": {
+                    "description": "Save Presentation",
+                    "type": "key",
+
+                    "default": "Control+KeyS"
+                },
+                "savePlaylistAs": {
+                    "description": "Save Presentation As",
+                    "type": "key",
+
+                    "default": "Control+Shift+KeyS"
+                }
+            }
+        }
+    },
+    "display": {
+        "name": "Display",
+
+        "screen": {
+            "description": "Screen",
+            "map": "display",
+
+            "entries": {
+                "hideCursor": {
+                    "description": "Hide cursor on display",
+                    "type": "boolean",
+
+                    "default": false
+                },
+                "setSize": {
+                    "description": "Use set size for display (regardless of screen resolution)",
+                    "type": "boolean",
+
+                    "default": false
+                },
+                "displaySize": {
+                    "description": "Display size",
+                    "type": "select",
+
+                    "default": "1280x720",
+
+                    "options": [
+                        "640x480, 4:3 - VGA",
+                        "800x600, 4:3 - SVGA",
+                        "1024x576, 16:9 - PAL",
+                        "1024x768, 4:3 - XGA",
+                        "1280x720, 16:9 - HD",
+                        "1600x900, 16:9 - HD+",
+                        "1920x1080, 16:9 - FHD",
+                        "2560x1080, 21:9 - UWHD",
+                        "2560x1440, 16:9 - WQHD"
+                    ]
+                },
+                "setBackground": {
+                    "description": "Background bar color (shown when using set size for display)",
+                    "type": "color",
+
+                    "default": "black"
+                }
+            }
+        },
+
+        "display": {
+            "description": "Text Scaling",
+            "map": "display",
+
+            "entries": {
+                "autoFitText": {
+                    "description": "Fit text & unify when adding items",
+                    "type": "boolean",
+
+                    "default": true
+                },
+                "autoFitTextOpen": {
+                    "description": "Fit text & unify when opening presentations",
+                    "type": "boolean",
+
+                    "default": true
+                },
+                "increaseSizeOnFit": {
+                    "description": "Increase text size when fitting",
+                    "type": "boolean",
+
+                    "default": true
+                },
+                "minTextSize": {
+                    "description": "Minimum text size",
+                    "type": "number",
+                    "unit": "px",
+
+                    "min": 1,
+                    "max": 999,
+                    "precision": 1,
+
+                    "popupMin": 2,
+                    "popupMax": 50,
+
+                    "default": 10
+                },
+                "reduceTextSize": {
+                    "description": "Always scale text down to fit",
+                    "type": "boolean",
+
+                    "default": true
+                }
+            }
+        }
+    },
+    "print": {
+        "name": "Print",
+
+        "options": {
+            "description": "Options",
+            "map": "print",
+
+            "entries": {
+                "showInfo": {
+                    "description": "Show print tool introduction/information in page setup when opened",
+                    "type": "boolean",
+
+                    "default": true
+                }
+            }
+        }
+    }
+}

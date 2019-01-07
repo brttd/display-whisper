@@ -1,0 +1,5 @@
+{
+    "name": "dw-editor",
+    "main": "editor.js",
+    "version": "1.0.0"
+}

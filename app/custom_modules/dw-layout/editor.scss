@@ -1,0 +1,47 @@
+@import 'fonts';
+@import 'all';
+
+%editor {
+    @extend %all;
+
+    display: inline-block;
+
+    flex: 0 1 auto;
+    flex-flow: row wrap;
+
+    min-height: fit-content;
+
+    .section {
+        display: inline-block;
+
+        .title {
+            display: block;
+
+            font-size: $font-size;
+            font-family: $font-family;
+        }
+    }
+}
+.editor-textEdit {
+    @extend %editor;
+
+    button {
+        margin: 0;
+    }
+}
+
+.editor-imageEdit {
+    @extend %editor;
+}
+
+.editor-boxEdit {
+    @extend %editor;
+}
+
+.editor-backgroundEdit {
+    @extend %editor;
+}
+
+.editor-playEdit {
+    @extend %editor;
+}

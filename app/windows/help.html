@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"><title>Help</title>
+<meta http-equiv="Content-Security-Policy" content="default-src data: file: 'self' 'unsafe-inline'">
+<link href="../fonts/fonts.css" rel="stylesheet">
+<style>
+html, body {
+    margin: 0;
+
+    height: 100%;
+    overflow: hidden;
+}
+body {
+    display: flex;
+    flex-direction: column;
+
+    font-family: "Inter UI", sans-serif;
+    font-size: 15px;
+}
+header {
+    user-select: none;
+}
+header #help-sections {
+    border-bottom: 1px solid rgb(128, 128, 128);
+
+    white-space: nowrap;
+    overflow: auto;
+}
+header #help-quick-nav {
+    padding: 0.5em;
+
+    border-bottom: 1px solid rgb(128, 128, 128);
+}
+header h2 {
+    display: inline-block;
+
+    margin: 0;
+    padding: 0.5em;
+
+    font-size: 1.7em;
+    color: hsl(0, 0%, 40%);
+    text-decoration: underline;
+
+    background: transparent;
+
+    cursor: pointer;
+
+    transition: background 0.1s;
+}
+header h2:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+header h2.selected {
+    color: hsl(0, 0%, 0%);
+
+    background: rgba(0, 0, 0, 0.2);
+}
+header a {
+    margin: 0.5em;
+}
+
+article {
+    padding: 0 1em;
+    overflow: auto;
+}
+p {
+    line-height: 1.5;
+}
+a {
+    color: hsl(240, 60%, 30%);
+}
+
+blockquote {
+    margin: 1em;
+    padding: 0.4em 0.6em;
+
+    background: rgba(128, 128, 128, 0.25);
+
+}
+blockquote p {
+    margin: 0;
+}
+
+li {
+    margin: 0.3em 0;
+}
+
+kbd {
+    display: inline-block;
+
+    margin: 1px;
+    margin-top: 0px;
+    margin-bottom: -1px;
+
+    padding: 2px 5px;
+
+    line-height: 1;
+
+    background: rgba(0, 0, 0, 0.1);
+
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    border-bottom-width: 2px;
+    border-right-width: 2px;
+}
+svg {
+    width: 18px;
+    height: 18px;
+
+    vertical-align: middle;
+
+    fill: black;
+}
+</style>
+</head>
+<body><script src="help.js"></script></body>
+</html>

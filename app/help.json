@@ -1,0 +1,26 @@
+[
+    {
+        "name": "Introduction",
+        "file": "help/introduction.md"
+    },
+    {
+        "name": "Songs",
+        "file": "help/songs.md"
+    },
+    {
+        "name": "Templates",
+        "file": "help/templates.md"
+    },
+    {
+        "name": "Presentation",
+        "file": "help/presentation.md"
+    },
+    {
+        "name": "Text Sizing",
+        "file": "help/text-scaling.md"
+    },
+    {
+        "name": "Preferences",
+        "file": "help/preferences.md"
+    }
+]

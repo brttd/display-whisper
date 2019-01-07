@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'">
+        
+        <link href="../fonts/fonts.css" rel="stylesheet">
+
+        <style>
+            html, body {
+                height: 100%;
+            }
+            body {
+                display: flex;
+                flex-flow: column nowrap;
+
+                margin: 0;
+                
+
+                text-align: center;
+                font-family: 'Inter UI';
+                font-size: 13px;
+
+                overflow: hidden;
+            }
+            #scroll {
+                flex: 1 1 100%;
+
+                padding: 18px;
+
+                overflow: auto;
+                overflow-y: scroll;
+            }
+            #footer {
+                flex: 0 0 auto;
+
+                text-align: right;
+
+                padding: 6px;
+            }
+            p, ul, span, a, button {
+                padding: 0;
+            }
+            h1 {
+                font-size: 19px;
+            }
+            h2 {
+                font-size: 16px;
+            }
+            h3 {
+                font-size: 14px;
+                margin: 0;
+            }
+
+            p {
+                margin: 6px;
+                -webkit-margin-collapse: separate;
+            }
+            ul {
+                margin: 0 auto;
+                width: fit-content;
+                text-align: left;
+                list-style: none;
+            }
+            li {
+                display: block;
+                margin: 6px;
+            }
+            span {
+                padding: 2px;
+
+                color: hsl(0, 0%, 20%);
+                /* background: hsl(0, 0%, 90%); */
+                /* border-radius: 2px; */
+            }
+
+            hr {
+                /* max-width: 600px; */
+                border: none;
+                border-top: 1px solid hsl(0, 0%, 60%);
+            }
+
+            #licenses div {
+                background: hsl(0, 0%, 90%);
+
+                text-align: left;
+                
+                padding: 1em;
+                margin: 1em 0;
+                white-space: pre-wrap;
+            }
+            #licenses h2 {
+                text-align: center;
+                margin: 0;
+            }
+            #licenses span {
+                display: block;
+                text-align: center;
+            }
+            #licenses span a {
+                margin: 0 0.5em;
+            }
+            #licenses pre {
+                margin: 0;
+                margin-top: 1em;
+
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: pre-wrap;
+            }
+
+            button {
+                display: inline-block;
+
+                line-height: 1.4em;
+
+                color: hsl(0, 0%, 30%);
+                background: hsl(0, 0%, 90%);
+                
+                padding: 3px 6px 2px;
+
+                border: 1px solid hsl(0, 0%, 70%);
+
+                outline: none;
+
+                cursor: pointer;
+            }
+            button:hover {
+                background: hsl(200, 30%, 85%);
+                border-color: hsl(200, 30%, 65%);
+            }
+            button:active, button:focus {
+                background: hsl(200, 60%, 80%);
+                border-color: hsl(200, 60%, 60%);
+            }
+
+            #footer button {
+                margin: 6px;
+            }
+        </style>
+    </head>
+<body>
+<div id="scroll">
+<h2>Display Whisper</h2>
+<h3>version <span id="app_version">?</span></h3>
+<p>Created by <a href="https://brettdoyle.uk">Brett Doyle.</a>
+<br>
+<a href="https://github.com/brttd/display-whisper/">View on GitHub.</a>
+</p>
+
+<p>Using <a href="https://rsms.me/inter/">Inter UI</a> font.</p>
+<hr>
+<ul>
+<li>Node: <span id="node_version">?</span></li>
+<li>Electron: <span id="electron_version">?</span></li> 
+<li>Chromium: <span id="chrome_version">?</span></li>
+</ul>
+<hr>
+<div id="licenses"><h1>Licenses</h1><span>(Click to expand)</span></div>
+</div>
+<div id="footer">
+<button id="close">Close</button>
+</div>
+<script src="about.js"></script>
+</body>
+</html>
