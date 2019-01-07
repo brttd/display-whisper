@@ -640,8 +640,6 @@ function openDisplay() {
     )
 
     windows.display.webContents.on('did-finish-load', () => {
-        windows.display.setBounds(display.bounds)
-
         //when reopening the display window,
         //re-display whatever was last displayed
         if (lastDisplayData !== null) {
@@ -649,6 +647,7 @@ function openDisplay() {
         }
 
         if (display.show) {
+            updateDisplayPosition()
             windows.display.show()
         }
     })
@@ -1256,10 +1255,18 @@ function openItemEditor(type, id, data = {}) {
     win.setMenu(null)
 }
 
-function updateDisplayPosition(position) {
-    if (display.show) windows.display.minimize()
-    windows.display.setBounds(display.bounds)
-    windows.display.maximize()
+let updateDisplayPosition
+
+if (process.platform === 'darwin') {
+    updateDisplayPosition = () => {
+        windows.display.minmize()
+        windows.display.setBounds(display.bounds)
+        windows.display.maximize()
+    }
+} else {
+    updateDisplayPosition = () => {
+        windows.display.setBounds(display.bounds)
+    }
 }
 
 function setDisplay(options) {
@@ -1275,8 +1282,7 @@ function setDisplay(options) {
         display.bounds = displays[display.screen].bounds
 
         if (windows.display && display.show) {
-            windows.display.setBounds(display.bounds)
-            windows.display.maximize
+            updateDisplayPosition()
         }
 
         change = true
@@ -1293,7 +1299,7 @@ function setDisplay(options) {
             display.show &&
             (typeof options.show !== 'boolean' || options.show)
         ) {
-            windows.display.setBounds(display.bounds)
+            updateDisplayPosition()
         }
 
         change = true
@@ -1304,7 +1310,7 @@ function setDisplay(options) {
 
         if (windows.display) {
             if (display.show === true) {
-                windows.display.setBounds(display.bounds)
+                updateDisplayPosition()
                 windows.display.show()
 
                 if (lastDisplayData !== null) {
