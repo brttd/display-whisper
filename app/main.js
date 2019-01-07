@@ -556,7 +556,7 @@ function openDisplay() {
         //thickFrame: false,
         skipTaskbar: true,
         hasShadow: false,
-	kiosk: true,
+        kiosk: settings.get('display.kiosk', false),
 
         title: 'Display Whisper | Display',
 
@@ -2084,6 +2084,12 @@ function setupDisplays() {
 
         if (customDisplaySize.use) {
             sendToAllWindows('display-info', getDisplayInfo())
+        }
+    })
+
+    settings.listen('display.kiosk', value => {
+        if (windows.display) {
+            windows.display.setKiosk(value)
         }
     })
 }
