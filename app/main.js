@@ -556,6 +556,7 @@ function openDisplay() {
         //thickFrame: false,
         skipTaskbar: true,
         hasShadow: false,
+	kiosk: true,
 
         title: 'Display Whisper | Display',
 
@@ -1259,7 +1260,7 @@ let updateDisplayPosition
 
 if (process.platform === 'darwin') {
     updateDisplayPosition = () => {
-        windows.display.minmize()
+        windows.display.minimize()
         windows.display.setBounds(display.bounds)
         windows.display.maximize()
     }
