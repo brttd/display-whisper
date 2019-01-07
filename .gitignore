@@ -1,0 +1,8 @@
+node_modules
+
+app.asar
+app.asar.unpacked
+
+out
+build
+package
