@@ -32,6 +32,8 @@
                 white-space: nowrap;
                 text-overflow: ellipsis;
 
+                max-height: 1.4em;
+
                 padding: 2px 4px;
 
                 border-top: 1px solid $bkg-dark;
@@ -93,6 +95,12 @@
             }
 
             .title {
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+
+                max-height: 1.4em;
+
                 border: none;
                 border-bottom: 1px solid $bkg-dark;
 
