@@ -2965,6 +2965,122 @@ exports.change = addStyles
     }
     items.InputItem = InputItem
 
+    //Vertical distance between popup origin, and popup box
+    let popupArrowHeight = 7
+
+    class InputPopup {
+        constructor(data = {}) {
+            this.node = document.createElement('div')
+            this.node.className = 'popup'
+
+            this.arrowNode = document.createElement('div')
+            this.arrowNode.className = 'arrow'
+            this.node.appendChild(this.arrowNode)
+
+            this.box = {
+                maxWidth: 100,
+                minWidth: 0,
+                maxHeight: 100,
+                minHeight: 0,
+
+                padding: 4,
+
+                width: 0,
+                height: 0,
+
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0
+            }
+
+            if (isFinite(data.maxWidth) && data.maxWidth > 0) {
+                this.box.maxWidth = data.maxWidth
+            }
+            if (isFinite(data.minWidth) && data.minWidth > 0) {
+                this.box.minWidth = data.minWidth
+            }
+            if (isFinite(data.maxHeight) && data.maxHeight > 0) {
+                this.box.maxHeight = data.maxHeight
+            }
+            if (isFinite(data.minHeight) && data.minHeight > 0) {
+                this.box.minHeight = data.minHeight
+            }
+
+            if (isFinite(data.padding) && data.padding > 0) {
+                this.box.padding = data.padding
+            }
+        }
+
+        _move(position) {
+            this.box.left =
+                position.x + position.width / 2 - this.box.maxWidth / 2
+
+            this.box.left = Math.min(
+                window.innerWidth - this.box.maxWidth - this.box.padding,
+                this.box.left
+            )
+            this.box.left = Math.max(this.box.padding, this.box.left)
+
+            this.node.style.left = this.box.left + 'px'
+
+            this.box.width = Math.min(
+                this.box.maxWidth,
+                window.innerWidth - this.box.padding * 2
+            )
+
+            this.box.width = Math.max(this.box.minWidth, this.box.width)
+            this.node.style.width = this.box.width + 'px'
+
+            let spaceBelow =
+                window.innerHeight -
+                (position.y + position.height) -
+                popupArrowHeight
+            let spaceAbove = position.y - popupArrowHeight
+
+            if (spaceBelow < this.box.maxHeight && spaceBelow < spaceAbove) {
+                //Show popup above position
+                this.node.style.bottom =
+                    window.innerHeight - position.y + popupArrowHeight + 'px'
+                this.node.style.top = ''
+
+                this.node.classList.add('above')
+
+                this.box.height = Math.min(
+                    this.box.maxHeight,
+                    spaceAbove - this.box.padding
+                )
+            } else {
+                //Show popup below position
+                this.node.style.top =
+                    position.y + position.height + popupArrowHeight + 'px'
+                this.node.style.bottom = ''
+
+                this.node.classList.remove('above')
+
+                this.box.height = Math.min(
+                    this.box.maxHeight,
+                    spaceBelow - this.box.padding
+                )
+            }
+
+            this.box.height = Math.max(this.box.minHeight, this.box.height)
+            this.node.style.height = this.box.height + 'px'
+
+            this.arrowNode.style.left =
+                Math.min(
+                    this.box.width - 22,
+                    position.x - this.box.left + (position.width / 2 - 6)
+                ) + 'px'
+        }
+
+        hide() {
+            if (this.node.parentNode === document.body) {
+                document.body.removeChild(this.node)
+            }
+        }
+    }
+
     //Button (and Drag) don't retain focus. Interacting with them will make other items blur, but they don't stay focused
     class Button extends Item {
         /*
@@ -3774,35 +3890,25 @@ exports.change = addStyles
     exports.TextMultiLineInput = items.TextMultiLineInput = TextMultiLineInput
 
     //Number input popup control
-    let numberPopup = {}
-    {
-        let mainNode = document.createElement('div')
-        mainNode.className = 'number-popup'
+    let numberPopup = new InputPopup({
+        maxWidth: 200,
 
-        let arrowNode = document.createElement('div')
-        arrowNode.className = 'arrow'
-        mainNode.appendChild(arrowNode)
+        minHeight: 18,
+        maxHeight: 18
+    })
+    {
+        numberPopup.node.classList.add('number')
 
         let sliderNode = document.createElement('div')
         sliderNode.className = 'slider'
-
-        mainNode.appendChild(sliderNode)
+        numberPopup.node.appendChild(sliderNode)
 
         let numberRange = {
             min: 0,
             max: 0,
 
-
-            currentValue: 0
+            value: 0
         }
-
-        let boxMaxWidth = 200
-        let boxWidth = 0
-        let boxPadding = 4
-
-        let boxVerticalOffset = 7
-        let boxHeight = 18
-
 
         let sliderWidth = 0
         let sliderLeft = 0
@@ -3812,14 +3918,18 @@ exports.change = addStyles
 
         let mouseDown = false
 
-        numberPopup.node = mainNode
-
         numberPopup.dragCallback = null
 
         function moveSlider(value) {
-            numberRange.currentValue = Math.max(numberRange.min, Math.min(numberRange.max, value))
+            numberRange.currentValue = Math.max(
+                numberRange.min,
+                Math.min(numberRange.max, value)
+            )
 
-            let pos = ((numberRange.currentValue - numberRange.min) / (numberRange.max - numberRange.min)) * sliderWidth
+            let pos =
+                ((numberRange.currentValue - numberRange.min) /
+                    (numberRange.max - numberRange.min)) *
+                sliderWidth
 
             sliderNode.style.left = pos + sliderPadding - 1 + 'px'
         }
@@ -3828,10 +3938,9 @@ exports.change = addStyles
             numberPopup.move(position)
 
             if (number.highlight) {
-                mainNode.classList.add('highlight')
-                
+                numberPopup.node.classList.add('highlight')
             } else {
-                mainNode.classList.remove('highlight')
+                numberPopup.node.classList.remove('highlight')
             }
 
             if (typeof number.min === 'number' && isFinite(number.min)) {
@@ -3851,39 +3960,21 @@ exports.change = addStyles
                 moveSlider(0)
             }
 
-            document.body.appendChild(mainNode)
+            document.body.appendChild(numberPopup.node)
         }
         numberPopup.move = function(position) {
-            let boxLeft = position.x + position.width / 2 - boxMaxWidth / 2
-            
-            boxLeft = Math.min(window.innerWidth - boxMaxWidth - boxPadding, boxLeft)
-            boxLeft = Math.max(boxPadding, boxLeft)
+            numberPopup._move(position)
 
-            mainNode.style.left = boxLeft + 'px'
-            
-            boxWidth = Math.min(boxMaxWidth, (window.innerWidth - boxPadding * 2))
-            mainNode.style.maxWidth = boxWidth + 'px'
-            
-            if (window.innerHeight - position.y - position.height > boxHeight + boxVerticalOffset + boxPadding) {
-                mainNode.style.top = position.y + position.height + boxVerticalOffset + 'px'
-                mainNode.style.bottom = ''
-                mainNode.classList.remove('above')
-            } else {
-                mainNode.style.bottom = window.innerHeight - position.y + boxVerticalOffset + 'px'
-                mainNode.style.top = ''
-                mainNode.classList.add('above')
-            }
-
-            arrowNode.style.left = Math.min(boxWidth - 22, (position.x - boxLeft) + (position.width / 2 - 6)) + 'px'
-
-            sliderWidth = boxWidth - sliderPadding * 2 - sliderButtonSize
-            sliderLeft = boxLeft + sliderPadding + sliderButtonSize / 2
+            sliderWidth =
+                numberPopup.box.width - sliderPadding * 2 - sliderButtonSize
+            sliderLeft =
+                numberPopup.box.left + sliderPadding + sliderButtonSize / 2
 
             moveSlider(numberRange.currentValue)
         }
         numberPopup.hide = function() {
-            if (mainNode.parentNode === document.body) {
-                document.body.removeChild(mainNode)
+            if (numberPopup.node.parentNode === document.body) {
+                document.body.removeChild(numberPopup.node)
 
                 mouseDown = false
                 sliderNode.classList.remove('active')
@@ -3894,7 +3985,7 @@ exports.change = addStyles
             set: moveSlider
         })
 
-        mainNode.addEventListener('mousedown', event => {
+        numberPopup.node.addEventListener('mousedown', event => {
             mouseDown = true
             sliderNode.classList.add('active')
         })
@@ -3911,16 +4002,16 @@ exports.change = addStyles
             if (mouseDown) {
                 let newPos = Math.max(
                     0,
-                    Math.min(
-                        sliderWidth,
-                        event.pageX - sliderLeft
-                    )
+                    Math.min(sliderWidth, event.pageX - sliderLeft)
                 )
 
-                sliderNode.style.left = newPos + sliderPadding - 1 +  'px'
+                sliderNode.style.left = newPos + sliderPadding - 1 + 'px'
 
                 if (typeof numberPopup.dragCallback === 'function') {
-                    let actualNumber = (newPos / sliderWidth) * (numberRange.max - numberRange.min) + numberRange.min
+                    let actualNumber =
+                        (newPos / sliderWidth) *
+                            (numberRange.max - numberRange.min) +
+                        numberRange.min
 
                     numberRange.currentValue = actualNumber
 
@@ -5757,14 +5848,24 @@ exports.change = addStyles
     exports.FileInput = items.FileInput = FileInput
 
     //Image input dropdown box
-    let imageDropDown = {}
+    let imagePopup = new InputPopup({
+        maxWidth: 600,
+        minWidth: 100,
+        maxHeight: 500,
+        minHeight: 71
+    })
     {
-        let mainNode = document.createElement('div')
-        mainNode.className = 'image-dropdown'
+        imagePopup.node.classList.add('image')
+
+        let imageMaxWidth = 100
+        let boxExtraWidth = 13
+        let boxExtraHeight = 79
+
+        let maxRows = 6
+        let maxColumns = 4
 
         let fileNode = document.createElement('button')
-
-        mainNode.appendChild(fileNode)
+        imagePopup.node.appendChild(fileNode)
 
         let libraryNode = document.createElement('div')
         libraryNode.className = 'library'
@@ -5796,7 +5897,7 @@ exports.change = addStyles
         let scrollNode = document.createElement('div')
         scrollNode.className = 'list-scroll'
 
-        mainNode.appendChild(scrollNode)
+        imagePopup.node.appendChild(scrollNode)
 
         let listNode = document.createElement('div')
         listNode.className = 'list'
@@ -5805,17 +5906,10 @@ exports.change = addStyles
 
         let fileDialogOpen = false
 
-        let maxHeight = 500
-        let maxWidth = 600
-        let minHeight = 300
-        let minWidth = 300
+        imagePopup.hoverCallback = null
+        imagePopup.clickCallback = null
 
-        imageDropDown.node = mainNode
-
-        imageDropDown.hoverCallback = null
-        imageDropDown.clickCallback = null
-
-        Object.defineProperty(imageDropDown, 'fileDialogOpen', {
+        Object.defineProperty(imagePopup, 'fileDialogOpen', {
             get: () => {
                 return fileDialogOpen
             }
@@ -5843,7 +5937,6 @@ exports.change = addStyles
         }
 
         function scrollList() {
-            //This doesn't work
             let elem = listNode.querySelector('.active')
             if (elem) {
                 let elemScroll = elem.offsetTop - listNode.offsetTop
@@ -5860,8 +5953,8 @@ exports.change = addStyles
             }
         }
 
-        imageDropDown.show = function(position, image) {
-            imageDropDown.move(position)
+        imagePopup.show = function(position, image) {
+            imagePopup.move(position)
 
             fileNode.textContent = 'Select File'
             fileNode.classList.remove('active')
@@ -5890,62 +5983,34 @@ exports.change = addStyles
             if (currentActive) {
                 scrollNode.scrollTop = 0
 
-                if (mainNode.parentNode !== document.body) {
+                if (imagePopup.node.parentNode !== document.body) {
                     body.onFrame.end(scrollList)
                 }
             }
 
-            document.body.appendChild(mainNode)
+            document.body.appendChild(imagePopup.node)
         }
-        imageDropDown.move = function(position) {
-            mainNode.style.minWidth = position.width + 'px'
-            //Vertical position
-            //If the space above is greater than the space beloew, and the space below is less than the minimum height
-            if (
-                window.innerHeight - position.bottom < minHeight &&
-                position.top > window.innerHeight - position.bottom
-            ) {
-                mainNode.style.bottom =
-                    window.innerHeight - position.top - 1 + 'px'
-                mainNode.style.top = ''
+        imagePopup.move = function(position) {
+            imagePopup.box.minWidth = position.width
 
-                mainNode.style.maxHeight =
-                    Math.min(maxHeight, position.top - 5) + 'px'
+            if (Images.files.length === 0) {
+                imagePopup.box.maxWidth = 255
+                imagePopup.box.maxHeight = imagePopup.box.minHeight
             } else {
-                mainNode.style.top = position.bottom - 1 + 'px'
-                mainNode.style.bottom = ''
+                imagePopup.box.maxWidth =
+                    boxExtraWidth +
+                    imageMaxWidth * Math.min(maxRows, Images.files.length)
 
-                mainNode.style.maxHeight =
-                    Math.min(
-                        maxHeight,
-                        window.innerHeight - position.bottom - 5
-                    ) + 'px'
+                imagePopup.box.maxHeight =
+                    boxExtraHeight +
+                    imageMaxWidth *
+                        Math.min(
+                            maxColumns,
+                            Math.max(1, Images.files.length / maxRows)
+                        )
             }
 
-            //Horizontal position
-            //If the space to the left is greater than the space to the right, and the spac to the left is less than the minimum width
-            if (
-                window.innerWidth - position.left < minWidth &&
-                position.right > window.innerWidth - position.left
-            ) {
-                mainNode.style.right = window.innerWidth - position.right + 'px'
-                mainNode.style.left = ''
-
-                mainNode.style.maxWidth =
-                    Math.min(maxWidth, position.right - 4) + 'px'
-            } else {
-                mainNode.style.left = position.left + 'px'
-                mainNode.style.right = ''
-
-                mainNode.style.maxWidth =
-                    Math.min(maxWidth, window.innerWidth - position.left - 4) +
-                    'px'
-            }
-        }
-        imageDropDown.hide = function() {
-            if ((mainNode.parentNode = document.body)) {
-                document.body.removeChild(mainNode)
-            }
+            imagePopup._move(position)
         }
 
         fileNode.addEventListener('click', () => {
@@ -5990,13 +6055,13 @@ exports.change = addStyles
                         return false
                     }
 
-                    if (typeof imageDropDown.clickCallback === 'function') {
-                        imageDropDown.clickCallback({
+                    if (typeof imagePopup.clickCallback === 'function') {
+                        imagePopup.clickCallback({
                             value: imagePath,
                             database: false,
 
                             fromUser: true,
-                            from: imageDropDown
+                            from: imagePopup
                         })
                     }
                 }
@@ -6008,7 +6073,7 @@ exports.change = addStyles
                 return false
             }
 
-            if (typeof imageDropDown.clickCallback !== 'function') {
+            if (typeof imagePopup.clickCallback !== 'function') {
                 return false
             }
 
@@ -6018,12 +6083,12 @@ exports.change = addStyles
                 img = event.target.parentNode.getAttribute('file')
             }
 
-            imageDropDown.clickCallback({
+            imagePopup.clickCallback({
                 value: img,
                 database: true,
 
                 fromUser: true,
-                from: imageDropDown
+                from: imagePopup
             })
         })
 
@@ -6033,21 +6098,21 @@ exports.change = addStyles
 
         Images.onEvent('update', () => {
             if (Images.files.length === 0) {
-                if (libraryNode.parentNode === mainNode) {
-                    mainNode.removeChild(libraryNode)
+                if (libraryNode.parentNode === imagePopup.node) {
+                    imagePopup.node.removeChild(libraryNode)
                 }
-                if (scrollNode.parentNode === mainNode) {
-                    mainNode.removeChild(scrollNode)
+                if (scrollNode.parentNode === imagePopup.node) {
+                    imagePopup.node.removeChild(scrollNode)
                 }
 
-                mainNode.appendChild(emptyLibraryNode)
+                imagePopup.node.appendChild(emptyLibraryNode)
             } else {
-                if (emptyLibraryNode.parentNode === mainNode) {
-                    mainNode.removeChild(emptyLibraryNode)
+                if (emptyLibraryNode.parentNode === imagePopup.node) {
+                    imagePopup.node.removeChild(emptyLibraryNode)
                 }
 
-                mainNode.appendChild(libraryNode)
-                mainNode.appendChild(scrollNode)
+                imagePopup.node.appendChild(libraryNode)
+                imagePopup.node.appendChild(scrollNode)
 
                 updateList()
             }
@@ -6143,9 +6208,9 @@ exports.change = addStyles
                 if (
                     !(
                         this.node === event.target ||
-                        imageDropDown.node === event.target ||
+                        imagePopup.node === event.target ||
                         this.node.contains(event.target) ||
-                        imageDropDown.node.contains(event.target)
+                        imagePopup.node.contains(event.target)
                     )
                 ) {
                     this.blur()
@@ -6155,7 +6220,7 @@ exports.change = addStyles
             body.onEvent('blur', () => {
                 //If the user clicks the "Select File" button on the image drop down, the open file dialog will be shown
                 //Because this is a seperate window, it is focused, and the window that the image input item is in gets blurred.
-                if (imageDropDown.fileDialogOpen) {
+                if (imagePopup.fileDialogOpen) {
                     return false
                 }
 
@@ -6265,20 +6330,11 @@ exports.change = addStyles
         }
 
         showDropDown() {
-            let bounds = this.buttonNode.getBoundingClientRect()
-
-            imageDropDown.show(
+            let bounds = imagePopup.show(
+                this.buttonNode.getBoundingClientRect(),
                 {
-                    top: bounds.y,
-                    bottom: bounds.y + bounds.height,
-                    left: bounds.x,
-                    right: bounds.x + bounds.width,
+                    highlight: this.node.classList.contains('highlight'),
 
-                    width: bounds.width,
-
-                    highlight: this.node.classList.contains('highlight')
-                },
-                {
                     value: this._value,
                     database: this._database
                 }
@@ -6289,23 +6345,14 @@ exports.change = addStyles
                 return false
             }
 
-            let bounds = this.buttonNode.getBoundingClientRect()
-
-            imageDropDown.move({
-                top: bounds.y,
-                bottom: bounds.y + bounds.height,
-                left: bounds.x,
-                right: bounds.x + bounds.width,
-
-                width: bounds.width
-            })
+            imagePopup.move(this.buttonNode.getBoundingClientRect())
         }
 
         openDropDown() {
             body.onFrame.start(this.showDropDown)
 
-            imageDropDown.hoverCallback = this.onDropDownHover
-            imageDropDown.clickCallback = this.onDropDownClick
+            imagePopup.hoverCallback = this.onDropDownHover
+            imagePopup.clickCallback = this.onDropDownClick
 
             this.buttonNode.classList.add('active')
             this.buttonNode.style.zIndex = '11'
@@ -6347,7 +6394,7 @@ exports.change = addStyles
 
             this._oldValue = this._value
 
-            imageDropDown.hide()
+            imagePopup.hide()
         }
     }
     exports.ImageInput = items.ImageInput = ImageInput
