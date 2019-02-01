@@ -1299,6 +1299,7 @@ $img-max-width: 10em;
 
         input {
             @include borders;
+            @include fonts;
 
             flex-basis: 100%;
 
