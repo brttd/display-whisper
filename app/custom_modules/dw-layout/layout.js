@@ -4106,7 +4106,7 @@ exports.change = addStyles
                 setPopupMin: false,
 
                 popupMax: 10,
-                setPopupMax: false,
+                setPopupMax: false
             }
 
             this.max = data.max
@@ -4167,7 +4167,10 @@ exports.change = addStyles
                 this._codeFocused = false
             })
             this.inputNode.addEventListener('input', () => {
-                this._value = round(parseFloat(this.inputNode.value), this._options.precision)
+                this._value = round(
+                    parseFloat(this.inputNode.value),
+                    this._options.precision
+                )
 
                 if (this._value !== parseFloat(this.inputNode.value)) {
                     this.inputNode.value = this._value
@@ -4254,7 +4257,12 @@ exports.change = addStyles
                 this.blur()
             })
             body.onEvent('mousedown', event => {
-                if (this.node !== event.target && this.node.contains(event.target) === false && numberPopup.node !== event.target && numberPopup.node.contains(event.target) === false) {
+                if (
+                    this.node !== event.target &&
+                    this.node.contains(event.target) === false &&
+                    numberPopup.node !== event.target &&
+                    numberPopup.node.contains(event.target) === false
+                ) {
                     this.blur()
                 }
             })
@@ -4322,14 +4330,20 @@ exports.change = addStyles
             return this._options.precision
         }
         set precision(precision) {
-            if (typeof precision === 'number' && isFinite(precision) && precision >= 0) {
+            if (
+                typeof precision === 'number' &&
+                isFinite(precision) &&
+                precision >= 0
+            ) {
                 this._options.precision = Math.round(precision)
 
                 this.min = this._options.min
                 this.max = this._options.max
                 this.step = this._options.step
 
-                if (this._value !== round(this._value, this._options.precision)) {
+                if (
+                    this._value !== round(this._value, this._options.precision)
+                ) {
                     this.value = this._value
                 }
             }
@@ -4339,7 +4353,11 @@ exports.change = addStyles
             return this._options.max
         }
         set max(max) {
-            if (typeof max === 'number' && isFinite(max) && max >= this._options.min) {
+            if (
+                typeof max === 'number' &&
+                isFinite(max) &&
+                max >= this._options.min
+            ) {
                 max = round(max, this._options.precision)
 
                 this._options.max = this.inputNode.max = max
@@ -4354,7 +4372,11 @@ exports.change = addStyles
             return this._options.min
         }
         set min(min) {
-            if (typeof min === 'number' && isFinite(min) && min <= this._options.max) {
+            if (
+                typeof min === 'number' &&
+                isFinite(min) &&
+                min <= this._options.max
+            ) {
                 min = round(min, this._options.precision)
 
                 this._options.min = this.inputNode.min = min
@@ -4381,32 +4403,47 @@ exports.change = addStyles
         }
         set value(value) {
             if (typeof value === 'number' && isFinite(value)) {
-                this._value = round(Math.max(this._options.min, Math.min(this._options.max, value)), this._options.precision)
+                this._value = round(
+                    Math.max(
+                        this._options.min,
+                        Math.min(this._options.max, value)
+                    ),
+                    this._options.precision
+                )
 
                 this.inputNode.value = this._value
 
-                sendEventTo({
-                    value: this._value,
-                    oldValue: this._oldValue,
+                sendEventTo(
+                    {
+                        value: this._value,
+                        oldValue: this._oldValue,
 
-                    fromUser: false,
-                    from: this
-                }, this.events.change)
+                        fromUser: false,
+                        from: this
+                    },
+                    this.events.change
+                )
 
                 this._oldValue = this._value
             }
         }
 
         onPopupDrag(event) {
-            this._value = this.inputNode.value = round(event.value, this._options.precision)
+            this._value = this.inputNode.value = round(
+                event.value,
+                this._options.precision
+            )
 
-            sendEventTo({
-                value: this._value,
-                oldValue: this._oldValue,
+            sendEventTo(
+                {
+                    value: this._value,
+                    oldValue: this._oldValue,
 
-                fromUser: event.fromUser,
-                from: this
-            }, this.events.change)
+                    fromUser: event.fromUser,
+                    from: this
+                },
+                this.events.change
+            )
 
             this._oldValue = this._value
         }
@@ -4498,6 +4535,12 @@ exports.change = addStyles
 
             return { value: value }
         }
+    }
+
+    //Color input popup control
+    let colorPopup = new InputPopup({})
+    {
+        let mainNode = document.createElement('div')
     }
 
     class ColorInput extends focusItem {
@@ -9698,7 +9741,7 @@ exports.change = addStyles
                         min: 0,
                         max: 100,
 
-                        precision: 2,
+                        precision: 2
                     },
                     {
                         width: '8ch',
@@ -10204,11 +10247,11 @@ exports.change = addStyles
 
                     tooltip: 'time',
                     unit: 's',
-                    
+
                     min: 0,
                     max: 60 * 60 * 24,
                     step: 1,
-                    
+
                     precision: 1,
 
                     popupMin: 0,
@@ -10283,7 +10326,7 @@ exports.change = addStyles
 
                         tooltip: 'time',
                         step: 0.1,
-                        
+
                         min: 0,
                         max: 60 * 60,
                         unit: 's',
@@ -15601,21 +15644,17 @@ class BoxEdit {
 
         //On mac, the windows menu should show whenever the window is focused
         if (process.platform === 'darwin') {
-
-            exports.menu.set = () => {
+            exports.menu.set = () => {}
+            exports.menu.add = () => {
+                return { submenu: { items: [] } }
             }
-            exports.menu.add = () => {return {submenu: {items: []}}}
             exports.menu.change = () => {}
             exports.menu.disable = () => {}
 
             ipcRenderer.on('menu', (event, context, value) => {
                 if (Array.isArray(listeners[context])) {
-                    for (
-                        let i = 0;
-                        i < listeners[context].length;
-                        i++
-                    ) {
-                        listeners[context][i]({value: value})
+                    for (let i = 0; i < listeners[context].length; i++) {
+                        listeners[context][i]({ value: value })
                     }
                 }
 
@@ -15626,7 +15665,6 @@ class BoxEdit {
                     })
                 }
             })
-
         }
 
         exports.menu.disable = function(name) {}
@@ -16002,7 +16040,7 @@ class BoxEdit {
             message: text
         })
     })
-    
+
     ipcRenderer.on('update-available', (event, version) => {
         exports.dialog.showNotification(
             {
