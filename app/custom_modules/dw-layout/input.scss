@@ -203,6 +203,50 @@ input::-webkit-inner-spin-button {
     cursor: pointer;
 }
 
+.popup {
+    @include borders;
+
+    box-sizing: border-box;
+    position: absolute;
+
+    z-index: 10;
+
+    background: $bkg-main;
+    border-color: $bkg-main-dark;
+
+    .arrow {
+        @include borders(0);
+
+        position: absolute;
+
+        left: calc(50% - 7px);
+        top: -7px;
+
+        width: 10px;
+        height: 10px;
+
+        transform: rotate(45deg);
+
+        background: $bkg-main;
+        border-color: $bkg-main-dark;
+
+        border-bottom: none;
+        border-right: none;
+
+        //This stops the arrow spilling over into the popup too much
+        border-bottom-right-radius: 100%;
+    }
+
+    &.above {
+        .arrow {
+            top: auto;
+            bottom: -7px;
+
+            transform: rotate(225deg);
+        }
+    }
+}
+
 .input-button {
     @extend .all;
 
@@ -462,47 +506,15 @@ input::-webkit-inner-spin-button {
 }
 $slider-button-size: 12px;
 $slider-padding: 2px;
-.number-popup {
-    @include borders($slider-button-size + $slider-padding + 2px);
-
-    box-sizing: border-box;
-    position: absolute;
-
-    z-index: 10;
-
-    width: 200px;
-    height: $slider-button-size + $slider-padding * 2 + 2px;
+.popup.number {
+    border-radius: $slider-button-size;
 
     background: $bkg;
     border-color: $bkg-dark;
 
     .arrow {
-        @include borders(0);
-
-        position: absolute;
-
-        left: calc(50% - 7px);
-        top: -7px;
-
-        width: 10px;
-        height: 10px;
-
-        transform: rotate(45deg);
-
         background: $bkg;
         border-color: $bkg-dark;
-
-        border-bottom: none;
-        border-right: none;
-    }
-
-    &.above {
-        .arrow {
-            top: auto;
-            bottom: -7px;
-
-            transform: rotate(225deg);
-        }
     }
 
     &:after {
@@ -567,6 +579,7 @@ $slider-padding: 2px;
         }
     }
 }
+
 .input-color {
     @extend .all;
 
@@ -947,23 +960,13 @@ $slider-padding: 2px;
 }
 $img-min-width: 4em;
 $img-max-width: 10em;
-.image-dropdown {
-    @include borders;
+.popup.image {
     @include fonts;
-
-    box-sizing: border-box;
-
-    position: absolute;
 
     display: flex;
     flex-direction: column;
 
-    z-index: 10;
-
     padding: 2px;
-
-    background: $bkg-main;
-    border-color: $bkg-main-dark;
 
     color: $text;
 
@@ -986,7 +989,8 @@ $img-max-width: 10em;
         flex-flow: row nowrap;
 
         margin: 2px;
-        padding: $input-padding;
+        padding: first($input-padding) * 2 last($input-padding);
+        padding-bottom: 0;
 
         border-top: 1px solid $bkg-main-dark;
 
