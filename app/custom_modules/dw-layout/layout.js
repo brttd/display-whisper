@@ -12759,18 +12759,6 @@ class BoxEdit {
                     }
                 })
 
-                this.dragButton.onEvent('click', () => {
-                    sendEventTo(
-                        {
-                            index: 0,
-
-                            fromUser: true,
-                            from: this
-                        },
-                        this.events['select-click']
-                    )
-                })
-
                 this.titleNode.addEventListener('click', () => {
                     sendEventTo(
                         {
