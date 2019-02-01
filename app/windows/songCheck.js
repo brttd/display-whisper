@@ -94,7 +94,7 @@ const infoText = new layout.Text({}, { align: 'center' })
 const songList = new layout.TableList(
     {
         columns: 4,
-        columnWidths: ['13ch', '100%', '3ch', '4ch']
+        columnWidths: ['13ch', '100%', '3ch', '5ch']
     },
     {
         margin: '4px',

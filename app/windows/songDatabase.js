@@ -28,7 +28,7 @@ const filterContent = new layout.CheckboxInput({
 })
 const resultsBox = new layout.TableList({
     columns: 4,
-    columnWidths: ['50%', '50%', '3ch', '4ch']
+    columnWidths: ['50%', '50%', '3ch', '5ch']
 })
 
 //Buttons for other windows

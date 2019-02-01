@@ -75,7 +75,7 @@ const resultsBox = new layout.TableList({
     drag: true,
 
     columns: 4,
-    columnWidths: ['50%', '50%', '3ch', '4ch']
+    columnWidths: ['50%', '50%', '3ch', '5ch']
 })
 
 //(print) Item list + add text button

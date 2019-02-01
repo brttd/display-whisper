@@ -3236,7 +3236,7 @@ const item_add = {
                 drag: true,
 
                 columns: 4,
-                columnWidths: ['65%', '35%', '3ch', '4ch']
+                columnWidths: ['65%', '35%', '3ch', '5ch']
             },
             {
                 size: '100%',
