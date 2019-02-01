@@ -31,6 +31,10 @@ const resultsBox = new layout.TableList({
     columnWidths: ['50%', '50%', '3ch', '5ch']
 })
 
+const removeAllButton = new layout.Button({
+    text: 'Remove All'
+})
+
 //Buttons for other windows
 const openCheckButton = new layout.Button({
     text: 'Check',
@@ -270,6 +274,8 @@ const removeButton = new layout.Button({
                                             items: [
                                                 openCheckButton,
                                                 new layout.Filler(),
+                                                removeAllButton,
+                                                new layout.Filler(),
                                                 openAddButton,
                                                 openImportButton,
                                                 openExportButton
@@ -294,7 +300,7 @@ const removeButton = new layout.Button({
                     ],
 
                     small: true,
-                    minWidth: 250,
+                    minWidth: 325,
                     maxWidth: 500,
                     minHeight: 250,
                     size: 30
@@ -683,6 +689,12 @@ function showSearchResults() {
 
         resultsBox.select(index)
     }
+
+    if (Songs.files.length === 0) {
+        removeAllButton.disabled = true
+    } else {
+        removeAllButton.disabled = false
+    }
 }
 
 function updateSearch() {
@@ -1027,6 +1039,28 @@ function selectSection(name) {
             (error, answer) => {
                 if (answer === 'Remove') {
                     remove()
+                }
+            }
+        )
+    })
+
+    removeAllButton.onEvent('click', () => {
+        layout.dialog.showQuestion(
+            {
+                title: 'Remove all songs?',
+
+                message: 'Are you sure you want to remove all songs?',
+                detail: 'This action cannot be undone!',
+
+                options: ['Remove', 'Cancel']
+            },
+            (error, answer) => {
+                if (answer === 'Remove') {
+                    layout.showLoader(layout.body, 'Removing songs')
+
+                    Songs.removeAll(() => {
+                        layout.hideLoader(layout.body)
+                    })
                 }
             }
         )
