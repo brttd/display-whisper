@@ -247,21 +247,38 @@ removeButton.onEvent('click', () => {
     if (!image) {
         return false
     }
+    layout.dialog.showQuestion(
+        {
+            title: 'Remove image?',
 
-    Images.remove(image, error => {
-        if (error) {
-            if (error) {
-                layout.dialog.showError({
-                    message: 'Unable to delete image',
-                    detail: error.message || error.toString()
+            message:
+                'Are you sure you want to remove the image "' + image + '"?',
+            detail: 'This action cannot be undone!',
+
+            options: ['Remove', 'Cancel']
+        },
+        (error, answer) => {
+            if (answer === 'Remove') {
+                Images.remove(image, error => {
+                    if (error) {
+                        if (error) {
+                            layout.dialog.showError({
+                                message: 'Unable to delete image',
+                                detail: error.message || error.toString()
+                            })
+
+                            logger.error(
+                                "Couldn't remove image from database",
+                                error
+                            )
+                        }
+                    }
+
+                    updateImageList()
                 })
-
-                logger.error("Couldn't remove image from database", error)
             }
         }
-
-        updateImageList()
-    })
+    )
 })
 
 removeAllButton.onEvent('click', event => {
