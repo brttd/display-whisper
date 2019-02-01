@@ -2051,6 +2051,99 @@ class GroupDatabase extends EmptyGroupDatabase {
 
         return false
     }
+
+    removeAll(callback) {
+        if (this._files.length === 0) {
+            if (typeof callback === 'function') {
+                callback(null, false)
+            }
+
+            return false
+        }
+
+        if (typeof callback === 'function') {
+            let removed = []
+
+            let onFileRemove = error => {
+                if (error) {
+                    if (error.code === 'ENOENT') {
+                        this._ensureDirExists()
+                    } else {
+                        logger.error(
+                            "Database couldn't delete file",
+                            filename,
+                            ':',
+                            error
+                        )
+                    }
+
+                    return removeNext()
+                }
+
+                if (this._files.length === 0) {
+                    this._list = []
+
+                    this._groups = []
+                    this._IDs = {}
+                    this._availableIDs = {}
+                    this._highestID = {}
+
+                    this._sendUpdate(removed)
+                    this._callListeners('update', removed.map(this._toGroup))
+
+                    callback(null, true)
+
+                    return false
+                } else {
+                    let removing = this._files.pop()
+                    removed.push(removing)
+
+                    fs.unlink(path.join(this._dirname, removing), onFileRemove)
+                }
+            }
+
+            for (
+                let i = 0;
+                i < maxSimultaneousFileLoads && i < this._files.length;
+                i++
+            ) {
+                let removing = this._files.pop()
+                removed.push(removing)
+
+                fs.unlink(path.join(this._dirname, removing), onFileRemove)
+            }
+        } else {
+            for (let i = 0; i < this._files.length; i++) {
+                try {
+                    fs.unlinkSync(path.join(this._dirname, this._files[i]))
+                } catch (error) {
+                    if (error.code !== 'ENOENT') {
+                        logger.error(
+                            "Database couldn't delete file",
+                            name,
+                            ':',
+                            error
+                        )
+                    }
+                }
+            }
+
+            this._sendUpdate(this._files)
+            this._callListeners('update', this._files.map(this._toGroup))
+
+            this._list = []
+            this._files
+
+            this._groups = []
+            this._IDs = {}
+            this._availableIDs = {}
+            this._highestID = {}
+
+            return true
+        }
+
+        return false
+    }
 }
 
 module.exports = AgnosticDatabase
