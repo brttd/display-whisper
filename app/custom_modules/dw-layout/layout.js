@@ -1265,7 +1265,7 @@ const body = new Item(document.body)
 
 exports.change = addStyles
 
-//Main elements
+//Main items
 {
     loadCSS('main.css')
 
@@ -1598,7 +1598,7 @@ exports.change = addStyles
     exports.Block = items.Block = Block
 }
 
-//Layout elements
+//Layout items
 {
     loadCSS('layout.css')
 
@@ -2802,7 +2802,7 @@ exports.change = addStyles
     exports.ReorderableBlock = items.ReorderableBlock = ReorderableBlock
 }
 
-//input items:
+//Input items
 {
     loadCSS('input.css')
 
@@ -2965,7 +2965,7 @@ exports.change = addStyles
     }
     items.InputItem = InputItem
 
-    //Button (and Drag) don't retain focus. Interacting with them will make other elements blur, but they don't stay focused
+    //Button (and Drag) don't retain focus. Interacting with them will make other items blur, but they don't stay focused
     class Button extends Item {
         /*
         Standard button input.
@@ -8718,7 +8718,7 @@ exports.change = addStyles
     exports.TableList = items.TableList = TableList
 }
 
-//editor controls
+//Editor items
 {
     loadCSS('editor.css')
 
@@ -12626,7 +12626,7 @@ class BoxEdit {
     exports.Display.getMaxTextSize = getMaxTextSize
 }
 
-//Special interface items + methods
+//Special items + methods
 {
     loadCSS('special.css')
 
@@ -13648,7 +13648,7 @@ class BoxEdit {
     exports.Timer = items.Timer = Timer
 }
 
-//Print
+//Print item
 {
     loadCSS('print.css')
 
