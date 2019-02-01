@@ -831,8 +831,6 @@ function loadSong(group, groupID) {
                 playOrderEditor.add(editor.data.playOrder[i])
             }
 
-            layout.window.setTitle('Song Database | ' + editor.data.name)
-
             if (editor.data.playOrder.length > 0) {
                 playOrderEditor.select(0, false, true)
             } else {
