@@ -8546,6 +8546,13 @@ exports.change = addStyles
             return this._index
         }
 
+        get selected() {
+            if (this._index >= 0 && this._index < this.items.length) {
+                return this.items[this._index]
+            }
+            return null
+        }
+
         clear() {
             this.listNode.innerHTML = ''
 
