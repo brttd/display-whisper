@@ -8335,8 +8335,6 @@ exports.change = addStyles
             this.items = []
             this._index = -1
 
-            this.direction = data.direction
-
             bindFunctions(this, this.writeListContent, this.scrollToElem)
 
             if (
