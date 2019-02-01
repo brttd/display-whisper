@@ -263,7 +263,7 @@ removeButton.onEvent('click', () => {
                     if (error) {
                         if (error) {
                             layout.dialog.showError({
-                                message: 'Unable to delete image',
+                                message: 'Unable to remove image',
                                 detail: error.message || error.toString()
                             })
 
@@ -301,7 +301,7 @@ removeAllButton.onEvent('click', event => {
                     if (error) {
                         if (error) {
                             layout.dialog.showError({
-                                message: 'Unable to delete image',
+                                message: 'Unable to remove image',
                                 detail: error.message || error.toString()
                             })
 

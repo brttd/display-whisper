@@ -113,8 +113,8 @@ textStyleEditor.connect(textEditor)
 const saveButton = new layout.Button({
     text: 'Save'
 })
-const deleteButton = new layout.Button({
-    icon: 'delete'
+const removeButton = new layout.Button({
+    text: 'Remove'
 })
 
 //blocks, etc
@@ -339,7 +339,7 @@ const deleteButton = new layout.Button({
                                 minHeight: 250,
                                 size: 80
                             }),
-                            /* delete */
+                            /* remove */
                             new layout.LayoutBlock({
                                 items: [
                                     new layout.Block(
@@ -347,7 +347,7 @@ const deleteButton = new layout.Button({
                                             items: [
                                                 new layout.Filler(),
                                                 saveButton,
-                                                deleteButton
+                                                removeButton
                                             ],
                                             childSpacing: '8px'
                                         },
@@ -595,7 +595,7 @@ function setDisabled(disabled) {
 
     playTimeEditor.disabled = textEditor.disabled = disabled
 
-    deleteButton.disabled = disabled
+    removeButton.disabled = disabled
 }
 
 function save(callback) {
@@ -643,11 +643,11 @@ function remove() {
                 layout.dialog.showNotification({
                     type: 'error',
                     message:
-                        'Unable to delete song!\n' + error.message ||
+                        'Unable to remove song!\n' + error.message ||
                         error.toString()
                 })
 
-                logger.error("Couldn't delete song: " + error)
+                logger.error("Couldn't remove song: " + error)
 
                 return false
             }
@@ -944,7 +944,7 @@ function selectSection(name) {
     }
 }
 
-//song search/load/delete
+//song search/load/remove
 {
     searchBox.onEvent('change', updateSearch)
 
@@ -977,7 +977,11 @@ function selectSection(name) {
                     {
                         title: 'Save Changes?',
                         message:
-                            'There are unsaved changes to the current song!',
+                            'There are unsaved changes to the song "' +
+                            editor.data.name +
+                            '"!',
+                        detail:
+                            'These changes will be lost unless you save them.',
 
                         options: ['Save', 'Discard', 'Cancel']
                     },
@@ -1002,25 +1006,28 @@ function selectSection(name) {
     })
 }
 
-//Save & Delete
+//Save & Remove
 {
     saveButton.onEvent('click', () => {
         //This causes the 'output' event to happen, and the handler for that should call the save function
         editor.apply()
     })
 
-    deleteButton.onEvent('click', () => {
+    removeButton.onEvent('click', () => {
         layout.dialog.showQuestion(
             {
-                title: 'Delete song?',
+                title: 'Remove song?',
 
-                message: 'Are you sure you want to delete this song?',
-                detail: 'This action cannot be undone!',
+                message:
+                    'Are you sure you want to remove the song "' +
+                    editor.data.name +
+                    '"?',
+                detail: 'This cannot be undone!',
 
-                options: ['Delete', 'Cancel']
+                options: ['Remove', 'Cancel']
             },
             (error, answer) => {
-                if (answer === 'Delete') {
+                if (answer === 'Remove') {
                     remove()
                 }
             }
@@ -1246,12 +1253,12 @@ layout.window.onEvent('close', event => {
 
         layout.dialog.showQuestion(
             {
-                title: 'Save changes?',
+                title: 'Save Changes?',
                 message:
-                    'You have made changes to the song "' +
+                    'There are unsaved changes to the song "' +
                     editor.data.name +
-                    '" which have not been saved!',
-                detail: 'Do you want to save your changes?',
+                    '"!',
+                detail: 'These changes will be lost unless you save them.',
 
                 options: ['Save', 'Discard', 'Cancel']
             },
@@ -1277,7 +1284,11 @@ function showSong(songGroup, songID) {
         layout.dialog.showQuestion(
             {
                 title: 'Save Changes?',
-                message: 'There are unsaved changes to the current song!',
+                message:
+                    'There are unsaved changes to the song "' +
+                    editor.data.name +
+                    '"!',
+                detail: 'These changes will be lost unless you save them.',
 
                 options: ['Save', 'Discard', 'Cancel']
             },

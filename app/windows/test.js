@@ -151,7 +151,6 @@ layout.body.add(
             items: [
                 new layout.Button({ icon: 'add' }),
                 new layout.Button({ icon: 'close' }),
-                new layout.Button({ icon: 'delete' }),
                 new layout.Button({ icon: 'display' }),
                 new layout.Button({ icon: 'edit' }),
                 new layout.Button({ icon: 'expand-x' }),

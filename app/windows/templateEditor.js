@@ -59,7 +59,7 @@ const propertiesBar = new layout.Block({
 const saveButton = new layout.Button({
     text: 'Save'
 })
-const deleteButton = new layout.Button({
+const removeButton = new layout.Button({
     text: 'Remove'
 })
 
@@ -183,7 +183,7 @@ colorControl.connect(displayEditor)
                             items: [
                                 new layout.Block(
                                     {
-                                        items: [saveButton, deleteButton],
+                                        items: [saveButton, removeButton],
                                         childSpacing: '8px'
                                     },
                                     {
@@ -306,14 +306,14 @@ function remove(ID, name = '') {
                     if (error) {
                         layout.dialog.showError({
                             message:
-                                'Unable to delete "' +
+                                'Unable to remove "' +
                                     name +
                                     '"\n' +
                                     error.message || error.toString()
                         })
 
                         logger.error(
-                            'Unable to delete template ' + name + ':',
+                            'Unable to remove template ' + name + ':',
                             error
                         )
 
@@ -923,7 +923,7 @@ saveButton.onEvent('click', () => {
     save()
 })
 
-deleteButton.onEvent('click', () => {
+removeButton.onEvent('click', () => {
     remove(editor.data.ID, editor.data.name)
 })
 
@@ -987,7 +987,7 @@ Templates.onEvent('update', () => {
         }
     }
 
-    deleteButton.disabled = Templates.files.length === 1
+    removeButton.disabled = Templates.files.length === 1
 
     layout.hideLoader(list)
 

@@ -77,7 +77,7 @@ Select _Library_ > _Songs_ from the _Menu_ in the Control window, or _Song Libra
 
 On the left, you can search for songs. Select a song from the results by clicking on it to show its data, which can then by edited.
 
-If you want to remove a song from the song library, select it and click the _Delete_ (![delete](#delete)) button.
+If you want to remove a song from the song library, select it and click the _Remove_ button.
 
 ## Checking Songs
 Select _Tools_ > _Check Songs_ from the _Menu_ in the Control window, or from the _Menu_ in the Song Library window.
@@ -93,7 +93,7 @@ This will show a list of songs with invalid, or empty song information. At the t
 For both **Important** and **All** options, clicking a song from the list will open it in the Song Library window. You can then add any missing information.  
 For the the **Invalid Files** option, clicking an item in the list will give two options for dealing with the corrupted file:
 * **Open**: Will open the actual file, allowing you to extract any existing song content, which can then be added back to the Song Library.
-* **Delete**: Will remove the file.
+* **Delete**: Will delete the file.
 
 The **Fix Missing** button will automatically fix all issues show in the **Important** song list. Each song with invalid or missing song information will have it set to a blank value.
 
