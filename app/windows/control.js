@@ -3817,8 +3817,12 @@ const item_add = {
     //image add
     {
         let imageEditor = new layout.ImageStyleEdit({})
+        let boxEditor = new layout.BoxStyleEdit({
+            align: false
+        })
 
         imageBlock.add(imageEditor)
+        imageBlock.add(boxEditor)
 
         let previewEditor = new layout.DisplayEdit(
             {},
@@ -3841,6 +3845,7 @@ const item_add = {
         imageBlock.add(previewEditor)
 
         imageEditor.connect(image)
+        boxEditor.connect(image)
 
         let imageMultiSelect = new layout.FileInput({
             open: true,
