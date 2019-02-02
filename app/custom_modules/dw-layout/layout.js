@@ -6623,15 +6623,16 @@ exports.change = addStyles
             //TODO: make hovering over image in list emit event.
             body.onEvent('click', event => {
                 if (
-                    !(
-                        this.node === event.target ||
-                        imagePopup.node === event.target ||
-                        this.node.contains(event.target) ||
-                        imagePopup.node.contains(event.target)
-                    )
+                    event.target === this.node ||
+                    this.node.contains(event.target) ||
+                    event.target === imagePopup.node ||
+                    imagePopup.node.contains(event.target) ||
+                    event.target === document.body
                 ) {
-                    this.blur()
+                    return false
                 }
+
+                this.blur()
             })
 
             body.onEvent('blur', () => {
