@@ -3050,6 +3050,9 @@ exports.change = addStyles
                     this.box.maxHeight,
                     spaceAbove - this.box.padding
                 )
+                this.box.height = Math.max(this.box.minHeight, this.box.height)
+
+                this.box.top = position.y - popupArrowHeight - this.box.height
             } else {
                 //Show popup below position
                 this.node.style.top =
@@ -3062,9 +3065,10 @@ exports.change = addStyles
                     this.box.maxHeight,
                     spaceBelow - this.box.padding
                 )
-            }
+                this.box.height = Math.max(this.box.minHeight, this.box.height)
 
-            this.box.height = Math.max(this.box.minHeight, this.box.height)
+                this.box.top = position.y + position.height + popupArrowHeight
+            }
             this.node.style.height = this.box.height + 'px'
 
             this.arrowNode.style.left =
