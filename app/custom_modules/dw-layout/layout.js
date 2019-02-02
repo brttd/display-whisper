@@ -4546,12 +4546,361 @@ exports.change = addStyles
         }
     }
 
-    //Color input popup control
-    let colorPopup = new InputPopup({})
-    {
-        let mainNode = document.createElement('div')
+    //hue, saturation, brightness numbers -> {red, green, blue} object
+    function hsbToStrRGB(hue, saturation, brightness) {
+        //from https://stackoverflow.com/a/17243070
+
+        let f = (hue / 360) * 6 - Math.floor((hue / 360) * 6)
+        let p = brightness * (1 - saturation)
+        let q = brightness * (1 - f * saturation)
+        let t = brightness * (1 - (1 - f) * saturation)
+
+        let red = brightness
+        let green = t
+        let blue = p
+
+        if (hue >= 60 && hue < 120) {
+            red = q
+            green = brightness
+            blue = p
+        } else if (hue >= 120 && hue < 180) {
+            red = p
+            green = brightness
+            blue = t
+        } else if (hue >= 180 && hue < 240) {
+            red = p
+            green = q
+            blue = brightness
+        } else if (hue >= 240 && hue < 300) {
+            red = t
+            green = p
+            blue = brightness
+        } else if (hue >= 300 && hue < 360) {
+            red = brightness
+            green = p
+            blue = q
+        }
+
+        return {
+            red: Math.round(red * 255),
+            green: Math.round(green * 255),
+            blue: Math.round(blue * 255)
+        }
     }
 
+    //red, green, blue numbers -> {hue, saturation, brightness} object
+    function rgbToHSB(red, green, blue) {
+        //from https://stackoverflow.com/a/17243070
+
+        let max = Math.max(red, green, blue)
+        let min = Math.min(red, green, blue)
+
+        let diff = max - min
+        let hue = 0
+
+        if (max !== min) {
+            if (max === red) {
+                hue = green - blue + diff * (green < blue ? 6 : 0)
+            } else if (max === green) {
+                hue = blue - red + diff * 2
+            } else if (max === blue) {
+                hue = red - green + diff * 4
+            }
+            hue /= 6 * diff
+        }
+
+        return {
+            hue: (hue *= 360),
+            saturation: (max === 0 ? 0 : diff / max) * 100,
+            brightness: max / 2.5
+        }
+    }
+
+    //Color input popup control
+    let colorPopup = new InputPopup({
+        maxWidth: 200,
+        maxHeight: 150
+    })
+    {
+        colorPopup.node.classList.add('color')
+
+        let boxPadding = 4
+        //hue input box adds 20, numbers input adds 28
+        let boxExtraVerticalHeight = 48
+
+        let currentColor = {
+            hue: 0,
+            saturation: 0,
+            brightness: 0,
+
+            red: 0,
+            green: 0,
+            blue: 0
+        }
+
+        let inputSize = {
+            top: 0,
+            left: 0,
+            width: 0
+        }
+
+        let currentInput = ''
+
+        let inputBox = document.createElement('div')
+        inputBox.className = 'input'
+        colorPopup.node.appendChild(inputBox)
+
+        //saturation-lightness box
+        let sbNode = document.createElement('div')
+        sbNode.className = 'satlight'
+        inputBox.appendChild(sbNode)
+
+        let sbSlider = document.createElement('div')
+        sbSlider.className = 'slider'
+        sbNode.appendChild(sbSlider)
+
+        let hueNode = document.createElement('div')
+        hueNode.className = 'hue'
+        inputBox.appendChild(hueNode)
+
+        let hueSlider = document.createElement('div')
+        hueSlider.className = 'slider'
+        hueNode.appendChild(hueSlider)
+
+        //r, g, b, number inputs
+        numberInputs = {}
+        {
+            let numberInputBox = document.createElement('div')
+            numberInputBox.className = 'numbers'
+
+            let colors = ['red', 'green', 'blue']
+
+            function onNumberChange() {
+                let newColor = rgbToHSB(
+                    currentColor.red,
+                    currentColor.green,
+                    currentColor.blue
+                )
+
+                currentColor.hue = newColor.hue
+                currentColor.saturation = newColor.saturation
+                currentColor.brightness = newColor.brightness
+
+                if (typeof colorPopup.changeCallback === 'function') {
+                    colorPopup.changeCallback({
+                        value:
+                            'rgb(' +
+                            currentColor.red +
+                            ',' +
+                            currentColor.green +
+                            ',' +
+                            currentColor.blue +
+                            ')',
+
+                        from: colorPopup,
+                        fromUser: true
+                    })
+                }
+
+                if (needsUpdate) {
+                    needsUpdate = false
+                    requestAnimationFrame(updateInputBox)
+                }
+            }
+
+            function onInputChange(color) {
+                let value = parseFloat(this.value)
+                if (isFinite(value)) {
+                    currentColor[color] = value
+
+                    onNumberChange()
+                }
+            }
+
+            function onInputBlur(color) {
+                this.value = currentColor[color]
+            }
+
+            for (let i = 0; i < colors.length; i++) {
+                numberInputs[colors[i]] = document.createElement('input')
+                numberInputs[colors[i]].type = 'number'
+                numberInputs[colors[i]].max = 255
+                numberInputs[colors[i]].min = 0
+                numberInputs[colors[i]].step = 1
+                numberInputs[colors[i]].value = 0
+                numberInputs[colors[i]].id = 'color-popup-' + colors[i] + '-input'
+                numberInputBox.appendChild(document.createElement('label'))
+                numberInputBox.lastElementChild.textContent = colors[i][0].toUpperCase()
+                numberInputBox.lastElementChild.for = numberInputs[colors[i]].id
+                numberInputBox.appendChild(numberInputs[colors[i]])
+
+                numberInputs[colors[i]].addEventListener(
+                    'change',
+                    onInputChange.bind(numberInputs[colors[i]], colors[i])
+                )
+                numberInputs[colors[i]].addEventListener(
+                    'keydown',
+                    onInputChange.bind(numberInputs[colors[i]], colors[i])
+                )
+
+                numberInputs[colors[i]].addEventListener('blur', onInputBlur.bind(numberInputs[colors[i]], colors[i]))
+            }
+
+            colorPopup.node.appendChild(numberInputBox)
+        }
+
+        let needsUpdate = true
+        function updateInputBox() {
+            needsUpdate = true
+
+            sbNode.style.background =
+                'linear-gradient(to right, white, hsl(' +
+                currentColor.hue +
+                ',100%,50%))'
+
+            sbSlider.style.top = 100 - currentColor.brightness + '%'
+            sbSlider.style.left = currentColor.saturation + '%'
+            hueSlider.style.left = currentColor.hue / 3.6 + '%'
+        }
+
+        function onDrag(mouse) {
+            if (currentInput === 'sb') {
+                currentColor.brightness = Math.max(
+                    0,
+                    Math.min(
+                        100,
+                        100 -
+                            ((mouse.pageY - inputSize.top) / inputSize.height) *
+                                100
+                    )
+                )
+
+                currentColor.saturation = Math.max(
+                    0,
+                    Math.min(
+                        100,
+                        ((mouse.pageX - inputSize.left) / inputSize.width) * 100
+                    )
+                )
+            } else if (currentInput === 'hue') {
+                currentColor.hue = Math.max(
+                    0,
+                    Math.min(
+                        360,
+                        ((mouse.pageX - inputSize.left) / inputSize.width) * 360
+                    )
+                )
+            } else {
+                return false
+            }
+
+            let newColor = hsbToStrRGB(
+                currentColor.hue,
+                currentColor.saturation / 100,
+                currentColor.brightness / 100
+            )
+
+            currentColor.red = numberInputs.red.value = newColor.red
+            currentColor.green = numberInputs.green.value = newColor.green
+            currentColor.blue = numberInputs.blue.value = newColor.blue
+
+            if (typeof colorPopup.changeCallback === 'function') {
+                colorPopup.changeCallback({
+                    value:
+                        'rgb(' +
+                        currentColor.red +
+                        ',' +
+                        currentColor.green +
+                        ',' +
+                        currentColor.blue +
+                        ')',
+
+                    from: colorPopup,
+                    fromUser: true
+                })
+            }
+
+            if (needsUpdate) {
+                needsUpdate = false
+                requestAnimationFrame(updateInputBox)
+            }
+        }
+
+        function removeActiveHighlight() {
+            if (currentInput === 'sb') {
+                sbSlider.classList.remove('active')
+            } else if (currentInput === 'hue') {
+                hueSlider.classList.remove('active')
+            }
+        }
+
+        colorPopup.show = function(position, data) {
+            colorPopup.move(position)
+
+            document.body.appendChild(colorPopup.node)
+
+            let newColor = color.extractRGB(data.value)
+            currentColor.red = numberInputs.red.value = newColor.r
+            currentColor.green = numberInputs.green.value = newColor.g
+            currentColor.blue = numberInputs.blue.value = newColor.b
+
+            newColor = rgbToHSB(newColor.r, newColor.g, newColor.b)
+            currentColor.hue = newColor.hue
+            currentColor.saturation = newColor.saturation
+            currentColor.brightness = newColor.brightness
+
+            updateInputBox()
+        }
+        colorPopup.move = function(position) {
+            colorPopup._move(position)
+
+            inputSize.top = colorPopup.box.top + boxPadding
+            inputSize.left = colorPopup.box.left + boxPadding
+            inputSize.width = colorPopup.box.width - boxPadding * 2
+            inputSize.height =
+                colorPopup.box.height - boxPadding * 2 - boxExtraVerticalHeight
+        }
+        colorPopup.hide = function() {
+            removeActiveHighlight()
+            currentInput = ''
+            colorPopup.changeCallback = null
+
+            if (colorPopup.node.parentNode === document.body) {
+                document.body.removeChild(colorPopup.node)
+            }
+        }
+
+        sbNode.addEventListener('mousedown', event => {
+            removeActiveHighlight()
+            currentInput = 'sb'
+
+            sbSlider.classList.add('active')
+
+            onDrag(event)
+        })
+        hueNode.addEventListener('mousedown', event => {
+            removeActiveHighlight()
+            currentInput = 'hue'
+
+            hueSlider.classList.add('active')
+
+            onDrag(event)
+        })
+
+        window.addEventListener('mouseup', () => {
+            removeActiveHighlight()
+            currentInput = ''
+        })
+        window.addEventListener('blur', () => {
+            removeActiveHighlight()
+            currentInput = ''
+        })
+
+        window.addEventListener('mousemove', onDrag)
+    }
+
+    let blankColor =
+        'url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAAAAABX3VL4AAAACXBIWXMAAAsTAAALEwEAmpwYAAAADklEQVQImWP+L8Uw8z8AB6wCtQYJB2cAAAAASUVORK5CYII=)'
     class ColorInput extends focusItem {
         /*
         Standard color input.
@@ -4582,20 +4931,13 @@ exports.change = addStyles
         */
         constructor(data = {}, styles = {}) {
             super(document.createElement('div'), {}, data.focus)
-            this.inputNode = document.createElement('input')
-            this.inputNode.id = getUniqueId('color')
-            this.inputNode.type = 'color'
 
             this.addClass('input-color')
 
             if (typeof data.label === 'string') {
                 this.node.appendChild(document.createElement('label'))
                 this.node.firstChild.textContent = data.label
-
-                this.node.firstChild.setAttribute('for', this.inputNode.id)
             }
-
-            this.node.appendChild(this.inputNode)
 
             addStyles(this, styles)
 
@@ -4603,8 +4945,7 @@ exports.change = addStyles
             this.node.appendChild(this.buttonNode)
 
             this.colorSquare = document.createElement('div')
-            this.colorSquare.style.backgroundImage =
-                'url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAAAAABX3VL4AAAACXBIWXMAAAsTAAALEwEAmpwYAAAADklEQVQImWP+L8Uw8z8AB6wCtQYJB2cAAAAASUVORK5CYII=)'
+            this.colorSquare.style.backgroundImage = blankColor
             this.buttonNode.appendChild(this.colorSquare)
             this.buttonNode.appendChild(getIconSVG('expand-x'))
 
@@ -4616,11 +4957,20 @@ exports.change = addStyles
 
             this.tooltip = data.tooltip
 
+            bindFunctions(
+                this,
+                this.showPopup,
+                this.movePopup,
+                this.onPopupChange
+            )
+
+            this._value = 'rgb(0,0,0)'
             this.value = data.value
 
             this.buttonNode.addEventListener('click', () => {
                 this.buttonNode.blur()
                 this._focused = true
+
                 if (this._globalFocus) {
                     body.inputFocused(this, !this._codeFocused)
                 }
@@ -4631,57 +4981,32 @@ exports.change = addStyles
                     },
                     this.events.focus
                 )
-                this.inputNode.click()
+
+                this.openPopup()
+
                 this.buttonNode.classList.add('active')
                 this._codeFocused = false
-            })
-
-            this._oldValue = this.inputNode.value
-
-            this.inputNode.addEventListener('input', () => {
-                this.colorSquare.style.background = this.inputNode.value
-                this.blur(true)
-                sendEventTo(
-                    {
-                        value: this.inputNode.value,
-                        oldValue: this._oldValue,
-                        fromUser: true,
-                        from: this
-                    },
-                    this.events.change
-                )
-                this._oldValue = this.inputNode.value
             })
 
             body.onEvent('click', event => {
                 if (
                     event.target === this.node ||
-                    event.target === this.inputNode
+                    this.node.contains(event.target) ||
+                    colorPopup.node.contains(event.target) ||
+                    event.target === colorPopup.node ||
+                    event.target === document.body
                 ) {
                     return false
                 }
 
-                if (event.target.parentNode === this.node) {
-                    return false
-                } else if (event.target.parentNode) {
-                    if (event.target.parentNode.parentNode === this.node) {
-                        return false
-                    }
-                }
-
+                this.blur()
+            })
+            body.onEvent('blur', () => {
                 this.blur()
             })
 
-            //TODO: Create custom color input dropdown
-
-            //the color picker dialog which opens when inputNode is clicked takes focus away from window
-            //So when the window is focused again, that means the dialog has closed
-
-            body.onEvent('focus', () => {
-                if (this._focused) {
-                    this.blur()
-                }
-            })
+            body.onEvent('resize', this.movePopup)
+            body.onEvent('scroll', this.movePopup)
         }
 
         get disabled() {
@@ -4702,26 +5027,26 @@ exports.change = addStyles
         }
 
         get tooltip() {
-            return this.inputNode.tooltip
+            return this.buttonNode.tooltip
         }
         set tooltip(tooltip) {
             if (typeof tooltip === 'string') {
-                this.inputNode.tooltip = tooltip
+                this.buttonNode.tooltip = tooltip
             }
         }
 
         get value() {
-            return this.inputNode.value
+            return this._value
         }
         set value(value) {
             if (color.isColor(value)) {
-                this.inputNode.value = color.toHex(value)
+                this._value = color.toRGB(value)
 
-                this.colorSquare.style.background = this.inputNode.value
+                this.colorSquare.style.background = this._value
 
                 sendEventTo(
                     {
-                        value: this.inputNode.value,
+                        value: this._value,
                         oldValue: this._oldValue,
 
                         fromUser: false,
@@ -4730,8 +5055,44 @@ exports.change = addStyles
                     this.events.change
                 )
 
-                this._oldValue = this.inputNode.value
+                this._oldValue = this._value
             }
+        }
+
+        onPopupChange(event) {
+            this._value = event.value
+
+            this.colorSquare.style.background = this._value
+
+            sendEventTo(
+                {
+                    value: this._value,
+                    oldValue: this._oldValue,
+
+                    fromUser: event.fromUser,
+                    from: this
+                },
+                this.events.change
+            )
+
+            this._oldValue = this._value
+        }
+
+        showPopup() {
+            colorPopup.show(this.buttonNode.getBoundingClientRect(), {
+                value: this._value
+            })
+        }
+        movePopup() {
+            if (this._focused) {
+                colorPopup.move(this.buttonNode.getBoundingClientRect())
+            }
+        }
+
+        openPopup() {
+            body.onFrame.start(this.showPopup)
+
+            colorPopup.changeCallback = this.onPopupChange
         }
 
         focus(fromUser = false) {
@@ -4739,7 +5100,13 @@ exports.change = addStyles
             this.buttonNode.click()
         }
         blur(fromUser = false) {
+            if (!this._focused) {
+                return false
+            }
+
             this._focused = false
+
+            colorPopup.hide()
 
             sendEventTo(
                 {
@@ -4749,8 +5116,6 @@ exports.change = addStyles
                 this.events.blur
             )
 
-            //TODO: remove? I don't think this is neccesary
-            this.inputNode.blur()
             this.buttonNode.classList.remove('active')
         }
     }
