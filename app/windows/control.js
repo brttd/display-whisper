@@ -1666,8 +1666,11 @@ const playlist = {}
     function load(data = {}) {
         file = ''
         list = []
+        removeHistory = []
         active.index = 0
         active.subIndex = 0
+
+        updateRemoveButton()
 
         itemsBlock.clear()
 
