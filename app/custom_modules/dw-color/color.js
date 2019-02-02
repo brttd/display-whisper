@@ -261,6 +261,23 @@ function toHex(color) {
     }
 }
 
+function extractRGB(color) {
+    color = toRGB(color)
+    color = color.split(',')
+
+    if (color[0][3] === 'a') {
+        color[0] = color[0].slice(5, color[0].length)
+    } else {
+        color[0] = color[0].slice(4, color[0].length)
+    }
+
+    return {
+        r: parseFloat(color[0]),
+        g: parseFloat(color[1]),
+        b: parseFloat(color[2])
+    }
+}
+
 function brightness(color) {
     color = color.trim().toLowerCase()
 
@@ -316,4 +333,5 @@ exports.toRGB = toRGB
 exports.toHSL = toHSL
 exports.toHex = toHex
 exports.isColor = isColor
+exports.extractRGB = extractRGB
 exports.brightness = brightness
