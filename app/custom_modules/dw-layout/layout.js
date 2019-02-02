@@ -3938,6 +3938,33 @@ exports.change = addStyles
             sliderNode.style.left = pos + sliderPadding - 1 + 'px'
         }
 
+        function onMouseMove(event) {
+            if (mouseDown) {
+                let newPos = Math.max(
+                    0,
+                    Math.min(sliderWidth, event.pageX - sliderLeft)
+                )
+
+                sliderNode.style.left = newPos + sliderPadding - 1 + 'px'
+
+                if (typeof numberPopup.dragCallback === 'function') {
+                    let actualNumber =
+                        (newPos / sliderWidth) *
+                            (numberRange.max - numberRange.min) +
+                        numberRange.min
+
+                    numberRange.currentValue = actualNumber
+
+                    numberPopup.dragCallback({
+                        value: actualNumber,
+
+                        from: numberPopup,
+                        fromUser: true
+                    })
+                }
+            }
+        }
+
         numberPopup.show = function(position, number) {
             numberPopup.move(position)
 
@@ -3977,11 +4004,12 @@ exports.change = addStyles
             moveSlider(numberRange.currentValue)
         }
         numberPopup.hide = function() {
+            mouseDown = false
+            sliderNode.classList.remove('active')
+            numberPopup.dragCallback = null
+
             if (numberPopup.node.parentNode === document.body) {
                 document.body.removeChild(numberPopup.node)
-
-                mouseDown = false
-                sliderNode.classList.remove('active')
             }
         }
 
@@ -3992,6 +4020,8 @@ exports.change = addStyles
         numberPopup.node.addEventListener('mousedown', event => {
             mouseDown = true
             sliderNode.classList.add('active')
+
+            onMouseMove(event)
         })
         window.addEventListener('mouseup', () => {
             mouseDown = false
@@ -4002,32 +4032,7 @@ exports.change = addStyles
             sliderNode.classList.remove('active')
         })
 
-        window.addEventListener('mousemove', event => {
-            if (mouseDown) {
-                let newPos = Math.max(
-                    0,
-                    Math.min(sliderWidth, event.pageX - sliderLeft)
-                )
-
-                sliderNode.style.left = newPos + sliderPadding - 1 + 'px'
-
-                if (typeof numberPopup.dragCallback === 'function') {
-                    let actualNumber =
-                        (newPos / sliderWidth) *
-                            (numberRange.max - numberRange.min) +
-                        numberRange.min
-
-                    numberRange.currentValue = actualNumber
-
-                    numberPopup.dragCallback({
-                        value: actualNumber,
-
-                        from: numberPopup,
-                        fromUser: true
-                    })
-                }
-            }
-        })
+        window.addEventListener('mousemove', onMouseMove)
     }
     class NumberInput extends focusItem {
         /*
