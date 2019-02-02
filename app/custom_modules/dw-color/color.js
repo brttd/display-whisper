@@ -89,11 +89,11 @@ function toRGB(color) {
         if (numbers[1] === 0) {
             return (
                 'rgb(' +
-                Math.floor(l * 256).toString() +
+                Math.floor(numbers[2] * 256).toString() +
                 ',' +
-                Math.floor(l * 256).toString() +
+                Math.floor(numbers[2] * 256).toString() +
                 ',' +
-                Math.floor(l * 256).toString() +
+                Math.floor(numbers[2] * 256).toString() +
                 ')'
             )
         } else {
