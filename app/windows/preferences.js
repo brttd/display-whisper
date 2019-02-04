@@ -27,7 +27,6 @@ function getEntryBlock(key, data) {
     let input = false
 
     data.tooltip = data.description
-    data.highlight = true
 
     switch (data.type) {
         case 'boolean':
