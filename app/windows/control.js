@@ -1430,10 +1430,15 @@ const playlist = {}
             return false
         }
 
-        let actualSelected = {
-            index: selected.index,
-            subIndex: selected.subIndex
+        if (active.index < 0 || active.index >= items.length) {
+            active = getNewPosition(active)
         }
+        let currentActiveId = list[active.index].id
+
+        if (selected.index < 0 || selected.index >= items.length) {
+            selected = getNewPosition(selected)
+        }
+        let currentSelectedId = list[selected.index].id
 
         if (selected.index >= 0 && selected.index < itemsBlock.items.length) {
             itemsBlock.items[selected.index].selected = false
@@ -1449,41 +1454,22 @@ const playlist = {}
 
         list.splice(newIndex, 0, data)
 
-        if (active.index === index) {
-            //the active item is being moved
-            setActive({ index: newIndex, subIndex: active.subIndex })
-        } else if (index <= active.index && newIndex >= active.index) {
-            //an item below the active item was moved to above the active item
-            setActive({ index: active.index - 1, subIndex: active.subIndex })
-        } else if (newIndex <= active.index && index >= active.index) {
-            //an item above the active item was moved to beloew the active item
-            setActive({ index: active.index + 1, subIndex: active.subIndex })
+        for (let i = 0; i < list.length; i++) {
+            if (list[i].id === currentActiveId) {
+                active.index = i
+            }
+            if (list[i].id === currentSelectedId) {
+                selected.index = i
+            }
         }
 
-        //setActive automatically selects the active item, but that will mean any user-selected section is lost
-        if (index === actualSelected.index) {
-            //Selected item was moved
-            setSelected({ index: newIndex, subIndex: actualSelected.subIndex })
-        } else if (
-            index <= actualSelected.index &&
-            newIndex >= actualSelected.index
-        ) {
-            //An item below the selected item was moved to above the selected item
-            setSelected({
-                index: actualSelected.index - 1,
-                subIndex: actualSelected.subIndex
-            })
-        } else if (
-            newIndex <= actualSelected.index &&
-            index >= actualSelected.index
-        ) {
-            setSelected({
-                index: actualSelected.index + 1,
-                subIndex: actualSelected.subIndex
-            })
-        } else {
-            setSelected(actualSelected)
+        if (active.index === newIndex) {
+            scrollTo(active)
+        } else if (selected.index === newIndex) {
+            scrollTo(selected)
         }
+
+        updateOutput()
 
         editHasOccured()
     }
