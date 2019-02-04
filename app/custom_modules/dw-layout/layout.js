@@ -1194,7 +1194,7 @@ const body = new Item(document.body)
         )
     })
 
-    body.onEvent = (eventName, listener) => {
+    exports.onEvent = body.onEvent = (eventName, listener) => {
         if (typeof eventName !== 'string' || typeof listener !== 'function') {
             return false
         }
@@ -1202,38 +1202,10 @@ const body = new Item(document.body)
         if (!body.events[eventName]) {
             body.events[eventName] = []
 
-            if (basicMouseEvents.includes(eventName)) {
-                window.addEventListener(eventName, event => {
-                    event = convertMouse(event)
-                    event.fromUser = true
-                    event.from = this
-
-                    sendEventTo(event, body.events[eventName])
-                })
-            } else if (basicKeyboardEvents.includes(eventName)) {
-                window.addEventListener(eventName, event => {
-                    sendEventTo(
-                        {
-                            fromUser: true,
-                            from: this,
-
-                            target: event.target,
-
-                            shift: event.shiftKey,
-                            ctrl: event.ctrlKey,
-                            alt: event.altKey,
-                            meta: event.metaKey,
-
-                            repeat: event.repeat,
-
-                            code: event.code,
-                            key: event.key,
-                            keyCode: event.keyCode
-                        },
-                        body.events[eventName]
-                    )
-                })
-            }
+            window.addEventListener(
+                eventName,
+                passEventTo.bind(null, body.events[eventName])
+            )
         }
 
         body.events[eventName].push(listener)
