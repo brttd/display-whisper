@@ -9,6 +9,8 @@ const Database = require('dw-database')
 const Songs = new Database.Group('songs', { load: false, parse: true })
 const Templates = new Database.Group('templates', { load: true, parse: true })
 
+const newlineRegex = new RegExp(/\n/g)
+
 let increaseSizeOnFit = true
 
 let itemLocked = false
@@ -1550,7 +1552,11 @@ fitTextButton.onEvent('click', () => {
 
             //Since the text has changed, the splitting of sections might need to be updated.
             //So the user should be shown the update sections button
-            if (editor.data.maxLines > 0) {
+            if (
+                editor.data.maxLines > 0 &&
+                (newText.match(newlineRegex) || '').length >=
+                    editor.data.maxLines
+            ) {
                 updateSectionsButton.visible = true
             }
         }
