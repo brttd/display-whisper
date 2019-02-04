@@ -39,19 +39,7 @@ $min-size: 24px;
 }
 
 @mixin colors($options: null, $color: true) {
-    @if $options == active-highlight {
-        @if $color == true {
-            color: $text-active-highlight;
-            fill: $text-active-highlight;
-        }
-
-        background: $bkg-active-highlight;
-        border-color: $bkg-active-highlight-dark;
-
-        &::-webkit-input-placeholder {
-            color: $text;
-        }
-    } @else if $options == active {
+    @if $options == active {
         @if $color == true {
             color: $text-active;
             fill: $text-active;
@@ -73,18 +61,6 @@ $min-size: 24px;
         border-color: $bkg-main-dark;
 
         cursor: default;
-    } @else if $options == hover-highlight {
-        @if $color == true {
-            color: $text;
-            fill: $text;
-        }
-
-        background: mix($bkg, $bkg-active-highlight, 50%);
-        border-color: mix($bkg-dark, $bkg-active-highlight-dark, 50%);
-
-        &::-webkit-input-placeholder {
-            color: $text-light;
-        }
     } @else if $options == hover {
         @if $color == true {
             color: $text;
@@ -160,20 +136,6 @@ input::-webkit-inner-spin-button {
             &:focus,
             &.active {
                 @include colors(active);
-            }
-        }
-    }
-
-    &.highlight {
-        input:not([disabled]) {
-            &:hover {
-                @include colors(hover-highlight);
-            }
-
-            &:active,
-            &:focus,
-            &.active {
-                @include colors(active-highlight);
             }
         }
     }
@@ -290,20 +252,6 @@ input::-webkit-inner-spin-button {
         }
     }
 
-    &.highlight {
-        &:not([disabled]) {
-            &:hover {
-                @include colors(hover-highlight);
-            }
-
-            &:active,
-            &:focus,
-            &.active {
-                @include colors(active-highlight);
-            }
-        }
-    }
-
     &.large {
         padding: first($input-padding);
 
@@ -370,19 +318,6 @@ input::-webkit-inner-spin-button {
             }
         }
     }
-    &.highlight {
-        input:not([disabled]) {
-            &:hover {
-                background: mix($bkg, $bkg-active-highlight, 50%);
-                border-color: mix($bkg-dark, $bkg-active-highlight-dark, 50%);
-            }
-
-            &:checked {
-                background: $bkg-active-highlight-dark;
-                border-color: $bkg-active-highlight-dark;
-            }
-        }
-    }
 
     label {
         @include fonts;
@@ -444,18 +379,6 @@ input::-webkit-inner-spin-button {
             }
         }
     }
-    &.highlight {
-        textarea:not([disabled]) {
-            &:hover {
-                @include colors(hover-highlight);
-            }
-
-            &:active,
-            &:focus {
-                @include colors(active-highlight);
-            }
-        }
-    }
 }
 
 .input-number {
@@ -496,12 +419,6 @@ input::-webkit-inner-spin-button {
         border-right: none;
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
-    }
-
-    .highlight {
-        input:focus + label.unit {
-            border-left-color: $bkg-active-highlight-dark;
-        }
     }
 }
 $slider-button-size: 12px;
@@ -559,23 +476,6 @@ $slider-padding: 2px;
         &.active {
             background: $bkg-active;
             border-color: $bkg-active-dark;
-        }
-    }
-
-    &.highlight {
-        &:hover {
-            .slider {
-                background: mix($bkg-main, $bkg-active-highlight, 50%);
-                border-color: mix(
-                    $bkg-main-dark,
-                    $bkg-active-highlight-dark,
-                    50%
-                );
-            }
-        }
-        .slider.active {
-            background: $bkg-active-highlight;
-            border-color: $bkg-active-highlight-dark;
         }
     }
 }
@@ -644,20 +544,6 @@ $slider-padding: 2px;
             &:focus,
             &.active {
                 @include colors(active);
-            }
-        }
-    }
-
-    &.highlight {
-        button:not([disabled]) {
-            &:hover {
-                @include colors(hover-highlight);
-            }
-
-            &:active,
-            &:focus,
-            &.active {
-                @include colors(active-highlight);
             }
         }
     }
@@ -871,18 +757,6 @@ $slider-padding: 2px;
             }
         }
     }
-    &.highlight {
-        select:not([disabled]) {
-            &:hover {
-                @include colors(hover-highlight);
-            }
-
-            &:active,
-            &:focus {
-                @include colors(active-highlight);
-            }
-        }
-    }
 }
 
 .input-font {
@@ -927,19 +801,6 @@ $slider-padding: 2px;
             &:focus,
             &.active {
                 @include colors(active);
-            }
-        }
-    }
-    &.highlight {
-        input:not([disabled]) {
-            &:hover {
-                @include colors(hover-highlight);
-            }
-
-            &:active,
-            &:focus,
-            &.active {
-                @include colors(active-highlight);
             }
         }
     }
@@ -1102,20 +963,6 @@ $slider-padding: 2px;
             &.active,
             &:focus {
                 @include colors(active);
-            }
-        }
-    }
-
-    &.highlight {
-        button:not([disabled]) {
-            &:hover {
-                @include colors(hover-highlight);
-            }
-
-            &:active,
-            &.active,
-            &:focus {
-                @include colors(active-highlight);
             }
         }
     }
@@ -1575,32 +1422,6 @@ $img-max-width: 10em;
             background: $bkg-dark;
         }
     }
-
-    &.highlight {
-        .item {
-            &.active {
-                @include colors(active-highlight);
-            }
-            &.dragging {
-                background: $bkg-active-highlight-dark;
-                opacity: 0.5;
-            }
-        }
-
-        .add {
-            input,
-            select {
-                &:hover {
-                    @include colors(hover-highlight, $color: false);
-                }
-
-                &:active,
-                &:focus {
-                    @include colors(active-highlight, $color: false);
-                }
-            }
-        }
-    }
 }
 
 .input-tableList {
@@ -1669,19 +1490,6 @@ $img-max-width: 10em;
         }
         &.drag {
             background: $bkg-active-dark;
-        }
-    }
-
-    & {
-        &.highlight {
-            tr {
-                &.select {
-                    background: $bkg-active-highlight;
-                }
-                &.drag {
-                    background: $bkg-active-highlight-dark;
-                }
-            }
         }
     }
 }
