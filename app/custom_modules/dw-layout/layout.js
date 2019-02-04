@@ -1141,10 +1141,10 @@ const body = new Item(document.body)
             event.preventDefault()
         }
 
-        body.node.addEventListener('dragenter', cancelEvent, true)
-        body.node.addEventListener('dragover', cancelEvent, true)
+        document.body.addEventListener('dragenter', cancelEvent, true)
+        document.body.addEventListener('dragover', cancelEvent, true)
 
-        body.node.addEventListener('drop', event => {
+        document.body.addEventListener('drop', event => {
             sendEventTo(
                 {
                     fromUser: true,
@@ -3106,7 +3106,7 @@ exports.change = addStyles
             this.events.click = []
 
             if (typeof data.onClick === 'function') {
-                this.onEvent('click', data.onClick)
+                this.node.addEventListener('click', data.onClick)
             }
 
             if (data.active === true) {
@@ -5614,8 +5614,8 @@ exports.change = addStyles
                         value: this._value,
                         oldValue: this._oldValue,
 
-                        from: this,
-                        fromUser: true
+                        fromUser: true,
+                        from: this
                     },
                     this.events.change
                 )
@@ -6409,8 +6409,8 @@ exports.change = addStyles
 
                 sendEventTo(
                     {
-                        from: this,
-                        fromUser: !this._codeFocused
+                        fromUser: !this._codeFocused,
+                        from: this
                     },
                     this.events.focus
                 )
@@ -6596,8 +6596,8 @@ exports.change = addStyles
                         value: this.value,
                         database: this._database,
 
-                        from: this,
-                        fromUser: true
+                        fromUser: true,
+                        from: this
                     },
                     this.events.change
                 )
@@ -7513,8 +7513,8 @@ exports.change = addStyles
 
                 sendEventTo(
                     {
-                        from: this,
-                        fromUser: true
+                        fromUser: true,
+                        from: this
                     },
                     this.events.focus
                 )
@@ -7784,10 +7784,11 @@ exports.change = addStyles
                 this.addSelectInput.addEventListener('input', () => {
                     sendEventTo(
                         {
-                            from: this,
-                            fromUser: true,
                             value: this.addSelectInput.value,
-                            oldValue: oldValue
+                            oldValue: oldValue,
+
+                            fromUser: true,
+                            from: this
                         },
                         this.events['add-change']
                     )
@@ -7797,10 +7798,11 @@ exports.change = addStyles
                 this.addTextInput.addEventListener('input', () => {
                     sendEventTo(
                         {
-                            from: this,
-                            fromUser: true,
                             value: this.addTextInput.value,
-                            oldValue: oldValue
+                            oldValue: oldValue,
+
+                            fromUser: true,
+                            from: this
                         },
                         this.events['add-change']
                     )
@@ -7820,8 +7822,8 @@ exports.change = addStyles
 
                     sendEventTo(
                         {
-                            from: this,
-                            fromUser: event.fromUser
+                            fromUser: event.fromUser,
+                            from: this
                         },
                         this.events.focus
                     )
@@ -7895,8 +7897,8 @@ exports.change = addStyles
                         {
                             index: lastIndex,
 
-                            from: this,
-                            fromUser: true
+                            fromUser: true,
+                            from: this
                         },
                         this.events.drop
                     )
@@ -8189,8 +8191,8 @@ exports.change = addStyles
 
                     sendEventTo(
                         {
-                            from: this,
-                            fromUser: event.fromUser
+                            fromUser: event.fromUser,
+                            from: this
                         },
                         this.events.focus
                     )
@@ -9310,23 +9312,29 @@ exports.change = addStyles
                     this.node.appendChild(this.styleBlock)
                 }
 
-                this.bold.onEvent('click', event =>
-                    this.sendEdit('bold', event.fromUser)
+                this.bold.onEvent(
+                    'click',
+                    this.sendEdit.bind(this, 'bold', true)
                 )
-                this.italic.onEvent('click', event =>
-                    this.sendEdit('italic', event.fromUser)
+                this.italic.onEvent(
+                    'click',
+                    this.sendEdit.bind(this, 'italic', true)
                 )
-                this.underline.onEvent('click', event =>
-                    this.sendEdit('underline', event.fromUser)
+                this.underline.onEvent(
+                    'click',
+                    this.sendEdit.bind(this, 'underline', true)
                 )
-                this.strikethrough.onEvent('click', event =>
-                    this.sendEdit('strikethrough', event.fromUser)
+                this.strikethrough.onEvent(
+                    'click',
+                    this.sendEdit.bind(this, 'strikethrough', true)
                 )
-                this.subscript.onEvent('click', event =>
-                    this.sendEdit('subscript', event.fromUser)
+                this.subscript.onEvent(
+                    'click',
+                    this.sendEdit.bind(this, 'subscript', true)
                 )
-                this.superscript.onEvent('click', event =>
-                    this.sendEdit('superscript', event.fromUser)
+                this.superscript.onEvent(
+                    'click',
+                    this.sendEdit.bind(this, 'superscript', true)
                 )
             }
 
@@ -9394,26 +9402,26 @@ exports.change = addStyles
                     this.node.appendChild(this.alignBlock)
                 }
 
-                this.alignLeft.onEvent('click', event => {
+                this.alignLeft.onEvent('click', () => {
                     this.alignLeft.active = true
                     this.alignCenter.active = false
                     this.alignRight.active = false
 
-                    this.sendEdit('align', 'left', event.fromUser)
+                    this.sendEdit('align', 'left', true)
                 })
-                this.alignCenter.onEvent('click', event => {
+                this.alignCenter.onEvent('click', () => {
                     this.alignLeft.active = false
                     this.alignCenter.active = true
                     this.alignRight.active = false
 
-                    this.sendEdit('align', 'center', event.fromUser)
+                    this.sendEdit('align', 'center', true)
                 })
-                this.alignRight.onEvent('click', event => {
+                this.alignRight.onEvent('click', () => {
                     this.alignLeft.active = false
                     this.alignCenter.active = false
                     this.alignRight.active = true
 
-                    this.sendEdit('align', 'right', event.fromUser)
+                    this.sendEdit('align', 'right', true)
                 })
 
                 this.verticalAlign.onEvent('change', event => {
@@ -10777,8 +10785,8 @@ class BoxEdit {
 
         sendEventTo(
             {
-                from: this,
-                fromUser: fromUser
+                fromUser: fromUser,
+                from: this
             },
             this.events.focus
         )
@@ -11395,8 +11403,8 @@ class BoxEdit {
 
                         sendEventTo(
                             {
-                                from: this,
-                                fromUser: true
+                                fromUser: true,
+                                from: this
                             },
                             this.events.drag
                         )
@@ -11776,8 +11784,8 @@ class BoxEdit {
 
             sendEventTo(
                 {
-                    from: this,
-                    fromUser: fromUser
+                    fromUser: fromUser,
+                    from: this
                 },
                 this.events.focus
             )
@@ -11920,10 +11928,10 @@ class BoxEdit {
 
             sendEventTo(
                 {
-                    from: this,
+                    scale: this.values.scale,
+                    
                     fromUser: false,
-
-                    scale: this.values.scale
+                    from: this
                 },
                 this.events.change
             )
@@ -11941,8 +11949,8 @@ class BoxEdit {
 
             sendEventTo(
                 {
-                    from: this,
-                    fromUser: fromUser
+                    fromUser: fromUser,
+                    from: this
                 },
                 this.events.focus
             )
@@ -11952,8 +11960,8 @@ class BoxEdit {
 
             sendEventTo(
                 {
-                    from: this,
-                    fromUser: false
+                    fromUser: false,
+                    from: this
                 },
                 this.events.blur
             )
@@ -11972,10 +11980,10 @@ class BoxEdit {
 
                 sendEventTo(
                     {
-                        from: this,
-                        fromUser: fromUser,
+                        url: this.values.url,
 
-                        url: this.values.url
+                        fromUser: fromUser,
+                        from: this
                     },
                     this.events.change
                 )
@@ -11986,10 +11994,10 @@ class BoxEdit {
 
                 sendEventTo(
                     {
-                        from: this,
-                        fromUser: fromUser,
+                        database: this.values.database,
 
-                        database: this.values.database
+                        fromUser: fromUser,
+                        from: this
                     },
                     this.events.change
                 )
@@ -12012,10 +12020,10 @@ class BoxEdit {
 
                 sendEventTo(
                     {
-                        from: this,
-                        fromUser: fromUser,
+                        scale: this.values.scale,
 
-                        scale: this.values.scale
+                        fromUser: fromUser,
+                        from: this
                     },
                     this.events.change
                 )
@@ -12197,8 +12205,8 @@ class BoxEdit {
 
                         sendEventTo(
                             {
-                                from: this,
-                                fromUser: true
+                                fromUser: true,
+                                from: this
                             },
                             this.events.drag
                         )
@@ -13085,7 +13093,7 @@ class BoxEdit {
 
             this._disabled = false
 
-            bindFunctions(this, this.onResize, this.writeContent)
+            bindFunctions(this, this.onResize, this.writeContent, this.onItemSelectClick, this.onItemActiveClick)
 
             this.title = data.title
             this.sections = data.sections
@@ -13257,6 +13265,30 @@ class BoxEdit {
             }
         }
 
+        onItemSelectClick(event) {
+            sendEventTo(
+                {
+                    index: this.indexOf(event.from),
+
+                    fromUser: true,
+                    from: this
+                },
+                this.events['select-click']
+            )
+        }
+
+        onItemActiveClick(event) {
+            sendEventTo(
+                {
+                    index: this.indexOf(event.from),
+
+                    fromUser: true,
+                    from: this
+                },
+                this.events['active-click']
+            )
+        }
+
         add(data, index = -1) {
             if (!editor.util.isObj(data)) {
                 return false
@@ -13287,29 +13319,9 @@ class BoxEdit {
 
             this.needsChange.sectionCount = true
 
-            item.onEvent('select-click', event => {
-                sendEventTo(
-                    {
-                        index: this.indexOf(item),
+            item.onEvent('select-click', this.onItemSelectClick)
 
-                        fromUser: event.fromUser,
-                        from: this
-                    },
-                    this.events['select-click']
-                )
-            })
-
-            item.onEvent('active-click', event => {
-                sendEventTo(
-                    {
-                        index: this.indexOf(item),
-
-                        fromUser: event.fromUser,
-                        from: this
-                    },
-                    this.events['active-click']
-                )
-            })
+            item.onEvent('active-click', this.onItemActiveClick)
 
             item.onEvent('selected', () => {
                 if (this.indexOf(item) !== 0) {
@@ -13671,7 +13683,7 @@ class BoxEdit {
 
                 if (selected) {
                     sendEventTo(
-                        { from: this, fromUser: false },
+                        { fromUser: false, from: this },
                         this.events.selected
                     )
                 }
@@ -14374,9 +14386,10 @@ class BoxEdit {
 
                 sendEventTo(
                     {
-                        fromUser: fromUser,
+                        size: size,
 
-                        size: size
+                        fromUser: fromUser,
+                        from: this
                     },
                     this.events.change
                 )
@@ -14416,9 +14429,10 @@ class BoxEdit {
 
                 sendEventTo(
                     {
-                        fromUser: fromUser,
+                        landscape: landscape,
 
-                        landscape: landscape
+                        fromUser: fromUser,
+                        from: this
                     },
                     this.events.change
                 )
@@ -14450,9 +14464,10 @@ class BoxEdit {
 
                 sendEventTo(
                     {
-                        fromUser: fromUser,
+                        margin: margin,
 
-                        margin: margin
+                        fromUser: fromUser,
+                        from: this
                     },
                     this.events.change
                 )
@@ -14481,9 +14496,10 @@ class BoxEdit {
 
                 sendEventTo(
                     {
-                        fromUser: fromUser,
+                        columns: columns,
 
-                        columns: columns
+                        fromUser: fromUser,
+                        from: this
                     },
                     this.events.change
                 )
