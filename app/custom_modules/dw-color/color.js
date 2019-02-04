@@ -18,8 +18,6 @@ const HSL = /(^hsla?\((\s*\d+.*,){2,3}\s*\d+.*\)$)/i
 //Then require 3 or 6 repeats of 'Digit or A or B or C or D or E or F'
 const Hex = /(^#[\dabcdef]{6}$)|(^#[\dabcdef]{3}$)/i
 
-const notDigit = /\D/g
-
 const colorNames = {
     black: '#000000',
     silver: '#c0c0c0',
@@ -151,116 +149,6 @@ function toRGB(color) {
     }
 }
 
-function toHSL(color) {
-    color = color.trim().toLowerCase()
-
-    if (RGB.test(color)) {
-        //From:
-        //http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
-
-        let numbers = color.split(',')
-
-        if (numbers[0][3] === 'a') {
-            numbers[0] = numbers[0].slice(5, numbers[0].length)
-        } else {
-            numbers[0] = numbers[0].slice(4, numbers.length)
-        }
-
-        numbers = [
-            parseFloat(numbers[0]) / 255,
-            parseFloat(numbers[1]) / 255,
-            parseFloat(numbers[2]) / 255
-        ]
-
-        let max = Math.max(numbers[0], numbers[1], numbers[2])
-        let min = Math.min(numbers[0], numbers[1], numbers[2])
-
-        let h = 0
-        let s = 0
-        let l = (max + min) / 2
-
-        if (max !== min) {
-            let d = max - min
-
-            s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
-
-            switch (max) {
-                case r:
-                    h = (g - b) / d + (g < b ? 6 : 0)
-                    break
-                case g:
-                    h = (b - r) / d + 2
-                    break
-                case b:
-                    h = (r - g) / d + 4
-                    break
-            }
-
-            h /= 6
-        }
-
-        return (
-            'hsl(' +
-            (h * 360).toString() +
-            ',' +
-            (s * 100).toString() +
-            '%,' +
-            (l * 100).toString() +
-            '%)'
-        )
-    } else if (HSL.test(color)) {
-        return color
-    } else if (Hex.test(color)) {
-        return toHSL(toRGB(color))
-    } else {
-        //if the input color is a CSS color name, return that
-        //otherwise, return black
-        return toHSL(toRGB(colorNames[color] || '#000000'))
-    }
-}
-
-function toHex(color) {
-    color = color.trim().toLowerCase()
-
-    if (RGB.test(color)) {
-        let numbers = color.split(',')
-
-        //all numbers can't be below 0, or above 255
-
-        //the first number will have 'rgb(' or 'hsl(' in front of it,
-        //so that needs to be replaced before parsing it
-        let r = Math.min(
-            Math.max(parseFloat(numbers[0].replace(notDigit, '')), 0),
-            255
-        ).toString(16)
-        //All hex representations must be two digits,
-        //so if it's got only one digit, pad the front with a '0'
-        if (r.length === 1) {
-            r = '0' + r
-        }
-
-        let g = Math.min(Math.max(parseFloat(numbers[1]), 0), 255).toString(16)
-        if (g.length === 1) {
-            g = '0' + g
-        }
-
-        let b = Math.min(Math.max(parseFloat(numbers[2]), 0), 255).toString(16)
-        if (b.length === 1) {
-            b = '0' + b
-        }
-
-        return '#' + r + g + b
-    } else if (HSL.test(color)) {
-        return toHex(toRGB(color))
-    } else if (Hex.test(color)) {
-        return color
-    } else {
-        //if the input color is a CSS color name, return that
-        //otherwise, return black
-        return colorNames[color] || '#000000'
-    }
-}
-
 function extractRGB(color) {
     color = toRGB(color)
     color = color.split(',')
@@ -330,8 +218,6 @@ function isColor(color) {
 }
 
 exports.toRGB = toRGB
-exports.toHSL = toHSL
-exports.toHex = toHex
 exports.isColor = isColor
 exports.extractRGB = extractRGB
 exports.brightness = brightness
