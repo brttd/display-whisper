@@ -1362,16 +1362,10 @@ Songs.onEvent('error', error => {
     })
 })
 
-testButton.onEvent('click', () => {
-    preview.setupTest()
-})
+testButton.onEvent('click', preview.setupTest)
 
-printButton.onEvent('click', () => {
-    preview.print()
-})
-pdfButton.onEvent('click', () => {
-    preview.save()
-})
+printButton.onEvent('click', preview.print)
+pdfButton.onEvent('click', preview.save)
 
 layout.menu.onEvent('edit', event => {
     if (event.label === 'Undo') {

@@ -928,9 +928,7 @@ partsList.onEvent('select', event => {
     }
 })
 
-saveButton.onEvent('click', () => {
-    save()
-})
+saveButton.onEvent('click', save)
 
 removeButton.onEvent('click', () => {
     remove(editor.data.ID, editor.data.name)

@@ -1018,10 +1018,8 @@ function selectSection(name) {
 
 //Save & Remove
 {
-    saveButton.onEvent('click', () => {
-        //This causes the 'output' event to happen, and the handler for that should call the save function
-        editor.apply()
-    })
+    //This causes the 'output' event to happen, and the handler for that should call the save function
+    saveButton.onEvent('click', editor.apply)
 
     removeButton.onEvent('click', () => {
         layout.dialog.showQuestion(

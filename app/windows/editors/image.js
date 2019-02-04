@@ -315,9 +315,7 @@ applyButton.onEvent('click', () => {
     editor.apply()
 })
 
-cancelButton.onEvent('click', () => {
-    layout.window.close()
-})
+cancelButton.onEvent('click', layout.window.close)
 
 let gotData = false
 ipcRenderer.on('edit-data', (event, data) => {

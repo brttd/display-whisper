@@ -679,9 +679,7 @@ maxLines.onEvent('change', event => {
     }
 })
 
-updateSectionsButton.onEvent('click', () => {
-    updateSectionsAndSelect()
-})
+updateSectionsButton.onEvent('click', updateSectionsAndSelect)
 
 fitTextButton.onEvent('click', () => {
     let collections = {
@@ -1672,9 +1670,7 @@ applyButton.onEvent('click', () => {
     editor.apply()
 })
 
-cancelButton.onEvent('click', () => {
-    layout.window.close()
-})
+cancelButton.onEvent('click', layout.window.close)
 
 editor.onEvent('history', () => {
     layout.menu.change('edit', {

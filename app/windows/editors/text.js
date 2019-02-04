@@ -428,9 +428,7 @@ maxLinesEditor.onEvent('change', event => {
     }
 })
 
-updateSectionsButton.onEvent('click', () => {
-    updateSectionsAndSelect()
-})
+updateSectionsButton.onEvent('click', updateSectionsAndSelect)
 
 fitTextButton.onEvent('click', () => {
     layout.Display.getMaxTextSize(displaySections, maxSize => {
@@ -786,9 +784,7 @@ applyButton.onEvent('click', () => {
     editor.apply()
 })
 
-cancelButton.onEvent('click', () => {
-    layout.window.close()
-})
+cancelButton.onEvent('click', layout.window.close)
 
 let gotData = false
 ipcRenderer.on('edit-data', (event, data) => {

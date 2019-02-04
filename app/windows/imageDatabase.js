@@ -281,7 +281,7 @@ removeButton.onEvent('click', () => {
     )
 })
 
-removeAllButton.onEvent('click', event => {
+removeAllButton.onEvent('click', () => {
     layout.dialog.showQuestion(
         {
             title: 'Remove all images?',

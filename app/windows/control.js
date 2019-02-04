@@ -1174,7 +1174,7 @@ const playlist = {}
 
         item.onEvent('active-click', onItemActive)
         item.onEvent('select-click', onItemSelect)
-        item.onEvent('edit-click', event => {
+        item.onEvent('edit-click', () => {
             ipcRenderer.send(
                 'start-edit',
                 input.itemType,
@@ -4213,9 +4213,7 @@ const item_control = {
 
         ipcRenderer.send('display-blank', blankButton.active)
     })
-    undoRemoveButton.onEvent('click', event => {
-        playlist.undoRemove()
-    })
+    undoRemoveButton.onEvent('click', playlist.undoRemove)
 
     item_control.setOption = (name, value) => {
         if (name === 'playMode') {
@@ -4425,21 +4423,10 @@ const item_display1 = {
         setType(event.label.toLowerCase())
     })
 
-    showButtons.active.onEvent('click', () => {
-        setType('active')
-    })
-
-    showButtons.previous.onEvent('click', () => {
-        setType('previous')
-    })
-
-    showButtons.next.onEvent('click', () => {
-        setType('next')
-    })
-
-    showButtons.preview.onEvent('click', () => {
-        setType('preview')
-    })
+    showButtons.active.onEvent('click', setType.bind(null, 'active'))
+    showButtons.previous.onEvent('click', setType.bind(null, 'previous'))
+    showButtons.next.onEvent('click', setType.bind(null, 'next'))
+    showButtons.preview.onEvent('click', setType.bind(null, 'preview'))
 }
 
 //======================
@@ -4575,21 +4562,10 @@ const item_display2 = {
         setType(event.label.toLowerCase())
     })
 
-    showButtons.active.onEvent('click', () => {
-        setType('active')
-    })
-
-    showButtons.previous.onEvent('click', () => {
-        setType('previous')
-    })
-
-    showButtons.next.onEvent('click', () => {
-        setType('next')
-    })
-
-    showButtons.preview.onEvent('click', () => {
-        setType('preview')
-    })
+    showButtons.active.onEvent('click', setType.bind(null, 'active'))
+    showButtons.previous.onEvent('click', setType.bind(null, 'previous'))
+    showButtons.next.onEvent('click', setType.bind(null, 'next'))
+    showButtons.preview.onEvent('click', setType.bind(null, 'preview'))
 }
 
 /*
@@ -4694,7 +4670,7 @@ const item_display3 = {
         }
     }
 
-    display.onEvent('contextmenu', event => {
+    display.onEvent('contextmenu', () => {
         layout.contextMenu.show(
             [
                 {
@@ -4726,21 +4702,10 @@ const item_display3 = {
         setType(event.label.toLowerCase())
     })
 
-    showButtons.active.onEvent('click', event => {
-        setType('active')
-    })
-
-    showButtons.previous.onEvent('click', event => {
-        setType('previous')
-    })
-
-    showButtons.next.onEvent('click', event => {
-        setType('next')
-    })
-
-    showButtons.preview.onEvent('click', event => {
-        setType('preview')
-    })
+    showButtons.active.onEvent('click', setType.bind(null, 'active'))
+    showButtons.previous.onEvent('click', setType.bind(null, 'previous'))
+    showButtons.next.onEvent('click', setType.bind(null, 'next'))
+    showButtons.preview.onEvent('click', setType.bind(null, 'preview'))
 }
 
 //======================
@@ -4844,7 +4809,7 @@ const item_display4 = {
         }
     }
 
-    display.onEvent('contextmenu', event => {
+    display.onEvent('contextmenu', () => {
         layout.contextMenu.show(
             [
                 {
@@ -4876,21 +4841,10 @@ const item_display4 = {
         setType(event.label.toLowerCase())
     })
 
-    showButtons.active.onEvent('click', event => {
-        setType('active')
-    })
-
-    showButtons.previous.onEvent('click', event => {
-        setType('previous')
-    })
-
-    showButtons.next.onEvent('click', event => {
-        setType('next')
-    })
-
-    showButtons.preview.onEvent('click', event => {
-        setType('preview')
-    })
+    showButtons.active.onEvent('click', setType.bind(null, 'active'))
+    showButtons.previous.onEvent('click', setType.bind(null, 'previous'))
+    showButtons.next.onEvent('click', setType.bind(null, 'next'))
+    showButtons.preview.onEvent('click', setType.bind(null, 'preview'))
 }
 */
 

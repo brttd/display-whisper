@@ -596,9 +596,7 @@ layout.body.onEvent('file-drop', event => {
     }
 })
 
-importButton.onEvent('click', event => {
-    importSongs()
-})
+importButton.onEvent('click', importSongs)
 
 overwite.onEvent('change', event => {
     if (event.fromUser) {
