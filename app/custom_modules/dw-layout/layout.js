@@ -24,20 +24,6 @@ const objUtil = require('dw-editor').util
 
 const thisWin = remote.getCurrentWindow()
 
-//loader
-{
-    window.addEventListener('load', () => {
-        requestAnimationFrame(() => {
-            document.body.style.transition = 'opacity 0.4s'
-            document.body.style.opacity = 1
-
-            setTimeout(() => {
-                document.body.style.transition = ''
-            }, 1500)
-        })
-    })
-}
-
 let idCounter = 0
 
 //Each exported layout item type, stored by name
@@ -1054,7 +1040,16 @@ const body = new Item(document.body)
         }
 
         window.addEventListener('load', () => {
-            body.onIdle(body.onResize)
+            body.onIdle(() => {
+                document.body.style.transition = 'opacity 0.4s'
+                document.body.style.opacity = 1
+
+                setTimeout(() => {
+                    document.body.style.transition = ''
+                }, 1500)
+
+                body.onResize()
+            })
         })
     }
 
