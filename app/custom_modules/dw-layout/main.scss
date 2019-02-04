@@ -39,10 +39,17 @@ $cursors: (
 );
 
 @each $cursor in $cursors {
-    .cursor-#{$cursor} {
-        cursor: $cursor !important;
+    body.cursor-#{$cursor} * {
+        @if $cursor == grab {
+            cursor: -webkit-grab !important;
+        } @else if $cursor == grabbing {
+            cursor: -webkit-grabbing !important;
+        } @else {
+            cursor: $cursor !important;
+        }
     }
 }
+
 .hide {
     display: none !important;
 }
