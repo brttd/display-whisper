@@ -10893,8 +10893,6 @@ class BoxEdit {
 
             return false
         }
-        mouse.percX = Math.max(0, Math.min(1, mouse.percX))
-        mouse.percY = Math.max(0, Math.min(1, mouse.percY))
 
         if (this.resizing === 'm') {
             let width = this.values.right - this.values.left
@@ -10903,8 +10901,8 @@ class BoxEdit {
             mouse.percX += this.mouseOffset.x
             mouse.percY += this.mouseOffset.y
 
-            mouse.percX = Math.min(1 - width/100, mouse.percX)
-            mouse.percY = Math.min(1 - height/100, mouse.percY)
+            mouse.percX = Math.max(0, Math.min(1 - width/100, mouse.percX))
+            mouse.percY = Math.max(0, Math.min(1 - height/100, mouse.percY))
 
             this.values.left = round(mouse.percX * 100, positionPrecision)
             this.values.right = round(
@@ -10918,6 +10916,9 @@ class BoxEdit {
                 positionPrecision
             )
         }
+
+        mouse.percX = Math.max(0, Math.min(1, mouse.percX))
+        mouse.percY = Math.max(0, Math.min(1, mouse.percY))
 
         if (this.resizing.includes('t')) {
             this.values.top = round(mouse.percY * 100, positionPrecision)
