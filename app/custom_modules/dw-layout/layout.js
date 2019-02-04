@@ -13054,25 +13054,24 @@ class BoxEdit {
             {
                 this.dragButton = new exports.Drag(
                     {
-                        direction: 'y',
-                        highlight: true
+                        icon: 'move-y',
                     },
                     {
-                        align: 'stretch'
+                        align: 'stretch',
+                        class: 'highlight'
                     }
                 )
                 this.editButton = new exports.Button(
                     {
                         icon: 'edit',
-                        highlight: true
                     },
                     {
-                        align: 'stretch'
+                        align: 'stretch',
+                        class: 'highlight'
                     }
                 )
                 this.toggleButton = new exports.Button({
-                    icon: 'expand-y',
-                    highlight: false
+                    icon: 'expand-y'
                 })
                 this.itemsBlock = new exports.Block(
                     {},
@@ -13082,11 +13081,11 @@ class BoxEdit {
                 )
                 this.removeButton = new exports.Button(
                     {
-                        icon: 'remove',
-                        highlight: true
+                        icon: 'remove'
                     },
                     {
-                        align: 'stretch'
+                        align: 'stretch',
+                        class: 'highlight'
                     }
                 )
 
@@ -13517,12 +13516,14 @@ class BoxEdit {
             }
 
             if (this.needsChange.active) {
-                this.toggleButton.active = this.toggleButton.highlight = this.properties.active
+                this.toggleButton.active = this.properties.active
 
                 if (this.properties.active) {
                     this.node.classList.add('active')
+                    this.toggleButton.node.classList.add('highlight')
                 } else {
                     this.node.classList.remove('active')
+                    this.toggleButton.node.classList.remove('highlight')
                 }
 
                 this.needsChange.active = false
@@ -13555,7 +13556,13 @@ class BoxEdit {
             }
 
             if (this.needsChange.minimized) {
-                this.toggleButton.active = this.toggleButton.highlight = this.properties.active
+                this.toggleButton.active = this.properties.active
+
+                if (this.properties.active) {
+                    this.toggleButton.node.classList.add('highlight')
+                } else {
+                    this.toggleButton.node.classList.remove('highlight')
+                }
 
                 if (this.properties.minimized) {
                     if (
@@ -13669,11 +13676,11 @@ class BoxEdit {
 
                 this.activeButton = new exports.Button(
                     {
-                        highlight: true,
                         icon: 'play'
                     },
                     {
-                        align: 'stretch'
+                        align: 'stretch',
+                        class: 'highlight'
                     }
                 )
 
