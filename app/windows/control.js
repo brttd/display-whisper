@@ -382,6 +382,8 @@ const playlist = {}
         dragging = itemsBlock.indexOf(event.from)
 
         itemsBlock.hovering = true
+
+        layout.setCursor('grabbing')
     }
     function onItemRemove(event) {
         remove(itemsBlock.indexOf(event.from))
