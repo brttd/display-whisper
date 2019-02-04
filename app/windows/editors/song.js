@@ -38,7 +38,9 @@ const songNameInput = new layout.TextInput(
         label: 'Title:'
     },
     {
-        size: '20ch'
+        size: '20ch',
+        grow: true,
+        shrink: true
     }
 )
 const songAuthorInput = new layout.TextInput(
@@ -46,7 +48,9 @@ const songAuthorInput = new layout.TextInput(
         label: 'Author:'
     },
     {
-        size: '20ch'
+        size: '20ch',
+        grow: true,
+        shrink: true
     }
 )
 const songCopyrightInput = new layout.TextInput(
@@ -54,7 +58,9 @@ const songCopyrightInput = new layout.TextInput(
         label: 'Copyright:'
     },
     {
-        size: '20ch'
+        size: '20ch',
+        grow: true,
+        shrink: true
     }
 )
 const editButton = new layout.Button({ text: 'Edit' })
