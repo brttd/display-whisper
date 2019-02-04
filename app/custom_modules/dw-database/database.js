@@ -1665,16 +1665,16 @@ class GroupDatabase extends EmptyGroupDatabase {
 
                 return callback(null)
             } else if (this.options.load === false) {
-                list.forEach(filename => {
-                    let file = this._toGroup(filename)
+                for (let i = 0; i < list.length; i++) {
+                    let file = this._toGroup(list[i])
 
                     if (!this.validID(file.group, file.ID)) {
                         return false
                     }
 
-                    this._files.push(filename)
+                    this._files.push(list[i])
                     this._addID(file.group, file.ID)
-                })
+                }
 
                 this._updating = false
 
