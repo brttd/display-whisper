@@ -278,11 +278,6 @@ layout.body.add(
                     tooltip: 'Font tooltip'
                 }),
                 new layout.FontInput({
-                    text: 'Higlight',
-                    highlight: true,
-                    tooltip: 'Font Highlight tooltip'
-                }),
-                new layout.FontInput({
                     text: 'Disabled',
                     disabled: true,
                     tooltip: 'Font Disabled tooltip'
@@ -291,12 +286,6 @@ layout.body.add(
                 new layout.Button({
                     text: 'Button',
                     tooltip: 'Button tooltip'
-                }),
-                new layout.Button({
-                    text: 'Button',
-                    icon: 'play',
-                    highlight: true,
-                    tooltip: 'Button Icon tooltip'
                 }),
                 new layout.Button({
                     text: 'Disabled',
@@ -310,25 +299,9 @@ layout.body.add(
                     tooltip: 'Button Large tooltip'
                 }),
 
-                new layout.Drag({
-                    direction: 'y',
-                    tooltip: 'Drag tooltip'
-                }),
-                new layout.Drag({
-                    direction: 'x',
-                    size: 'large',
-                    tooltip: 'Drag Large tooltip'
-                }),
-
                 new layout.CheckboxInput({
                     label: 'Checkbox',
                     tooltip: 'Checkbox tooltip'
-                }),
-                new layout.CheckboxInput({
-                    label: 'Highlight',
-                    highlight: true,
-                    value: true,
-                    tooltip: 'Checkbox Highlight tooltip'
                 }),
                 new layout.CheckboxInput({
                     label: 'Disabled',
@@ -344,14 +317,6 @@ layout.body.add(
                     maxLength: 3
                 }),
                 new layout.TextInput({
-                    label: 'Highlight',
-                    highlight: true,
-                    placeholder: 'Default',
-                    tooltip: 'Text Highlight tooltip',
-
-                    maxLength: Infinity
-                }),
-                new layout.TextInput({
                     label: 'Disabled',
                     disabled: true,
                     placeholder: 'Default',
@@ -363,13 +328,6 @@ layout.body.add(
                     unit: '%',
                     placeholder: 'Default',
                     tooltip: 'Number tooltip'
-                }),
-                new layout.NumberInput({
-                    label: 'Highlight',
-                    unit: '%',
-                    highlight: true,
-                    placeholder: 'Default',
-                    tooltip: 'Number Highlight tooltip'
                 }),
                 new layout.NumberInput({
                     label: 'Disabled',
@@ -384,11 +342,6 @@ layout.body.add(
                     tooltip: 'Color tooltip'
                 }),
                 new layout.ColorInput({
-                    label: 'Highlight',
-                    highlight: true,
-                    tooltip: 'Color Highlight tooltip'
-                }),
-                new layout.ColorInput({
                     label: 'Disabled',
                     disabled: true,
                     tooltip: 'Color Disabled tooltip'
@@ -400,12 +353,6 @@ layout.body.add(
                     tooltip: 'Select tooltip'
                 }),
                 new layout.SelectInput({
-                    label: 'Highlight',
-                    highlight: true,
-                    options: ['1', '2', '3', '4'],
-                    tooltip: 'Select Highlight tooltip'
-                }),
-                new layout.SelectInput({
                     label: 'Select',
                     disabled: true,
                     options: ['1', '2', '3', '4'],
@@ -415,12 +362,6 @@ layout.body.add(
                 new layout.KeyInput({
                     text: 'Key',
                     tooltip: 'Key tooltip'
-                }),
-                new layout.KeyInput({
-                    text: 'Highlight',
-                    highlight: true,
-
-                    tooltip: 'Key Highlight tooltip'
                 }),
                 new layout.KeyInput({
                     text: 'Disabled',
