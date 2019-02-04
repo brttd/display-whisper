@@ -3290,105 +3290,6 @@ exports.change = addStyles
     }
     exports.Button = items.Button = Button
 
-    class Drag extends Item {
-        /*
-        Button input, but for only for moving items.
-
-        Constructor data:
-            size (string): 'large' or 'small'.
-            direction (string): 'x' or 'y'. Sets the icon shown.
-            tooltip (string): 'drag' by default.
-            onDrag (function): Called when button is clicked.
-        
-        Properties:
-            disabled (get/set) (boolean): Retrieve/set disabled state.
-        
-        Methods:
-            N/A
-
-        Events:
-            'drag'
-        */
-        constructor(data = {}, styles = {}) {
-            super(document.createElement('button'), styles)
-            this.addClass('input-drag')
-
-            if (data.direction === 'x') {
-                this.iconNode = getIconSVG('move-x')
-            } else if (data.direction === 'y') {
-                this.iconNode = getIconSVG('move-y')
-            } else {
-                this.iconNode = getIconSVG('move-xy')
-            }
-
-            if (data.size === 'large' || data.size === 'small') {
-                this.addClass(data.size)
-            }
-
-            if (data.highlight === true) {
-                this.addClass('highlight')
-            }
-
-            if (typeof data.tooltip === 'string') {
-                this.node.title = data.tooltip
-            }
-
-            this.disabled = data.disabled
-
-            this.node.appendChild(this.iconNode)
-
-            if (typeof data.onDrag === 'function') {
-                this.onEvent('drag', data.onDrag)
-            }
-
-            this.node.addEventListener('click', () => {
-                this.node.blur()
-
-                if (data.focus !== false) {
-                    body.inputFocused(this, true)
-                }
-            })
-
-            let mousedown = false
-
-            this.node.addEventListener('mousedown', () => {
-                mousedown = true
-                body.setCursor('grabbing')
-            })
-
-            this.node.addEventListener('mouseleave', () => {
-                if (mousedown) {
-                    sendEventTo(
-                        {
-                            fromUser: true,
-                            from: this
-                        },
-                        this.events.drag
-                    )
-                }
-            })
-
-            body.onEvent('blur', () => {
-                mousedown = false
-                this.node.blur()
-            })
-
-            body.onEvent('mouseup', () => {
-                mousedown = false
-                this.node.blur()
-            })
-        }
-
-        get disabled() {
-            return this.node.disabled
-        }
-        set disabled(disabled) {
-            if (typeof disabled === 'boolean') {
-                this.node.disabled = disabled
-            }
-        }
-    }
-    exports.Drag = items.Drag = Drag
 
     class CheckboxInput extends InputItem {
         /*
@@ -13052,7 +12953,7 @@ class BoxEdit {
 
             //buttons & other items
             {
-                this.dragButton = new exports.Drag(
+                this.dragButton = new exports.Button(
                     {
                         icon: 'move-y',
                     },
@@ -13110,7 +13011,7 @@ class BoxEdit {
                 }
                 this.node.appendChild(this.removeButton.node)
 
-                this.dragButton.onEvent('drag', event => {
+                this.dragButton.onEvent('mousedown', event => {
                     sendEventTo(
                         {
                             fromUser: event.fromUser,
