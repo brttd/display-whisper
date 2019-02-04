@@ -1421,6 +1421,7 @@ const playlist = {}
         }
 
         if (
+            list.length <= 1 ||
             index < 0 ||
             index >= list.length ||
             newIndex < 0 ||
