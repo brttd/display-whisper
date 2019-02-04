@@ -3290,7 +3290,6 @@ exports.change = addStyles
     }
     exports.Button = items.Button = Button
 
-
     class CheckboxInput extends InputItem {
         /*
         Standard checkbox input. Label is shown after input.
@@ -4324,7 +4323,7 @@ exports.change = addStyles
                 value: this._value,
 
                 min: this._options.popupMin,
-                max: this._options.popupMax,
+                max: this._options.popupMax
             })
         }
         movePopup() {
@@ -4588,9 +4587,12 @@ exports.change = addStyles
                 numberInputs[colors[i]].min = 0
                 numberInputs[colors[i]].step = 1
                 numberInputs[colors[i]].value = 0
-                numberInputs[colors[i]].id = 'color-popup-' + colors[i] + '-input'
+                numberInputs[colors[i]].id =
+                    'color-popup-' + colors[i] + '-input'
                 numberInputBox.appendChild(document.createElement('label'))
-                numberInputBox.lastElementChild.textContent = colors[i][0].toUpperCase()
+                numberInputBox.lastElementChild.textContent = colors[
+                    i
+                ][0].toUpperCase()
                 numberInputBox.lastElementChild.for = numberInputs[colors[i]].id
                 numberInputBox.appendChild(numberInputs[colors[i]])
 
@@ -4603,7 +4605,10 @@ exports.change = addStyles
                     onInputChange.bind(numberInputs[colors[i]], colors[i])
                 )
 
-                numberInputs[colors[i]].addEventListener('blur', onInputBlur.bind(numberInputs[colors[i]], colors[i]))
+                numberInputs[colors[i]].addEventListener(
+                    'blur',
+                    onInputBlur.bind(numberInputs[colors[i]], colors[i])
+                )
             }
 
             colorPopup.node.appendChild(numberInputBox)
@@ -6579,14 +6584,10 @@ exports.change = addStyles
         }
 
         showDropDown() {
-            imagePopup.show(
-                this.buttonNode.getBoundingClientRect(),
-                {
-
-                    value: this._value,
-                    database: this._database
-                }
-            )
+            imagePopup.show(this.buttonNode.getBoundingClientRect(), {
+                value: this._value,
+                database: this._database
+            })
         }
         moveDropDown() {
             if (!this._focused) {
@@ -10875,7 +10876,12 @@ class BoxEdit {
 
     mouseMove(mouse) {
         if (this.resizing === '') {
-            if (mouse.percX < 0 || mouse.percX > 1 || mouse.percY < 0 || mouse.percY > 1) {
+            if (
+                mouse.percX < 0 ||
+                mouse.percX > 1 ||
+                mouse.percY < 0 ||
+                mouse.percY > 1
+            ) {
                 return false
             }
             this.mouseOffset.x = this.values.left / 100 - mouse.percX
@@ -10901,8 +10907,8 @@ class BoxEdit {
             mouse.percX += this.mouseOffset.x
             mouse.percY += this.mouseOffset.y
 
-            mouse.percX = Math.max(0, Math.min(1 - width/100, mouse.percX))
-            mouse.percY = Math.max(0, Math.min(1 - height/100, mouse.percY))
+            mouse.percX = Math.max(0, Math.min(1 - width / 100, mouse.percX))
+            mouse.percY = Math.max(0, Math.min(1 - height / 100, mouse.percY))
 
             this.values.left = round(mouse.percX * 100, positionPrecision)
             this.values.right = round(
@@ -12961,7 +12967,7 @@ class BoxEdit {
             {
                 this.dragButton = new exports.Button(
                     {
-                        icon: 'move-y',
+                        icon: 'move-y'
                     },
                     {
                         align: 'stretch',
@@ -12970,7 +12976,7 @@ class BoxEdit {
                 )
                 this.editButton = new exports.Button(
                     {
-                        icon: 'edit',
+                        icon: 'edit'
                     },
                     {
                         align: 'stretch',
