@@ -796,8 +796,12 @@ function updateTemplateListAndSelect() {
         ) {
             layout.dialog.showQuestion(
                 {
-                    title: 'Save',
-                    message: 'Save changes?',
+                    title: 'Save Template?',
+                    message:
+                        'You have made changes to the template "' +
+                        editor.data.name +
+                        '" which have not been saved!',
+                    detail: 'The changes will be lost unless you save them.',
 
                     options: ['Save', 'Discard', 'Cancel']
                 },
@@ -1003,12 +1007,12 @@ layout.window.onEvent('close', event => {
 
         layout.dialog.showQuestion(
             {
-                title: 'Save changes?',
+                title: 'Save Template?',
                 message:
                     'You have made changes to the template "' +
                     editor.data.name +
                     '" which have not been saved!',
-                detail: 'Do you want to save your changes?',
+                detail: 'The changes will be lost unless you save them.',
 
                 options: ['Save', 'Discard', 'Cancel']
             },

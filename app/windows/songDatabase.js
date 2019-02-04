@@ -985,13 +985,13 @@ function selectSection(name) {
             if (editor.hasChanges) {
                 layout.dialog.showQuestion(
                     {
-                        title: 'Save Changes?',
+                        title: 'Save Song?',
                         message:
-                            'There are unsaved changes to the song "' +
+                            'You have made changes to the song "' +
                             editor.data.name +
-                            '"!',
+                            '" which have not been saved!',
                         detail:
-                            'These changes will be lost unless you save them.',
+                            'The changes will be lost unless you save them.',
 
                         options: ['Save', 'Discard', 'Cancel']
                     },
@@ -1285,12 +1285,12 @@ layout.window.onEvent('close', event => {
 
         layout.dialog.showQuestion(
             {
-                title: 'Save Changes?',
+                title: 'Save Song?',
                 message:
-                    'There are unsaved changes to the song "' +
+                    'You have made changes to the song "' +
                     editor.data.name +
-                    '"!',
-                detail: 'These changes will be lost unless you save them.',
+                    '" which have not been saved!',
+                detail: 'The changes will be lost unless you save them.',
 
                 options: ['Save', 'Discard', 'Cancel']
             },
@@ -1315,12 +1315,12 @@ function showSong(songGroup, songID) {
     if (editor.hasChanges) {
         layout.dialog.showQuestion(
             {
-                title: 'Save Changes?',
+                title: 'Save Song?',
                 message:
-                    'There are unsaved changes to the song "' +
+                    'You have made changes to the song "' +
                     editor.data.name +
-                    '"!',
-                detail: 'These changes will be lost unless you save them.',
+                    '" which have not been saved!',
+                detail: 'The changes will be lost unless you save them.',
 
                 options: ['Save', 'Discard', 'Cancel']
             },
