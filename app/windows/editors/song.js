@@ -286,7 +286,7 @@ backgroundControl.connect(displayEditor)
                                     ],
 
                                     size: 20,
-                                    minWidth: 100,
+                                    minWidth: 640,
                                     minHeight: 90,
                                     maxHeight: 90
                                 }),
@@ -313,7 +313,7 @@ backgroundControl.connect(displayEditor)
                                     ],
 
                                     size: 70,
-                                    minWidth: 760,
+                                    minWidth: 640,
                                     minHeight: 400
                                 })
                                 /* OK, Apply, Cancel */
