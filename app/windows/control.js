@@ -1325,8 +1325,16 @@ const playlist = {}
             index: index
         })
 
+        itemsBlock.items[index].selected = false
+        itemsBlock.items[index].active = false
+
         list.splice(index, 1)
         itemsBlock.remove(index)
+
+        let lastSelected = {
+            index: selected.index,
+            subIndex: selected.subIndex
+        }
 
         if (index < active.index) {
             setActive({ index: active.index - 1, subIndex: active.subIndex })
@@ -1334,13 +1342,13 @@ const playlist = {}
             setActive({ index: active.index - 1, subIndex: 0 })
         }
 
-        if (index < selected.index) {
+        if (index < lastSelected.index) {
             setSelected({
-                index: selected.index - 1,
-                subIndex: selected.subIndex
+                index: lastSelected.index - 1,
+                subIndex: lastSelected.subIndex
             })
-        } else if (index === selected.index) {
-            setSelected({ index: selected.index - 1, subIndex: 0 })
+        } else if (index === lastSelected.index) {
+            setSelected({ index: lastSelected.index - 1, subIndex: 0 })
         }
 
         if (list.length === 0) {
