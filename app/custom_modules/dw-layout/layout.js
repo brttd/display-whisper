@@ -824,6 +824,12 @@ const body = new Item(document.body)
 
     body.items = []
 
+    body.events['input-focus'] = []
+    body.events.resize = []
+    body.events.scroll = []
+    body.events.focus = []
+    body.events.blur = []
+
     function onBodyResize() {
         for (let i = 0; i < bodyItemResizeFunctions.length; i++) {
             body.onFrame.end(bodyItemResizeFunctions[i])
@@ -1157,11 +1163,6 @@ const body = new Item(document.body)
     let sendScrollEvent = () => {
         sendEventTo({ fromUser: true, from: body }, body.events.scroll)
     }
-
-    body.events.resize = []
-    body.events.scroll = []
-    body.events.focus = []
-    body.events.blur = []
 
     window.addEventListener('resize', () => {
         size.width = window.innerWidth
