@@ -786,15 +786,14 @@ function updateTemplateListAndSelect() {
 //selecting, deleting, & adding templates
 {
     list.onEvent('select', event => {
-        if (
-            event.index < 0 ||
-            event.index >= Templates.list.length ||
-            Templates.list[event.index].ID === editor.data.ID
-        ) {
+        if (event.index < 0 || event.index >= Templates.list.length) {
             return false
         }
 
-        if (editor.hasChanges) {
+        if (
+            editor.hasChanges &&
+            Templates.list[event.index].ID !== editor.data.ID
+        ) {
             layout.dialog.showQuestion(
                 {
                     title: 'Save',
