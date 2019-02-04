@@ -324,7 +324,7 @@ backgroundControl.connect(displayEditor)
                                     ],
 
                                     size: 70,
-                                    minWidth: 640,
+                                    minWidth: 500,
                                     minHeight: 400
                                 })
                                 /* OK, Apply, Cancel */
@@ -1048,7 +1048,7 @@ fitTextButton.onEvent('click', () => {
         if (!Songs.validID(editor.data.group, editor.data.groupID)) {
             layout.dialog.showNotification({
                 type: 'warning',
-                message: 'No song in library with same ID'
+                message: 'No song in library with same ID!'
             })
 
             return false
