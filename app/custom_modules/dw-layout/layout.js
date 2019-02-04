@@ -13973,16 +13973,6 @@ class BoxEdit {
     }
 
     let printElem = null
-    let printOverlayNode = document.createElement('div')
-    let printOverlayTextNode = document.createElement('span')
-    {
-        printOverlayNode.className = 'printOverlay'
-
-        printOverlayNode.appendChild(document.createElement('div'))
-
-        printOverlayNode.lastChild.appendChild(printOverlayTextNode)
-        printOverlayNode.lastChild.lastChild.textContent = 'Printing'
-    }
 
     let printStyleNode = document.createElement('style')
     let setPageSize = null
@@ -14800,8 +14790,7 @@ class BoxEdit {
         }
 
         print(options = {}) {
-            printOverlayTextNode.textContent = 'Printing'
-            body.node.appendChild(printOverlayNode)
+            exports.showLoader(body, 'Printing')
 
             this._updatePrintElem()
 
@@ -14828,15 +14817,12 @@ class BoxEdit {
                     printBackground: true
                 })
 
-                if (printOverlayNode.parentElement) {
-                    printOverlayNode.parentElement.removeChild(printOverlayNode)
-                }
+                exports.hideLoader(body)
             })
         }
 
         save(options = {}) {
-            printOverlayTextNode.textContent = 'Saving'
-            body.node.appendChild(printOverlayNode)
+            exports.showLoader(body, 'Saving')
 
             this._updatePrintElem()
 
@@ -14860,11 +14846,7 @@ class BoxEdit {
                                     ')!\nPlease try again.'
                             )
 
-                            if (printOverlayNode.parentElement) {
-                                printOverlayNode.parentElement.removeChild(
-                                    printOverlayNode
-                                )
-                            }
+                            exports.hideLoader(body)
 
                             return false
                         }
@@ -14881,21 +14863,13 @@ class BoxEdit {
                             },
                             (error, filename) => {
                                 if (!filename) {
-                                    if (printOverlayNode.parentElement) {
-                                        printOverlayNode.parentElement.removeChild(
-                                            printOverlayNode
-                                        )
-                                    }
+                                    exports.hideLoader(body)
 
                                     return false
                                 }
 
                                 fs.writeFile(filename, PDFData, error => {
-                                    if (printOverlayNode.parentElement) {
-                                        printOverlayNode.parentElement.removeChild(
-                                            printOverlayNode
-                                        )
-                                    }
+                                    exports.hideLoader(body)
 
                                     if (error) {
                                         logger.error(
