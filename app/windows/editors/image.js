@@ -321,6 +321,8 @@ cancelButton.onEvent('click', () => {
 
 ipcRenderer.on('edit-data', (event, data) => {
     editor.set(data)
+
+    imageBox.focus()
     update()
 })
 
