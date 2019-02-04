@@ -4,10 +4,12 @@ const path = require('path')
 const fs = require('fs')
 const logger = require('dw-log')
 
-const userDataPath = (
-    require('electron').app || require('electron').remote.app
-).getPath('userData')
-const dir = path.join(userDataPath, 'database')
+const dir = path.join(
+    (require('electron').app || require('electron').remote.app).getPath(
+        'userData'
+    ),
+    'database'
+)
 
 const maxSimultaneousFileLoads = 10
 
