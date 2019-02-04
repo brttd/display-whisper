@@ -13514,6 +13514,10 @@ class BoxEdit {
                 }
 
                 this.needsChange.minimized = false
+
+                if (this.parent && this.parent.checkResize) {
+                    this.parent.checkResize()
+                }
             }
 
             if (this.needsChange.sectionCount) {
@@ -13550,6 +13554,10 @@ class BoxEdit {
                 }
 
                 this.needsChange.sectionCount = false
+
+                if (this.parent && this.parent.checkResize) {
+                    this.parent.checkResize()
+                }
             }
         }
     }
