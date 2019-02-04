@@ -234,7 +234,7 @@ module.exports = class Text {
             let section = this.data.sections[sectionIndex]
 
             let sectionParts = richText.distributeLines(
-                this.data.sections[sectionIndex],
+                this.data.sections[sectionIndex].text,
                 this.data.maxLines
             )
 
