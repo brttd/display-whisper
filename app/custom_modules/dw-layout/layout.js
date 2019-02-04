@@ -3092,7 +3092,6 @@ exports.change = addStyles
 
         Constructor data:
             size (string): 'large' or 'small'.
-            highlight (boolean): If true, will be shown in highlight color when active.
             disabled (boolean): Disabled state.
             icon (string): Icon name. If undefined, no icon will be shown.
             text (string): Text shown in button.
@@ -3131,10 +3130,6 @@ exports.change = addStyles
 
             if (data.size === 'large' || data.size === 'small') {
                 this.addClass(data.size)
-            }
-
-            if (data.highlight === true) {
-                this.addClass('highlight')
             }
 
             if (data.disabled === true) {
@@ -3257,14 +3252,6 @@ exports.change = addStyles
         set disabled(disabled) {
             if (typeof disabled === 'boolean') {
                 this.node.disabled = disabled
-            }
-        }
-
-        set highlight(value) {
-            if (value) {
-                this.addClass('highlight')
-            } else {
-                this.removeClass('highlight')
             }
         }
 
@@ -3409,7 +3396,6 @@ exports.change = addStyles
 
         Constructor data:
             disabled (boolean)
-            highlight (boolean)
             value (boolean)
             onChange (function)
         
@@ -3432,10 +3418,6 @@ exports.change = addStyles
             this.node.insertBefore(this.inputNode, this.node.firstChild)
 
             this.disabled = data.disabled
-
-            if (data.highlight === true) {
-                this.addClass('highlight')
-            }
 
             if (typeof data.value === 'boolean') {
                 this.inputNode.checked = data.value
@@ -3502,7 +3484,6 @@ exports.change = addStyles
         Constructor data:
             autoFocusNext (boolean)
             disabled (boolean)
-            highlight (boolean)
             placeholder (string)
             tooltip (string)
             value (string)
@@ -3531,10 +3512,6 @@ exports.change = addStyles
             }
 
             this.disabled = data.disabled
-
-            if (data.highlight === true) {
-                this.addClass('highlight')
-            }
 
             this._maxLength = Infinity
 
@@ -3712,7 +3689,6 @@ exports.change = addStyles
 
         Constructor data:
             disabled (boolean)
-            highlight (boolean)
             tooltip (string)
             placeholder (string)
             value (string)
@@ -3749,10 +3725,6 @@ exports.change = addStyles
             this.node.appendChild(this.inputNode)
 
             this.disabled = data.disabled
-
-            if (data.highlight === true) {
-                this.addClass('highlight')
-            }
 
             this.tooltip = data.tooltip
             this.placeholder = data.placeholder
@@ -3968,12 +3940,6 @@ exports.change = addStyles
         numberPopup.show = function(position, number) {
             numberPopup.move(position)
 
-            if (number.highlight) {
-                numberPopup.node.classList.add('highlight')
-            } else {
-                numberPopup.node.classList.remove('highlight')
-            }
-
             if (typeof number.min === 'number' && isFinite(number.min)) {
                 numberRange.min = number.min
             } else {
@@ -4041,7 +4007,6 @@ exports.change = addStyles
         Constructor data:
             autoFocusNext (boolean)
             disabled (boolean)
-            highlight (boolean)
             placeholder (string)
             tooltip (string)
             unit (string): Shown at end of input.
@@ -4098,10 +4063,6 @@ exports.change = addStyles
             this.autoFocusNext = false
             if (typeof data.autoFocusNext === 'boolean') {
                 this.autoFocusNext = data.autoFocusNext
-            }
-
-            if (data.highlight === true) {
-                this.addClass('highlight')
             }
 
             this._options = {
@@ -4463,8 +4424,6 @@ exports.change = addStyles
 
                 min: this._options.popupMin,
                 max: this._options.popupMax,
-
-                highlight: this.node.classList.contains('highlight')
             })
         }
         movePopup() {
@@ -4907,7 +4866,6 @@ exports.change = addStyles
 
         Constructor data:
             disabled (boolean)
-            highlight (boolean)
             tooltip (string)
             value (string: COLOR)
             focus (boolean): If false, will not emit global body input-focus event.
@@ -4950,10 +4908,6 @@ exports.change = addStyles
             this.buttonNode.appendChild(getIconSVG('expand-x'))
 
             this.disabled = data.disabled
-
-            if (data.highlight === true) {
-                this.addClass('highlight')
-            }
 
             this.tooltip = data.tooltip
 
@@ -5136,7 +5090,6 @@ exports.change = addStyles
 
         Constructor data:
             disabled (boolean)
-            highlight (boolean)
             label (string): Shown above dropdown box.
             tooltip (string)
             options (array: string)
@@ -5182,10 +5135,6 @@ exports.change = addStyles
             this.addClass('input-select')
 
             this.disabled = data.disabled
-
-            if (data.highlight === true) {
-                this.addClass('highlight')
-            }
 
             this.tooltip = data.tooltip
 
@@ -5528,7 +5477,6 @@ exports.change = addStyles
 
         Constructor data:
             disabled (boolean)
-            highlight (boolean)
             label (string): Shown above input box.
             tooltip (string)
             value (string)
@@ -5555,10 +5503,6 @@ exports.change = addStyles
                 this.node.firstChild.textContent = data.label
 
                 this.node.firstChild.setAttribute('for', this.inputNode.id)
-            }
-
-            if (data.highlight === true) {
-                this.addClass('highlight')
             }
 
             this.node.appendChild(this.inputNode)
@@ -5820,7 +5764,6 @@ exports.change = addStyles
 
         Constructor data:
             disabled (boolean)
-            highlight (boolean)
             value (string)
             focus (boolean)
         
@@ -5858,10 +5801,6 @@ exports.change = addStyles
                 this.textNode = document.createElement('span')
                 this.textNode.innerText = ' '
                 this.node.appendChild(this.textNode)
-            }
-
-            if (data.highlight === true) {
-                this.addClass('highlight')
             }
 
             if (data.disabled === true) {
@@ -6003,7 +5942,6 @@ exports.change = addStyles
             text (string)
             tooltip (string)
             size (string: 'large' or 'small')
-            highlight (boolean)
             disabled (boolean)
             defaultPath (string)
             buttonLabel (string)
@@ -6055,9 +5993,6 @@ exports.change = addStyles
 
             if (data.size === 'large' || data.size === 'small') {
                 this.addClass(data.size)
-            }
-            if (data.highlight === true) {
-                this.addClass('highlight')
             }
             if (data.disabled === true) {
                 this.node.disabled = true
@@ -6541,7 +6476,6 @@ exports.change = addStyles
 
         Constructor data:
             label (string)
-            highlight (boolean)
             disabled (boolean)
             value (string)
             focus (boolean)
@@ -6573,10 +6507,6 @@ exports.change = addStyles
                 this.node.firstChild.textContent = data.label
 
                 this.node.firstChild.setAttribute('for', this.buttonNode.id)
-            }
-
-            if (data.highlight === true) {
-                this.addClass('highlight')
             }
 
             this.node.appendChild(this.buttonNode)
@@ -6748,10 +6678,9 @@ exports.change = addStyles
         }
 
         showDropDown() {
-            let bounds = imagePopup.show(
+            imagePopup.show(
                 this.buttonNode.getBoundingClientRect(),
                 {
-                    highlight: this.node.classList.contains('highlight'),
 
                     value: this._value,
                     database: this._database
@@ -7955,10 +7884,6 @@ exports.change = addStyles
                 multiSelect: false
             }
 
-            if (data.highlight === true) {
-                this.addClass('highlight')
-            }
-
             //TODO
             //if (data.disabled === true) {this.listNode.disabled = true}
 
@@ -8721,8 +8646,6 @@ exports.change = addStyles
             if (this._globalFocus) {
                 body.inputFocused(this, fromUser)
             }
-
-            //TODO: add highlight border, etc?
         }
         blur(fromUser = false) {
             this._focused = false
@@ -8738,7 +8661,6 @@ exports.change = addStyles
         A table display item.
 
         Constructor data:
-            highlight (boolean)
             disabled (boolean)
             columns (number)
             columnWidths (array: numbers): Width of each column.
@@ -8783,10 +8705,6 @@ exports.change = addStyles
 
                 columns: 1,
                 columnWidths: []
-            }
-
-            if (data.highlight === true) {
-                this.addClass('highlight')
             }
 
             if (data.disabled === true) {
