@@ -2177,7 +2177,7 @@ const playlist = {}
         }
     })
 
-    layout.body.onEvent('file-drop', event => {
+    layout.onEvent('file-drop', event => {
         if (event.files.length > 1) {
             layout.dialog.showNotification({
                 type: 'message',

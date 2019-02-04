@@ -566,7 +566,7 @@ fileSelect.onEvent('open', event => {
     loadFile(event.content)
 })
 
-layout.body.onEvent('file-drop', event => {
+layout.onEvent('file-drop', event => {
     if (event.files.length === 0) {
         return false
     }
