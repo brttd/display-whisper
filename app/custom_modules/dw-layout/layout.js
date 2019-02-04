@@ -2499,6 +2499,9 @@ exports.change = addStyles
 
             this.node.appendChild(getSeparatorNode())
 
+            this._offsetTop = 0
+            this._scrollTop = 0
+
             this.items = []
             this._itemResizeFunctions = []
 
@@ -2506,7 +2509,7 @@ exports.change = addStyles
 
             this.lastIndexHover = -1
 
-            bindFunctions(this, this.onResize, this.readSize, this.checkSize)
+            bindFunctions(this, this.onResize, this.readScroll, this.readSize, this.checkSize)
 
             if (Array.isArray(data.items)) {
                 for (let i = 0; i < data.items.length; i++) {
@@ -2516,8 +2519,6 @@ exports.change = addStyles
 
             this.node.addEventListener('mousemove', mouse => {
                 if (this.hovering) {
-                    mouse = this.convertMouse(mouse)
-
                     let newIndex = this.mouseIndex(mouse)
 
                     if (newIndex === this.lastIndexHover) {
@@ -2546,8 +2547,6 @@ exports.change = addStyles
                 }
 
                 if (this.hovering) {
-                    mouse = this.convertMouse(mouse)
-
                     sendEventTo(
                         {
                             index: this.mouseIndex(mouse),
@@ -2569,7 +2568,11 @@ exports.change = addStyles
                 }
             })
 
-            body.onEvent('mouseup', () => {
+            this.node.addEventListener('scroll', () => {
+                body.onFrame.start(this.readScroll)
+            })
+
+            window.addEventListener('mouseup', () => {
                 if (this.lastIndexHover >= 0) {
                     this.node.children[
                         this.lastIndexHover * 2
@@ -2596,9 +2599,23 @@ exports.change = addStyles
             }
         }
 
+        readScroll() {
+            this._scrollTop = this.node.scrollTop
+        }
+
         readSize() {
             this._width = this.node.offsetWidth
             this._height = this.node.offsetHeight
+
+            //Update all item offset top/height
+            this._offsetTop = this.node.offsetTop
+            for (let i = 0; i < this.items.length; i++) {
+                this.items[i]._nodeOffsetTop =
+                    this.items[i].node.offsetTop - this._offsetTop
+                this.items[i]._nodeOffsetHeight = this.items[
+                    i
+                ].node.offsetHeight
+            }
         }
 
         checkSize() {
@@ -2630,49 +2647,28 @@ exports.change = addStyles
             body.onFrame.end(this.checkSize)
         }
 
-        convertMouse(mouse) {
-            return {
-                x:
-                    mouse.clientX -
-                    this.node.getBoundingClientRect().left +
-                    this.node.scrollLeft,
-                y:
-                    mouse.clientY -
-                    this.node.getBoundingClientRect().top +
-                    this.node.scrollTop
-            }
-        }
-
         mouseIndex(mouse) {
-            //TODO: this method is bad for performance
-            //Needs to be replaced or removed
             if (this.items.length === 0) {
                 return 0
             }
 
+            let mouseY = mouse.clientY - this._offsetTop + this._scrollTop
+
             if (
-                this.dragItem !== this.items[0] &&
-                this.dropItem !== this.items[0]
-            )
-                if (
-                    mouse.y <
-                    this.items[0].node.offsetTop +
-                        this.items[0].node.offsetHeight / 2
-                )
-                    return 0
+                mouseY <
+                this.items[0]._nodeOffsetTop +
+                    this.items[0]._nodeOffsetHeight / 2
+            ) {
+                return 0
+            }
 
             for (let i = this.items.length - 1; i >= 0; i--) {
                 if (
-                    this.items[i] !== this.dragItem &&
-                    this.items[i] !== this.dropItem
+                    mouseY >=
+                    this.items[i]._nodeOffsetTop +
+                        this.items[i]._nodeOffsetHeight / 2
                 ) {
-                    if (
-                        mouse.y >=
-                        this.items[i].node.offsetTop +
-                            this.items[i].node.offsetHeight / 2
-                    ) {
-                        return i + 1
-                    }
+                    return i + 1
                 }
             }
 
@@ -2693,6 +2689,9 @@ exports.change = addStyles
 
                     this.node.insertBefore(item.node, this.node.lastChild)
                 }
+
+                item._nodeOffsetHeight = 0
+                item._nodeOffsetTop = 0
 
                 item.parent = this
 
@@ -2772,8 +2771,10 @@ exports.change = addStyles
                     )
                     this.node.insertBefore(divider, item.node)
                 }
-
+                
                 this.items.splice(newIndex, 0, item)
+
+                body.onFrame.start(this.readSize)
 
                 sendEventTo(event, this.events.reorder)
             }
