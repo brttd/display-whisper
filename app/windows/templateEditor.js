@@ -279,14 +279,16 @@ function remove(ID, name = '') {
     let message = 'Remove template "' + name + '"?'
 
     if (Templates.files.length <= 1) {
-        message = 'Replace template "' + name + '" with default?'
+        message = 'Reset template "' + name + '" to default?'
     }
 
     layout.dialog.showQuestion(
         {
-            title: 'Remove',
+            title:
+                (Templates.files.length === 1 ? 'Reset ' : 'Remove ') +
+                ' Template?',
             message: message,
-            detail: 'This action cannot be undone',
+            detail: 'This action cannot be undone.',
 
             options: ['Remove', 'Cancel']
         },
