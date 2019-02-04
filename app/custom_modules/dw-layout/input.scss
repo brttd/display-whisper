@@ -19,7 +19,7 @@ $min-size: 24px;
     @return nth($list, length($list));
 }
 
-.all {
+%all-inputs {
     @extend %all;
 
     display: inline-flex;
@@ -101,7 +101,7 @@ input::-webkit-inner-spin-button {
 }
 
 %input {
-    @extend .all;
+    @extend %all-inputs;
 
     display: inline-block;
 
@@ -210,7 +210,7 @@ input::-webkit-inner-spin-button {
 }
 
 .input-button {
-    @extend .all;
+    @extend %all-inputs;
 
     @extend %button;
 
@@ -279,7 +279,7 @@ input::-webkit-inner-spin-button {
 }
 
 .input-checkbox {
-    @extend .all;
+    @extend %all-inputs;
 
     input {
         @include colors;
@@ -339,7 +339,7 @@ input::-webkit-inner-spin-button {
 }
 
 .input-text-multiLine {
-    @extend .all;
+    @extend %all-inputs;
 
     display: inline-flex;
 
@@ -481,7 +481,7 @@ $slider-padding: 2px;
 }
 
 .input-color {
-    @extend .all;
+    @extend %all-inputs;
 
     display: inline-block;
 
@@ -712,7 +712,7 @@ $slider-padding: 2px;
 }
 
 .input-select {
-    @extend .all;
+    @extend %all-inputs;
 
     display: inline-block;
 
@@ -760,7 +760,7 @@ $slider-padding: 2px;
 }
 
 .input-font {
-    @extend .all;
+    @extend %all-inputs;
 
     display: inline-block;
 
@@ -921,7 +921,7 @@ $slider-padding: 2px;
 }
 
 .input-image {
-    @extend .all;
+    @extend %all-inputs;
 
     display: inline-block;
 
