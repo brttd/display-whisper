@@ -396,16 +396,19 @@ function updateSections() {
             displaySections.push(editor.util.copyObj(editor.data.intro))
 
             displaySections[displayIndex]._sectionName = introName
+            displaySections[displayIndex]._sectionSplitIndex = 0
             displaySections[displayIndex].name = 'Intro'
         } else if (editor.data.playOrder[sectionIndex] === outroName) {
             displaySections.push(editor.util.copyObj(editor.data.outro))
 
             displaySections[displayIndex]._sectionName = outroName
+            displaySections[displayIndex]._sectionSplitIndex = 0
             displaySections[displayIndex].name = 'Outro'
         } else if (editor.data.playOrder[sectionIndex] === blankName) {
             displaySections.push(editor.util.copyObj(editor.data.blank))
 
             displaySections[displayIndex]._sectionName = blankName
+            displaySections[displayIndex]._sectionSplitIndex = 0
             displaySections[displayIndex].name = 'Blank'
         } else if (
             editor.data.sections.hasOwnProperty(
@@ -428,6 +431,7 @@ function updateSections() {
                 displaySections[displayIndex]._sectionName = displaySections[
                     displayIndex
                 ].name = section.name
+                displaySections[displayIndex]._sectionSplitIndex = 0
             } else {
                 for (
                     let partIndex = 0;
@@ -437,6 +441,7 @@ function updateSections() {
                     let partSection = editor.util.copyObj(section)
 
                     partSection._sectionIndex = sectionIndex
+                    partSection._sectionSplitIndex = partIndex
                     partSection._sectionName = section.name
                     partSection.name =
                         section.name +
@@ -456,6 +461,8 @@ function updateSections() {
             displaySections[displayIndex]._sectionName = displaySections[
                 displayIndex
             ].name = 'Missing Section!'
+
+            displaySections[displayIndex]._sectionSplitIndex = 0
         }
 
         displaySections[displayIndex]._sectionIndex = sectionIndex
