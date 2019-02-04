@@ -621,39 +621,28 @@ class Item {
 
     onEvent(eventName, listener = () => {}) {
         if (!this.events[eventName]) {
-            this.events[eventName] = []
+            if (eventName === 'click') {
+                this.events.click = []
 
-            if (basicMouseEvents.includes(eventName)) {
-                this.node.addEventListener(eventName, event => {
-                    event = convertMouse(event)
-                    event.fromUser = true
-                    event.from = this
+                this.node.addEventListener(
+                    'click',
+                    passEventTo.bind(this, this.events.click, {
+                        fromUser: true,
+                        from: this
+                    })
+                )
+            } else if (eventName === 'contextmenu') {
+                this.events.contextmenu = []
 
-                    sendEventTo(event, this.events[eventName])
-                })
-            } else if (basicKeyboardEvents.includes(eventName)) {
-                window.addEventListener(eventName, event => {
-                    sendEventTo(
-                        {
-                            fromUser: true,
-                            from: this,
-
-                            target: event.target,
-
-                            shift: event.shiftKey,
-                            ctrl: event.ctrlKey,
-                            alt: event.altKey,
-                            meta: event.metaKey,
-
-                            repeat: event.repeat,
-
-                            code: event.code,
-                            key: event.key,
-                            keyCode: event.keyCode
-                        },
-                        this.events[eventName]
-                    )
-                })
+                this.node.addEventListener(
+                    'contextmenu',
+                    passEventTo.bind(this, this.events.contextmenu, {
+                        fromUser: true,
+                        from: this
+                    })
+                )
+            } else {
+                this.events[eventName] = []
             }
         }
 
