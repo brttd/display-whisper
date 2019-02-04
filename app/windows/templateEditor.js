@@ -580,6 +580,10 @@ function showTemplate(index) {
     }
 
     updateAll()
+
+    if (editNodes.length > 0) {
+        editNodes[0].focus()
+    }
 }
 
 function switchFormat(name) {
