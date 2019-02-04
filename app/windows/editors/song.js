@@ -1530,30 +1530,39 @@ fitTextButton.onEvent('click', () => {
         }
 
         if (typeof event.text === 'string') {
-            //When changing the text, the text in the display sections needs to be updated for the section being changed
-            //This ensures that if the user changes to another section, before clicking "Update Sections", then the text change will be retained if they switch back to the changed section
-            editor.util.applyObj(displaySections[activeIndex], {
-                text: event.text,
-                plainText: event.plainText || richText.removeFormat(event.text)
-            })
+            let sectionName = displaySections[activeIndex]._sectionName
+            let sectionIndex = displaySections[activeIndex]._sectionIndex
+            let sectionSplitIndex =
+                displaySections[activeIndex]._sectionSplitIndex
 
             //When changing a section, if a section is split into multiple parts, the seperate parts need to be collected back into a single string before being applied to the base editor data
             let newText = []
 
-            let sectionName = displaySections[activeIndex]._sectionName
-            let sectionIndex = displaySections[activeIndex]._sectionIndex
-
             for (let i = 0; i < displaySections.length; i++) {
-                if (
-                    displaySections[i]._sectionName === sectionName &&
-                    displaySections[i]._sectionIndex === sectionIndex
-                ) {
-                    newText.push(displaySections[i].text)
+                if (displaySections[i]._sectionName === sectionName) {
+                    //Each displayed section needs to have the same text in it:
+                    //So the displayed sections need to be edited to ensure they all contain the same text data
+                    if (
+                        displaySections[i]._sectionSplitIndex ===
+                        sectionSplitIndex
+                    ) {
+                        editor.util.applyObj(displaySections[i], {
+                            text: event.text,
+                            plainText:
+                                event.plainText ||
+                                richText.removeFormat(event.text)
+                        })
+                    }
+
+                    if (displaySections[i]._sectionIndex === sectionIndex) {
+                        newText.push(displaySections[i].text)
+                    }
                 }
             }
 
             newText = newText.join('\n')
 
+            //The event passed to the changeSection method needs to contain the text for the whole section, instead of just for whatever part was edited
             event.text = newText
             event.plainText = richText.removeFormat(newText)
 
