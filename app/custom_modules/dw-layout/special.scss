@@ -240,7 +240,7 @@
 
             font-size: $font-size;
             font-family: $font-family;
-            color: $text-main;
+            color: $text;
 
             text-shadow: -1px 0px 0px white, 0px -1px 0px white,
                 1px 0px 0px white, -1px 1px 0px white, 1px 1px 0px white,
@@ -260,7 +260,7 @@
             height: 0.06em;
             min-height: 1px;
 
-            background: $text-main;
+            background: $text;
         }
         &.animate {
             &:after {
@@ -299,10 +299,6 @@
         margin: 1px;
 
         color: $text;
-    }
-
-    &.highlight .bar {
-        background: $bkg-active-highlight;
     }
 
     &.disabled {
