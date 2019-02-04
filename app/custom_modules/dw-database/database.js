@@ -1824,6 +1824,14 @@ class GroupDatabase extends EmptyGroupDatabase {
                         return callback(error)
                     }
 
+                    if (this.options.parse) {
+                        try {
+                            data = JSON.parse(data)
+                        } catch (error) {
+                            return callback(error)
+                        }
+                    }
+
                     callback(null, this._transform(data, name))
                 }
             )
