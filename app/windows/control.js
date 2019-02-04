@@ -2255,7 +2255,8 @@ const playlist = {}
             layout.dialog.showQuestion(
                 {
                     title: 'Save Presentation?',
-                    message: 'Your Presentation has not been saved.',
+                    message: 'You have made changes to the presentation which have not been saved!',
+                    detail: 'The changes will be lost unless you save them.',
                     options: ['Save', 'Discard', 'Cancel']
                 },
                 (error, answer) => {
