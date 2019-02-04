@@ -2473,7 +2473,13 @@ exports.change = addStyles
 
             this.lastIndexHover = -1
 
-            bindFunctions(this, this.onResize, this.readScroll, this.readSize, this.checkSize)
+            bindFunctions(
+                this,
+                this.onResize,
+                this.readScroll,
+                this.readSize,
+                this.checkSize
+            )
 
             if (Array.isArray(data.items)) {
                 for (let i = 0; i < data.items.length; i++) {
@@ -2529,6 +2535,8 @@ exports.change = addStyles
                     this.node.children[
                         this.lastIndexHover * 2
                     ].classList.remove('active')
+
+                    this.lastIndexHover = -1
                 }
             })
 
