@@ -2213,7 +2213,7 @@ exports.change = addStyles
                 this.parent.setDividerPosition(this, position * 100)
             }.bind(this)
 
-            body.onEvent('mousemove', event => {
+            window.addEventListener('mousemove', event => {
                 if (
                     !mousedown ||
                     this.parent instanceof LayoutBlock === false
@@ -2227,11 +2227,11 @@ exports.change = addStyles
                 body.onFrame.start(updateParent)
             })
 
-            body.onEvent('blur', () => {
+            window.addEventListener('blur', () => {
                 mousedown = false
             })
 
-            body.onEvent('mouseup', () => {
+            window.addEventListener('mouseup', () => {
                 mousedown = false
             })
         }
@@ -3188,8 +3188,8 @@ exports.change = addStyles
                 )
             })
 
-            body.onEvent('blur', () => this.node.blur())
-            body.onEvent('mouseup', () => this.node.blur())
+            window.addEventListener('blur', () => this.node.blur())
+            window.addEventListener('mouseup', () => this.node.blur())
         }
 
         onEvent(eventName, listener = () => {}) {
@@ -3206,7 +3206,7 @@ exports.change = addStyles
                         sendEventTo(convertMouse(event), this.events.drag)
                     }
                 })
-                body.onEvent('mouseup', () => {
+                window.addEventListener('mouseup', () => {
                     this._mousedown = false
                 })
             } else {
@@ -4123,10 +4123,10 @@ exports.change = addStyles
                 }
             })
 
-            body.onEvent('blur', () => {
+            window.addEventListener('blur', () => {
                 this.blur()
             })
-            body.onEvent('mousedown', event => {
+            document.body.addEventListener('mousedown', event => {
                 if (
                     this.node !== event.target &&
                     this.node.contains(event.target) === false &&
@@ -4848,7 +4848,7 @@ exports.change = addStyles
                 this._codeFocused = false
             })
 
-            body.onEvent('click', event => {
+            document.body.addEventListener('mousedown', event => {
                 if (
                     event.target === this.node ||
                     this.node.contains(event.target) ||
@@ -4861,7 +4861,7 @@ exports.change = addStyles
 
                 this.blur()
             })
-            body.onEvent('blur', () => {
+            window.addEventListener('blur', () => {
                 this.blur()
             })
 
@@ -5484,7 +5484,7 @@ exports.change = addStyles
 
             //TODO: Listen to context menu events
 
-            body.onEvent('click', event => {
+            document.body.addEventListener('mousedown', event => {
                 if (
                     !(
                         this.node === event.target ||
@@ -5497,7 +5497,7 @@ exports.change = addStyles
                 }
             })
 
-            body.onEvent('blur', () => {
+            window.addEventListener('blur', () => {
                 this.blur()
             })
 
@@ -5752,7 +5752,7 @@ exports.change = addStyles
                 this.textNode.textContent = keyboard.getDisplay(this.shortcut)
             })
 
-            body.onEvent('blur', () => {
+            window.addEventListener('blur', () => {
                 this.blur()
             })
             this.overlayNode.addEventListener('click', event => {
@@ -6457,7 +6457,7 @@ exports.change = addStyles
             })
 
             //TODO: make hovering over image in list emit event.
-            body.onEvent('click', event => {
+            document.body.addEventListener('mousedown', event => {
                 if (
                     event.target === this.node ||
                     this.node.contains(event.target) ||
@@ -6471,7 +6471,7 @@ exports.change = addStyles
                 this.blur()
             })
 
-            body.onEvent('blur', () => {
+            window.addEventListener('blur', () => {
                 //If the user clicks the "Select File" button on the image drop down, the open file dialog will be shown
                 //Because this is a seperate window, it is focused, and the window that the image input item is in gets blurred.
                 if (imagePopup.fileDialogOpen) {
@@ -7940,7 +7940,7 @@ exports.change = addStyles
                     )
                 }
             })
-            body.onEvent('mouseup', () => {
+            window.addEventListener('mouseup', () => {
                 this.dragging = null
                 this.dropping = false
 
@@ -7951,17 +7951,17 @@ exports.change = addStyles
                 }
             })
 
-            body.onEvent('click', event => {
+            document.body.addEventListener('mousedown', event => {
                 if (!this.listNode.contains(event.target)) {
                     this.blur()
                 }
             })
 
-            body.onEvent('blur', () => {
+            window.addEventListener('blur', () => {
                 this.blur()
             })
 
-            body.onEvent('keydown', event => {
+            window.addEventListener('keydown', event => {
                 if (this._focused && this._selected.length === 1) {
                     if (event.key === 'ArrowDown') {
                         let index = this.items.indexOf(this._selected[0])
@@ -8798,16 +8798,20 @@ exports.change = addStyles
                 }
             })
 
-            body.onEvent('mouseup', () => {
+            window.addEventListener('mouseup', () => {
                 mousedown = false
+                
                 let selected = this.listNode.querySelector('.drag')
+                
                 if (selected) {
                     selected.classList.remove('drag')
                 }
             })
-            body.onEvent('blur', () => {
+            window.addEventListener('blur', () => {
                 mousedown = false
+                
                 let selected = this.listNode.querySelector('.drag')
+
                 if (selected) {
                     selected.classList.remove('drag')
                 }
@@ -10737,10 +10741,11 @@ class BoxEdit {
             body.setCursor(cursorNames[this.resizing])
         })
 
-        body.onEvent('mouseup', () => {
+        window.addEventListener('mouseup', () => {
             if (body.cursor === cursorNames[this.resizing]) {
                 body.setCursor('')
             }
+
             this.resizing = ''
         })
 
@@ -11417,10 +11422,10 @@ class BoxEdit {
                 this.node.addEventListener('mousedown', () => {
                     mousedown = true
                 })
-                body.onEvent('mouseup', () => {
+                window.addEventListener('mouseup', () => {
                     mousedown = false
                 })
-                body.onEvent('blur', () => {
+                window.addEventListener('blur', () => {
                     mousedown = false
                 })
 
@@ -12219,10 +12224,10 @@ class BoxEdit {
                 this.node.addEventListener('mousedown', () => {
                     mousedown = true
                 })
-                body.onEvent('mouseup', () => {
+                window.addEventListener('mouseup', () => {
                     mousedown = false
                 })
-                body.onEvent('blur', () => {
+                window.addEventListener('blur', () => {
                     mousedown = false
                 })
 
@@ -13086,10 +13091,10 @@ class BoxEdit {
                         )
                     }
                 })
-                body.onEvent('mouseup', () => {
+                window.addEventListener('mouseup', () => {
                     titleMouseDown = false
                 })
-                body.onEvent('blur', () => {
+                window.addEventListener('blur', () => {
                     titleMouseDown = false
                 })
             }
@@ -14290,14 +14295,14 @@ class BoxEdit {
                         mouseDown = true
                     }
                 })
-                body.onEvent('mouseup', () => {
+                window.addEventListener('mouseup', () => {
                     mouseDown = false
                 })
-                body.onEvent('blur', () => {
+                window.addEventListener('blur', () => {
                     mouseDown = false
                 })
 
-                body.onEvent('mousemove', event => {
+                window.addEventListener('mousemove', event => {
                     if (mouseDown) {
                         this.scrollNode.scrollLeft -= event.movementX
                         this.scrollNode.scrollTop -= event.movementY
@@ -16193,7 +16198,7 @@ class BoxEdit {
             }
         }
 
-        body.onEvent('contextmenu', () => {
+        document.body.addEventListener('contextmenu', () => {
             inputSeparator.visible = false
             globalSeparator.visible = false
             if (!visibleItems(contextMenu)) {
