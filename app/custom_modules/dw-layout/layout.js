@@ -9009,6 +9009,7 @@ exports.change = addStyles
     class editorFocusItem extends focusItem {
         constructor(node, styles, focus = true) {
             super(node, styles, focus)
+            this.addClass('editor')
 
             this.inputItems = []
 
@@ -9105,7 +9106,7 @@ exports.change = addStyles
         */
         constructor(data = {}, styles = {}) {
             super(document.createElement('div'), styles)
-            this.addClass('editor-textEdit')
+            this.addClass('textEdit')
 
             //(Having seperate blocks for each group of options means that when they wrap, they do it in a more sensible manner (all style buttons will go to a new line, instead of 1 at a time))
 
@@ -9667,7 +9668,6 @@ exports.change = addStyles
         */
         constructor(data = {}, styles = {}) {
             super(document.createElement('div'), styles)
-            this.addClass('editor-imageEdit')
 
             //image
             {
@@ -9858,7 +9858,6 @@ exports.change = addStyles
         */
         constructor(data = {}, styles = {}) {
             super(document.createElement('div'), styles)
-            this.addClass('editor-boxEdit')
 
             //position
             {
@@ -10168,7 +10167,6 @@ exports.change = addStyles
         */
         constructor(data = {}, styles = {}) {
             super(document.createElement('div'), styles)
-            this.addClass('editor-backgroundEdit')
 
             {
                 this.mainBlock = document.createElement('div')
@@ -10424,7 +10422,6 @@ exports.change = addStyles
         */
         constructor(data = {}, styles = {}) {
             super(document.createElement('div'), styles)
-            this.addClass('editor-playEdit')
 
             //play
             {

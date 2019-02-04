@@ -1,7 +1,7 @@
 @import 'fonts';
 @import 'all';
 
-%editor {
+.editor {
     @extend %all;
 
     display: inline-block;
@@ -21,27 +21,10 @@
             font-family: $font-family;
         }
     }
-}
-.editor-textEdit {
-    @extend %editor;
 
-    button {
-        margin: 0;
+    &.textEdit {
+        button {
+            margin: 0;
+        }
     }
-}
-
-.editor-imageEdit {
-    @extend %editor;
-}
-
-.editor-boxEdit {
-    @extend %editor;
-}
-
-.editor-backgroundEdit {
-    @extend %editor;
-}
-
-.editor-playEdit {
-    @extend %editor;
 }
