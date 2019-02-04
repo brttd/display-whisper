@@ -90,7 +90,8 @@ const maxLines = new layout.NumberInput({
 })
 
 const fitTextButton = new layout.Button({
-    text: 'Fit Text & Unify'
+    text: 'Fit Text & Unify',
+    size: 'large'
 })
 
 const updateSectionsButton = new layout.Button({ text: 'Update Sections' })
@@ -107,8 +108,7 @@ const sectionsBar = new layout.Block({
             { align: 'center' }
         ),
         maxLines,
-        updateSectionsButton,
-        fitTextButton
+        updateSectionsButton
     ],
 
     childSpacing: '8px'
@@ -154,7 +154,8 @@ backgroundControl.connect(displayEditor)
         align: 'center'
     })
     layout.change(fitTextButton, {
-        align: 'center'
+        align: 'end',
+        margin: '4px'
     })
     layout.change(showSectionOverlay, {
         align: 'center'
@@ -247,6 +248,8 @@ backgroundControl.connect(displayEditor)
                                                     songsBlock,
                                                     new layout.Filler(),
 
+                                                    fitTextButton,
+
                                                     new layout.Block(
                                                         {
                                                             items: [
@@ -294,7 +297,7 @@ backgroundControl.connect(displayEditor)
                                     ],
 
                                     size: 20,
-                                    minWidth: 640,
+                                    minWidth: 507,
                                     minHeight: 90,
                                     maxHeight: 90
                                 }),
