@@ -10875,6 +10875,9 @@ class BoxEdit {
 
     mouseMove(mouse) {
         if (this.resizing === '') {
+            if (mouse.percX < 0 || mouse.percX > 1 || mouse.percY < 0 || mouse.percY > 1) {
+                return false
+            }
             this.mouseOffset.x = this.values.left / 100 - mouse.percX
             this.mouseOffset.y = this.values.top / 100 - mouse.percY
 
@@ -10890,6 +10893,8 @@ class BoxEdit {
 
             return false
         }
+        mouse.percX = Math.max(0, Math.min(1, mouse.percX))
+        mouse.percY = Math.max(0, Math.min(1, mouse.percY))
 
         if (this.resizing === 'm') {
             let width = this.values.right - this.values.left
@@ -10897,6 +10902,9 @@ class BoxEdit {
 
             mouse.percX += this.mouseOffset.x
             mouse.percY += this.mouseOffset.y
+
+            mouse.percX = Math.min(1 - width/100, mouse.percX)
+            mouse.percY = Math.min(1 - height/100, mouse.percY)
 
             this.values.left = round(mouse.percX * 100, positionPrecision)
             this.values.right = round(
@@ -12111,7 +12119,7 @@ class BoxEdit {
                 body.onFrame.end(this.writeSize)
             })
 
-            this.screenNode.addEventListener('mousemove', event => {
+            window.addEventListener('mousemove', event => {
                 let mouse = this.convertMouse(event)
 
                 for (let i = 0; i < this.nodes.length; i++) {
