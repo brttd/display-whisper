@@ -319,7 +319,31 @@ cancelButton.onEvent('click', () => {
     layout.window.close()
 })
 
+let gotData = false
 ipcRenderer.on('edit-data', (event, data) => {
+    if (gotData) {
+        layout.dialog.showQuestion(
+            {
+                title: 'Update?',
+                message:
+                    'The item has been modified in the presentation! Do you want to see the new changes?',
+                detail: "Any changes you've made will be lost!",
+                options: ['Yes', 'No']
+            },
+            (error, answer) => {
+                if (answer === 'Yes') {
+                    editor.set(data)
+
+                    imageBox.focus()
+                    update()
+                }
+            }
+        )
+
+        return false
+    }
+
+    gotData = true
     editor.set(data)
 
     imageBox.focus()
