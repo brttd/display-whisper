@@ -294,6 +294,13 @@ function sendEventTo(event, listeners) {
     }
 }
 
+//Can be bound in an .addEventListener call, for a simpler code structure
+function passEventTo(listeners, event) {
+    for (let i = 0; i < listeners.length; i++) {
+        listeners[i](event)
+    }
+}
+
 //Make all functions bound to the given context
 function bindFunctions(item) {
     for (let i = 1; i < arguments.length; i++) {
@@ -13024,33 +13031,22 @@ class BoxEdit {
                 }
                 this.node.appendChild(this.removeButton.node)
 
-                this.dragButton.onEvent('mousedown', event => {
-                    sendEventTo(
-                        {
-                            fromUser: event.fromUser,
-                            from: this
-                        },
-                        this.events['drag-click']
-                    )
-                })
-                this.editButton.onEvent('click', event => {
-                    sendEventTo(
-                        {
-                            fromUser: event.fromUser,
-                            from: this
-                        },
-                        this.events['edit-click']
-                    )
-                })
-                this.removeButton.onEvent('click', event => {
-                    sendEventTo(
-                        {
-                            fromUser: event.fromUser,
-                            from: this
-                        },
-                        this.events['remove-click']
-                    )
-                })
+                this.events['drag-click'] = []
+                this.events['edit-click'] = []
+                this.events['remove-click'] = []
+
+                this.dragButton.node.addEventListener(
+                    'mousedown',
+                    passEventTo.bind(this, this.events['drag-click'], {fromUser: true, from: this})
+                )
+                this.editButton.onEvent(
+                    'click',
+                    passEventTo.bind(this, this.events['edit-click'], {fromUser: true, from: this})
+                )
+                this.removeButton.onEvent(
+                    'click',
+                    passEventTo.bind(this, this.events['remove-click'], {fromUser: true, from: this})
+                )
 
                 this.toggleButton.onEvent('click', () => {
                     if (this.properties.minimized) {
@@ -13624,27 +13620,22 @@ class BoxEdit {
 
                 this.items = [this.displayItem, this.activeButton]
 
-                let sendActive = event => {
-                    sendEventTo(
-                        {
-                            fromUser: event.fromUser || true,
-                            from: this
-                        },
-                        this.events['select-click']
-                    )
-                }
-                this.displayItem.onEvent('click', sendActive)
-                this.infoNode.addEventListener('click', sendActive)
+                this.events['select-click'] = []
+                this.events['active-click'] = []
 
-                this.activeButton.onEvent('click', event => {
-                    sendEventTo(
-                        {
-                            fromUser: event.fromUser,
-                            from: this
-                        },
-                        this.events['active-click']
-                    )
-                })
+                this.displayItem.onEvent(
+                    'click',
+                    passEventTo.bind(this, this.events['select-click'], {fromUser: true, from: this})
+                )
+                this.infoNode.addEventListener(
+                    'click',
+                    passEventTo.bind(this, this.events['select-click'], {fromUser: true, from: this})
+                )
+
+                this.activeButton.onEvent(
+                    'click',
+                    passEventTo.bind(this, this.events['active-click'], {fromUser: true, from: this})
+                )
             }
 
             this.properties = {
