@@ -1,4 +1,5 @@
 const path = require('path')
+const fs = require('fs')
 
 const layout = require('dw-layout')
 const logger = require('dw-log')
@@ -30,6 +31,9 @@ const imageList = new layout.TableList({
     columnWidths: ['', '5ch']
 })
 
+const exportButton = new layout.Button({
+    text: 'Export'
+})
 const removeAllButton = new layout.Button({
     text: 'Remove All'
 })
@@ -70,7 +74,27 @@ layout.body.add(
                 items: [
                     new layout.Block(
                         {
-                            items: [imageAddButton, imageList, removeAllButton],
+                            items: [
+                                imageAddButton,
+                                imageList,
+                                new layout.Block(
+                                    {
+                                        items: [
+                                            exportButton,
+                                            new layout.Filler(),
+                                            removeAllButton
+                                        ],
+                                        childSpacing: '8px'
+                                    },
+                                    {
+                                        direction: 'horizontal',
+                                        grow: false,
+                                        shrink: false,
+
+                                        padding: 0
+                                    }
+                                )
+                            ],
                             childSpacing: '8px'
                         },
                         {
@@ -127,6 +151,7 @@ let updatingImages = false
 
 function toggleInterface(enabled) {
     imageAddButton.disabled = !enabled
+    exportButton.disabled = !enabled
     removeAllButton.disabled = !enabled
     removeButton.disabled = !enabled
 }
@@ -137,12 +162,14 @@ function updateImageList() {
     imageList.clear()
 
     if (Images.files.length === 0) {
+        exportButton.disabled = true
         removeAllButton.disabled = true
 
         showImage()
 
         return false
     }
+    exportButton.disabled = false
     removeAllButton.disabled = false
 
     for (let i = 0; i < Images.files.length; i++) {
@@ -276,6 +303,95 @@ removeButton.onEvent('click', () => {
 
                     updateImageList()
                 })
+            }
+        }
+    )
+})
+
+exportButton.onEvent('click', () => {
+    layout.dialog.showOpen(
+        {
+            title: 'Select Folder',
+            message: 'Export To Folder',
+
+            button: 'Export',
+
+            openFolder: true
+        },
+        (error, folder) => {
+            if (folder) {
+                let toExport = [...Images.files]
+
+                //-1 = ask user
+                //0 = skip
+                //1 = overwrite
+                let overwriteAction = -1
+
+                if (toExport.length === 0) {
+                    return false
+                }
+
+                layout.showLoader(layout.body, 'Exporting')
+
+                let exportNext = error => {
+                    if (error) {
+                        layout.dialog.showNotification({
+                            type: 'error',
+                            message: 'Unable to export image!\n' + error
+                        })
+                    }
+
+                    if (toExport.length === 0) {
+                        layout.hideLoader(layout.body)
+
+                        return false
+                    }
+
+                    let file = toExport.pop()
+
+                    if (
+                        fs.existsSync(path.join(folder, file)) &&
+                        overwriteAction !== 1
+                    ) {
+                        if (overwriteAction === 0) {
+                            exportNext()
+                        } else {
+                            layout.dialog.showQuestion(
+                                {
+                                    title: 'Overwite Files?',
+
+                                    message:
+                                        'The selected folder contains files with the same name!',
+                                    detail:
+                                        'Do you want to overwrite the existing files, or skip the images?',
+
+                                    options: ['Overwrite', 'Skip']
+                                },
+                                (error, answer) => {
+                                    if (answer === 'Overwrite') {
+                                        overwriteAction = 1
+                                        fs.copyFile(
+                                            path.join(Images.directory, file),
+                                            path.join(folder, file),
+                                            exportNext
+                                        )
+                                    } else {
+                                        overwriteAction = 0
+                                        exportNext()
+                                    }
+                                }
+                            )
+                        }
+                    } else {
+                        fs.copyFile(
+                            path.join(Images.directory, file),
+                            path.join(folder, file),
+                            exportNext
+                        )
+                    }
+                }
+
+                exportNext()
             }
         }
     )
