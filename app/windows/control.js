@@ -1327,6 +1327,7 @@ const playlist = {}
 
         itemsBlock.items[index].selected = false
         itemsBlock.items[index].active = false
+        itemsBlock.items[index].editActive = false
 
         list.splice(index, 1)
         itemsBlock.remove(index)
