@@ -12,9 +12,6 @@ REQUIRED:
         Output differs to preview (extra blank pages).
         Long paragraphs don't break over pages.
         Add user options to filter song searching.
-    
-    Image Library:
-        Allow image renaming
 
     FontInput item: Drop down list lags, change so that DOM only contains rows that are visible in scroll position.
     
@@ -26,12 +23,7 @@ REQUIRED:
     Installers - Windows & Mac
 
 REQUIRED - long term:
-    ColorInput item: Create custom color picker.
-
     Layout: context menu for all items.
-    
-    Change layout.menu.add to take listener function as argument.
-    Remove layout.menu.on
 
     Create single source for interface text (file, instead of hard coded strings), allowing for translation + Win/Mac differences
         change keyboard shortcut display based on language, win/mac, keyboard, etc..
@@ -46,7 +38,11 @@ REQUIRED - long term:
         Add Image option
         Options for how columns are laid out. Currently adding extra whitespace is the only way to control where column breaks are. Specific options to move certain items to a new column, etc, are needed.
 
-    Control window song search: Add filter by group option.
+    Control window song search:
+        Add filter by group option.
+
+    Image Library:
+        Allow image renaming
 
     Song Library:
         Group input to change group for song.
@@ -64,9 +60,6 @@ WANTED:
 
     Template editor: song 'show name' option should show/hide the name box
 
-    TableList item: Allow selection of multiple rows.
-        (For adding multiple songs to presentation at the same time)
-
     DisplayEditor item:
         Make box handles respond to background images (CSS Blending function)?
 
@@ -78,12 +71,5 @@ WANTED:
 
 CODE CHANGES:
     Change displayEdit.add to public nodeEdits, with .add the same as block.add
-
-    Refactor variable names to be more readable (IE, no 'func')
-
-    Attempt to find, and remove memory leaks
-    Go through all event listeners (.on, .addEventListener), and make sure they aren't being excessively created
-
-    Check that no issues occur after being open for long times (leave open for 1+ weeks)
 
     Main process - Re use editing browser windows?
