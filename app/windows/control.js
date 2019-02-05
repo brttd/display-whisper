@@ -1818,19 +1818,19 @@ const playlist = {}
 
             layout.dialog.showQuestion(
                 {
-                    title: 'Save?',
+                    title: 'Save Presentation?',
 
-                    message: 'There are unsaved changes to the presentation!',
-                    detail: 'Save changes?',
+                    message: playlist.file
+                        ? 'You have made changes to the presentation which have not been saved!'
+                        : 'The presentation has not been saved!',
+                    detail: playlist.file
+                        ? 'Do you want to save your changes?'
+                        : 'Do you want to save the presentation?',
 
-                    options: [
-                        playlist.file ? 'Save' : 'Save As',
-                        'Discard',
-                        'Cancel'
-                    ]
+                    options: ['Save', 'Discard', 'Cancel']
                 },
                 (error, result) => {
-                    if (result === 'Save' || result === 'Save As') {
+                    if (result === 'Save') {
                         fileSavePlaylist(error => {
                             callback(error, true)
                         })
