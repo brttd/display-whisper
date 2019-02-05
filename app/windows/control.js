@@ -2234,12 +2234,10 @@ const playlist = {}
 
         ipcRenderer.send('close')
     })
-
     ipcRenderer.on('cancel-close', () => {
         closing = false
         canClose = false
     })
-
     ipcRenderer.on('can-close', () => {
         if (!closing) {
             return
@@ -2247,35 +2245,16 @@ const playlist = {}
 
         canClose = true
 
-        if (!playlist.file && list.length !== 0) {
-            layout.dialog.showQuestion(
-                {
-                    title: 'Save Presentation?',
-                    message:
-                        'You have made changes to the presentation which have not been saved!',
-                    detail: 'The changes will be lost unless you save them.',
-                    options: ['Save', 'Discard', 'Cancel']
-                },
-                (error, answer) => {
-                    if (answer === 'Cancel') {
-                        closing = false
-                        canClose = false
-                    } else {
-                        layout.showLoader(layout.body, 'Saving')
+        checkSave((error, canContinue) => {
+            if (!canContinue) {
+                closing = false
+                canClose = false
 
-                        if (answer === 'Save') {
-                            fileSavePlaylistAs(() => {
-                                finishClose()
-                            })
-                        } else {
-                            finishClose()
-                        }
-                    }
-                }
-            )
-        } else {
+                return false
+            }
+
             finishClose()
-        }
+        })
     })
 
     itemsBlock.onEvent('drop', event => {
