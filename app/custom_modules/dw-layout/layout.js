@@ -3186,7 +3186,6 @@ exports.change = addStyles
                 body.onEvent('mouseup', () => {
                     this._mousedown = false
                 })
-
             } else {
                 super.onEvent(...arguments)
             }
