@@ -848,8 +848,6 @@ function openControl() {
         })
     )
 
-    windows.control.setMenu(null)
-
     return windows.control
 }
 
