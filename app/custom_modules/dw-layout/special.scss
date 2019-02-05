@@ -277,6 +277,7 @@
             min-height: 1px;
 
             background: $text;
+            outline: 1px solid white;
         }
         &.animate {
             &:after {
