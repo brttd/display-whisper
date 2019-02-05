@@ -421,7 +421,7 @@ function changeSection(index, change) {
 }
 
 maxLinesEditor.onEvent('change', event => {
-    if (event.value >= 0 && isFinite(event.value)) {
+    if (event.fromUser && event.value >= 0 && isFinite(event.value)) {
         editor.change('maxLines', ~~event.value)
 
         updateSectionsAndSelect()
