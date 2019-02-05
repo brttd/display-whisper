@@ -8812,6 +8812,10 @@ exports.change = addStyles
         clear() {
             this.listNode.innerHTML = ''
 
+            while (this.listDocumentFragment.childElementCount > 0) {
+                this.listDocumentFragment.removeChild(this.listDocumentFragment.lastChild)
+            }
+
             this.items = []
             this._index = -1
         }
