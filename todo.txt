@@ -1,17 +1,12 @@
 REQUIRED:
     Bold, Italic, font options for text nodes.
 
-    When editing a display box, don't allow box positions to overlap (top should never be greater than bottom, etc)
-
     When editor gets second 'edit-data':
         Add all editor.data as a change, filtered by 'edit-data' data
 
     Display window - Fix:
         Occasionally flashes white (Only when looping?).
         When changing screens or opening, it briefly shows at smaller size before resizing to full screen.
-
-    Song library:
-        When a database change occurs, if the song the user is currently editing has changed, show notification and ask to "discard changes and reload" or "continue editing"
     
     Print tool:
         Output differs to preview (extra blank pages).
