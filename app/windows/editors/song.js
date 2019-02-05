@@ -1763,7 +1763,7 @@ layout.window.onEvent('close', event => {
             {
                 title: 'Apply changes?',
                 message:
-                    'You have made changes to this item which have not yet been applied!',
+                    'You have made changes to this item which have not been applied!',
                 detail: 'Do you want to apply your changes?',
 
                 options: ['Apply', 'Discard', 'Cancel']
