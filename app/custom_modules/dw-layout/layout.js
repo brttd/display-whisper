@@ -15467,24 +15467,54 @@ class BoxEdit {
 
     exports.menu = {}
     {
+        const acceleratorItems = []
+
+        function onMenuItemAccelerator(item) {
+            if (item.enabled === false) {
+                return false
+            }
+
+            let eventName = item.parentItem.toLowerCase()
+
+            if (Array.isArray(listeners[eventName])) {
+                for (let i = 0; i < listeners[eventName].length; i++) {
+                    listeners[eventName][i](item.message)
+                }
+            }
+        }
+
         exports.menu.change = function(label, item, state) {
             ipcRenderer.send('change-menu', label, item, state)
+
+            for (let i = 0; i < acceleratorItems.length; i++) {
+                if (
+                    acceleratorItems[i].parentItem.toLowerCase() ===
+                        label.toLowerCase() &&
+                    (acceleratorItems[i].message.toLowerCase() ===
+                        item.toLowerCase() || acceleratorItems[i].label === item.toLowerCase())
+                ) {
+                    objUtil.applyObj(acceleratorItems[i], state)
+                }
+            }
         }
 
         exports.menu.onEvent = function(eventName, listener) {
-            if (typeof eventName !== 'string' || typeof listener !== 'function') {
+            if (
+                typeof eventName !== 'string' ||
+                typeof listener !== 'function'
+            ) {
                 return false
             }
 
             eventName = eventName.toLowerCase()
-    
+
             if (!Array.isArray(listeners[eventName])) {
                 listeners[eventName] = []
             }
-    
+
             listeners[eventName].push(listener)
         }
-    
+
         ipcRenderer.on('menu', (event, eventName, value) => {
             eventName = eventName.toLowerCase()
 
@@ -15493,6 +15523,15 @@ class BoxEdit {
                     listeners[eventName][i](value)
                 }
             }
+        })
+
+        ipcRenderer.on('register-menu-accelerator', (event, menuItem) => {
+            acceleratorItems.push(menuItem)
+
+            keyboard.register(
+                menuItem.accelerator,
+                onMenuItemAccelerator.bind(null, menuItem)
+            )
         })
     }
 

@@ -1538,8 +1538,11 @@ const appMenu = new Menu()
             accelerator: item.accelerator,
             icon: item.icon,
             enabled: item.enabled,
-            checked: item.checked,
-            submenu: item.submenu
+            submenu: item.submenu,
+
+            //If the item has a role, register it's accelerator
+            //Otherwise, don't (Layout module registers it instead)
+            registerAccelerator: item.role === undefined ? false : true
         }
     }
 
@@ -1548,30 +1551,30 @@ const appMenu = new Menu()
             win.menuChanges = {}
         }
 
-        for (let itemId in allMenuItems) {
+        for (let itemId in dynamicItems) {
             if (win.menuChanges[itemId]) {
                 if (typeof win.menuChanges[itemId].enabled === 'boolean') {
-                    allMenuItems[itemId].enabled =
+                    dynamicItems[itemId].enabled =
                         win.menuChanges[itemId].enabled
                 } else {
-                    allMenuItems[itemId].enabled =
-                        allMenuItems[itemId].defaults.enabled
+                    dynamicItems[itemId].enabled =
+                        dynamicItems[itemId].defaults.enabled
                 }
 
                 if (typeof win.menuChanges[itemId].visible === 'boolean') {
-                    allMenuItems[itemId].visible =
+                    dynamicItems[itemId].visible =
                         win.menuChanges[itemId].visible
                 } else {
-                    allMenuItems[itemId].visible =
-                        allMenuItems[itemId].defaults.visible
+                    dynamicItems[itemId].visible =
+                        dynamicItems[itemId].defaults.visible
                 }
             } else {
                 //If the window doesn't have changes for this menu item, use the default
-                allMenuItems[itemId].enabled =
-                    allMenuItems[itemId].defaults.enabled
+                dynamicItems[itemId].enabled =
+                    dynamicItems[itemId].defaults.enabled
 
-                allMenuItems[itemId].visible =
-                    allMenuItems[itemId].defaults.visible
+                dynamicItems[itemId].visible =
+                    dynamicItems[itemId].defaults.visible
             }
         }
     }
@@ -1596,6 +1599,18 @@ const appMenu = new Menu()
             updateMenuToWindow(win)
         }
     }
+
+    function sendAcceleratorsToWindow(win) {
+        for (let i = 0; i < allAcceleratorItems.length; i++) {
+            win.webContents.send(
+                'register-menu-accelerator',
+                allAcceleratorItems[i]
+            )
+        }
+    }
+
+    const dynamicItems = {}
+    const allAcceleratorItems = []
 
     const items = {
         app: new MenuItem(
@@ -1887,10 +1902,8 @@ const appMenu = new Menu()
         )
     }
 
-    const allMenuItems = {}
-
-    //Populate the allMenuItems object with menu items
-    //Each menu item should be stored undo 'label-item' (IE: file-open)
+    //Populate the dynamicItems object with menu items
+    //Also populate the allAcceleratorItems array
     for (let label in items) {
         if (items.hasOwnProperty(label)) {
             let itemId = items[label].label.toLowerCase() + '-'
@@ -1899,12 +1912,26 @@ const appMenu = new Menu()
 
             for (let i = 0; i < toCheck.length; i++) {
                 if (toCheck[i].static !== true) {
-                    allMenuItems[
+                    dynamicItems[
                         itemId +
                             (
                                 toCheck[i].message || toCheck[i].label
                             ).toLowerCase()
                     ] = toCheck[i]
+                }
+
+                if (toCheck[i].accelerator && !toCheck[i].role) {
+                    allAcceleratorItems.push({
+                        parentItem: toCheck[i].parentItem,
+
+                        message: toCheck[i].message,
+
+                        type: toCheck[i].type,
+                        label: toCheck[i].label,
+                        sublabel: toCheck[i].sublabel,
+                        accelerator: toCheck[i].accelerator,
+                        enabled: toCheck[i].enabled
+                    })
                 }
             }
         }
@@ -1946,7 +1973,7 @@ const appMenu = new Menu()
 
         let itemID = label.toLowerCase() + '-' + item.toLowerCase()
 
-        if (allMenuItems[itemID]) {
+        if (dynamicItems[itemID]) {
             modifyWindowItem(
                 BrowserWindow.fromWebContents(event.sender),
                 itemID,
@@ -1957,6 +1984,13 @@ const appMenu = new Menu()
 
     app.on('browser-window-focus', (event, win) => {
         updateMenuToWindow(win)
+    })
+
+    app.on('browser-window-created', (event, win) => {
+        win.webContents.on(
+            'did-finish-load',
+            sendAcceleratorsToWindow.bind(null, win)
+        )
     })
 }
 
