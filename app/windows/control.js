@@ -2356,10 +2356,6 @@ const playlist = {}
         lastDisplay = display
 
         updateAllItems()
-
-        layout.body.onFrame.start(() => {
-            scrollTo(selected)
-        })
     })
 
     //Loading autosave
