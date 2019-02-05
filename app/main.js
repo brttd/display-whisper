@@ -1723,7 +1723,7 @@ const appMenu = new Menu()
                     },
                     {
                         label: 'Redo',
-                        accelerator: 'CmdOrCtrl+X',
+                        accelerator: 'Shift+CmdOrCtrl+Z',
 
                         sendTo: 'active',
                         message: 'redo',
