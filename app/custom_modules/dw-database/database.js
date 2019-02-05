@@ -1753,6 +1753,8 @@ class GroupDatabase extends EmptyGroupDatabase {
         this._updating = true
         this._callListeners('update-start')
 
+        let listCopy = [...list]
+
         let toLoad = list.length
 
         let onFileLoad = () => {
@@ -1760,7 +1762,7 @@ class GroupDatabase extends EmptyGroupDatabase {
             if (toLoad === 0) {
                 this._updating = false
 
-                this._callListeners('update', list.map(this._toGroup))
+                this._callListeners('update', listCopy.map(this._toGroup))
 
                 return callback(null)
             } else if (list.length > 0) {
