@@ -3361,8 +3361,10 @@ const item_add = {
             resultsBox.clear()
             results = []
 
-            //Since the results have been cleared, no song can be selected, and the add button should be disabled
-            addButton.disabled = true
+            if (tabBlock.tab === 'Song') {
+                //Since the results have been cleared, no song can be selected, and the add button should be disabled
+                addButton.disabled = true
+            }
 
             let searchTerm = searchBox.value
                 .replace(punctuationCharacters, '')
@@ -3657,6 +3659,7 @@ const item_add = {
             if (item_add.options.tab !== 'Song') {
                 return false
             }
+
             if (song) {
                 for (let key in songAddOptions) {
                     selectedTemplate[key] = songAddOptions[key]
@@ -3669,6 +3672,7 @@ const item_add = {
             if (item_add.options.tab !== 'Song') {
                 return false
             }
+
             if (song) {
                 for (let key in songAddOptions) {
                     selectedTemplate[key] = songAddOptions[key]
@@ -3682,7 +3686,11 @@ const item_add = {
             if (event.tab.name === 'Song' && event.fromUser) {
                 searchBox.focus()
 
-                addButton.disabled = true
+                if (resultsBox.selected && song) {
+                    addButton.disabled = false
+                } else {
+                    addButton.disabled = true
+                }
             }
         })
 
