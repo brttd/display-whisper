@@ -9949,22 +9949,46 @@ exports.change = addStyles
 
                 this.left.onEvent('change', event => {
                     if (event.fromUser) {
-                        this.sendEdit({ left: event.value }, event.fromUser)
+                        let maxValue = Math.min(event.value, this.right.value)
+                        
+                        if (maxValue !== event.value) {
+                            this.left.value = maxValue
+                        }
+
+                        this.sendEdit({ left: maxValue }, event.fromUser)
                     }
                 })
                 this.right.onEvent('change', event => {
                     if (event.fromUser) {
-                        this.sendEdit({ right: event.value }, event.fromUser)
+                        let maxValue = Math.max(event.value, this.left.value)
+                        
+                        if (maxValue !== event.value) {
+                            this.right.value = maxValue
+                        }
+
+                        this.sendEdit({ right: maxValue }, event.fromUser)
                     }
                 })
                 this.top.onEvent('change', event => {
                     if (event.fromUser) {
-                        this.sendEdit({ top: event.value }, event.fromUser)
+                        let maxValue = Math.min(event.value, this.bottom.value)
+                        
+                        if (maxValue !== event.value) {
+                            this.top.value = maxValue
+                        }
+
+                        this.sendEdit({ top: maxValue }, event.fromUser)
                     }
                 })
                 this.bottom.onEvent('change', event => {
                     if (event.fromUser) {
-                        this.sendEdit({ bottom: event.value }, event.fromUser)
+                        let maxValue = Math.max(event.value, this.top.value)
+                        
+                        if (maxValue !== event.value) {
+                            this.bottom.value = maxValue
+                        }
+
+                        this.sendEdit({ bottom: maxValue }, event.fromUser)
                     }
                 })
             }
@@ -10908,39 +10932,15 @@ class BoxEdit {
         mouse.percY = Math.max(0, Math.min(1, mouse.percY))
 
         if (this.resizing.includes('t')) {
-            this.values.top = round(mouse.percY * 100, positionPrecision)
-            /*
-            this.values.top = round(
-                (mouse.displayY + boxOutlineOffset) / currentDisplay.height * 100,
-                positionPrecision
-            )
-            */
+            this.values.top = Math.min(round(mouse.percY * 100, positionPrecision), this.values.bottom)
         } else if (this.resizing.includes('b')) {
-            this.values.bottom = round(mouse.percY * 100, positionPrecision)
-            /*
-            this.values.bottom = round(
-                (mouse.displayY - boxOutlineOffset) / currentDisplay.height * 100,
-                positionPrecision
-            )
-            */
+            this.values.bottom = Math.max(round(mouse.percY * 100, positionPrecision), this.values.top)
         }
 
         if (this.resizing.includes('l')) {
-            this.values.left = round(mouse.percX * 100, positionPrecision)
-            /*
-            this.values.left = round(
-                (mouse.displayX + boxOutlineOffset) / currentDisplay.width * 100,
-                positionPrecision
-            )
-            */
+            this.values.left = Math.min(round(mouse.percX * 100, positionPrecision), this.values.right)
         } else if (this.resizing.includes('r')) {
-            this.values.right = round(mouse.percX * 100, positionPrecision)
-            /*
-            this.values.right = round(
-                (mouse.displayX - boxOutlineOffset) / currentDisplay.width * 100,
-                positionPrecision
-            )
-            */
+            this.values.right = Math.max(round(mouse.percX * 100, positionPrecision), this.values.left)
         }
 
         this.updatePosition()
@@ -11035,11 +11035,22 @@ class BoxEdit {
         if (typeof data.bottom === 'number' && isFinite(data.bottom)) {
             this.values.bottom = round(data.bottom, positionPrecision)
 
-            this.node.style.bottom = (100 - this.values.bottom).toString() + '%'
-
             event.bottom = data.bottom
         }
 
+        if (this.values.top > this.values.bottom) {
+            this.values.top = this.values.bottom = round(
+                (this.values.top + this.values.bottom) / 2, positionPrecision
+            )
+        }
+
+        if (this.values.left > this.values.right) {
+            this.values.left = this.values.right = round(
+                (this.values.left + this.values.right) / 2, positionPrecision
+            )
+        }
+
+        
         if (Object.keys(event).length > 0) {
             event.fromUser = fromUser
             event.from = this
