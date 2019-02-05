@@ -16,7 +16,6 @@
     "devDependencies": {
         "archiver": "^2.1.1",
         "asar": "^0.13.1",
-        "cpr": "^2.2.0",
         "electron": "^3.0.8",
         "electron-packager": "^9.1.0",
         "license-checker": "^19.0.0",
