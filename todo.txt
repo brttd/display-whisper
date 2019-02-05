@@ -1,4 +1,5 @@
 REQUIRED:
+    Image editor list is broken, sometimes list images twice or non-existant images.
     Bold, Italic, font options for text nodes.
 
     When editor gets second 'edit-data':
@@ -46,8 +47,6 @@ REQUIRED - long term:
 
     Song Library:
         Group input to change group for song.
-        Duplicate song button.
-        Remove punctuation when searching.
 
     Song Editor:
         For Intro, Outro, Section & End overlay nodes, show the displayed text, and then when user starts editing text switch to actual "{section}" text.
