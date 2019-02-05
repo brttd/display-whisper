@@ -612,47 +612,67 @@ const playlist = {}
         updateOutput()
     }
 
-    function scrollTo(position) {
-        if (options.autoScroll === false) {
-            return false
-        }
-        if (position.index < 0 || position.index >= list.length) {
-            return false
-        }
+    let scrollPosition = { index: 0, subIndex: 0 }
 
+    function doScroll() {
+            if (
+                options.autoScroll === false ||
+                scrollPosition.index < 0 ||
+                scrollPosition.index >= itemsBlock.items.length ||
+                scrollPosition.subIndex < 0 ||
+                scrollPosition.subIndex >=
+                    itemsBlock.items[scrollPosition.index].items.length
+            ) {
+                return false
+            }
+
+            let node =
+                itemsBlock.items[scrollPosition.index].items[
+                    scrollPosition.subIndex
+                ].node
+
+            let listHeight = itemsBlock.node.offsetHeight
+            let listScroll = itemsBlock.node.scrollTop
+
+            let itemCenter =
+                node.offsetTop +
+                node.offsetHeight / 2 -
+                itemsBlock.node.offsetTop
+
+            let listPadding = Math.min(node.offsetHeight * 2.6, listHeight / 2)
+
+            if (itemCenter - listPadding < listScroll) {
+                itemsBlock.node.scrollTo({
+                    top: itemCenter - listPadding,
+                    left: 0,
+                    behavior: options.scrollSmooth ? 'smooth' : 'auto'
+                })
+            } else if (itemCenter + listPadding > listScroll + listHeight) {
+                itemsBlock.node.scrollTo({
+                    top: itemCenter - (listHeight - listPadding),
+                    left: 0,
+                    behavior: options.scrollSmooth ? 'smooth' : 'auto'
+                })
+            }
+    }
+
+    let scrollNextFrame = () => {layout.onFrame.start(doScroll)}
+
+    function scrollTo(position) {
         if (
+            options.autoScroll === false ||
+            position.index < 0 ||
+            position.index >= list.length ||
             position.subIndex < 0 ||
             position.subIndex >= itemsBlock.items[position.index].items.length
         ) {
             return false
         }
 
-        let node =
-            itemsBlock.items[position.index].items[position.subIndex].node
+        scrollPosition.index = position.index
+        scrollPosition.subIndex = position.subIndex
 
-        let listHeight = itemsBlock.node.offsetHeight
-
-        let itemCenter =
-            node.offsetTop + node.offsetHeight / 2 - itemsBlock.node.offsetTop
-
-        let listPadding = Math.min(node.offsetHeight * 2.6, listHeight / 2)
-
-        if (itemCenter - listPadding < itemsBlock.node.scrollTop) {
-            itemsBlock.node.scrollTo({
-                top: itemCenter - listPadding,
-                left: 0,
-                behavior: options.scrollSmooth ? 'smooth' : 'auto'
-            })
-        } else if (
-            itemCenter + listPadding >
-            itemsBlock.node.scrollTop + listHeight
-        ) {
-            itemsBlock.node.scrollTo({
-                top: itemCenter - (listHeight - listPadding),
-                left: 0,
-                behavior: options.scrollSmooth ? 'smooth' : 'auto'
-            })
-        }
+        layout.onFrame.start(scrollNextFrame)
     }
 
     //Updates previews and sends display message
