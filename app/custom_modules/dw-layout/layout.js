@@ -9950,7 +9950,7 @@ exports.change = addStyles
                 this.left.onEvent('change', event => {
                     if (event.fromUser) {
                         let maxValue = Math.min(event.value, this.right.value)
-                        
+
                         if (maxValue !== event.value) {
                             this.left.value = maxValue
                         }
@@ -9961,7 +9961,7 @@ exports.change = addStyles
                 this.right.onEvent('change', event => {
                     if (event.fromUser) {
                         let maxValue = Math.max(event.value, this.left.value)
-                        
+
                         if (maxValue !== event.value) {
                             this.right.value = maxValue
                         }
@@ -9972,7 +9972,7 @@ exports.change = addStyles
                 this.top.onEvent('change', event => {
                     if (event.fromUser) {
                         let maxValue = Math.min(event.value, this.bottom.value)
-                        
+
                         if (maxValue !== event.value) {
                             this.top.value = maxValue
                         }
@@ -9983,7 +9983,7 @@ exports.change = addStyles
                 this.bottom.onEvent('change', event => {
                     if (event.fromUser) {
                         let maxValue = Math.max(event.value, this.top.value)
-                        
+
                         if (maxValue !== event.value) {
                             this.bottom.value = maxValue
                         }
@@ -10934,15 +10934,27 @@ class BoxEdit {
         mouse.percY = Math.max(0, Math.min(1, mouse.percY))
 
         if (this.resizing.includes('t')) {
-            this.values.top = Math.min(round(mouse.percY * 100, positionPrecision), this.values.bottom)
+            this.values.top = Math.min(
+                round(mouse.percY * 100, positionPrecision),
+                this.values.bottom
+            )
         } else if (this.resizing.includes('b')) {
-            this.values.bottom = Math.max(round(mouse.percY * 100, positionPrecision), this.values.top)
+            this.values.bottom = Math.max(
+                round(mouse.percY * 100, positionPrecision),
+                this.values.top
+            )
         }
 
         if (this.resizing.includes('l')) {
-            this.values.left = Math.min(round(mouse.percX * 100, positionPrecision), this.values.right)
+            this.values.left = Math.min(
+                round(mouse.percX * 100, positionPrecision),
+                this.values.right
+            )
         } else if (this.resizing.includes('r')) {
-            this.values.right = Math.max(round(mouse.percX * 100, positionPrecision), this.values.left)
+            this.values.right = Math.max(
+                round(mouse.percX * 100, positionPrecision),
+                this.values.left
+            )
         }
 
         body.onFrame.end(this.updatePosition)
@@ -11036,21 +11048,22 @@ class BoxEdit {
 
         if (this.values.top > this.values.bottom) {
             this.values.top = this.values.bottom = round(
-                (this.values.top + this.values.bottom) / 2, positionPrecision
+                (this.values.top + this.values.bottom) / 2,
+                positionPrecision
             )
         }
 
         if (this.values.left > this.values.right) {
             this.values.left = this.values.right = round(
-                (this.values.left + this.values.right) / 2, positionPrecision
+                (this.values.left + this.values.right) / 2,
+                positionPrecision
             )
         }
 
-        
         if (Object.keys(event).length > 0) {
             event.fromUser = fromUser
             event.from = this
-            
+
             body.onFrame.end(this.updatePosition)
 
             sendEventTo(event, this.events.change)
@@ -11946,7 +11959,7 @@ class BoxEdit {
             sendEventTo(
                 {
                     scale: this.values.scale,
-                    
+
                     fromUser: false,
                     from: this
                 },
@@ -13019,15 +13032,24 @@ class BoxEdit {
 
                 this.dragButton.node.addEventListener(
                     'mousedown',
-                    passEventTo.bind(this, this.events['drag-click'], {fromUser: true, from: this})
+                    passEventTo.bind(this, this.events['drag-click'], {
+                        fromUser: true,
+                        from: this
+                    })
                 )
                 this.editButton.onEvent(
                     'click',
-                    passEventTo.bind(this, this.events['edit-click'], {fromUser: true, from: this})
+                    passEventTo.bind(this, this.events['edit-click'], {
+                        fromUser: true,
+                        from: this
+                    })
                 )
                 this.removeButton.onEvent(
                     'click',
-                    passEventTo.bind(this, this.events['remove-click'], {fromUser: true, from: this})
+                    passEventTo.bind(this, this.events['remove-click'], {
+                        fromUser: true,
+                        from: this
+                    })
                 )
 
                 this.toggleButton.onEvent('click', () => {
@@ -13110,7 +13132,13 @@ class BoxEdit {
 
             this._disabled = false
 
-            bindFunctions(this, this.onResize, this.writeContent, this.onItemSelectClick, this.onItemActiveClick)
+            bindFunctions(
+                this,
+                this.onResize,
+                this.writeContent,
+                this.onItemSelectClick,
+                this.onItemActiveClick
+            )
 
             this.title = data.title
             this.sections = data.sections
@@ -13611,16 +13639,25 @@ class BoxEdit {
 
                 this.displayItem.onEvent(
                     'click',
-                    passEventTo.bind(this, this.events['select-click'], {fromUser: true, from: this})
+                    passEventTo.bind(this, this.events['select-click'], {
+                        fromUser: true,
+                        from: this
+                    })
                 )
                 this.infoNode.addEventListener(
                     'click',
-                    passEventTo.bind(this, this.events['select-click'], {fromUser: true, from: this})
+                    passEventTo.bind(this, this.events['select-click'], {
+                        fromUser: true,
+                        from: this
+                    })
                 )
 
                 this.activeButton.onEvent(
                     'click',
-                    passEventTo.bind(this, this.events['active-click'], {fromUser: true, from: this})
+                    passEventTo.bind(this, this.events['active-click'], {
+                        fromUser: true,
+                        from: this
+                    })
                 )
             }
 
@@ -15491,7 +15528,8 @@ class BoxEdit {
                     acceleratorItems[i].parentItem.toLowerCase() ===
                         label.toLowerCase() &&
                     (acceleratorItems[i].message.toLowerCase() ===
-                        item.toLowerCase() || acceleratorItems[i].label === item.toLowerCase())
+                        item.toLowerCase() ||
+                        acceleratorItems[i].label === item.toLowerCase())
                 ) {
                     objUtil.applyObj(acceleratorItems[i], state)
                 }
