@@ -79,7 +79,8 @@ const maxLinesEditor = new layout.NumberInput({
 })
 
 const fitTextButton = new layout.Button({
-    text: 'Fit Text & Unify'
+    text: 'Fit Text & Unify',
+    size: 'large'
 })
 
 const updateSectionsButton = new layout.Button({
@@ -129,7 +130,8 @@ backgroundControl.connect(displayEditor)
         align: 'center'
     })
     layout.change(fitTextButton, {
-        align: 'center'
+        align: 'end',
+        margin: '4px'
     })
     layout.change(sectionsBar, {
         direction: 'horizontal',
@@ -164,30 +166,50 @@ backgroundControl.connect(displayEditor)
                                         new layout.Block(
                                             {
                                                 items: [
-                                                    new layout.Text({
-                                                        text: 'Templates'
-                                                    }),
+                                                    new layout.Filler(),
+                                                    fitTextButton,
                                                     new layout.Block(
                                                         {
                                                             items: [
-                                                                templateSelector,
-                                                                applyTemplateButton
+                                                                new layout.Text(
+                                                                    {
+                                                                        text:
+                                                                            'Templates'
+                                                                    }
+                                                                ),
+                                                                new layout.Block(
+                                                                    {
+                                                                        items: [
+                                                                            templateSelector,
+                                                                            applyTemplateButton
+                                                                        ],
+                                                                        childSpacing:
+                                                                            '8px'
+                                                                    },
+                                                                    {
+                                                                        direction:
+                                                                            'horizontal',
+                                                                        padding: 0
+                                                                    }
+                                                                )
                                                             ],
+
                                                             childSpacing: '8px'
                                                         },
                                                         {
                                                             direction:
-                                                                'horizontal',
+                                                                'vertical',
+                                                            grow: false,
+                                                            shrink: false,
+
                                                             padding: 0
                                                         }
                                                     )
                                                 ],
-
                                                 childSpacing: '8px'
                                             },
                                             {
-                                                direction: 'vertical',
-                                                align: 'end'
+                                                direction: 'horizontal'
                                             }
                                         )
                                     ],
