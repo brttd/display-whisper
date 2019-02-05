@@ -11,7 +11,7 @@ const Songs = new Database.Group('songs', {
 
 const closeButton = new layout.Button(
     {
-        text: 'Cancel',
+        text: 'Close',
 
         onClick: () => layout.window.close()
     },
