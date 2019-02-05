@@ -561,7 +561,7 @@ const Songs = new Database.Group('songs', {
         )
 
         data._allLower = [
-            data._namelower,
+            data._nameLower,
             data._authorLower,
             data._copyrightLower,
             data._contentLower
