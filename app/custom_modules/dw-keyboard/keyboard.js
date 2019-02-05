@@ -4,7 +4,22 @@ if (typeof window !== 'object') {
     throw new Error("Window doesn't have addEventListener method!")
 }
 
-const modifiers = ['Alt', 'AltGraph', 'Control', 'Meta', 'Shift', 'Super']
+const modifiers = [
+    'Alt',
+    'AltGraph',
+    'CapsLock',
+    'Control',
+    'Fn',
+    'FnLock',
+    'Hyper',
+    'Meta',
+    'NumLock',
+    'ScrollLock',
+    'Shift',
+    'Super',
+    'Symbol',
+    'SymbolLock'
+]
 
 const events = {}
 
@@ -249,7 +264,6 @@ let keyDisplays = {
 
     Slash: 'Slash',
 
-    CapsLock: 'Caps Lock',
     ContextMenu: 'Context Menu',
     Enter: 'Enter',
     Tab: 'Tab',
@@ -266,7 +280,6 @@ let keyDisplays = {
     ArrowRight: 'Right',
     ArrowUp: 'Up',
 
-    NumLock: 'Num Lock',
     Numpad0: 'Num 0',
     Numpad1: 'Num 1',
     Numpad2: 'Num 2',
@@ -303,28 +316,34 @@ let keyDisplays = {
     F11: 'F11',
     F12: 'F12',
 
-    Fn: 'Function',
-
-    PrintScreen: 'Print Screen',
-    ScrollLock: 'Scroll Lock',
+    PrintScreen: 'Prt Sc',
     Pause: 'Pause',
 
     //Modifier keys:
     Alt: 'Alt',
     AltGraph: 'Alt Gr',
+    CapsLock: 'Caps Lock',
     Control: 'Ctrl',
-    Shift: 'Shift',
-
+    Fn: 'Fn',
+    FnLock: 'Fn Lock',
+    Hyper: 'Hyper',
     Meta: '⌘',
-
-    Super: 'Super'
+    NumLock: 'Num Lock',
+    ScrollLock: 'Scroll Lock',
+    Shift: 'Shift',
+    Super: 'Super',
+    Symbol: 'Symbol',
+    SymbolLock: 'Symbol Lock'
 }
 
 if (process.platform === 'win32') {
     keyDisplays['Meta'] = 'Windows'
-} else if (process.platform === 'linux') {
-    //Linux doesn't have a standard key display for the meta key
-    keyDisplays['Meta'] = 'Meta'
+} else {
+    keyDisplays['Alt'] = '⌥'
+    keyDisplays['AltGraph'] = '⌥ Gr'
+    keyDisplays['CapsLock'] = '⇪'
+    keyDisplays['Control'] = '⌃'
+    keyDisplays['Shift'] = '⇧'
 }
 
 /*
@@ -341,8 +360,11 @@ let listeners = []
 let idCounter = 0
 let listenerShortcutsList = []
 
+//Keys being held down
 let activeKeyList = []
+//Modifiers being held down
 let activeModifierList = []
+//Keys which were held, and have been released
 let releasedKeyList = []
 
 let activeShortcut = ''
