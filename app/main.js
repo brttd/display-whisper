@@ -744,65 +744,6 @@ function openControl() {
         windows.control.maximize()
     }
 
-    let onCloseMessage = event => {
-        if (event.sender !== windows.control.webContents) {
-            return false
-        }
-
-        let closing = true
-        //This event happens when the user tries to close the control window
-        //It is cancelled by the control window, which will wait until a 'can-close' message is sent
-
-        //To ensure the control window can safely close, all other windows (excluding display) must be closed first
-        //If any of them send a 'close-canceled' message, tell the control window it can't close
-        ipcMain.once('close-canceled', event => {
-            if (event.sender !== windows.control.webContents) {
-                closing = false
-                windows.control.webContents.send('cancel-close')
-            }
-        })
-
-        //All windows which need to be closed
-        let toClose = []
-
-        for (let windowName in windows) {
-            if (windows[windowName] && windowName !== 'control') {
-                toClose.push(windows[windowName])
-            }
-        }
-
-        for (let id in editors) {
-            if (editors[id]) {
-                toClose.push(editors[id])
-            }
-        }
-
-        let closeNext = () => {
-            if (!closing) {
-                return false
-            }
-
-            if (toClose.length === 0) {
-                windows.control.webContents.send('can-close')
-
-                return false
-            }
-
-            //Remove a window, and close it
-            //when it's closed, move onto the next one
-
-            let win = toClose.pop()
-
-            win.once('closed', closeNext)
-
-            win.close()
-        }
-
-        closeNext()
-    }
-
-    ipcMain.on('close', onCloseMessage)
-
     windows.control.on('close', () => {
         bounds = windows.control.getContentBounds()
 
@@ -846,8 +787,6 @@ function openControl() {
                 }
             }
         })
-
-        ipcMain.removeListener('close', onCloseMessage)
     })
 
     windows.control.webContents.on('new-window', onWinNewWindow)
@@ -1850,6 +1789,66 @@ if (process.platform === 'darwin') {
         })
     })
 }
+
+//Control window close message
+ipcMain.on('close', event => {
+    if (!windows.control || event.sender !== windows.control.webContents) {
+        return false
+    }
+    //The control window needs a special system to handle closing:
+    //All other windows need to be closed before the control window can close
+    //But if any of the other windows have their close canceled (by the user), then the control window can't close
+
+    //The event should only continue while closing is true (if it's cancelled, closing is set to false, and nothing more should happen)
+    let closing = true
+
+    //A window may cancel its close, in which case the control window needs to be told to also cancel
+    ipcMain.once('close-canceled', event => {
+        if (closing && event.sender !== windows.control.webContents) {
+            closing = false
+
+            windows.control.webContents.send('cancel-close')
+        }
+    })
+
+    let toClose = []
+
+    //Get all windows & editors which are open
+    for (let windowName in windows) {
+        if (windows[windowName] && windowName !== 'control') {
+            toClose.push(windows[windowName])
+        }
+    }
+    for (let id in editors) {
+        if (editors[id]) {
+            toClose.push(editors[id])
+        }
+    }
+
+    let closeNext = () => {
+        //If a cancel happened, don't do anything more
+        if (!closing) {
+            return false
+        }
+
+        //if there are no windows left to close, tell the control window it can close
+        if (toClose.length === 0) {
+            windows.control.webContents.send('can-close')
+
+            return false
+        }
+
+        //Remove a window from the list to close
+        let win = toClose.pop()
+
+        //When the window is closed, move to the next one
+        win.once('closed', closeNext)
+
+        win.close()
+    }
+
+    closeNext()
+})
 
 //Window messages
 {
