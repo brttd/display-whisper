@@ -773,12 +773,16 @@ function resetSong() {
 }
 
 //Changes the song to the given ID, and updates all editing items
-function loadSong(group, groupID) {
+function loadSong(group, groupID, force = false) {
     if (typeof groupID === 'string') {
         groupID = parseInt(groupID)
     }
 
-    if (group === editor.data.group && groupID === editor.data.groupID) {
+    if (
+        group === editor.data.group &&
+        groupID === editor.data.groupID &&
+        force === false
+    ) {
         return false
     }
 
@@ -1229,8 +1233,44 @@ Songs.onEvent('update-start', () => {
     layout.showLoader(resultsBox)
 })
 layout.showLoader(resultsBox)
-Songs.onEvent('update', () => {
+Songs.onEvent('update', changed => {
     layout.hideLoader(resultsBox)
+
+    if (Array.isArray(changed) && editor.data.group) {
+        let activeSongChanged = false
+
+        for (let i = 0; i < changed.length; i++) {
+            if (
+                changed[i].group === editor.data.group &&
+                changed[i].ID === editor.data.groupID
+            ) {
+                activeSongChanged = true
+
+                break
+            }
+        }
+
+        if (activeSongChanged) {
+            layout.dialog.showQuestion(
+                {
+                    title: 'Reload Song?',
+
+                    message:
+                        'The song you currently have selected has been changed!\nIf you do not reload, the song you see might be different to what is saved in the library.',
+                    detail: editor.hasChanges
+                        ? 'If you do reload, any changes you have made will be lost!'
+                        : '',
+
+                    options: ['Reload', 'Cancel']
+                },
+                (error, answer) => {
+                    if (answer === 'Reload') {
+                        loadSong(editor.data.group, editor.data.groupID, true)
+                    }
+                }
+            )
+        }
+    }
 
     showSearchResults()
 })
