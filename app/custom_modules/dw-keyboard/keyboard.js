@@ -167,10 +167,10 @@ let keyReplacements = {
 
     Ctrl: 'Control',
 
-    Command: 'Meta',
-    Cmd: 'Meta',
     CommandOrControl: 'Meta',
     CmdOrCtrl: 'Meta',
+    Command: 'Meta',
+    Cmd: 'Meta',
     '⌘': 'Meta',
 
     '⇧': 'Shift'
@@ -178,10 +178,10 @@ let keyReplacements = {
 
 if (process.platform === 'win32' || process.platform === 'linux') {
     //Windows and Linux don't have the command key
-    keyReplacements['Command'] = 'Control'
-    keyReplacements['Cmd'] = 'Control'
     keyReplacements['CommandOrControl'] = 'Control'
     keyReplacements['CmdOrCtrl'] = 'Control'
+    keyReplacements['Command'] = 'Control'
+    keyReplacements['Cmd'] = 'Control'
 }
 
 //Character codes -> user-displayed string (US layout)
