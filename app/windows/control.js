@@ -2210,6 +2210,8 @@ const playlist = {}
 
     function finishClose() {
         if (lastEditTime >= lastAutoSaveTime) {
+            layout.showLoader(layout.body, 'Auto-Saving')
+
             files.save('autosave.dpl', getSaveData(), error => {
                 if (error) {
                     logger.error('Unable to autosave on close:', error)
