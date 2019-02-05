@@ -117,6 +117,9 @@ textStyleEditor.connect(textEditor)
 const saveButton = new layout.Button({
     text: 'Save'
 })
+const duplicateButton = new layout.Button({
+    text: 'Duplicate'
+})
 const removeButton = new layout.Button({
     text: 'Remove'
 })
@@ -353,6 +356,7 @@ const removeButton = new layout.Button({
                                             items: [
                                                 new layout.Filler(),
                                                 saveButton,
+                                                duplicateButton,
                                                 removeButton
                                             ],
                                             childSpacing: '8px'
@@ -578,6 +582,7 @@ function setDisabled(disabled) {
 
     playTimeEditor.disabled = textEditor.disabled = disabled
 
+    duplicateButton.disabled = disabled
     removeButton.disabled = disabled
 }
 
@@ -1001,6 +1006,45 @@ function selectSection(name) {
 {
     //This causes the 'output' event to happen, and the handler for that should call the save function
     saveButton.onEvent('click', editor.apply)
+
+    duplicateButton.onEvent('click', () => {
+        let newSong = editor.util.copyObj(editor.data)
+
+        if (!Songs.validGroup(newSong.group)) {
+            newSong.group = 'S'
+        }
+
+        newSong.groupID = Songs.getUniqueID(newSong.group)
+
+        Songs.save(
+            newSong.group,
+            newSong.groupID,
+            removeSearchData(newSong),
+            error => {
+                if (error) {
+                    layout.dialog.showNotification({
+                        type: 'error',
+                        message:
+                            'Unable to duplicate!\n' + error.message ||
+                            error.toString()
+                    })
+
+                    logger.error('Unable to duplicate song: ' + error)
+
+                    return false
+                }
+
+                layout.dialog.showNotification({
+                    type: 'success',
+                    message:
+                        'Duplicated song with ID ' +
+                        newSong.group +
+                        '-' +
+                        newSong.groupID.toString()
+                })
+            }
+        )
+    })
 
     removeButton.onEvent('click', () => {
         layout.dialog.showQuestion(
