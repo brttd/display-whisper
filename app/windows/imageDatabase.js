@@ -145,12 +145,12 @@ function updateImageList() {
     }
     removeAllButton.disabled = false
 
-    Images.files.forEach(image => {
+    for (let i = 0; i < Images.files.length; i++) {
         imageList.add([
-            path.basename(image, path.extname(image)),
-            path.extname(image)
+            path.basename(Images.files[i], path.extname(Images.files[i])),
+            path.extname(Images.files[i])
         ])
-    })
+    }
 
     imageList.select(toSelect, true)
 
