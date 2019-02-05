@@ -1,5 +1,4 @@
 REQUIRED:
-    Image editor list is broken, sometimes list images twice or non-existant images.
     Bold, Italic, font options for text nodes.
 
     When editor gets second 'edit-data':
