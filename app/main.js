@@ -1439,10 +1439,6 @@ const appMenu = new Menu()
             return
         }
 
-        if (typeof item.message === '') {
-            item.message = item.label
-        }
-
         if (item.sendTo === 'active') {
             let activeWindow = BrowserWindow.getFocusedWindow()
 
@@ -1532,7 +1528,7 @@ const appMenu = new Menu()
             parentItem: item.parentItem || '',
 
             sendTo: item.sendTo || null,
-            message: item.message || '',
+            message: item.message || item.label || '',
 
             click: onMenuClick,
             role: item.role,
