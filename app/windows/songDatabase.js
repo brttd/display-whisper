@@ -388,29 +388,6 @@ const removeButton = new layout.Button({
     )
 }
 
-layout.menu.add('edit')
-layout.menu.add({
-    label: 'Tools',
-    submenu: [
-        {
-            label: 'Add Song...',
-            window: 'songAdd'
-        },
-        {
-            label: 'Import Songs...',
-            window: 'songImport'
-        },
-        {
-            label: 'Export Songs...',
-            window: 'songExport'
-        },
-        {
-            label: 'Check Songs...',
-            window: 'songCheck'
-        }
-    ]
-})
-
 //List of song properties which are displayed in search results
 const resultsText = ['name', 'author', 'group', 'groupID']
 
@@ -1284,12 +1261,21 @@ Songs.onEvent('error', error => {
     })
 })
 
-//Whenever the editor history changes, the menu undo/redo options need to be enabled/disabled
 editor.onEvent('history', () => {
-    layout.menu.change('edit', {
-        undo: editor.canUndo,
-        redo: editor.canRedo
+    layout.menu.change('edit', 'undo', {
+        enabled: editor.canUndo
     })
+    layout.menu.change('edit', 'redo', {
+        enabled: editor.canRedo
+    })
+})
+
+layout.menu.onEvent('edit', item => {
+    if (item === 'undo') {
+        editor.undo()
+    } else if (item === 'redo') {
+        editor.redo()
+    }
 })
 
 //If undo/redo happens, etc
@@ -1308,14 +1294,6 @@ editor.onEvent('output', () => {
 })
 
 resetSong()
-
-layout.menu.onEvent('edit', event => {
-    if (event.label === 'Undo') {
-        editor.undo()
-    } else if (event.label === 'Redo') {
-        editor.redo()
-    }
-})
 
 layout.window.onEvent('close', event => {
     if (editor.hasChanges) {

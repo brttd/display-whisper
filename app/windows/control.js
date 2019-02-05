@@ -131,48 +131,6 @@ const itemsBlock = new layout.ReorderableBlock(
 
 const playlist = {}
 {
-    const fileMenu = layout.menu.add({
-        label: 'File',
-
-        context: 'file',
-
-        submenu: [
-            {
-                label: 'New Presentation',
-
-                value: 'new'
-            },
-            {
-                label: 'Open Presentation...',
-
-                value: 'open'
-            },
-            {
-                label: 'Open Recent',
-
-                context: 'open',
-
-                submenu: []
-            },
-            {
-                type: 'separator'
-            },
-            {
-                label: 'Save',
-
-                value: 'save'
-            },
-            {
-                label: 'Save As...',
-
-                value: 'save-as'
-            }
-        ]
-    })
-    const recentlyOpenedMenu = fileMenu.submenu.items[2]
-
-    let recentlyOpened = []
-
     let lastSaveTime = 0
     let lastAutoSaveTime = 0
 
@@ -271,66 +229,6 @@ const playlist = {}
         return path.basename(filename, '.dpl')
     }
 
-    let savingRecent = false
-    function saveRecentlyOpenedList() {
-        if (savingRecent === false) {
-            savingRecent = true
-
-            setTimeout(() => {
-                savingRecent = false
-
-                files.save(
-                    path.join(files.dataDir, 'recentlyOpened.json'),
-                    recentlyOpened,
-                    error => {
-                        if (error) {
-                            logger.error(
-                                'Unable to save recently opened list',
-                                error
-                            )
-                        }
-                    }
-                )
-            }, 1000)
-        }
-    }
-
-    function updateRecentlyOpenedMenu() {
-        layout.menu.change(recentlyOpenedMenu, {
-            submenu: recentlyOpened.map(file => {
-                return { value: file, label: displayFilename(file) }
-            })
-        })
-    }
-
-    function removeRecentlyOpened(file) {
-        let index = recentlyOpened.indexOf(file)
-        if (index !== -1) {
-            recentlyOpened.splice(index, 1)
-        }
-
-        updateRecentlyOpenedMenu()
-
-        saveRecentlyOpenedList()
-    }
-
-    function addRecentlyOpened(file) {
-        let index = recentlyOpened.indexOf(file)
-        if (index !== -1) {
-            recentlyOpened.splice(index, 1)
-        }
-
-        recentlyOpened.unshift(file)
-
-        while (recentlyOpened.length > 5) {
-            recentlyOpened.pop()
-        }
-
-        updateRecentlyOpenedMenu()
-
-        saveRecentlyOpenedList()
-    }
-
     //save functions
     function editHasOccured() {
         lastEditTime = Date.now()
@@ -362,6 +260,10 @@ const playlist = {}
             'Undo Remove (' + removeHistory.length.toString() + ')'
 
         undoRemoveButton.disabled = removeHistory.length === 0
+
+        layout.menu.change('edit', 'undo', {
+            enabled: removeHistory.length > 0
+        })
     }
 
     //event functions
@@ -1891,15 +1793,11 @@ const playlist = {}
 
                 logger.error('Error loading playlist file', file, error)
 
-                removeRecentlyOpened(file)
-
                 return false
             }
             data.file = file
 
             playlist.load(data)
-
-            addRecentlyOpened(file)
         })
     }
     //User file functions
@@ -1950,15 +1848,11 @@ const playlist = {}
                 })
                 logger.error('Error saving playlist file', file, error)
 
-                removeRecentlyOpened(file)
-
                 if (typeof callback === 'function') {
                     callback(error, false)
                 }
             } else {
                 playlist.saved = true
-
-                addRecentlyOpened(file)
 
                 if (typeof callback === 'function') {
                     callback(null, true)
@@ -2185,22 +2079,14 @@ const playlist = {}
         ])
     }
 
-    layout.menu.onEvent('file', event => {
-        if (event.value === 'new') {
+    layout.menu.onEvent('file', item => {
+        if (item === 'new') {
             fileNewPlaylist()
-        } else if (event.value === 'open') {
+        } else if (item === 'open') {
             fileOpenPlaylist()
-        } else if (event.context === 'open') {
-            checkSave((error, canContinue) => {
-                if (!canContinue) {
-                    return false
-                }
-
-                loadFile(event.value)
-            })
-        } else if (event.value === 'save-as') {
+        } else if (item === 'save-as') {
             fileSavePlaylistAs()
-        } else if (event.value === 'save') {
+        } else if (item === 'save') {
             fileSavePlaylist()
         }
     })
@@ -2368,50 +2254,7 @@ const playlist = {}
             }
 
             load(data)
-
-            if (data.file) {
-                addRecentlyOpened(data.file)
-            }
         })
-
-        files.load(
-            path.join(files.dataDir, 'recentlyOpened.json'),
-            (error, data) => {
-                if (error) {
-                    if (error.code === 'ENOENT') {
-                        files.save(
-                            path.join(files.dataDir, 'recentlyOpened.json'),
-                            [],
-                            error => {
-                                if (error) {
-                                    logger.error(
-                                        'Unable to save (blank) recently opened file list:',
-                                        error
-                                    )
-
-                                    return false
-                                }
-                            }
-                        )
-                    } else {
-                        logger.error(
-                            'Unable to load recently opened file list:',
-                            error
-                        )
-                    }
-
-                    return false
-                }
-
-                recentlyOpened = data
-
-                if (file) {
-                    addRecentlyOpened(file)
-                } else {
-                    updateRecentlyOpenedMenu()
-                }
-            }
-        )
     }
 
     ipcRenderer.on('open-file', (event, file) => {
@@ -2422,127 +2265,6 @@ const playlist = {}
 
             loadFile(file)
         })
-    })
-}
-
-layout.menu.add({
-    label: 'Library',
-    submenu: [
-        {
-            label: 'Songs...',
-            window: 'songDatabase'
-        },
-        {
-            label: 'Images...',
-            window: 'imageDatabase'
-        }
-    ]
-})
-layout.menu.add({
-    label: 'Tools',
-    submenu: [
-        {
-            label: 'Add Song...',
-            window: 'songAdd'
-        },
-        {
-            label: 'Import Songs...',
-            window: 'songImport'
-        },
-        {
-            label: 'Export Songs...',
-            window: 'songExport'
-        },
-        {
-            label: 'Check Songs...',
-            window: 'songCheck'
-        },
-        {
-            type: 'separator'
-        },
-        {
-            label: 'Print...',
-            window: 'print'
-        },
-        {
-            type: 'separator'
-        },
-        {
-            label: 'Edit Templates...',
-            window: 'templateEditor'
-        }
-    ]
-})
-
-if (process.platform === 'darwin') {
-    layout.menu.add({
-        label: 'Help',
-        submenu: [
-            {
-                label: 'Help...',
-                window: 'help'
-            },
-            {
-                type: 'separator'
-            },
-            {
-                label: 'Report Issue (GitHub)...',
-                url: 'https://github.com/brttd/display-whisper/issues/new'
-            },
-            {
-                label: 'Report Issue (Email)...',
-                url:
-                    'mailto://displaywhisper@brettdoyle.uk?subject=Display%20Whisper%20-%20issue'
-            },
-            {
-                type: 'separator'
-            },
-            {
-                label: 'View Log',
-                window: 'log'
-            }
-        ]
-    })
-} else {
-    layout.menu.add({
-        label: 'Preferences...',
-        window: 'preferences'
-    })
-    layout.menu.add({
-        label: 'Help',
-        submenu: [
-            {
-                label: 'Help...',
-                window: 'help'
-            },
-            {
-                label: 'About',
-                window: 'about'
-            },
-            {
-                label: 'Check For Updates',
-                message: 'check-version'
-            },
-            {
-                type: 'separator'
-            },
-            {
-                label: 'Report Issue (GitHub)...',
-                url: 'https://github.com/brttd/display-whisper/issues/new'
-            },
-            {
-                label: 'Report Issue (Email)...',
-                url:
-                    'mailto://displaywhisper@brettdoyle.uk?subject=Display%20Whisper%20-%20issue'
-            },
-            {
-                type: 'separator'
-            },
-            {
-                label: 'View Log',
-                window: 'log'
-            }
-        ]
     })
 }
 
@@ -4229,6 +3951,11 @@ const item_control = {
         ipcRenderer.send('display-blank', blankButton.active)
     })
     undoRemoveButton.onEvent('click', playlist.undoRemove)
+    layout.menu.onEvent('edit', label => {
+        if (label === 'undo') {
+            playlist.undoRemove()
+        }
+    })
 
     item_control.setOption = (name, value) => {
         if (name === 'playMode') {
@@ -4885,6 +4612,8 @@ layout.contextMenu.onEvent('click', event => {
         layout.window.openWindow('templateEditor')
     }
 })
+
+layout.menu.change('edit', 'redo', { enabled: false })
 
 //**********************
 //Dynamic interface layout...

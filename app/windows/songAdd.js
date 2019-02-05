@@ -388,12 +388,6 @@ let activeIndex = -1
     */
 }
 
-layout.menu.add('edit')
-layout.menu.add({
-    label: 'Song Library...',
-    window: 'songDatabase'
-})
-
 function getSafeName(name, data = editor.data) {
     let counter = parseFloat(name.replace(notDigits, ''))
 
@@ -895,19 +889,21 @@ fileSelect.onEvent('open', event => {
     })
 }
 
-layout.menu.onEvent('edit', event => {
-    if (event.label === 'Undo') {
-        editor.undo()
-    } else if (event.label === 'Redo') {
-        editor.redo()
-    }
+editor.onEvent('history', () => {
+    layout.menu.change('edit', 'undo', {
+        enabled: editor.canUndo
+    })
+    layout.menu.change('edit', 'redo', {
+        enabled: editor.canRedo
+    })
 })
 
-editor.onEvent('history', () => {
-    layout.menu.change('edit', {
-        undo: editor.canUndo,
-        redo: editor.canRedo
-    })
+layout.menu.onEvent('edit', item => {
+    if (item === 'undo') {
+        editor.undo()
+    } else if (item === 'redo') {
+        editor.redo()
+    }
 })
 
 editor.onEvent('change', from => {

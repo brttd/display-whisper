@@ -517,27 +517,6 @@ const pdfButton = new layout.Button({
     )
 }
 
-layout.menu.add('edit')
-
-layout.menu.add({
-    label: 'Library',
-    submenu: [
-        {
-            label: 'Songs...',
-            window: 'songDatabase'
-        },
-        {
-            label: 'Images...',
-            window: 'imageDatabase'
-        }
-    ]
-})
-
-layout.menu.change('edit', {
-    undo: false,
-    redo: false
-})
-
 const searchFilters = {
     all: function(item) {
         return item._allLower.includes(this)
@@ -1367,19 +1346,21 @@ testButton.onEvent('click', preview.setupTest)
 printButton.onEvent('click', preview.print)
 pdfButton.onEvent('click', preview.save)
 
-layout.menu.onEvent('edit', event => {
-    if (event.label === 'Undo') {
-        editor.undo()
-    } else if (event.label === 'Redo') {
-        editor.redo()
-    }
+editor.onEvent('history', () => {
+    layout.menu.change('edit', 'undo', {
+        enabled: editor.canUndo
+    })
+    layout.menu.change('edit', 'redo', {
+        enabled: editor.canRedo
+    })
 })
 
-editor.onEvent('history', () => {
-    layout.menu.change('edit', {
-        undo: editor.canUndo,
-        redo: editor.canRedo
-    })
+layout.menu.onEvent('edit', item => {
+    if (item === 'undo') {
+        editor.undo()
+    } else if (item === 'redo') {
+        editor.redo()
+    }
 })
 
 editor.onEvent('change', from => {

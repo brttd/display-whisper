@@ -158,16 +158,6 @@ layout.body.add(
     })
 )
 
-layout.menu.add('edit')
-layout.menu.add({
-    label: 'Image Library...',
-    window: 'imageDatabase'
-})
-layout.menu.add({
-    label: 'Edit Templates...',
-    window: 'templateEditor'
-})
-
 //Templates
 {
     Templates.onEvent('update', () => {
@@ -275,10 +265,20 @@ editor.onEvent('output', data => {
 })
 
 editor.onEvent('history', () => {
-    layout.menu.change('edit', {
-        undo: editor.canUndo,
-        redo: editor.canRedo
+    layout.menu.change('edit', 'undo', {
+        enabled: editor.canUndo
     })
+    layout.menu.change('edit', 'redo', {
+        enabled: editor.canRedo
+    })
+})
+
+layout.menu.onEvent('edit', item => {
+    if (item === 'undo') {
+        editor.undo()
+    } else if (item === 'redo') {
+        editor.redo()
+    }
 })
 
 editor.onEvent('change', from => {
@@ -346,14 +346,6 @@ ipcRenderer.on('edit-data', (event, data) => {
 
     imageBox.focus()
     update()
-})
-
-layout.menu.onEvent('edit', event => {
-    if (event.label === 'Undo') {
-        editor.undo()
-    } else if (event.label === 'Redo') {
-        editor.redo()
-    }
 })
 
 layout.window.onEvent('close', event => {

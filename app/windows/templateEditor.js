@@ -228,8 +228,6 @@ let defaultTemplate = {}
 
 let selectedIndex = -1
 
-layout.menu.add('edit')
-
 function save(callback) {
     editor.apply()
 
@@ -880,10 +878,19 @@ function updateTemplateListAndSelect() {
     })
 }
 
-layout.menu.onEvent('edit', event => {
-    if (event.label === 'Undo') {
+editor.onEvent('history', () => {
+    layout.menu.change('edit', 'undo', {
+        enabled: editor.canUndo
+    })
+    layout.menu.change('edit', 'redo', {
+        enabled: editor.canRedo
+    })
+})
+
+layout.menu.onEvent('edit', item => {
+    if (item === 'undo') {
         editor.undo()
-    } else if (event.label === 'Redo') {
+    } else if (item === 'redo') {
         editor.redo()
     }
 })
@@ -892,15 +899,6 @@ editor.onEvent('change', from => {
     if (from === 'undo' || from === 'redo') {
         updateAll()
     }
-})
-
-editor.onEvent('history', () => {
-    layout.menu.change('edit', {
-        undo: editor.canUndo,
-        redo: editor.canRedo
-    })
-
-    saveButton.disabled = !editor.hasChanges
 })
 
 displayEditor.onEvent('change', slideChange)

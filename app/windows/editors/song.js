@@ -374,16 +374,6 @@ backgroundControl.connect(displayEditor)
     )
 }
 
-layout.menu.add('edit')
-layout.menu.add({
-    label: 'Song Library...',
-    window: 'songDatabase'
-})
-layout.menu.add({
-    label: 'Edit Templates...',
-    window: 'templateEditor'
-})
-
 const introName = 'Song - Intro'
 const outroName = 'Song - Outro'
 const blankName = 'Song - Blank'
@@ -1673,10 +1663,20 @@ applyButton.onEvent('click', () => {
 cancelButton.onEvent('click', layout.window.close)
 
 editor.onEvent('history', () => {
-    layout.menu.change('edit', {
-        undo: editor.canUndo,
-        redo: editor.canRedo
+    layout.menu.change('edit', 'undo', {
+        enabled: editor.canUndo
     })
+    layout.menu.change('edit', 'redo', {
+        enabled: editor.canRedo
+    })
+})
+
+layout.menu.onEvent('edit', item => {
+    if (item === 'undo') {
+        editor.undo()
+    } else if (item === 'redo') {
+        editor.redo()
+    }
 })
 
 editor.onEvent('change', from => {
@@ -1746,14 +1746,6 @@ ipcRenderer.on('setting', (event, key, value) => {
 })
 
 ipcRenderer.send('get-setting', 'display.increaseSizeOnFit', true)
-
-layout.menu.onEvent('edit', event => {
-    if (event.label === 'Undo') {
-        editor.undo()
-    } else if (event.label === 'Redo') {
-        editor.redo()
-    }
-})
 
 layout.window.onEvent('close', event => {
     if (editor.hasChanges) {
