@@ -6,13 +6,13 @@ if (typeof document !== 'object' || typeof window !== 'object') {
 }
 document.body.style.opacity = 0
 
-const { remote, ipcRenderer, shell } = require('electron')
+const { remote, ipcRenderer } = require('electron')
 const { dialog, Menu, MenuItem } = remote
 
 const fs = require('fs')
+const path = require('path')
 
 const fontList = require('font-list')
-const path = require('path')
 
 const richText = require('dw-rich-text')
 const color = require('dw-color')
@@ -22,26 +22,8 @@ const Database = require('dw-database')
 
 const objUtil = require('dw-editor').util
 
+//Global variables
 const thisWin = remote.getCurrentWindow()
-
-let idCounter = 0
-
-//Each exported layout item type, stored by name
-let items = {}
-
-//List of events which can be passed directly to item event listeners
-const basicMouseEvents = [
-    'mouseup',
-    'mousedown',
-    'mousemove',
-    'mouseout',
-    'mouseover',
-    'mousein',
-    'click',
-    'dblclick',
-    'contextmenu'
-]
-const basicKeyboardEvents = ['keydown', 'keypress', 'keyup']
 
 //Mappings between js style names, and CSS style names
 const stylesMap = {
@@ -150,6 +132,11 @@ const styleValuesMap = {
 //Used for storing unqiue item specific mappings.
 //Each item can add it's own functions, which are called when that property is changed for the item
 const itemStylesMap = {}
+
+let idCounter = 0
+
+//Each exported layout item type, stored by name
+let items = {}
 
 function loadCSS(name) {
     name = __dirname + '/' + name
@@ -8813,7 +8800,9 @@ exports.change = addStyles
             this.listNode.innerHTML = ''
 
             while (this.listDocumentFragment.childElementCount > 0) {
-                this.listDocumentFragment.removeChild(this.listDocumentFragment.lastChild)
+                this.listDocumentFragment.removeChild(
+                    this.listDocumentFragment.lastChild
+                )
             }
 
             this.items = []
@@ -15041,9 +15030,6 @@ class BoxEdit {
 
     exports.window.openWindow = function(name, message) {
         ipcRenderer.send('open-window', name, message)
-    }
-    exports.window.openExternal = function(url) {
-        shell.openExternal(url)
     }
 
     /*
