@@ -10731,6 +10731,8 @@ class BoxEdit {
         this.previewResizing = ''
         this.mouseOffset = { x: 0, y: 0 }
 
+        bindFunctions(this, this.updatePosition)
+
         this.node.addEventListener('mousedown', () => {
             if (!this.parent) {
                 return false
@@ -10943,7 +10945,7 @@ class BoxEdit {
             this.values.right = Math.max(round(mouse.percX * 100, positionPrecision), this.values.left)
         }
 
-        this.updatePosition()
+        body.onFrame.end(this.updatePosition)
 
         sendEventTo(
             {
@@ -11011,23 +11013,17 @@ class BoxEdit {
         if (typeof data.top === 'number' && isFinite(data.top)) {
             this.values.top = round(data.top, positionPrecision)
 
-            this.node.style.top = this.values.top + '%'
-
             event.top = data.top
         }
 
         if (typeof data.left === 'number' && isFinite(data.left)) {
             this.values.left = round(data.left, positionPrecision)
 
-            this.node.style.left = this.values.left + '%'
-
             event.left = data.left
         }
 
         if (typeof data.right === 'number' && isFinite(data.right)) {
             this.values.right = round(data.right, positionPrecision)
-
-            this.node.style.right = (100 - this.values.right).toString() + '%'
 
             event.right = data.right
         }
@@ -11054,6 +11050,8 @@ class BoxEdit {
         if (Object.keys(event).length > 0) {
             event.fromUser = fromUser
             event.from = this
+            
+            body.onFrame.end(this.updatePosition)
 
             sendEventTo(event, this.events.change)
         }
