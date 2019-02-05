@@ -1423,10 +1423,9 @@ function checkForUpdate() {
     })
 }
 
-//MacOS Menu
-if (process.platform === 'darwin') {
-    const appMenu = new Menu()
-
+//Application Menu
+const appMenu = new Menu()
+{
     function onMenuClick(item) {
         if (typeof item.window === 'string') {
             openWindow(item.window)
@@ -1442,35 +1441,42 @@ if (process.platform === 'darwin') {
             return
         }
 
-        let activeWindow = BrowserWindow.getFocusedWindow()
+        if (typeof item.message === '') {
+            item.message = item.label
+        }
 
         if (item.sendTo === 'active') {
+            let activeWindow = BrowserWindow.getFocusedWindow()
+
             if (activeWindow) {
-                if (Array.isArray(item.value)) {
+                if (Array.isArray(item.message)) {
                     activeWindow.webContents.send(
                         'menu',
-                        item.message,
-                        ...item.value
+                        item.parentItem,
+                        ...item.message
                     )
                 } else {
                     activeWindow.webContents.send(
                         'menu',
-                        item.message,
-                        item.value
+                        item.parentItem,
+                        item.message
                     )
                 }
             }
 
             return
-        } else if (item.sendTo === 'control') {
-            if (Array.isArray(item.value)) {
-                sendToControlWindow('menu', item.message, ...item.value)
+        } else {
+            if (Array.isArray(item.message)) {
+                openWindowAndSend(
+                    item.sendTo,
+                    ['menu', item.parentItem].concat(item.message)
+                )
             } else {
-                sendToControlWindow('menu', item.message, item.value)
-            }
-
-            if (!windows.control) {
-                openControl()
+                openWindowAndSend(item.sendTo, [
+                    'menu',
+                    item.parentItem,
+                    item.message
+                ])
             }
         }
     }
@@ -1489,10 +1495,7 @@ if (process.platform === 'darwin') {
                         typeof item.submenu[i] === 'object' &&
                         item.submenu[i] !== null
                     ) {
-                        item.submenu[i].topContext =
-                            item.topContext || item.context
-                        item.submenu[i].context =
-                            item.submenu[i].context || item.context
+                        item.submenu[i].parentItem = item.label
 
                         cleaned.push(cleanItem(item.submenu[i]))
                     }
@@ -1502,19 +1505,36 @@ if (process.platform === 'darwin') {
             item.submenu = cleaned
         }
 
+        let defaults = {
+            enabled: true,
+            visible: true
+        }
+
+        if (
+            typeof item.defaults === 'object' &&
+            !Array.isArray(item.defaults) &&
+            item.defaults !== null
+        ) {
+            if (typeof item.defaults.enabled === 'boolean') {
+                defaults.enabled = item.defaults.enabled
+            }
+            if (typeof item.defaults.visible === 'boolean') {
+                defaults.visible = item.defaults.visible
+            }
+        }
+
         return {
             window: item.window || null,
             url: item.url || null,
             function: item.function || null,
 
+            defaults: defaults,
+            static: item.static || item.role === 'seperator' || false,
+
+            parentItem: item.parentItem || '',
+
             sendTo: item.sendTo || null,
-
-            message: item.message || null,
-            value: item.value || null,
-
-            topContext: item.topContext || item.context || '',
-            context: item.context || '',
-            value: item.value || '',
+            message: item.message || '',
 
             click: onMenuClick,
             role: item.role,
@@ -1529,44 +1549,108 @@ if (process.platform === 'darwin') {
         }
     }
 
-    appMenu.append(
-        new MenuItem(
+    function updateMenuToWindow(win) {
+        if (typeof win.menuChanges !== 'object') {
+            win.menuChanges = {}
+        }
+
+        for (let itemId in allMenuItems) {
+            if (win.menuChanges[itemId]) {
+                if (typeof win.menuChanges[itemId].enabled === 'boolean') {
+                    allMenuItems[itemId].enabled =
+                        win.menuChanges[itemId].enabled
+                } else {
+                    allMenuItems[itemId].enabled =
+                        allMenuItems[itemId].defaults.enabled
+                }
+
+                if (typeof win.menuChanges[itemId].visible === 'boolean') {
+                    allMenuItems[itemId].visible =
+                        win.menuChanges[itemId].visible
+                } else {
+                    allMenuItems[itemId].visible =
+                        allMenuItems[itemId].defaults.visible
+                }
+            } else {
+                //If the window doesn't have changes for this menu item, use the default
+                allMenuItems[itemId].enabled =
+                    allMenuItems[itemId].defaults.enabled
+
+                allMenuItems[itemId].visible =
+                    allMenuItems[itemId].defaults.visible
+            }
+        }
+    }
+
+    function modifyWindowItem(win, itemID, changes) {
+        if (typeof win.menuChanges !== 'object') {
+            win.menuChanges = {}
+        }
+
+        if (typeof win.menuChanges[itemID] !== 'object') {
+            win.menuChanges[itemID] = {}
+        }
+
+        if (typeof changes.enabled === 'boolean') {
+            win.menuChanges[itemID].enabled = changes.enabled
+        }
+        if (typeof changes.visible === 'boolean') {
+            win.menuChanges[itemID].visible = changes.visible
+        }
+
+        if (win.isFocused()) {
+            updateMenuToWindow(win)
+        }
+    }
+
+    const items = {
+        app: new MenuItem(
             cleanItem({
-                label: 'Display Whisper',
+                label: 'Application',
 
                 submenu: [
                     {
                         label: 'About Display Whisper',
-                        window: 'about'
+                        window: 'about',
+
+                        static: true
                     },
                     {
                         label: 'Check For Updates',
-                        function: checkForUpdate
+                        function: checkForUpdate,
+
+                        static: true
                     },
                     {
                         type: 'separator'
                     },
                     {
                         label: 'Preferences...',
-                        window: 'preferences'
+                        window: 'preferences',
+
+                        static: true
                     },
-                    {
-                        type: 'separator'
-                    },
-                    {
-                        label: 'Quit',
-                        function: () => {
-                            if (windows.control) {
-                                windows.control.close()
-                            }
-                        }
-                    }
+                    //On MacOS the menu should also include a 'Quit' option
+                    process.platform === 'darwin'
+                        ? ({
+                              type: 'separator'
+                          },
+                          {
+                              label: 'Quit',
+
+                              function: () => {
+                                  if (windows.control) {
+                                      windows.control.close()
+                                  }
+                              },
+
+                              static: true
+                          })
+                        : null
                 ]
             })
-        )
-    )
-    appMenu.append(
-        new MenuItem(
+        ),
+        file: new MenuItem(
             cleanItem({
                 label: 'File',
                 context: 'file',
@@ -1574,53 +1658,43 @@ if (process.platform === 'darwin') {
                 submenu: [
                     {
                         label: 'New Presentation',
-                        sendTo: 'control',
 
-                        message: 'file',
-                        value: 'new'
+                        sendTo: 'control',
+                        message: 'new',
+
+                        static: true
                     },
                     {
                         label: 'Open Presentation...',
-                        sendTo: 'control',
 
-                        message: 'file',
-                        value: 'open'
-                    },
-                    /*
-                    Temporarily(?) disabled
-                    {
-                        label: 'Open Recent',
                         sendTo: 'control',
+                        message: 'open',
 
-                        context: 'open',
-        
-                        submenu: []
+                        static: true
                     },
-                    */
                     {
                         type: 'separator'
                     },
                     {
                         label: 'Save',
-                        sendTo: 'control',
 
-                        message: 'file',
-                        value: 'save'
+                        sendTo: 'control',
+                        message: 'save',
+
+                        static: true
                     },
                     {
                         label: 'Save As...',
-                        sendTo: 'control',
 
-                        message: 'file',
-                        value: 'save-as'
+                        sendTo: 'control',
+                        message: 'save-as',
+
+                        static: true
                     }
                 ]
             })
-        )
-    )
-    /*
-    appMenu.append(
-        new MenuItem(
+        ),
+        edit: new MenuItem(
             cleanItem({
                 label: 'Edit',
 
@@ -1629,90 +1703,125 @@ if (process.platform === 'darwin') {
                 submenu: [
                     {
                         label: 'Undo',
-                        sendTo: 'active',
+                        accelerator: 'CmdOrCtrl+Z',
 
-                        message: 'edit',
-                        value: 'undo'
+                        sendTo: 'active',
+                        message: 'undo',
+
+                        defaults: {
+                            enabled: false
+                        }
                     },
                     {
                         label: 'Redo',
-                        sendTo: 'active',
+                        accelerator: 'CmdOrCtrl+X',
 
-                        message: 'edit',
-                        value: 'redo'
+                        sendTo: 'active',
+                        message: 'redo',
+
+                        defaults: {
+                            enabled: false
+                        }
+                    },
+                    {
+                        type: 'separator'
+                    },
+                    {
+                        role: 'cut',
+                        sendTo: 'active'
+                    },
+                    {
+                        role: 'copy',
+                        sendTo: 'active'
+                    },
+                    {
+                        role: 'paste',
+                        sendTo: 'active'
+                    },
+                    {
+                        role: 'selectAll',
+                        sendTo: 'active'
                     }
                 ]
             })
-        )
-    )
-    */
-    appMenu.append(
-        new MenuItem(
+        ),
+        library: new MenuItem(
             cleanItem({
                 label: 'Library',
 
                 submenu: [
                     {
                         label: 'Songs...',
-                        window: 'songDatabase'
+                        window: 'songDatabase',
+
+                        static: true
+                    },
+                    {
+                        label: 'Add Songs...',
+                        window: 'songAdd',
+
+                        static: true
+                    },
+                    {
+                        label: 'Import Songs...',
+                        window: 'songImport',
+
+                        static: true
+                    },
+                    {
+                        label: 'Export Songs...',
+                        window: 'songExport',
+
+                        static: true
+                    },
+                    {
+                        label: 'Check Songs...',
+                        window: 'songCheck',
+
+                        static: true
+                    },
+                    {
+                        type: 'separator'
                     },
                     {
                         label: 'Images...',
-                        window: 'imageDatabase'
+                        window: 'imageDatabase',
+
+                        static: true
                     }
                 ]
             })
-        )
-    )
-    appMenu.append(
-        new MenuItem(
+        ),
+        tools: new MenuItem(
             cleanItem({
                 label: 'Tools',
 
                 submenu: [
                     {
-                        label: 'Add Song...',
-                        window: 'songAdd'
-                    },
-                    {
-                        label: 'Import Songs...',
-                        window: 'songImport'
-                    },
-                    {
-                        label: 'Export Songs...',
-                        window: 'songExport'
-                    },
-                    {
-                        label: 'Check Songs...',
-                        window: 'songCheck'
-                    },
-                    {
-                        type: 'separator'
-                    },
-                    {
                         label: 'Print...',
-                        window: 'print'
-                    },
-                    {
-                        type: 'separator'
+                        window: 'print',
+
+                        static: true
                     },
                     {
                         label: 'Edit Templates...',
-                        window: 'templateEditor'
+                        window: 'templateEditor',
+
+                        static: true
                     }
                 ]
             })
-        )
-    )
-    appMenu.append(
-        new MenuItem(
+        ),
+        help: new MenuItem(
             cleanItem({
                 label: 'Help',
 
                 submenu: [
                     {
                         label: 'Help...',
-                        window: 'help'
+                        window: 'help',
+
+                        static: true
                     },
                     {
                         type: 'separator'
@@ -1720,73 +1829,140 @@ if (process.platform === 'darwin') {
                     {
                         label: 'Report Issue (GitHub)...',
                         url:
-                            'https://github.com/brttd/display-whisper/issues/new'
+                            'https://github.com/brttd/display-whisper/issues/new',
+
+                        static: true
                     },
                     {
                         label: 'Report Issue (Email)...',
                         url:
-                            'mailto://displaywhisper@brettdoyle.uk?subject=Display%20Whisper%20-%20issue'
+                            'mailto://displaywhisper@brettdoyle.uk?subject=Display%20Whisper%20-%20issue',
+
+                        static: true
                     },
                     {
                         type: 'separator'
                     },
                     {
                         label: 'View Log',
-                        window: 'log'
+                        window: 'log',
+
+                        static: true
+                    }
+                ]
+            })
+        ),
+        debug: new MenuItem(
+            cleanItem({
+                label: 'Debug',
+
+                submenu: [
+                    {
+                        label: 'Open DevTools...',
+
+                        function: () => {
+                            let active = BrowserWindow.getFocusedWindow()
+
+                            if (active) {
+                                active.webContents.openDevTools()
+                            }
+                        },
+
+                        static: true
+                    },
+                    {
+                        role: 'toggleFullScreen',
+
+                        static: true
+                    },
+                    {
+                        type: 'separator'
+                    },
+                    {
+                        label: 'Restart',
+
+                        function: () => {
+                            app.relaunch()
+                            app.exit()
+                        },
+
+                        static: true
                     }
                 ]
             })
         )
-    )
-
-    const debugMenu = new MenuItem(
-        cleanItem({
-            label: 'Debug',
-
-            submenu: [
-                {
-                    label: 'Open DevTools...',
-
-                    function: () => {
-                        let active = BrowserWindow.getFocusedWindow()
-
-                        if (active) {
-                            active.webContents.openDevTools()
-                        }
-                    }
-                },
-                {
-                    label: 'Open Log...',
-                    window: 'log'
-                },
-                {
-                    type: 'separator'
-                },
-                {
-                    label: 'Disable Debug',
-
-                    function: () => {
-                        settings.set('debug.enable', false)
-                    }
-                }
-            ]
-        })
-    )
-
-    if (settings.get('debug.enable', false)) {
-        appMenu.append(debugMenu)
     }
 
-    app.on('ready', () => {
-        Menu.setApplicationMenu(appMenu)
+    const allMenuItems = {}
 
-        settings.listen('debug.enable', value => {
-            if (value) {
-                appMenu.append(debugMenu)
+    //Populate the allMenuItems object with menu items
+    //Each menu item should be stored undo 'label-item' (IE: file-open)
+    for (let label in items) {
+        if (items.hasOwnProperty(label)) {
+            let itemId = items[label].label.toLowerCase() + '-'
 
-                Menu.setApplicationMenu(appMenu)
+            let toCheck = items[label].submenu.items
+
+            for (let i = 0; i < toCheck.length; i++) {
+                if (toCheck[i].static !== true) {
+                    allMenuItems[
+                        itemId +
+                            (
+                                toCheck[i].message || toCheck[i].label
+                            ).toLowerCase()
+                    ] = toCheck[i]
+                }
             }
-        })
+        }
+    }
+
+    if (process.platform === 'darwin') {
+        appMenu.append(items.app)
+        appMenu.append(items.file)
+    } else {
+        appMenu.append(items.file)
+        appMenu.append(items.app)
+    }
+    appMenu.append(items.edit)
+    appMenu.append(items.library)
+    appMenu.append(items.tools)
+    appMenu.append(items.help)
+
+    if (settings.get('debug.enable', false)) {
+        appMenu.append(items.debug)
+    }
+
+    settings.listen('debug.enable', value => {
+        if (value) {
+            appMenu.append(items.debug)
+
+            Menu.setApplicationMenu(appMenu)
+        }
+    })
+
+    ipcMain.on('change-menu', (event, label, item, itemChanges) => {
+        if (
+            typeof label !== 'string' ||
+            typeof item !== 'string' ||
+            typeof itemChanges !== 'object' ||
+            itemChanges === null
+        ) {
+            return false
+        }
+
+        let itemID = label.toLowerCase() + '-' + item.toLowerCase()
+
+        if (allMenuItems[itemID]) {
+            modifyWindowItem(
+                BrowserWindow.fromWebContents(event.sender),
+                itemID,
+                itemChanges
+            )
+        }
+    })
+
+    app.on('browser-window-focus', (event, win) => {
+        updateMenuToWindow(win)
     })
 }
 
@@ -2142,6 +2318,8 @@ function setupDisplays() {
         settings.listen('debug.enable', value => {
             debug = value
         })
+
+        Menu.setApplicationMenu(appMenu)
 
         setupDisplays()
 
