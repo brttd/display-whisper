@@ -8841,7 +8841,7 @@ exports.change = addStyles
         }
 
         set(list) {
-            if (!Array.isArray(data)) {
+            if (!Array.isArray(list)) {
                 return false
             }
 
