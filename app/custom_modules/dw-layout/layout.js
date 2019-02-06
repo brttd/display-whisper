@@ -9120,7 +9120,7 @@ exports.change = addStyles
                         popupMax: 200
                     },
                     {
-                        width: '6ch'
+                        width: '5.5ch'
                     }
                 )
                 this.inputItems.push(this.size)
@@ -9198,7 +9198,7 @@ exports.change = addStyles
                         unit: '%'
                     },
                     {
-                        width: '6ch'
+                        width: '5.5ch'
                     }
                 )
                 this.inputItems.push(this.lineHeight)
@@ -9854,7 +9854,7 @@ exports.change = addStyles
                         autoFocusNext: true
                     },
                     {
-                        width: '8ch',
+                        width: '5.5ch',
                         grow: false
                     }
                 )
@@ -9874,7 +9874,7 @@ exports.change = addStyles
                         autoFocusNext: true
                     },
                     {
-                        width: '8ch',
+                        width: '5.5ch',
                         grow: false
                     }
                 )
@@ -9894,7 +9894,7 @@ exports.change = addStyles
                         autoFocusNext: true
                     },
                     {
-                        width: '8ch',
+                        width: '5.5ch',
                         grow: false
                     }
                 )
@@ -9913,7 +9913,7 @@ exports.change = addStyles
                         precision: 2
                     },
                     {
-                        width: '8ch',
+                        width: '5.5ch',
                         grow: false
                     }
                 )
