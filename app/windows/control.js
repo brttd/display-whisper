@@ -2521,9 +2521,9 @@ let displaying = false
 //Add Block
 //======================
 const item_add = {
-    //277 fits the text font + size + color inputs
-    minWidth: 277,
-    minHeight: 400,
+    //300x470 fits text without any overflow
+    minWidth: 300,
+    minHeight: 470,
 
     main: new layout.Block(
         {},
@@ -3441,6 +3441,10 @@ const item_add = {
         )
         textBlock.add(styleEditor)
 
+        const boxEditor = new layout.BoxStyleEdit({align: false})
+
+        textBlock.add(boxEditor)
+
         const fitTextButton = new layout.Button({
             text: 'Fit Text'
         })
@@ -3449,9 +3453,10 @@ const item_add = {
         const preview = new layout.DisplayEdit(
             {},
             {
-                shrink: true,
-                grow: true,
+                shrink: false,
+                grow: false,
                 size: 'auto',
+                height: 'display',
 
                 background: 'grey',
                 border: true
@@ -3464,6 +3469,7 @@ const item_add = {
         })
 
         textEditor.connect(styleEditor)
+        textEditor.connect(boxEditor)
 
         fitTextButton.onEvent('click', () => {
             textEditor.fit()
