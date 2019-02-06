@@ -100,18 +100,13 @@ const blankButton = new layout.Button(
         margin: 4
     }
 )
-const undoRemoveButton = new layout.Button(
-    {
-        text: 'Undo Remove (0)',
+const undoRemoveButton = new layout.Button({
+    text: 'Undo Remove (0)',
 
-        size: 'large',
+    size: 'large',
 
-        disabled: true
-    },
-    {
-        margin: '1px'
-    }
-)
+    disabled: true
+})
 
 //**********************
 //Playlist
@@ -2285,13 +2280,14 @@ const item_playlist = {
 //======================
 const item_menu = {
     minWidth: 200,
-    minHeight: 40,
-    maxHeight: 40,
+    minHeight: 44,
+    maxHeight: 44,
 
     main: new layout.Block(
-        {},
         {
-            padding: '1px',
+            childSpacing: 4
+        },
+        {
             direction: 'horizontal'
         }
     )
@@ -2301,36 +2297,29 @@ let displaying = false
 {
     let displayScreen = -1
 
-    const toggleDisplayButton = new layout.Button(
-        {
-            icon: 'display',
-            size: 'large'
-        },
-        {
-            margin: '1px'
-        }
-    )
+    const toggleDisplayButton = new layout.Button({
+        icon: 'display',
+        size: 'large'
+    })
 
     const screenButtons = []
     const screenButtonList = new layout.Block(
         {
-            direction: 'horizontal'
+            direction: 'horizontal',
+            childSpacing: item_menu.main.childSpacing
         },
         {
             grow: false,
-            shrink: false
+            shrink: false,
+
+            padding: 0
         }
     )
 
-    const fitTextAllButton = new layout.Button(
-        {
-            text: 'Fit Text & Unify - All',
-            size: 'large'
-        },
-        {
-            margin: '1px'
-        }
-    )
+    const fitTextAllButton = new layout.Button({
+        text: 'Fit Text & Unify - All',
+        size: 'large'
+    })
 
     item_menu.main.add(toggleDisplayButton)
     item_menu.main.add(screenButtonList)
@@ -2407,15 +2396,10 @@ let displaying = false
         //if the amount of screens changes, add/remove buttons
         if (display.screenCount > screenButtons.length) {
             while (screenButtons.length < display.screenCount) {
-                let button = new layout.Button(
-                    {
-                        text: (screenButtons.length + 1).toString(),
-                        size: 'large'
-                    },
-                    {
-                        margin: '1px'
-                    }
-                )
+                let button = new layout.Button({
+                    text: (screenButtons.length + 1).toString(),
+                    size: 'large'
+                })
                 button.onEvent('click', onScreenButtonPress)
 
                 screenButtons.push(button)
