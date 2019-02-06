@@ -25,6 +25,7 @@ const objUtil = require('dw-editor').util
 //Global variables
 const thisWin = remote.getCurrentWindow()
 
+//Used for quick conversion of number/string to css pixel unit string
 const mapToPx = value => {
     if (typeof value === 'number') {
         return value.toString() + 'px'
@@ -7855,6 +7856,7 @@ exports.change = addStyles
             let lastIndex = -1
 
             this.listNode.addEventListener('mousemove', event => {
+                //TODO: Replace with something that doesn't do node offset reads
                 let mouse = convertMouse(event, this.listNode)
 
                 if (this.dragging !== null || this.dropping) {
@@ -7882,6 +7884,7 @@ exports.change = addStyles
                 lastIndex = -1
             })
             this.listNode.addEventListener('mouseup', event => {
+                //TODO: Replace with something that doesn't do node offset reads
                 let mouse = convertMouse(event, this.listNode)
 
                 if (lastIndex >= 0 && lastIndex <= this.items.length) {
