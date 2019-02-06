@@ -15577,9 +15577,6 @@ class BoxEdit {
             listeners[context].push(listener)
         }
 
-        exports.contextMenu.show = () => {}
-        exports.contextMenu.setGlobal = () => {}
-
         //Default Menu
         exports.contextMenu.add('edit', [
             {
