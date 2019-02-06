@@ -15539,320 +15539,180 @@ class BoxEdit {
 
     exports.contextMenu = {}
     {
-        let listeners = {
-            click: []
-        }
+        //Item arrays, stored by context
+        const menuItems = {}
+        //Listener arrays, stored by context
+        const listeners = {}
 
-        let contextMenu = new Menu()
-        let emptyMenu = Menu.buildFromTemplate([])
+        //List of contexts which are always enabled
+        const globalEnabled = []
 
-        let inputSeparator = new MenuItem({
-            global: true,
-            input: true,
-            type: 'separator'
-        })
+        //Pre-built menus, stored by string context ids
+        const builtMenus = {}
 
-        let globalSeparator = new MenuItem({
-            global: true,
-            input: false,
-            type: 'separator'
-        })
+        //list of contexts which are enabled
+        let enabled = []
 
-        contextMenu.append(inputSeparator)
+        function onMenuClick(item) {
+            if (typeof item.window === 'string') {
+                exports.window.openWindow(item.window)
 
-        function getObjFromItem(item) {
-            return {
-                label: item.label,
-                sublabel: item.sublabel,
-                icon: item.icon,
-                enabled: item.enabled,
-                checked: item.checked,
-
-                parent: item.parent ? getObjFromItem(item.parent) : null
+                return
             }
-        }
-
-        function onItemClick(item) {
-            let customEvent = getObjFromItem(item)
-
-            customEvent.fromUser = true
-            customEvent.from = null
-
-            if (item.global === true) {
-                for (let i = 0; i < listeners.click.length; i++) {
-                    listeners.click[i](customEvent)
-                }
-            } else if (
-                typeof item.scope === 'string' &&
-                Array.isArray(listeners[item.scope])
-            ) {
-                for (let i = 0; i < listeners[item.scope].length; i++) {
-                    listeners[item.scope][i](customEvent)
-                }
-            }
-        }
-
-        function cleanItems(items, options = {}) {
-            if (!Array.isArray(items)) {
-                return []
-            }
-
-            let cleaned = []
-
-            for (let i = 0; i < items.length; i++) {
-                if (typeof items[i] === 'object' && items[i] !== null) {
-                    if (items[i].hasOwnProperty('submenu')) {
-                        items[i].submenu = cleanItems(items[i].submenu, options)
-                    }
-
-                    cleaned.push({
-                        global: options.global || false,
-                        input: options.input || false,
-                        scope: options.scope || '',
-
-                        click: onItemClick,
-                        role: items[i].role,
-                        type: items[i].type,
-                        label: items[i].label,
-                        sublabel: items[i].sublabel,
-                        icon: items[i].icon,
-                        enabled: items[i].enabled,
-                        checked: items[i].checked,
-                        submenu: items[i].submenu
-                    })
-                }
-            }
-
-            return cleaned
-        }
-
-        let checks = ['scope', 'label', 'sublabel', 'icon', 'type', 'role']
-
-        function isSame(item, template) {
-            for (let i = 0; i < checks.length; i++) {
-                if (typeof template[checks[i]] !== 'undefined') {
-                    if (item[checks[i]] !== template[checks[i]]) {
-                        return false
-                    }
-                }
-            }
-
-            return true
-        }
-
-        function makeSame(item, template) {
-            if (typeof template.enabled === 'boolean') {
-                item.enabled = template.enabled
-            }
-            if (typeof template.checked === 'boolean') {
-                item.checked = template.checked
-            }
-
-            if (Array.isArray(template.submenu) && item.submenu !== null) {
-                let itemIndex = 0
-
-                for (let i = 0; i < item.submenu.items.length; i++) {
-                    item.submenu.items[i].visible = false
-
-                    if (itemIndex < template.submenu.length) {
-                        if (
-                            isSame(
-                                item.submenu.items[i],
-                                template.submenu[itemIndex]
-                            )
-                        ) {
-                            item.submenu.items[i].visible = true
-
-                            makeSame(
-                                item.submenu.items[i],
-                                template.submenu[itemIndex]
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        function visibleItems(item) {
-            let count = 0
-
-            for (let i = 0; i < item.items.length; i++) {
-                if (
-                    item.items[i].visible === true &&
-                    item.items[i].type !== 'separator'
-                ) {
-                    if (item.items[i].submenu === null) {
-                        count += 1
-                    } else {
-                        count += visibleItems(item.items[i].submenu)
-                    }
-                }
-            }
-
-            return count
-        }
-
-        function addParentProperties(item) {
-            if (item.submenu) {
-                for (let i = 0; i < item.submenu.items.length; i++) {
-                    item.submenu.items[i].parent = item
-
-                    addParentProperties(item.submenu.items[i])
-                }
-            }
-        }
-
-        exports.contextMenu.setGlobal = function(items) {
-            if (!Array.isArray(items)) {
+            if (!Array.isArray(listeners[item.context])) {
                 return false
             }
-            items = cleanItems(items, { global: true })
 
-            contextMenu = Menu.buildFromTemplate(items)
+            for (let i = 0; i < listeners[item.context].length; i++) {
+                listeners[item.context][i](item)
+            }
+        }
+        function cleanItem(item) {
+            if (typeof item !== 'object' || item === null) {
+                return {}
+            }
 
-            contextMenu.insert(0, globalSeparator)
-            contextMenu.insert(0, inputSeparator)
+            return {
+                context: item.context || '',
+                value: item.value || item.label,
+                window: item.window || null,
+
+                click: onMenuClick,
+                role: item.role,
+                type: item.type,
+                label: item.label,
+                sublabel: item.sublabel,
+                accelerator: item.accelerator,
+                icon: item.icon,
+                enabled: item.enabled,
+
+                registerAccelerator: item.role === undefined ? false : true
+            }
         }
 
-        exports.contextMenu.showInput = function(items, rank = 0) {
-            if (Array.isArray(items)) {
-                items = cleanItems(items, { global: true, input: true })
+        exports.contextMenu.add = (context, items, global = false) => {
+            if (typeof context !== 'string' || typeof items !== 'object' || items === null) {
+                return false
+            }
 
-                if (items.length > 0) {
-                    inputSeparator.visible = true
+            if (!Array.isArray(items)) {
+                items = [items]
+            }
 
-                    let index = 0
-                    let itemIndex = 0
+            menuItems[context] = []
 
-                    for (
-                        let i = 0;
-                        i < contextMenu.items.length &&
-                        contextMenu.items[i] !== inputSeparator;
-                        i++
-                    ) {
-                        if (contextMenu.items[i].rank <= rank) {
-                            index = i
+            for (let i = 0; i < items.length; i++) {
+                items[i].context = context
+
+                let newItem = new MenuItem(cleanItem(items[i]))
+
+                menuItems[context].push(newItem)
+            }
+
+            if (global) {
+                globalEnabled.push(context)
+            }
+        }
+        exports.contextMenu.change = (context, changes) => {
+            if (typeof context !== 'string' || typeof items !== 'object' || items === null) {
+                return false
+            }
+
+            if (!Array.isArray(changes)) {
+                changes = [changes]
+            }
+
+            if (!Array.isArray(menuItems[context])) {
+                return false
+            }
+
+            for (let i = 0; i < menuItems[context].length && i < changes.length; i++) {
+                if (typeof changes[i].checked === 'boolean') {
+                    menuItems[context][i].checked = changes[i].checked
+                }
+                if (typeof changes[i].enabled === 'boolean') {
+                    menuItems[context][i].enabled = changes[i].enabled
+                }
+                if (typeof changes[i].visible === 'boolean') {
+                    menuItems[context][i].visible = changes[i].visible
+                }
+            }
+        }
+        exports.contextMenu.enable = (context) => {
+            if (Array.isArray(menuItems[context]) && !globalEnabled.includes(context)) {
+                enabled.push(context)
+            }
+        }
+
+        exports.contextMenu.onEvent = (context, listener) => {
+            if (typeof context !== 'string' || typeof listener !== 'function') {
+                return false
+            }
+
+            if (!Array.isArray(listeners[context])) {
+                listeners[context] = []
+            }
+
+            listeners[context].push(listener)
+        }
+
+        exports.contextMenu.show = () => {}
+        exports.contextMenu.setGlobal = () => {}
+
+        //Default Menu
+        exports.contextMenu.add('edit', [
+            {
+                role: 'cut',
+                value: 'cut'
+            },
+            {
+                role: 'copy',
+                value: 'copy'
+            },
+            {
+                role: 'paste',
+                value: 'paste'
+            },
+            {
+                role: 'selectAll',
+                value: 'selectAll'
+            },
+        ])
+
+        body.onEvent('input-focused', () => {
+            exports.contextMenu.disable()
+        })
+
+        //Before bubbling
+        window.addEventListener('contextmenu', () => {
+            enabled = []
+        }, {
+            capture: true
+        })
+        //After bubbling
+        window.addEventListener('contextmenu', () => {
+            if (enabled.length > 0 || globalEnabled.length > 0) {
+                let allContexts = enabled.concat(globalEnabled)
+
+                let menuId = allContexts.join('|')
+
+                //If there isn't a pre-built menu, build one
+                if (!builtMenus[menuId]) {
+                    builtMenus[menuId] = new Menu()
+
+                    for (let i = 0; i < allContexts.length; i++) {
+                        if (i !== 0) {
+                            builtMenus[menuId].append(new MenuItem({type: 'separator'}))
+                        }
+
+                        for (let j = 0; j < menuItems[allContexts[i]].length; j++) {
+                            builtMenus[menuId].append(menuItems[allContexts[i]][j])
                         }
                     }
-
-                    for (
-                        let i = index;
-                        i < contextMenu.items.length &&
-                        contextMenu.items[i] !== inputSeparator &&
-                        itemIndex < items.length;
-                        i++
-                    ) {
-                        if (isSame(contextMenu.items[i], items[itemIndex])) {
-                            contextMenu.items[i].visible = true
-
-                            makeSame(contextMenu.items[i], items[itemIndex])
-
-                            itemIndex += 1
-                        }
-                    }
-
-                    for (let i = itemIndex; i < items.length; i++) {
-                        contextMenu.insert(index, new MenuItem(items[i]))
-
-                        contextMenu.items[index].parent = contextMenu
-
-                        addParentProperties(contextMenu.items[index])
-
-                        index += 1
-                    }
-                }
-            }
-        }
-
-        exports.contextMenu.show = function(items, scope) {
-            if (Array.isArray(items)) {
-                items = cleanItems(items, { scope: scope })
-
-                if (items.length > 0) {
-                    globalSeparator.visible = true
-                    let itemIndex = 0
-
-                    let index = contextMenu.items.indexOf(inputSeparator) + 1
-
-                    for (
-                        let i = index;
-                        i < contextMenu.items.length &&
-                        contextMenu.items[i] !== globalSeparator &&
-                        itemIndex < items.length;
-                        i++
-                    ) {
-                        if (isSame(contextMenu.items[i], items[itemIndex])) {
-                            contextMenu.items[i].visible = true
-
-                            makeSame(contextMenu.items[i], items[itemIndex])
-
-                            itemIndex += 1
-                            index += 1
-                        }
-                    }
-
-                    for (let i = itemIndex; i < items.length; i++) {
-                        contextMenu.insert(
-                            index,
-                            new MenuItem(items[itemIndex])
-                        )
-                        contextMenu.items[
-                            contextMenu.items.length - 1
-                        ].parent = contextMenu
-
-                        addParentProperties(
-                            contextMenu.items[contextMenu.items.length - 1]
-                        )
-
-                        index += 1
-                        itemIndex += 1
-                    }
-                }
-            }
-            return null
-        }
-
-        exports.contextMenu.onEvent = function(event, listener) {
-            if (typeof listener === 'function') {
-                let eventName = ''
-                if (event.endsWith('-click')) {
-                    eventName = event.replace('-click', '')
-                } else if (event === 'click') {
-                    eventName = 'click'
                 }
 
-                if (eventName) {
-                    if (!listeners.hasOwnProperty(eventName)) {
-                        listeners[eventName] = []
-                    }
-
-                    listeners[eventName].push(listener)
-                }
+                builtMenus[menuId].popup({window: thisWin})
             }
-        }
-
-        body.onEvent('contextmenu', () => {
-            inputSeparator.visible = false
-            globalSeparator.visible = false
-            if (!visibleItems(contextMenu)) {
-                emptyMenu.popup({
-                    window: thisWin
-                })
-            } else {
-                contextMenu.popup({
-                    window: thisWin
-                })
-            }
-            for (let i = 0; i < contextMenu.items.length; i++) {
-                if (
-                    contextMenu.items[i].global === false ||
-                    contextMenu.items[i].input === true
-                ) {
-                    contextMenu.items[i].visible = false
-                }
-            }
-            inputSeparator.visible = false
-            globalSeparator.visible = false
         })
     }
 }
