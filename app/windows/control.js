@@ -224,6 +224,20 @@ const playlist = {}
         return path.basename(filename, '.dpl')
     }
 
+    layout.contextMenu.add('playlist-item', [
+        {
+            label: 'Edit'
+        },
+        {
+            label: 'Remove'
+        },
+        {
+            label: 'Minimize',
+            type: 'checkbox',
+            checked: false
+        }
+    ])
+
     //save functions
     function editHasOccured() {
         lastEditTime = Date.now()
@@ -282,17 +296,42 @@ const playlist = {}
 
         layout.setCursor('grabbing')
     }
+    function onItemEdit(event) {
+        ipcRenderer.send(
+            'start-edit',
+            event.from._itemType,
+            event.from._data.id,
+            event.from._data.getEditData()
+        )
+
+        activeEditors.push(event.from._data.id)
+
+        event.from.editActive = true
+    }
     function onItemRemove(event) {
         remove(itemsBlock.indexOf(event.from))
     }
     function onContextClick(event) {
         if (lastClicked !== null) {
             if (event.label === 'Minimize') {
-                if (event.checked === true) {
-                    lastClicked.minimize()
-                } else {
+                if (lastClicked.minimized) {
                     lastClicked.expand()
+                } else {
+                    lastClicked.minimize()
                 }
+            } else if (event.label === 'Edit') {
+                ipcRenderer.send(
+                    'start-edit',
+                    lastClicked._itemType,
+                    lastClicked._data.id,
+                    lastClicked._data.getEditData()
+                )
+
+                activeEditors.push(lastClicked._data.id)
+
+                lastClicked.editActive = true
+            } else if (event.label === 'Remove') {
+                remove(itemsBlock.indexOf(lastClicked))
             }
         }
     }
@@ -1026,6 +1065,9 @@ const playlist = {}
             showSectionWhenMinimized: options.showSectionWhenMinimized
         })
 
+        item._data = data
+        item._itemType = input.itemType
+
         data.id =
             itemIdCounter.toString(16) +
             '-' +
@@ -1090,40 +1132,22 @@ const playlist = {}
 
         item.onEvent('active-click', onItemActive)
         item.onEvent('select-click', onItemSelect)
-        item.onEvent('edit-click', () => {
-            ipcRenderer.send(
-                'start-edit',
-                input.itemType,
-                data.id,
-                data.getEditData()
-            )
-
-            activeEditors.push(data.id)
-
-            item.editActive = true
-        })
+        item.onEvent('edit-click', onItemEdit)
         item.onEvent('drag-click', onItemDrag)
         item.onEvent('remove-click', onItemRemove)
 
         item.onEvent('contextmenu', () => {
             lastClicked = item
-            layout.contextMenu.show(
-                [
-                    {
-                        label: 'Minimize',
-                        type: 'checkbox',
-                        checked: item.minimized
-                    } /*,
-                    {
-                        label: 'Edit'
-                    },
-                    {
-                        label: 'Remove'
-                    }
-                    */
-                ],
-                'playlistItem'
-            )
+
+            layout.contextMenu.change('playlist-item', [
+                {},
+                {},
+                {
+                    checked: lastClicked.minimized
+                }
+            ])
+
+            layout.contextMenu.enable('playlist-item')
         })
     }
     playlist.add = add
@@ -2103,7 +2127,7 @@ const playlist = {}
         }
     })
 
-    layout.contextMenu.onEvent('playlistItem-click', onContextClick)
+    layout.contextMenu.onEvent('playlist-item', onContextClick)
 
     let closing = false
     let canClose = false
@@ -2296,6 +2320,7 @@ const item_menu = {
 let displaying = false
 {
     let displayScreen = -1
+    let screenCount = 0
 
     const toggleDisplayButton = new layout.Button({
         icon: 'display',
@@ -2328,6 +2353,29 @@ let displaying = false
     item_menu.main.add(new layout.Filler())
     item_menu.main.add(fitTextAllButton)
 
+    layout.contextMenu.add('display-menu', [
+        {
+            label: 'Display',
+            type: 'checkbox'
+        },
+        {
+            label: 'Screen 1',
+            type: 'checkbox'
+        },
+        {
+            label: 'Screen 2',
+            type: 'checkbox'
+        },
+        {
+            label: 'Screen 3',
+            type: 'checkbox'
+        },
+        {
+            label: 'Screen 4',
+            type: 'checkbox'
+        }
+    ])
+
     function toggleDisplay() {
         displaying = !displaying
 
@@ -2355,40 +2403,39 @@ let displaying = false
     fitTextAllButton.onEvent('click', playlist.fitTextAll)
 
     item_menu.main.onEvent('contextmenu', () => {
-        let screenSubmenu = []
-        for (let i = 0; i < screenButtons.length; i++) {
-            screenSubmenu.push({
-                label: (i + 1).toString(),
-                type: 'checkbox',
-                checked: displayScreen === i
-            })
-        }
-        layout.contextMenu.show(
-            [
-                {
-                    label: 'Toggle Display',
-                    type: 'checkbox',
-                    checked: displaying
-                },
-                {
-                    label: 'Change Screen',
-                    type: 'submenu',
-                    submenu: screenSubmenu
-                }
-            ],
-            'displayMenu'
-        )
+        layout.contextMenu.change('display-menu', [
+            {
+                checked: displaying
+            },
+            {
+                checked: displayScreen === 0,
+                visible: screenCount >= 1
+            },
+            {
+                checked: displayScreen === 1,
+                visible: screenCount >= 2
+            },
+            {
+                checked: displayScreen === 2,
+                visible: screenCount >= 3
+            },
+            {
+                checked: displayScreen === 3,
+                visible: screenCount >= 4
+            }
+        ])
+        layout.contextMenu.enable('display-menu')
     })
 
-    layout.contextMenu.onEvent('displayMenu-click', event => {
-        if (event.label === 'Toggle Display') {
+    layout.contextMenu.onEvent('display-menu', event => {
+        if (event.label === 'Display') {
             toggleDisplay()
-        } else if (event.parent && event.parent.label === 'Change Screen') {
-            let screenNumber = parseInt(event.label)
-
-            if (isFinite(screenNumber)) {
-                ipcRenderer.send('change-display', { screen: screenNumber })
-            }
+        } else if (event.label === 'Screen 1') {
+            ipcRenderer.send('change-display', { screen: 0 })
+        } else if (event.label === 'Screen 2') {
+            ipcRenderer.send('change-display', { screen: 1 })
+        } else if (event.label === 'Screen 3') {
+            ipcRenderer.send('change-display', { screen: 2 })
         }
     })
 
@@ -2410,6 +2457,8 @@ let displaying = false
                 screenButtonList.remove(screenButtons.pop())
             }
         }
+
+        screenCount = display.screenCount
 
         //the first time the 'display-info' message is sent, displayScreen == -1
         if (displayScreen >= 0 && displayScreen < screenButtons.length) {
@@ -3062,6 +3111,8 @@ const item_add = {
             resultsBox.clear()
             results = []
 
+            song = false
+
             if (tabBlock.tab === 'Song') {
                 //Since the results have been cleared, no song can be selected, and the add button should be disabled
                 addButton.disabled = true
@@ -3198,6 +3249,31 @@ const item_add = {
             })
         }
 
+        function addSong(songData, index = -1) {
+            for (let key in songAddOptions) {
+                selectedTemplate[key] = songAddOptions[key]
+            }
+
+            playlist.add(songData, selectedTemplate, index)
+
+            warnUserMissingInfo(songData)
+        }
+
+        layout.contextMenu.add('song-add', [
+            {
+                label: 'Add to Presentation (End)',
+                value: 'add-end'
+            },
+            {
+                label: 'Add to Presentation (Start)',
+                value: 'add-end'
+            },
+            {
+                label: 'Edit in Library',
+                value: 'edit'
+            }
+        ])
+
         optionsBlock.visible = false
         optionsButton.onEvent(
             'toggle',
@@ -3330,29 +3406,24 @@ const item_add = {
         })
 
         resultsBox.onEvent('contextmenu', event => {
-            /*
-            layout.contextMenu.show(
-                [
-                    {
-                        label: 'Add To End'
-                    },
-                    {
-                        label: 'Add To Start'
-                    },
-                    {
-                        label: 'View In Database'
-                    }
-                ],
-                'songResults'
-            )
-            */
+            if (song) {
+                layout.contextMenu.enable('song-add')
+            }
         })
 
-        layout.contextMenu.onEvent('songResults-click', event => {
-            //TODO
-            if (event.label === 'Add To End') {
-            } else if (event.label === 'Add To Start') {
-            } else if (event.label === 'View In Database') {
+        layout.contextMenu.onEvent('song-add', event => {
+            if (song) {
+                if (event.value === 'add-end') {
+                    addSong(song)
+                } else if (event.value === 'add-start') {
+                    addSong(song, 0)
+                } else if (event.value === 'edit') {
+                    layout.window.openWindow('songDatabase', [
+                        'show-song',
+                        song.group,
+                        song.groupID
+                    ])
+                }
             }
         })
 
@@ -3362,11 +3433,7 @@ const item_add = {
             }
 
             if (song) {
-                for (let key in songAddOptions) {
-                    selectedTemplate[key] = songAddOptions[key]
-                }
-                playlist.add(song, selectedTemplate)
-                warnUserMissingInfo(song)
+                addSong(song)
             }
         })
         addButton.onEvent('drag', () => {
@@ -3836,49 +3903,6 @@ const item_control = {
         )
     )
 
-    item_control.main.onEvent('contextmenu', () => {
-        layout.contextMenu.show(
-            [
-                {
-                    label: 'Shuffle',
-                    type: 'checkbox',
-                    checked: shuffleInput.value
-                },
-                {
-                    label: 'Loop',
-                    type: 'checkbox',
-                    checked: loopInput.value
-                },
-                {
-                    type: 'separator'
-                },
-                {
-                    label: 'Auto',
-                    type: 'checkbox',
-                    checked: modeSelect.value === 'Auto'
-                },
-                {
-                    label: 'Manual',
-                    type: 'checkbox',
-                    checked: modeSelect.value === 'Manual'
-                }
-            ],
-            'control'
-        )
-    })
-
-    layout.contextMenu.onEvent('control-click', event => {
-        if (event.label === 'Shuffle') {
-            shuffleInput.value = event.checked
-        } else if (event.label === 'Loop') {
-            loopInput.value = event.checked
-        } else if (event.label === 'Auto') {
-            modeSelect.value = 'Auto'
-        } else if (event.label === 'Manual') {
-            modeSelect.value = 'Manual'
-        }
-    })
-
     loopInput.onEvent('change', event => {
         playlist.setPlayMode(modeSelect.value.toLowerCase(), {
             loop: event.value
@@ -4014,6 +4038,27 @@ const item_control = {
     }
 }
 
+//Preview context menu:
+let activePreviewContextMenu = -1
+layout.contextMenu.add('preview-display', [
+    {
+        label: 'Active',
+        type: 'checkbox'
+    },
+    {
+        label: 'Preview',
+        type: 'checkbox'
+    },
+    {
+        label: 'Previous',
+        type: 'checkbox'
+    },
+    {
+        label: 'Next',
+        type: 'checkbox'
+    }
+])
+
 //======================
 //Preview (1) Block
 //======================
@@ -4116,34 +4161,31 @@ const item_display1 = {
     }
 
     display.onEvent('contextmenu', () => {
-        layout.contextMenu.show(
-            [
-                {
-                    label: 'Active',
-                    type: 'checkbox',
-                    checked: item_display1.options.type === 'active'
-                },
-                {
-                    label: 'Preview',
-                    type: 'checkbox',
-                    checked: item_display1.options.type === 'preview'
-                },
-                {
-                    label: 'Previous',
-                    type: 'checkbox',
-                    checked: item_display1.options.type === 'previous'
-                },
-                {
-                    label: 'Next',
-                    type: 'checkbox',
-                    checked: item_display1.options.type === 'next'
-                }
-            ],
-            'display1'
-        )
+        activePreviewContextMenu = 1
+
+        layout.contextMenu.change('preview-display', [
+            {
+                checked: item_display1.options.type === 'active'
+            },
+            {
+                checked: item_display1.options.type === 'preview'
+            },
+            {
+                checked: item_display1.options.type === 'previous'
+            },
+            {
+                checked: item_display1.options.type === 'next'
+            }
+        ])
+
+        layout.contextMenu.enable('preview-display')
     })
 
-    layout.contextMenu.onEvent('display1-click', event => {
+    layout.contextMenu.onEvent('preview-display', event => {
+        if (activePreviewContextMenu !== 1) {
+            return false
+        }
+
         setType(event.label.toLowerCase())
     })
 
@@ -4255,34 +4297,31 @@ const item_display2 = {
     }
 
     display.onEvent('contextmenu', () => {
-        layout.contextMenu.show(
-            [
-                {
-                    label: 'Active',
-                    type: 'checkbox',
-                    checked: item_display2.options.type === 'active'
-                },
-                {
-                    label: 'Preview',
-                    type: 'checkbox',
-                    checked: item_display2.options.type === 'preview'
-                },
-                {
-                    label: 'Previous',
-                    type: 'checkbox',
-                    checked: item_display2.options.type === 'previous'
-                },
-                {
-                    label: 'Next',
-                    type: 'checkbox',
-                    checked: item_display2.options.type === 'next'
-                }
-            ],
-            'display2'
-        )
+        activePreviewContextMenu = 2
+
+        layout.contextMenu.change('preview-display', [
+            {
+                checked: item_display2.options.type === 'active'
+            },
+            {
+                checked: item_display2.options.type === 'preview'
+            },
+            {
+                checked: item_display2.options.type === 'previous'
+            },
+            {
+                checked: item_display2.options.type === 'next'
+            }
+        ])
+
+        layout.contextMenu.enable('preview-display')
     })
 
-    layout.contextMenu.onEvent('display2-click', event => {
+    layout.contextMenu.onEvent('preview-display', event => {
+        if (activePreviewContextMenu !== 2) {
+            return false
+        }
+
         setType(event.label.toLowerCase())
     })
 
@@ -4395,34 +4434,31 @@ const item_display3 = {
     }
 
     display.onEvent('contextmenu', () => {
-        layout.contextMenu.show(
-            [
-                {
-                    label: 'Active',
-                    type: 'checkbox',
-                    checked: item_display3.options.type === 'active'
-                },
-                {
-                    label: 'Preview',
-                    type: 'checkbox',
-                    checked: item_display3.options.type === 'preview'
-                },
-                {
-                    label: 'Previous',
-                    type: 'checkbox',
-                    checked: item_display3.options.type === 'previous'
-                },
-                {
-                    label: 'Next',
-                    type: 'checkbox',
-                    checked: item_display3.options.type === 'next'
-                }
-            ],
-            'display3'
-        )
+        activePreviewContextMenu = 3
+
+        layout.contextMenu.change('preview-display', [
+            {
+                checked: item_display3.options.type === 'active'
+            },
+            {
+                checked: item_display3.options.type === 'preview'
+            },
+            {
+                checked: item_display3.options.type === 'previous'
+            },
+            {
+                checked: item_display3.options.type === 'next'
+            }
+        ])
+
+        layout.contextMenu.enable('preview-display')
     })
 
-    layout.contextMenu.onEvent('display3-click', event => {
+    layout.contextMenu.onEvent('preview-display', event => {
+        if (activePreviewContextMenu !== 3) {
+            return false
+        }
+
         setType(event.label.toLowerCase())
     })
 
@@ -4534,34 +4570,31 @@ const item_display4 = {
     }
 
     display.onEvent('contextmenu', () => {
-        layout.contextMenu.show(
-            [
-                {
-                    label: 'Active',
-                    type: 'checkbox',
-                    checked: item_display4.options.type === 'active'
-                },
-                {
-                    label: 'Preview',
-                    type: 'checkbox',
-                    checked: item_display4.options.type === 'preview'
-                },
-                {
-                    label: 'Previous',
-                    type: 'checkbox',
-                    checked: item_display4.options.type === 'previous'
-                },
-                {
-                    label: 'Next',
-                    type: 'checkbox',
-                    checked: item_display4.options.type === 'next'
-                }
-            ],
-            'display4'
-        )
+        activePreviewContextMenu = 4
+
+        layout.contextMenu.change('preview-display', [
+            {
+                checked: item_display4.options.type === 'active'
+            },
+            {
+                checked: item_display4.options.type === 'preview'
+            },
+            {
+                checked: item_display4.options.type === 'previous'
+            },
+            {
+                checked: item_display4.options.type === 'next'
+            }
+        ])
+
+        layout.contextMenu.enable('preview-display')
     })
 
-    layout.contextMenu.onEvent('display4-click', event => {
+    layout.contextMenu.onEvent('preview-display', event => {
+        if (activePreviewContextMenu !== 4) {
+            return false
+        }
+
         setType(event.label.toLowerCase())
     })
 
@@ -4572,30 +4605,24 @@ const item_display4 = {
 }
 */
 
-layout.contextMenu.setGlobal([
-    {
-        label: 'Open Images Library'
-    },
-    {
-        label: 'Open Songs Library'
-    },
-    {
-        label: 'Open Template Editor'
-    }
-])
-
-layout.contextMenu.onEvent('click', event => {
-    if (event.label === 'Open Images Library') {
-        layout.window.openWindow('imageDatabase')
-    } else if (event.label === 'Open Songs Library') {
-        layout.window.openWindow('songDatabase')
-    }
-    if (event.label === 'Open Template Editor') {
-        layout.window.openWindow('templateEditor')
-    }
-})
-
-layout.menu.change('edit', 'redo', { enabled: false })
+layout.contextMenu.add(
+    'library',
+    [
+        {
+            label: 'Open Image Library',
+            window: 'imageDatabase'
+        },
+        {
+            label: 'Open Song Library',
+            window: 'songDatabase'
+        },
+        {
+            label: 'Open Template Editor',
+            window: 'templateEditor'
+        }
+    ],
+    true
+)
 
 //**********************
 //Dynamic interface layout...

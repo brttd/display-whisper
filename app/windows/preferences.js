@@ -10,6 +10,25 @@ const settingsFile = path.join(__dirname, '..', 'settings.json')
 
 let entryInputs = {}
 
+let activeContextMenuKey = null
+
+layout.contextMenu.add('reset-single', [
+    {
+        label: 'Reset this',
+        value: 'reset'
+    }
+])
+layout.contextMenu.add(
+    'reset-all',
+    [
+        {
+            label: 'Reset All',
+            value: 'reset'
+        }
+    ],
+    true
+)
+
 function onSettingChange(event) {
     if (!event.fromUser) {
         return false
@@ -103,14 +122,9 @@ function getEntryBlock(key, data) {
         ipcRenderer.send('get-setting', key, data.default)
 
         block.onEvent('contextmenu', () => {
-            layout.contextMenu.show(
-                [
-                    {
-                        label: 'Reset To Default'
-                    }
-                ],
-                key
-            )
+            activeContextMenuKey = key
+
+            layout.contextMenu.enable('reset-single')
         })
 
         function reset() {
@@ -123,14 +137,15 @@ function getEntryBlock(key, data) {
             })
         }
 
-        layout.contextMenu.onEvent(key + '-click', event => {
-            if (event.label === 'Reset To Default') {
-                reset()
+        layout.contextMenu.onEvent('reset-single', event => {
+            if (activeContextMenuKey === key) {
+                if (event.value === 'reset') {
+                    reset()
+                }
             }
         })
-
-        layout.contextMenu.onEvent('click', event => {
-            if (event.label === 'Reset All To Default') {
+        layout.contextMenu.onEvent('reset-all', event => {
+            if (event.value === 'reset') {
                 reset()
             }
         })
@@ -258,9 +273,3 @@ fs.readFile(settingsFile, (error, data) => {
         })
     }
 })
-
-layout.contextMenu.setGlobal([
-    {
-        label: 'Reset All To Default'
-    }
-])

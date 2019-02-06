@@ -2852,6 +2852,8 @@ exports.change = addStyles
                 this._codeFocused = false
             })
 
+            this.inputNode.addEventListener('contextmenu', exports.contextMenu.enable.bind(null, 'edit'))
+
             this.inputNode.addEventListener('blur', () => {
                 this._focused = false
                 sendEventTo(
@@ -3453,29 +3455,6 @@ exports.change = addStyles
                     this.blur()
                 }
             })
-
-            this.inputNode.addEventListener(
-                'contextmenu',
-                () => {
-                    exports.contextMenu.showInput([
-                        {
-                            role: 'cut'
-                        },
-                        {
-                            role: 'copy'
-                        },
-                        {
-                            role: 'paste'
-                        },
-                        {
-                            role: 'selectall'
-                        }
-                    ])
-                },
-                true
-            )
-
-            //TODO: listen to context menu events
         }
 
         get placeholder() {
@@ -3621,9 +3600,11 @@ exports.change = addStyles
 
             this.inputNode.addEventListener('focus', () => {
                 this._focused = true
+
                 if (this._globalFocus) {
                     body.inputFocused(this, !this._codeFocused)
                 }
+
                 sendEventTo(
                     {
                         fromUser: !this._codeFocused,
@@ -3633,6 +3614,8 @@ exports.change = addStyles
                 )
                 this._codeFocused = false
             })
+
+            this.inputNode.addEventListener('contextmenu', exports.contextMenu.enable.bind(null, 'edit'))
 
             this.inputNode.addEventListener('blur', () => {
                 this._focused = false
@@ -3660,29 +3643,6 @@ exports.change = addStyles
                     this.events.change
                 )
             })
-
-            this.inputNode.addEventListener(
-                'contextmenu',
-                () => {
-                    exports.contextMenu.showInput([
-                        {
-                            role: 'cut'
-                        },
-                        {
-                            role: 'copy'
-                        },
-                        {
-                            role: 'paste'
-                        },
-                        {
-                            role: 'selectall'
-                        }
-                    ])
-                },
-                true
-            )
-
-            //TODO: listen to context menu events
         }
 
         get disabled() {
@@ -4022,6 +3982,9 @@ exports.change = addStyles
 
                 this._codeFocused = false
             })
+
+            this.inputNode.addEventListener('contextmenu', exports.contextMenu.enable.bind(null, 'edit'))
+
             this.inputNode.addEventListener('input', () => {
                 this._value = round(
                     parseFloat(this.inputNode.value),
@@ -4123,27 +4086,6 @@ exports.change = addStyles
 
             body.onEvent('resize', this.movePopup)
             body.onEvent('scroll', this.movePopup)
-
-            this.inputNode.addEventListener(
-                'contextmenu',
-                () => {
-                    exports.contextMenu.showInput([
-                        {
-                            role: 'cut'
-                        },
-                        {
-                            role: 'copy'
-                        },
-                        {
-                            role: 'paste'
-                        },
-                        {
-                            role: 'selectall'
-                        }
-                    ])
-                },
-                true
-            )
         }
 
         get disabled() {
@@ -5442,27 +5384,6 @@ exports.change = addStyles
                     fontDropDown.search = this.inputNode.value.toLowerCase()
                 }
             })
-
-            this.inputNode.addEventListener(
-                'contextmenu',
-                () => {
-                    exports.contextMenu.showInput([
-                        {
-                            role: 'cut'
-                        },
-                        {
-                            role: 'copy'
-                        },
-                        {
-                            role: 'paste'
-                        },
-                        {
-                            role: 'selectall'
-                        }
-                    ])
-                },
-                true
-            )
 
             //TODO: Listen to context menu events
 

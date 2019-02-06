@@ -408,13 +408,3 @@ layout.body.add(
         }
     )
 )
-
-layout.contextMenu.setGlobal([
-    {
-        label: 'Global 1'
-    },
-    {
-        label: 'Global 2',
-        type: 'checkbox'
-    }
-])
