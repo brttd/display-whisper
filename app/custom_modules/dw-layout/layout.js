@@ -10972,20 +10972,12 @@ class BoxEdit {
         )
     }
 
-    convertMouse(mouse) {
-        let top = this.node.offsetTop
-        let left = this.node.offsetLeft
-
-        mouse.top = Math.round(mouse.y - top)
-        mouse.left = Math.round(mouse.x - left)
-        mouse.right = Math.round(mouse.x - left - this.node.offsetWidth + 1)
-        mouse.bottom = Math.round(mouse.y - top - this.node.offsetHeight + 1)
-
-        return mouse
-    }
-
     getMouseDirections(mouse) {
-        mouse = this.convertMouse(mouse)
+        //Multiple the top/left/right/bottom percentage values by the actual parent box size, to get the absolute pixel positions
+        mouse.top = Math.round(mouse.y - (this.values.top / 100) * this.parent.client.height)
+        mouse.left = Math.round(mouse.x - (this.values.left / 100) * this.parent.client.width)
+        mouse.right = Math.round(mouse.x - (this.values.right / 100) * this.parent.client.width)
+        mouse.bottom = Math.round(mouse.y - (this.values.bottom / 100) * this.parent.client.height)
 
         let directions = ''
 
@@ -12354,20 +12346,6 @@ class BoxEdit {
 
                 client: this.client
             }
-
-            mouse = convertMouse(mouse, this.screenNode)
-
-            /*
-            mouse.layerX = mouse.clientX - this.client.left
-            mouse.layerY = mouse.clientY - this.client.top
-
-            mouse.client = this.client
-
-            mouse.displayX = mouse.x * currentDisplay.width / this.screenNode.offsetWidth
-            mouse.displayY = mouse.y * currentDisplay.height / this.screenNode.offsetHeight
-            */
-
-            return mouse
         }
 
         add(data = {}, index = this.nodes.length) {
