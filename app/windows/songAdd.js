@@ -49,8 +49,7 @@ const copyrightBox = new layout.TextInput({
     label: 'Copyright'
 })
 const copyrightSymbolButton = new layout.Button({
-    text: '©',
-    size: 'small'
+    text: '©'
 })
 
 const addButton = new layout.Button({
@@ -61,8 +60,7 @@ const sourceEditor = new layout.TextMultiLineInput({
     label: 'Source'
 })
 const updateButton = new layout.Button({
-    text: 'Update',
-    size: 'small'
+    text: 'Update'
 })
 
 const sectionsList = new layout.List({

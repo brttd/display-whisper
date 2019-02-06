@@ -2594,16 +2594,14 @@ const item_add = {
 
     let addButton = new layout.Button(
         {
-            text: 'Add',
-            size: 'small'
+            text: 'Add'
         },
         {}
     )
 
     let templateSelect = new layout.SelectInput({}, {})
     let templateEditorButton = new layout.Button({
-        icon: 'edit',
-        size: 'small'
+        icon: 'edit'
     })
 
     item_add.main.add(tabBlock)

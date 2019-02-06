@@ -3076,7 +3076,7 @@ exports.change = addStyles
         Standard button input.
 
         Constructor data:
-            size (string): 'large' or 'small'.
+            size (string): 'large'.
             disabled (boolean): Disabled state.
             icon (string): Icon name. If undefined, no icon will be shown.
             text (string): Text shown in button.
@@ -3113,7 +3113,7 @@ exports.change = addStyles
             this.text = data.text
             this.tooltip = data.tooltip
 
-            if (data.size === 'large' || data.size === 'small') {
+            if (data.size === 'large') {
                 this.addClass(data.size)
             }
 
@@ -5828,7 +5828,6 @@ exports.change = addStyles
             icon (string)
             text (string)
             tooltip (string)
-            size (string: 'large' or 'small')
             disabled (boolean)
             defaultPath (string)
             buttonLabel (string)
@@ -5878,9 +5877,6 @@ exports.change = addStyles
             this.text = data.text
             this.tooltip = data.tooltip
 
-            if (data.size === 'large' || data.size === 'small') {
-                this.addClass(data.size)
-            }
             if (data.disabled === true) {
                 this.node.disabled = true
             }
@@ -9234,8 +9230,7 @@ exports.change = addStyles
                     {
                         focus: false,
                         disabled: true,
-                        icon: 'text-bold',
-                        size: 'small'
+                        icon: 'text-bold'
                     },
                     {}
                 )
@@ -9244,8 +9239,7 @@ exports.change = addStyles
                     {
                         focus: false,
                         disabled: true,
-                        icon: 'text-italic',
-                        size: 'small'
+                        icon: 'text-italic'
                     },
                     {}
                 )
@@ -9254,8 +9248,7 @@ exports.change = addStyles
                     {
                         focus: false,
                         disabled: true,
-                        icon: 'text-underline',
-                        size: 'small'
+                        icon: 'text-underline'
                     },
                     {}
                 )
@@ -9264,8 +9257,7 @@ exports.change = addStyles
                     {
                         focus: false,
                         disabled: true,
-                        icon: 'text-strikethrough',
-                        size: 'small'
+                        icon: 'text-strikethrough'
                     },
                     {}
                 )
@@ -9274,8 +9266,7 @@ exports.change = addStyles
                     {
                         focus: false,
                         disabled: true,
-                        icon: 'text-subscript',
-                        size: 'small'
+                        icon: 'text-subscript'
                     },
                     {}
                 )
@@ -9284,8 +9275,7 @@ exports.change = addStyles
                     {
                         focus: false,
                         disabled: true,
-                        icon: 'text-superscript',
-                        size: 'small'
+                        icon: 'text-superscript'
                     },
                     {}
                 )
@@ -9360,8 +9350,7 @@ exports.change = addStyles
                     {
                         focus: false,
                         disabled: true,
-                        icon: 'text-align-left',
-                        size: 'small'
+                        icon: 'text-align-left'
                     },
                     {}
                 )
@@ -9371,8 +9360,7 @@ exports.change = addStyles
                     {
                         focus: false,
                         disabled: true,
-                        icon: 'text-align-center',
-                        size: 'small'
+                        icon: 'text-align-center'
                     },
                     {}
                 )
@@ -9381,8 +9369,7 @@ exports.change = addStyles
                     {
                         focus: false,
                         disabled: true,
-                        icon: 'text-align-right',
-                        size: 'small'
+                        icon: 'text-align-right'
                     },
                     {}
                 )
