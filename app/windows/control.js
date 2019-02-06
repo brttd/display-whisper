@@ -3441,7 +3441,7 @@ const item_add = {
         )
         textBlock.add(styleEditor)
 
-        const boxEditor = new layout.BoxStyleEdit({align: false})
+        const boxEditor = new layout.BoxStyleEdit({ align: false })
 
         textBlock.add(boxEditor)
 
