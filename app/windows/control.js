@@ -3722,8 +3722,8 @@ const item_add = {
 //======================
 const item_control = {
     minWidth: 400,
-    minHeight: 80,
-    maxHeight: 80,
+    minHeight: 72,
+    maxHeight: 72,
 
     main: new layout.Block(
         {},
@@ -3807,18 +3807,7 @@ const item_control = {
         }
     )
 
-    item_control.main.add(
-        new layout.Block(
-            {
-                items: [timer]
-            },
-            {
-                direction: 'horizontal',
-                grow: 0,
-                shrink: 0
-            }
-        )
-    )
+    item_control.main.add(timer)
     item_control.main.add(
         new layout.Block(
             {
