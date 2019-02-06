@@ -272,12 +272,6 @@ input::-webkit-inner-spin-button {
     }
 }
 
-.input-drag {
-    @extend .input-button;
-
-    cursor: -webkit-grab;
-}
-
 .input-checkbox {
     @extend %all-inputs;
 
@@ -488,10 +482,6 @@ $slider-padding: 2px;
     label {
         @include fonts;
         display: block;
-    }
-
-    input {
-        display: none;
     }
 
     button {

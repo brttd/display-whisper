@@ -64,7 +64,6 @@ $box-size: $border-size + $box-padding * 2;
     position: relative;
 
     overflow: hidden;
-    /* @extend .display; */
 
     .screen {
         position: relative;
