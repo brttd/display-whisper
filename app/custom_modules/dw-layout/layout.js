@@ -14852,7 +14852,7 @@ class BoxEdit {
             })
         }
 
-        save(options = {}) {
+        save(options = {}, callback = () => {}) {
             exports.showLoader(body, 'Saving')
 
             this._updatePrintElem()
@@ -14869,16 +14869,9 @@ class BoxEdit {
                     },
                     (error, PDFData) => {
                         if (error) {
-                            logger.error("Couldn't print to PDF", error)
-
-                            layout.dialog.showNotification(
-                                'Error, unable to print to PDF (' +
-                                    (error.message || error.toString()) +
-                                    ')!\nPlease try again.'
-                            )
-
                             exports.hideLoader(body)
 
+                            callback(error)
                             return false
                         }
 
@@ -14893,8 +14886,17 @@ class BoxEdit {
                                 ]
                             },
                             (error, filename) => {
+                                if (error) {
+                                    exports.hideLoader(body)
+                                    callback(error)
+
+                                    return false
+                                }
+
                                 if (!filename) {
                                     exports.hideLoader(body)
+
+                                    callback(null, false)
 
                                     return false
                                 }
@@ -14903,19 +14905,11 @@ class BoxEdit {
                                     exports.hideLoader(body)
 
                                     if (error) {
-                                        logger.error(
-                                            "Couldn't write PDF to file",
-                                            error
-                                        )
-
-                                        layout.dialog.showNotification(
-                                            'Error, unable to save PDF (' +
-                                                (error.message ||
-                                                    error.toString()) +
-                                                ')!\nPlease try again.'
-                                        )
+                                        callback(error)
                                         return false
                                     }
+
+                                    callback(null, filename)
                                 })
                             }
                         )
