@@ -1,5 +1,3 @@
-//TODO: Rename to dw-interface
-
 //Check that the module has been used inside a valid document
 if (typeof document !== 'object' || typeof window !== 'object') {
     throw new Error('Layout module used outside of a valid HTML document!')
@@ -2854,8 +2852,6 @@ exports.change = addStyles
                 this._codeFocused = false
             })
 
-            //TODO: fix
-            //Blur event always has fromUser: true. This shouldn't happen when calling .blur
             this.inputNode.addEventListener('blur', () => {
                 this._focused = false
                 sendEventTo(
@@ -5664,7 +5660,6 @@ exports.change = addStyles
 
         */
         constructor(data = {}, styles = {}) {
-            //TODO: label
             super(document.createElement('button'), styles, data.focus)
             this.addClass('input-key')
 
@@ -7651,7 +7646,6 @@ exports.change = addStyles
         }
 
         setHighlight(state = '') {
-            //TODO: add other states
             if (state === 'error') {
                 this.addClass('error')
             } else {
@@ -7760,9 +7754,6 @@ exports.change = addStyles
                 multiSelect: false
             }
 
-            //TODO
-            //if (data.disabled === true) {this.listNode.disabled = true}
-
             this.items = []
 
             this._selected = []
@@ -7780,6 +7771,10 @@ exports.change = addStyles
 
             if (typeof data.multiSelect === 'boolean') {
                 this.options.multiSelect = data.multiSelect
+            }
+
+            if (typeof data.disabled === 'boolean') {
+                this.disabled = data.disabled
             }
 
             if (Array.isArray(data.items)) {
@@ -7843,7 +7838,6 @@ exports.change = addStyles
                 this.addSelectInput.addEventListener('focus', onFocus)
                 this.addTextInput.addEventListener('focus', onFocus)
 
-                //TODO: Add click & drag adding
                 this.addButton.addEventListener('click', () => {
                     onFocus()
                     this.add(oldValue, this.items.length, true)

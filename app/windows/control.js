@@ -3286,7 +3286,7 @@ const item_add = {
             }
         })
 
-        //TODO: show hymn preview on result select
+        //TODO: show song preview on result select
         resultsBox.onEvent('drag', event => {
             song = results.find(item => {
                 return (
