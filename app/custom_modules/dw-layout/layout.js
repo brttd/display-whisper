@@ -1794,6 +1794,9 @@ exports.change = addStyles
         }
 
         readSize() {
+            this._top = this.node.offsetTop
+            this._left = this.node.offsetLeft
+
             this._width = this.node.offsetWidth
             this._height = this.node.offsetHeight
         }
@@ -2165,7 +2168,10 @@ exports.change = addStyles
                 )
             })
 
-            let mouse = null
+            let mouse = {
+                x: 0,
+                y: 0
+            }
 
             let updateParent = function() {
                 if (this.parent instanceof LayoutBlock === false) {
@@ -2191,8 +2197,8 @@ exports.change = addStyles
                     return false
                 }
 
-                //TODO: this is bad for performance, need to replace or remove it
-                mouse = convertMouse(event, this.parent.node)
+                mouse.x = event.pageX - this.parent._left
+                mouse.y = event.pageY - this.parent._top
 
                 body.onFrame.start(updateParent)
             })
