@@ -25,6 +25,14 @@ const objUtil = require('dw-editor').util
 //Global variables
 const thisWin = remote.getCurrentWindow()
 
+const mapToPx = value => {
+    if (typeof value === 'number') {
+        return value.toString() + 'px'
+    }
+
+    return value
+}
+
 //Mappings between js style names, and CSS style names
 const stylesMap = {
     overflow: 'overflow',
@@ -76,32 +84,32 @@ const stylesMap = {
     maxHeight: 'maxHeight'
 }
 //Mappings between js style values, and CSS style values
-//(Each grouped by what property name they apply to)
+//(Either an object with direct mappings, or a function)
 const styleValuesMap = {
     border: {
         black: '1px solid black',
         true: '1px solid hsl(0, 0%, 70%)',
-        false: ''
+        false: 'none'
     },
     borderTop: {
         black: '1px solid black',
         true: '1px solid hsl(0, 0%, 70%)',
-        false: ''
+        false: 'none'
     },
     borderLeft: {
         black: '1px solid black',
         true: '1px solid hsl(0, 0%, 70%)',
-        false: ''
+        false: 'none'
     },
     borderRight: {
         black: '1px solid black',
         true: '1px solid hsl(0, 0%, 70%)',
-        false: ''
+        false: 'none'
     },
     borderBottom: {
         black: '1px solid black',
         true: '1px solid hsl(0, 0%, 70%)',
-        false: ''
+        false: 'none'
     },
 
     grow: {
@@ -127,7 +135,27 @@ const styleValuesMap = {
     justify: {
         start: 'flex-start',
         end: 'flex-end'
-    }
+    },
+
+    margin: mapToPx,
+    marginTop: mapToPx,
+    marginLeft: mapToPx,
+    marginRight: mapToPx,
+    marginBottom: mapToPx,
+
+    padding: mapToPx,
+    paddingTop: mapToPx,
+    paddingLeft: mapToPx,
+    paddingRight: mapToPx,
+    paddingBottom: mapToPx,
+
+    width: mapToPx,
+    minWidth: mapToPx,
+    maxWidth: mapToPx,
+
+    height: mapToPx,
+    minHeight: mapToPx,
+    maxHeight: mapToPx
 }
 //Used for storing unqiue item specific mappings.
 //Each item can add it's own functions, which are called when that property is changed for the item
@@ -305,7 +333,9 @@ function setNodeStyle(node, property, value) {
 
     if (stylesMap.hasOwnProperty(property)) {
         if (styleValuesMap.hasOwnProperty(property)) {
-            if (styleValuesMap[property].hasOwnProperty(value)) {
+            if (typeof styleValuesMap[property] === 'function') {
+                value = styleValuesMap[property](value)
+            } else if (styleValuesMap[property].hasOwnProperty(value)) {
                 value = styleValuesMap[property][value]
             }
         }
