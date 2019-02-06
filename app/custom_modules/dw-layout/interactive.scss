@@ -3,7 +3,7 @@
 @import 'all';
 
 .reorderable-block {
-    @extend %block;
+    @include block;
 
     .separator {
         align-self: stretch;
@@ -26,7 +26,7 @@
 }
 
 .tab-block {
-    @extend %block;
+    @include block;
 
     flex-flow: column nowrap;
 

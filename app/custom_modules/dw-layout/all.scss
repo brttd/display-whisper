@@ -1,4 +1,4 @@
-%all {
+@mixin all {
     display: inline-block;
     box-sizing: border-box;
 
@@ -13,8 +13,8 @@
     user-select: none;
 }
 
-%block {
-    @extend %all;
+@mixin block {
+    @include all;
 
     display: inline-flex;
     flex-flow: row nowrap;

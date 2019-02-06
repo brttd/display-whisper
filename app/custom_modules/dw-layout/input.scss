@@ -20,7 +20,7 @@ $min-size: 24px;
 }
 
 %all-inputs {
-    @extend %all;
+    @include all;
 
     display: inline-flex;
 
@@ -1124,7 +1124,7 @@ $img-max-width: 10em;
 .input-list {
     @include borders;
 
-    @extend %all;
+    @include all;
 
     display: inline-flex;
     overflow: hidden;
@@ -1417,7 +1417,7 @@ $img-max-width: 10em;
 }
 
 .input-tableList {
-    @extend %all;
+    @include all;
 
     @include fonts;
 

@@ -54,7 +54,7 @@ $cursors: (
     display: none !important;
 }
 .text {
-    @extend %all;
+    @include all;
     flex-grow: 0;
     margin: 0;
     padding: 0;
@@ -76,5 +76,5 @@ $cursors: (
     flex: 1 1 0;
 }
 .block {
-    @extend %block;
+    @include block;
 }

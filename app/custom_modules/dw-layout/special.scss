@@ -288,7 +288,7 @@
 }
 
 .timer {
-    @extend %all;
+    @include all;
 
     position: relative;
 

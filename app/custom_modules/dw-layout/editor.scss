@@ -2,7 +2,7 @@
 @import 'all';
 
 .editor {
-    @extend %all;
+    @include all;
 
     display: inline-block;
 

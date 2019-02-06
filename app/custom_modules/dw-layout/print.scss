@@ -49,7 +49,7 @@
 }
 
 .printPreview {
-    @extend %all;
+    @include all;
 
     display: inline-flex;
     flex-flow: column nowrap;
