@@ -664,6 +664,7 @@ function openDisplay() {
     if (debug) {
         windows.display.webContents.openDevTools()
     }
+
     windows.display.setMenu(null)
 
     return windows.display
@@ -1044,7 +1045,9 @@ function openWindow(name) {
         })
     )
 
-    win.setMenu(null)
+    if (!debug) {
+        win.setMenu(null)
+    }
 
     return win
 }
@@ -1190,7 +1193,9 @@ function openItemEditor(type, id, data = {}) {
         })
     )
 
-    win.setMenu(null)
+    if (!debug) {
+        win.setMenu(null)
+    }
 }
 
 let updateDisplayPosition
