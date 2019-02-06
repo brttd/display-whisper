@@ -144,37 +144,39 @@ const removeButton = new layout.Button({
     })
     layout.change(textEditor, {
         size: '100%',
-        shrink: 1,
+        shrink: true,
         align: 'stretch'
     })
 
     layout.change(nameBox, {
         size: '30% ',
         maxWidth: '30ch',
-        shrink: 1,
-        grow: 1
+        shrink: true,
+        grow: true
     })
     layout.change(authorBox, {
         size: '30%',
         maxWidth: '30ch',
-        shrink: 1,
-        grow: 1
+        shrink: true,
+        grow: true
     })
     layout.change(copyrightBox, {
         size: '30%',
         maxWidth: '30ch',
-        shrink: 1,
-        grow: 1
+        shrink: true,
+        grow: true
     })
 
     layout.change(textEditor, {
-        padding: '2px 4px'
+        padding: 2,
+        paddingLeft: 4,
+        paddingRight: 4
     })
 
     let infoBlock = new layout.Block(
         {
             items: [nameBox, authorBox, copyrightBox],
-            childSpacing: '8px'
+            childSpacing: 8
         },
         {
             wrap: true
@@ -188,10 +190,12 @@ const removeButton = new layout.Button({
                         text: 'Sections'
                     },
                     {
-                        grow: 0,
-                        shrink: 0,
+                        grow: false,
+                        shrink: false,
 
-                        padding: '0 4px'
+                        padding: 0,
+                        paddingLeft: 4,
+                        paddingRight: 4
                     }
                 ),
                 sectionsEditor,
@@ -201,15 +205,17 @@ const removeButton = new layout.Button({
                         text: 'Play Order'
                     },
                     {
-                        grow: 0,
-                        shrink: 0,
+                        grow: false,
+                        shrink: false,
 
-                        padding: '0 4px'
+                        padding: 0,
+                        paddingLeft: 4,
+                        paddingRight: 4
                     }
                 ),
                 playOrderEditor
             ],
-            childSpacing: '8px'
+            childSpacing: 8
         },
         {
             direction: 'vertical',
@@ -223,18 +229,18 @@ const removeButton = new layout.Button({
                 new layout.Block(
                     {
                         items: [textStyleEditor, playTimeEditor],
-                        childSpacing: '8px'
+                        childSpacing: 8
                     },
                     {
                         direction: 'horizontal',
-                        grow: 0,
-                        shrink: 0,
+                        grow: false,
+                        shrink: false,
                         padding: 0
                     }
                 ),
                 textEditor
             ],
-            childSpacing: '8px'
+            childSpacing: 8
         },
         {
             direction: 'vertical',
@@ -259,13 +265,13 @@ const removeButton = new layout.Button({
                                                 filterCopyright,
                                                 filterContent
                                             ],
-                                            childSpacing: '8px'
+                                            childSpacing: 8
                                         },
                                         {
                                             direction: 'horizontal',
 
-                                            grow: 0,
-                                            shrink: 0,
+                                            grow: false,
+                                            shrink: false,
                                             wrap: true,
 
                                             padding: 0
@@ -283,18 +289,18 @@ const removeButton = new layout.Button({
                                                 openImportButton,
                                                 openExportButton
                                             ],
-                                            childSpacing: '8px'
+                                            childSpacing: 8
                                         },
                                         {
                                             direction: 'horizontal',
 
-                                            grow: 0,
-                                            shrink: 0,
+                                            grow: false,
+                                            shrink: false,
                                             padding: 0
                                         }
                                     )
                                 ],
-                                childSpacing: '8px'
+                                childSpacing: 8
                             },
                             {
                                 direction: 'vertical'
@@ -359,12 +365,12 @@ const removeButton = new layout.Button({
                                                 duplicateButton,
                                                 removeButton
                                             ],
-                                            childSpacing: '8px'
+                                            childSpacing: 8
                                         },
                                         {
                                             direction: 'horizontal',
-                                            grow: 0,
-                                            shrink: 0
+                                            grow: false,
+                                            shrink: false
                                         }
                                     )
                                 ],

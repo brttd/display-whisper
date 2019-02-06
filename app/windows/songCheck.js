@@ -97,7 +97,7 @@ const songList = new layout.TableList(
         columnWidths: ['13ch', '100%', '3ch', '5ch']
     },
     {
-        margin: '4px',
+        margin: 4,
 
         border: true
     }
@@ -110,13 +110,13 @@ const fixMissingButton = new layout.Button({
 layout.change(layout.body, {
     direction: 'vertical',
 
-    padding: '4px'
+    padding: 4
 })
 
 layout.body.add(
     new layout.Block(
         {
-            childSpacing: '8px',
+            childSpacing: 8,
             items: [
                 showImportantButton,
                 showAllButton,
@@ -128,7 +128,7 @@ layout.body.add(
         },
         {
             direction: 'horizontal',
-            padding: '0',
+            padding: 0,
 
             shrink: false,
             grow: false
@@ -139,14 +139,15 @@ layout.body.add(songList)
 layout.body.add(
     new layout.Block(
         {
-            childSpacing: '8px',
+            childSpacing: 8,
             items: [fixMissingButton]
         },
         {
             direction: 'horizontal',
-            padding: '0',
             shrink: false,
-            grow: false
+            grow: false,
+
+            padding: 0
         }
     )
 )

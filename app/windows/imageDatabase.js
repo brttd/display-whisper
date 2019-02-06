@@ -42,7 +42,7 @@ const imageTitle = new layout.Text(
     {},
     {
         overflow: 'ellipsis',
-        grow: 1,
+        grow: true,
         align: 'center',
         textAlign: 'left'
     }
@@ -52,8 +52,8 @@ const imagePreview = new layout.Image(
         color: 'rgb(128, 128, 128)'
     },
     {
-        shrink: 1,
-        grow: 1,
+        shrink: true,
+        grow: true,
         size: 'fill',
 
         align: 'stretch',
@@ -84,7 +84,7 @@ layout.body.add(
                                             new layout.Filler(),
                                             removeAllButton
                                         ],
-                                        childSpacing: '8px'
+                                        childSpacing: 8
                                     },
                                     {
                                         direction: 'horizontal',
@@ -95,7 +95,7 @@ layout.body.add(
                                     }
                                 )
                             ],
-                            childSpacing: '8px'
+                            childSpacing: 8
                         },
                         {
                             direction: 'vertical'
@@ -116,19 +116,19 @@ layout.body.add(
                                 new layout.Block(
                                     {
                                         items: [imageTitle, removeButton],
-                                        childSpacing: '8px'
+                                        childSpacing: 8
                                     },
                                     {
-                                        padding: '',
+                                        padding: 0,
                                         direction: 'horizontal',
 
-                                        grow: 0,
-                                        shrink: 0
+                                        grow: false,
+                                        shrink: false
                                     }
                                 ),
                                 imagePreview
                             ],
-                            childSpacing: '8px'
+                            childSpacing: 8
                         },
                         {
                             direction: 'vertical'

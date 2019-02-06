@@ -177,8 +177,8 @@ layout.body.add(
             ]
         },
         {
-            grow: 0,
-            shrink: 0,
+            grow: false,
+            shrink: false,
             direction: 'horizontal',
             wrap: true
         }
@@ -195,8 +195,8 @@ layout.body.add(
             ]
         },
         {
-            grow: 0,
-            shrink: 0
+            grow: false,
+            shrink: false
         }
     )
 )
@@ -263,8 +263,8 @@ layout.body.add(
             ]
         },
         {
-            shrink: 0,
-            grow: 0
+            shrink: false,
+            grow: false
         }
     )
 )
@@ -379,11 +379,11 @@ layout.body.add(
                     tooltip: 'Image tooltip'
                 })
             ],
-            childSpacing: '8px'
+            childSpacing: 8
         },
         {
-            grow: 0,
-            shrink: 0,
+            grow: false,
+            shrink: false,
             wrap: true,
             direction: 'vertical'
         }
@@ -399,11 +399,11 @@ layout.body.add(
                 new layout.BoxStyleEdit({}),
                 new layout.BackgroundStyleEdit({})
             ],
-            childSpacing: '8px'
+            childSpacing: 8
         },
         {
-            grow: 0,
-            shrink: 0,
+            grow: false,
+            shrink: false,
             direction: 'vertical'
         }
     )

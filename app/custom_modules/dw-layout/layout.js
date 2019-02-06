@@ -1405,7 +1405,7 @@ exports.change = addStyles
 
         Constructor data:
             items (Array: Items): List of items to be added to block.
-            childSpacing (String: CSS unit / Number: Pixels): Spacing between child elements (and padding).
+            childSpacing (Number: Pixels): Spacing between child elements (and padding).
 
         Properties:
             items (Array: Items): List of items currently in block.
@@ -1422,30 +1422,17 @@ exports.change = addStyles
             super(document.createElement('div'), {})
             this.addClass('block')
 
-            if (typeof data.childSpacing === 'string') {
-                if (
-                    isFinite(parseFloat(data.childSpacing)) &&
-                    parseFloat(data.childSpacing) >= 0
-                ) {
-                    //If it's a string, extract the unit type by removing all digits
-                    this.spacing = {
-                        unit: data.childSpacing.replace(/\d/g, ''),
-                        amount: parseFloat(data.childSpacing)
-                    }
-                }
-            } else if (typeof (data.childSpacing === 'number')) {
+            this.spacing = 0
+
+            if (typeof (data.childSpacing === 'number')) {
                 if (isFinite(data.childSpacing) && data.childSpacing >= 0) {
-                    this.spacing = {
-                        unit: 'px',
-                        amount: data.childSpacing
-                    }
+                    this.spacing = data.childSpacing
                 }
             }
 
             if (this.spacing) {
                 addStyles(this, {
-                    padding:
-                        (this.spacing.amount / 2).toString() + this.spacing.unit
+                    padding: this.spacing / 2
                 })
             }
 
@@ -1468,6 +1455,10 @@ exports.change = addStyles
                     this.add(data.items[i])
                 }
             }
+        }
+
+        get childSpacing() {
+            return this.spacing
         }
 
         onResize(toParent = false) {
@@ -1515,9 +1506,7 @@ exports.change = addStyles
                     //All items apart from Blocks should have margin set
                     if (item instanceof Block === false) {
                         addStyles(item, {
-                            margin:
-                                (this.spacing.amount / 2).toString() +
-                                this.spacing.unit
+                            margin: this.spacing / 2
                         })
                     }
                 }
@@ -2947,7 +2936,7 @@ exports.change = addStyles
         margin: (item, value) => {
             //Margin should also change spacing between the label and input element
             if (item.node.firstChild !== item.inputNode) {
-                item.node.firstChild.style.marginBottom = value
+                item.node.firstChild.style.marginBottom = mapToPx(value)
             }
 
             return {}
@@ -4972,7 +4961,7 @@ exports.change = addStyles
     itemStylesMap.ColorInput = {
         margin: (item, value) => {
             if (item.node.firstChild !== item.inputNode) {
-                item.node.firstChild.style.marginBottom = value
+                item.node.firstChild.style.marginBottom = mapToPx(value)
             }
 
             return {}
@@ -9638,6 +9627,8 @@ exports.change = addStyles
     exports.TextStyleEdit = items.TextStyleEdit = TextStyleEdit
     itemStylesMap.TextStyleEdit = {
         margin: (item, value) => {
+            value = mapToPx(value)
+
             item.fontBlock.style.margin = item.lineBlock.style.margin = item.styleBlock.style.margin = item.alignBlock.style.margin =
                 '0'
 
@@ -9826,6 +9817,8 @@ exports.change = addStyles
     exports.ImageStyleEdit = items.ImageStyleEdit = ImageStyleEdit
     itemStylesMap.ImageStyleEdit = {
         margin: (item, value) => {
+            value = mapToPx(value)
+
             if (item.node.childElementCount > 1) {
                 item.imageBlock.style.marginRight = value
             }
@@ -9882,7 +9875,7 @@ exports.change = addStyles
                     },
                     {
                         width: '8ch',
-                        grow: 0
+                        grow: false
                     }
                 )
                 this.inputItems.push(this.left)
@@ -9902,7 +9895,7 @@ exports.change = addStyles
                     },
                     {
                         width: '8ch',
-                        grow: 0
+                        grow: false
                     }
                 )
                 this.inputItems.push(this.right)
@@ -9922,7 +9915,7 @@ exports.change = addStyles
                     },
                     {
                         width: '8ch',
-                        grow: 0
+                        grow: false
                     }
                 )
                 this.inputItems.push(this.top)
@@ -9941,7 +9934,7 @@ exports.change = addStyles
                     },
                     {
                         width: '8ch',
-                        grow: 0
+                        grow: false
                     }
                 )
                 this.inputItems.push(this.bottom)
@@ -10158,6 +10151,8 @@ exports.change = addStyles
     exports.BoxStyleEdit = items.BoxStyleEdit = BoxStyleEdit
     itemStylesMap.BoxStyleEdit = {
         margin: (item, value) => {
+            value = mapToPx(value)
+
             item.positionBlock.style.marginRight = value
 
             item.left.node.firstChild.style.marginBottom = item.right.node.firstChild.style.marginBottom = item.top.node.firstChild.style.marginBottom = item.bottom.node.firstChild.style.marginBottom = value
@@ -10413,6 +10408,8 @@ exports.change = addStyles
     exports.BackgroundStyleEdit = items.BackgroundStyleEdit = BackgroundStyleEdit
     itemStylesMap.BackgroundStyleEdit = {
         margin: (item, value) => {
+            value = mapToPx(value)
+
             for (let i = 0; i < item.inputItems.length; i++) {
                 item.inputItems[i].node.style.marginTop = value
             }
@@ -10638,6 +10635,8 @@ exports.change = addStyles
     exports.PlayStyleEdit = items.PlayStyleEdit = PlayStyleEdit
     itemStylesMap.PlayStyleEdit = {
         margin: (item, value) => {
+            value = mapToPx(value)
+            
             item.playBlock.style.margin = item.transitionBlock.style.margin =
                 '0'
 
@@ -13623,8 +13622,8 @@ class BoxEdit {
                 this.displayItem = new exports.Display(data.display, {
                     height: '80px',
                     width: 'display',
-                    shrink: 0,
-                    grow: 0,
+                    shrink: false,
+                    grow: false,
                     size: 'auto'
                 })
 
@@ -14145,7 +14144,7 @@ class BoxEdit {
                     },
                     {
                         width: '7ch',
-                        margin: '4px'
+                        margin: 4
                     }
                 )
                 this.controlNode.appendChild(this.sizeControl.node)
@@ -14157,7 +14156,7 @@ class BoxEdit {
                         value: false
                     },
                     {
-                        margin: '4px',
+                        margin: 4,
 
                         align: 'end'
                     }
@@ -14182,7 +14181,7 @@ class BoxEdit {
                     },
                     {
                         width: '6ch',
-                        margin: '4px'
+                        margin: 4
                     }
                 )
                 this.controlNode.appendChild(this.marginControl.node)
@@ -14204,7 +14203,7 @@ class BoxEdit {
                     },
                     {
                         width: '6ch',
-                        margin: '4px'
+                        margin: 4
                     }
                 )
                 this.controlNode.appendChild(this.columnControl.node)
@@ -14231,7 +14230,7 @@ class BoxEdit {
                     },
                     {
                         width: '6ch',
-                        margin: '4px'
+                        margin: 4
                     }
                 )
                 this.viewNode.appendChild(this.zoomControl.node)
@@ -14242,9 +14241,9 @@ class BoxEdit {
                     },
                     {
                         align: 'end',
-                        margin: '4px',
+                        margin: 4,
 
-                        marginLeft: '0'
+                        marginLeft: 0
                     }
                 )
                 this.zoomFull = new exports.Button(
@@ -14253,9 +14252,9 @@ class BoxEdit {
                     },
                     {
                         align: 'end',
-                        margin: '4px',
+                        margin: 4,
 
-                        marginLeft: '0'
+                        marginLeft: 0
                     }
                 )
                 this.viewNode.appendChild(this.zoomFit.node)

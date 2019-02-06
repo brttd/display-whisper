@@ -69,12 +69,12 @@ function getEntryBlock(key, data) {
                 new layout.Filler(),
                 input
             ],
-            childSpacing: '4px'
+            childSpacing: 6
         },
         {
             direction: 'horizontal',
-            grow: 0,
-            shrink: 0,
+            grow: false,
+            shrink: false,
 
             borderTop: true
         }
@@ -151,11 +151,13 @@ function getSectionBlock(key, data) {
         {
             direction: 'vertical',
             align: 'stretch',
-            grow: 0,
-            shrink: 0,
+            grow: false,
+            shrink: false,
 
             maxWidth: '100ch',
-            margin: '16px'
+
+            marginTop: 8,
+            marginLeft: 16
         }
     )
 
@@ -171,12 +173,12 @@ function getSectionBlock(key, data) {
                     : false,
                 block
             ],
-            childSpacing: '16px'
+            childSpacing: 16
         },
         {
             direction: 'vertical',
-            grow: 0,
-            shrink: 0,
+            grow: false,
+            shrink: false,
 
             borderBottom: true
         }
@@ -215,7 +217,7 @@ function displaySettings(data) {
             layout.change(
                 currentTab.content.items[currentTab.content.items.length - 1],
                 {
-                    borderBottom: ''
+                    borderBottom: false
                 }
             )
 

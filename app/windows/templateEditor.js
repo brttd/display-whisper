@@ -23,7 +23,7 @@ const list = new layout.List({
 })
 
 const itemsBar = new layout.Block(
-    { childSpacing: '8px' },
+    { childSpacing: 8 },
     { direction: 'horizontal' }
 )
 
@@ -53,7 +53,7 @@ const colorControl = new layout.BackgroundStyleEdit({})
 const playControl = new layout.PlayStyleEdit({}, {})
 
 const propertiesBar = new layout.Block({
-    childSpacing: '8px'
+    childSpacing: 8
 })
 
 const saveButton = new layout.Button({
@@ -67,20 +67,20 @@ colorControl.connect(displayEditor)
 
 {
     layout.change(itemsBar, {
-        grow: 0,
-        shrink: 0,
+        grow: false,
+        shrink: false,
         padding: 0
     })
     layout.change(propertiesBar, {
         direction: 'horizontal',
-        grow: 0,
-        shrink: 0,
+        grow: false,
+        shrink: false,
         wrap: true,
         padding: 0
     })
 
     layout.change(displayEditor, {
-        grow: 1
+        grow: true
     })
 
     layout.body.add(
@@ -102,7 +102,7 @@ colorControl.connect(displayEditor)
                                 new layout.Block(
                                     {
                                         items: [colorControl, playControl],
-                                        childSpacing: '8px'
+                                        childSpacing: 8
                                     },
                                     {
                                         direction: 'vertical'
@@ -123,7 +123,7 @@ colorControl.connect(displayEditor)
                                     items: [
                                         new layout.Block(
                                             {
-                                                childSpacing: '8px',
+                                                childSpacing: 8,
 
                                                 items: [
                                                     textControl,
@@ -149,7 +149,7 @@ colorControl.connect(displayEditor)
                                     items: [
                                         new layout.Block(
                                             {
-                                                childSpacing: '8px',
+                                                childSpacing: 8,
 
                                                 items: [
                                                     new layout.Text({
@@ -184,7 +184,7 @@ colorControl.connect(displayEditor)
                                 new layout.Block(
                                     {
                                         items: [saveButton, removeButton],
-                                        childSpacing: '8px'
+                                        childSpacing: 8
                                     },
                                     {
                                         direction: 'horizontal',

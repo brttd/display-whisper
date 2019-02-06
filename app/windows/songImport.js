@@ -35,13 +35,13 @@ const fileSelect = new layout.FileInput(
         button: 'Select File'
     },
     {
-        margin: '4px'
+        margin: 4
     }
 )
 const fileOutput = new layout.Text(
     { text: '' },
     {
-        margin: '4px'
+        margin: 4
     }
 )
 fileOutput.visible = false
@@ -51,7 +51,7 @@ const importOutput = new layout.Text(
         text: ''
     },
     {
-        margin: '4px'
+        margin: 4
     }
 )
 importOutput.visible = false
@@ -62,7 +62,7 @@ const importButton = new layout.Button(
         disabled: true
     },
     {
-        margin: '4px'
+        margin: 4
     }
 )
 const closeButton = new layout.Button(
@@ -71,7 +71,7 @@ const closeButton = new layout.Button(
         onClick: () => layout.window.close()
     },
     {
-        margin: '4px'
+        margin: 4
     }
 )
 
@@ -89,7 +89,7 @@ layout.body.add(
                         text: 'New songs which are already in library:'
                     },
                     {
-                        margin: '4px'
+                        margin: 4
                     }
                 ),
                 new layout.Block(
@@ -99,10 +99,10 @@ layout.body.add(
                     {
                         direction: 'vertical',
 
-                        grow: 0,
-                        shrink: 0,
+                        grow: false,
+                        shrink: false,
 
-                        margin: '4px'
+                        margin: 4
                     }
                 ),
                 new layout.Block(
@@ -122,10 +122,10 @@ layout.body.add(
                     {
                         direction: 'horizontal',
 
-                        grow: 0,
-                        shrink: 0,
+                        grow: false,
+                        shrink: false,
 
-                        margin: '4px'
+                        margin: 4
                     }
                 )
             ]
@@ -135,7 +135,7 @@ layout.body.add(
 
             overflow: 'auto',
 
-            padding: '8px'
+            padding: 8
         }
     )
 )
@@ -151,8 +151,8 @@ layout.body.add(
                     {
                         direction: 'horizontal',
 
-                        grow: 0,
-                        shrink: 0,
+                        grow: false,
+                        shrink: false,
 
                         align: 'end'
                     }
@@ -161,12 +161,12 @@ layout.body.add(
         },
         {
             direction: 'vertical',
-            grow: 0,
-            shrink: 0,
+            grow: false,
+            shrink: false,
 
             borderTop: true,
 
-            padding: '8px'
+            padding: 8
         }
     )
 )

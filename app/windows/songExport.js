@@ -16,7 +16,7 @@ const closeButton = new layout.Button(
         onClick: () => layout.window.close()
     },
     {
-        margin: '4px'
+        margin: 4
     }
 )
 const fileSelect = new layout.FileInput(
@@ -36,7 +36,7 @@ const fileSelect = new layout.FileInput(
         ]
     },
     {
-        margin: '4px'
+        margin: 4
     }
 )
 const output = new layout.Text(
@@ -44,14 +44,14 @@ const output = new layout.Text(
         text: 'Loading Songs...'
     },
     {
-        margin: '4px',
+        margin: 4,
         align: 'center'
     }
 )
 
 layout.change(layout.body, {
     direction: 'vertical',
-    padding: '8px',
+    padding: 8,
 
     justify: 'space-between'
 })
@@ -64,8 +64,8 @@ layout.body.add(
         },
         {
             direction: 'horizontal',
-            grow: 0,
-            shrink: 0,
+            grow: false,
+            shrink: false,
 
             align: 'end'
         }

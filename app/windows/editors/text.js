@@ -29,8 +29,8 @@ const displayEditor = new layout.DisplayEdit(
     {},
     {
         size: '100%',
-        shrink: 1,
-        grow: 1,
+        shrink: true,
+        grow: true,
         align: 'stretch',
 
         background: 'rgb(128, 128, 128)',
@@ -101,7 +101,7 @@ const sectionsBar = new layout.Block({
         fitTextButton
     ],
 
-    childSpacing: '8px'
+    childSpacing: 8
 })
 
 const displayButton = new layout.Button({
@@ -131,15 +131,15 @@ backgroundControl.connect(displayEditor)
     })
     layout.change(fitTextButton, {
         align: 'end',
-        margin: '4px'
+        margin: 4
     })
     layout.change(sectionsBar, {
         direction: 'horizontal',
 
         size: '35px',
 
-        grow: 0,
-        shrink: 0,
+        grow: false,
+        shrink: false,
 
         padding: 0
     })
@@ -183,8 +183,7 @@ backgroundControl.connect(displayEditor)
                                                                             templateSelector,
                                                                             applyTemplateButton
                                                                         ],
-                                                                        childSpacing:
-                                                                            '8px'
+                                                                        childSpacing: 8
                                                                     },
                                                                     {
                                                                         direction:
@@ -194,7 +193,7 @@ backgroundControl.connect(displayEditor)
                                                                 )
                                                             ],
 
-                                                            childSpacing: '8px'
+                                                            childSpacing: 8
                                                         },
                                                         {
                                                             direction:
@@ -206,7 +205,7 @@ backgroundControl.connect(displayEditor)
                                                         }
                                                     )
                                                 ],
-                                                childSpacing: '8px'
+                                                childSpacing: 8
                                             },
                                             {
                                                 direction: 'horizontal'
@@ -232,7 +231,7 @@ backgroundControl.connect(displayEditor)
                                                     sectionsBar,
                                                     displayEditor
                                                 ],
-                                                childSpacing: '8px'
+                                                childSpacing: 8
                                             },
                                             {
                                                 direction: 'vertical',
@@ -267,7 +266,7 @@ backgroundControl.connect(displayEditor)
                                     applyButton,
                                     cancelButton
                                 ],
-                                childSpacing: '8px'
+                                childSpacing: 8
                             },
                             {
                                 //align: 'end'

@@ -97,7 +97,7 @@ const blankButton = new layout.Button(
         toggle: true
     },
     {
-        margin: '4px'
+        margin: 4
     }
 )
 const undoRemoveButton = new layout.Button(
@@ -2556,29 +2556,29 @@ const item_add = {
 {
     let songBlock = new layout.Block(
         {
-            childSpacing: '8px'
+            childSpacing: 8
         },
         {
             direction: 'vertical',
-            paddingBottom: '0'
+            paddingBottom: 0
         }
     )
     let textBlock = new layout.Block(
         {
-            childSpacing: '8px'
+            childSpacing: 8
         },
         {
             direction: 'vertical',
-            paddingBottom: '0'
+            paddingBottom: 0
         }
     )
     let imageBlock = new layout.Block(
         {
-            childSpacing: '8px'
+            childSpacing: 8
         },
         {
             direction: 'vertical',
-            paddingBottom: '0'
+            paddingBottom: 0
         }
     )
 
@@ -2627,14 +2627,15 @@ const item_add = {
         new layout.Block(
             {
                 items: [addButton, templateSelect, templateEditorButton],
-                childSpacing: '8px'
+                childSpacing: 8
             },
             {
                 direction: 'horizontal',
                 justify: 'end',
-                shrink: 0,
-                grow: 0,
-                paddingTop: '0'
+                shrink: false,
+                grow: false,
+
+                paddingTop: 0
             }
         )
     )
@@ -2851,12 +2852,12 @@ const item_add = {
                     ),
                     updateButton
                 ],
-                childSpacing: '8px'
+                childSpacing: 8
             },
             {
                 direction: 'vertical',
-                grow: 0,
-                shrink: 0,
+                grow: false,
+                shrink: false,
 
                 padding: 0
             }
@@ -2889,12 +2890,12 @@ const item_add = {
                         }
                     })
                 ],
-                childSpacing: '8px'
+                childSpacing: 8
             },
             {
                 direction: 'horizontal',
-                grow: 0,
-                shrink: 0,
+                grow: false,
+                shrink: false,
 
                 justify: 'center',
                 wrap: true,
@@ -2910,8 +2911,8 @@ const item_add = {
             },
             {
                 size: '100%',
-                grow: 1,
-                shrink: 1
+                grow: true,
+                shrink: true
             }
         )
 
@@ -2945,8 +2946,8 @@ const item_add = {
             },
             {
                 direction: 'horizontal',
-                grow: 0,
-                shrink: 0,
+                grow: false,
+                shrink: false,
                 wrap: true,
 
                 padding: 0
@@ -2974,8 +2975,8 @@ const item_add = {
                 },
                 {
                     direction: 'horizontal',
-                    grow: 0,
-                    shrink: 0,
+                    grow: false,
+                    shrink: false,
 
                     padding: 0
                 }
@@ -3466,8 +3467,8 @@ const item_add = {
         const preview = new layout.DisplayEdit(
             {},
             {
-                shrink: 1,
-                grow: 1,
+                shrink: true,
+                grow: true,
                 size: 'auto',
 
                 background: 'grey',
@@ -3554,8 +3555,8 @@ const item_add = {
         let previewEditor = new layout.DisplayEdit(
             {},
             {
-                shrink: 0,
-                grow: 0,
+                shrink: false,
+                grow: false,
                 size: 'auto',
                 height: 'display',
 
@@ -3743,7 +3744,7 @@ const item_control = {
     main: new layout.Block(
         {},
         {
-            padding: '4px',
+            padding: 4,
             direction: 'vertical'
         }
     ),
@@ -3755,7 +3756,7 @@ const item_control = {
     }
 }
 {
-    layout.change(timer, { margin: '4px' })
+    layout.change(timer, { margin: 4 })
 
     let loopInput = new layout.CheckboxInput(
         {
@@ -3763,7 +3764,7 @@ const item_control = {
             label: 'Loop'
         },
         {
-            margin: '4px'
+            margin: 4
         }
     )
     let shuffleInput = new layout.CheckboxInput(
@@ -3772,7 +3773,7 @@ const item_control = {
             label: 'Shuffle'
         },
         {
-            margin: '4px'
+            margin: 4
         }
     )
     let modeSelect = new layout.SelectInput(
@@ -3781,7 +3782,7 @@ const item_control = {
             options: ['Auto', 'Manual']
         },
         {
-            margin: '4px'
+            margin: 4
         }
     )
 
@@ -3790,7 +3791,7 @@ const item_control = {
             icon: 'play-first'
         },
         {
-            margin: '4px'
+            margin: 4
         }
     )
     let prevButton = new layout.Button(
@@ -3798,7 +3799,9 @@ const item_control = {
             icon: 'play-previous'
         },
         {
-            margin: '4px 0px'
+            margin: 4,
+            marginLeft: 0,
+            marginRight: 0
         }
     )
     let nextButton = new layout.Button(
@@ -3806,7 +3809,9 @@ const item_control = {
             icon: 'play-next'
         },
         {
-            margin: '4px 0'
+            margin: 4,
+            marginLeft: 0,
+            marginRight: 0
         }
     )
     let lastButton = new layout.Button(
@@ -3814,7 +3819,7 @@ const item_control = {
             icon: 'play-last'
         },
         {
-            margin: '4px'
+            margin: 4
         }
     )
 
@@ -3848,8 +3853,8 @@ const item_control = {
             },
             {
                 direction: 'horizontal',
-                grow: 0,
-                shrink: 0
+                grow: false,
+                shrink: false
             }
         )
     )
@@ -4054,7 +4059,7 @@ const item_display1 = {
     let display = new layout.Display(
         {},
         {
-            grow: 1,
+            grow: true,
             align: 'stretch',
 
             background: 'rgb(128, 128, 128)',
@@ -4101,11 +4106,11 @@ const item_display1 = {
                     showButtons.previous,
                     showButtons.next
                 ],
-                childSpacing: '4px'
+                childSpacing: 4
             },
             {
-                shrink: 0,
-                grow: 0
+                shrink: false,
+                grow: false
             }
         )
     )
@@ -4193,7 +4198,7 @@ const item_display2 = {
     let display = new layout.Display(
         {},
         {
-            grow: 1,
+            grow: true,
             align: 'stretch',
 
             background: 'rgb(128, 128, 128)',
@@ -4240,11 +4245,11 @@ const item_display2 = {
                     showButtons.previous,
                     showButtons.next
                 ],
-                childSpacing: '4px'
+                childSpacing: 4
             },
             {
-                shrink: 0,
-                grow: 0
+                shrink: false,
+                grow: false
             }
         )
     )
@@ -4333,7 +4338,7 @@ const item_display3 = {
     let display = new layout.Display(
         {},
         {
-            grow: 1,
+            grow: true,
             align: 'stretch',
 
             background: 'rgb(128, 128, 128)',
@@ -4380,11 +4385,11 @@ const item_display3 = {
                     showButtons.previous,
                     showButtons.next
                 ],
-                childSpacing: '4px'
+                childSpacing: 4
             },
             {
-                shrink: 0,
-                grow: 0
+                shrink: false,
+                grow: false
             }
         )
     )
@@ -4472,7 +4477,7 @@ const item_display4 = {
     let display = new layout.Display(
         {},
         {
-            grow: 1,
+            grow: true,
             align: 'stretch',
 
             background: 'rgb(128, 128, 128)',
@@ -4519,11 +4524,11 @@ const item_display4 = {
                     showButtons.previous,
                     showButtons.next
                 ],
-                childSpacing: '4px'
+                childSpacing: 4
             },
             {
-                shrink: 0,
-                grow: 0
+                shrink: false,
+                grow: false
             }
         )
     )

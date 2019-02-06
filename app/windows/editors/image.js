@@ -17,8 +17,8 @@ const displayEditor = new layout.DisplayEdit(
     {},
     {
         size: '100%',
-        shrink: 1,
-        grow: 1,
+        shrink: true,
+        grow: true,
         align: 'stretch',
         background: 'rgb(128, 128, 128)',
         border: true
@@ -79,7 +79,7 @@ layout.body.add(
                                             templateSelector,
                                             applyTemplateButton
                                         ],
-                                        childSpacing: '8px'
+                                        childSpacing: 8
                                     },
                                     {
                                         padding: 0,
@@ -88,7 +88,7 @@ layout.body.add(
                                 )
                             ],
 
-                            childSpacing: '8px'
+                            childSpacing: 8
                         },
                         {
                             direction: 'vertical',
@@ -115,7 +115,7 @@ layout.body.add(
                                 displayEditor
                             ],
 
-                            childSpacing: '8px'
+                            childSpacing: 8
                         },
                         {
                             direction: 'vertical',
@@ -140,7 +140,7 @@ layout.body.add(
                                 applyButton,
                                 cancelButton
                             ],
-                            childSpacing: '8px'
+                            childSpacing: 8
                         },
                         {}
                     )

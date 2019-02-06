@@ -102,7 +102,7 @@ const sectionEditor = new layout.RichTextInput(
         lineHeight: 1.5
     },
     {
-        padding: '4px'
+        padding: 4
     }
 )
 
@@ -133,22 +133,22 @@ let activeIndex = -1
 
     layout.change(nameBox, {
         size: '25%',
-        shrink: 1,
-        grow: 1,
+        shrink: true,
+        grow: true,
         minWidth: '13ch',
         maxWidth: '30ch'
     })
     layout.change(authorBox, {
         size: '25%',
-        shrink: 1,
-        grow: 1,
+        shrink: true,
+        grow: true,
         minWidth: '13ch',
         maxWidth: '30ch'
     })
     layout.change(copyrightBox, {
         size: '25%',
-        shrink: 1,
-        grow: 1,
+        shrink: true,
+        grow: true,
         minWidth: '13ch',
         maxWidth: '30ch'
     })
@@ -180,8 +180,8 @@ let activeIndex = -1
         textAlign: 'left',
 
         size: '100%',
-        grow: 1,
-        shrink: 1,
+        grow: true,
+        shrink: true,
 
         overflow: 'ellipsis',
         wrap: 'nowrap'
@@ -204,12 +204,12 @@ let activeIndex = -1
                                                 new layout.Filler(),
                                                 addButton
                                             ],
-                                            childSpacing: '8px'
+                                            childSpacing: 8
                                         },
                                         {
                                             direction: 'horizontal',
-                                            grow: 0,
-                                            shrink: 0,
+                                            grow: false,
+                                            shrink: false,
 
                                             padding: 0
                                         }
@@ -225,12 +225,12 @@ let activeIndex = -1
                                                 copyrightSymbolButton
                                             ],
 
-                                            childSpacing: '8px'
+                                            childSpacing: 8
                                         },
                                         {
                                             direction: 'horizontal',
-                                            grow: 0,
-                                            shrink: 0,
+                                            grow: false,
+                                            shrink: false,
 
                                             padding: 0,
                                             wrap: true
@@ -240,7 +240,7 @@ let activeIndex = -1
                             },
                             {
                                 direction: 'vertical',
-                                padding: '4px'
+                                padding: 4
                             }
                         )
                     ],
@@ -268,7 +268,11 @@ let activeIndex = -1
                                                             {
                                                                 text: 'Source'
                                                             },
-                                                            { padding: '0 4px' }
+                                                            {
+                                                                padding: 0,
+                                                                paddingLeft: 4,
+                                                                paddingRight: 4
+                                                            }
                                                         ),
                                                         new layout.Filler(),
                                                         updateButton
@@ -276,15 +280,15 @@ let activeIndex = -1
                                                 },
                                                 {
                                                     direction: 'horizontal',
-                                                    shrink: 0,
-                                                    grow: 0,
-                                                    padding: '4px',
+                                                    shrink: false,
+                                                    grow: false,
+                                                    padding: 4,
                                                     paddingBottom: '0'
                                                 }
                                             ),
                                             sourceEditor
                                         ],
-                                        childSpacing: '8px'
+                                        childSpacing: 8
                                     },
                                     {
                                         direction: 'vertical'
@@ -305,16 +309,24 @@ let activeIndex = -1
                                         items: [
                                             new layout.Text(
                                                 { text: 'Sections' },
-                                                { padding: '0 4px' }
+                                                {
+                                                    padding: 0,
+                                                    paddingLeft: 4,
+                                                    paddingRight: 4
+                                                }
                                             ),
                                             sectionsList,
                                             new layout.Text(
                                                 { text: 'Play Order' },
-                                                { padding: '0 4px' }
+                                                {
+                                                    padding: 0,
+                                                    paddingLeft: 4,
+                                                    paddingRight: 4
+                                                }
                                             ),
                                             playOrderList
                                         ],
-                                        childSpacing: '8px'
+                                        childSpacing: 8
                                     },
                                     {
                                         direction: 'vertical'
@@ -340,12 +352,12 @@ let activeIndex = -1
                                                         sectionTime,
                                                         textStyleEditor
                                                     ],
-                                                    childSpacing: '8px'
+                                                    childSpacing: 8
                                                 },
                                                 {
                                                     direction: 'horizontal',
-                                                    grow: 0,
-                                                    shrink: 0,
+                                                    grow: false,
+                                                    shrink: false,
                                                     wrap: true,
 
                                                     padding: 0
@@ -353,7 +365,7 @@ let activeIndex = -1
                                             ),
                                             sectionEditor
                                         ],
-                                        childSpacing: '8px'
+                                        childSpacing: 8
                                     },
                                     {
                                         direction: 'vertical'
@@ -379,13 +391,6 @@ let activeIndex = -1
     )
 
     sectionTime.node.firstChild.style.marginBottom = '4px'
-
-    /*
-    //childSpacing will have given it 4px spacing, remove the bit on the left so that there's only 4px between label and input
-    layout.change(sectionTime, {
-        marginLeft: 0
-    })
-    */
 }
 
 function getSafeName(name, data = editor.data) {

@@ -92,7 +92,7 @@ const addTextButton = new layout.Button({
 //Editing controls for songs
 const songOptionsBlock = new layout.Block(
     {
-        childSpacing: '8px'
+        childSpacing: 8
     },
     {
         direction: 'vertical'
@@ -149,7 +149,7 @@ const songResetAllButton = new layout.Button({
 //Editing controls for text
 const textOptionsBlock = new layout.Block(
     {
-        childSpacing: '8px'
+        childSpacing: 8
     },
     {
         direction: 'vertical'
@@ -224,8 +224,8 @@ const pdfButton = new layout.Button({
         align: 'stretch'
     })
     layout.change(preview, {
-        grow: 1,
-        shrink: 1,
+        grow: true,
+        shrink: true,
 
         size: '100%',
 
@@ -239,7 +239,7 @@ const pdfButton = new layout.Button({
     songOptionsBlock.add(
         new layout.Block(
             {
-                childSpacing: '8px',
+                childSpacing: 8,
 
                 items: [
                     new layout.Block(
@@ -248,7 +248,7 @@ const pdfButton = new layout.Button({
                                 new layout.Text(
                                     { text: 'Type' },
                                     {
-                                        marginBottom: '4px'
+                                        marginBottom: 4
                                     }
                                 ),
                                 songType
@@ -256,10 +256,10 @@ const pdfButton = new layout.Button({
                         },
                         {
                             direction: 'vertical',
-                            grow: 0,
-                            shrink: 0,
+                            grow: false,
+                            shrink: false,
 
-                            margin: '4px'
+                            margin: 4
                         }
                     ),
                     songStyleEditor
@@ -268,8 +268,8 @@ const pdfButton = new layout.Button({
             {
                 direction: 'horizontal',
 
-                grow: 0,
-                shrink: 0,
+                grow: false,
+                shrink: false,
 
                 padding: 0
             }
@@ -279,7 +279,7 @@ const pdfButton = new layout.Button({
     songOptionsBlock.add(
         new layout.Block(
             {
-                childSpacing: '8px',
+                childSpacing: 8,
                 items: [songResetButton, songResetAllButton]
             },
             {
@@ -288,8 +288,8 @@ const pdfButton = new layout.Button({
 
                 padding: 0,
 
-                grow: 0,
-                shrink: 0
+                grow: false,
+                shrink: false
             }
         )
     )
@@ -303,11 +303,13 @@ const pdfButton = new layout.Button({
     })
 
     layout.change(textStyling, {
-        margin: '4px'
+        margin: 4
     })
 
     layout.change(textEditor, {
-        padding: '2px 4px'
+        padding: 2,
+        paddingLeft: 4,
+        paddingRight: 4
     })
 
     textOptionsBlock.add(
@@ -322,7 +324,7 @@ const pdfButton = new layout.Button({
                                         text: 'Type'
                                     },
                                     {
-                                        marginBottom: '4px'
+                                        marginBottom: 4
                                     }
                                 ),
                                 textType
@@ -330,11 +332,11 @@ const pdfButton = new layout.Button({
                         },
                         {
                             direction: 'vertical',
-                            grow: 0,
-                            shrink: 0,
+                            grow: false,
+                            shrink: false,
 
-                            margin: '4px',
-                            marginRight: ''
+                            margin: 4,
+                            marginRight: 0
                         }
                     ),
                     textStyling
@@ -342,19 +344,21 @@ const pdfButton = new layout.Button({
             },
             {
                 direction: 'horizontal',
-                grow: 0,
-                shrink: 0
+                grow: false,
+                shrink: false
             }
         )
     )
     textOptionsBlock.add(textEditor)
 
     layout.change(landscapeWarning, {
-        grow: 0,
-        shrink: 0,
+        grow: false,
+        shrink: false,
 
-        margin: '4px',
-        padding: '2px 6px',
+        margin: 4,
+        padding: 2,
+        paddingLeft: 6,
+        paddingRight: 6,
 
         background: 'hsl(0, 60%, 75%)'
     })
@@ -372,7 +376,7 @@ const pdfButton = new layout.Button({
                         new layout.Block(
                             {
                                 items: [searchBox, resultsBox],
-                                childSpacing: '8px'
+                                childSpacing: 8
                             },
                             {
                                 direction: 'vertical'
@@ -398,7 +402,7 @@ const pdfButton = new layout.Button({
                                                     itemList,
                                                     addTextButton
                                                 ],
-                                                childSpacing: '8px'
+                                                childSpacing: 8
                                             },
                                             {
                                                 direction: 'vertical'
@@ -449,15 +453,15 @@ const pdfButton = new layout.Button({
                                                                     fontInput,
                                                                     sizeInput
                                                                 ],
-                                                                childSpacing:
-                                                                    '4px'
+                                                                childSpacing: 8
                                                             },
                                                             {
                                                                 direction:
                                                                     'horizontal',
-                                                                grow: 0,
-                                                                shrink: 0,
-                                                                padding: 2
+                                                                grow: false,
+                                                                shrink: false,
+
+                                                                padding: 0
                                                             }
                                                         )
                                                     ]
@@ -466,8 +470,8 @@ const pdfButton = new layout.Button({
                                                     direction: 'horizontal',
                                                     wrap: true,
 
-                                                    grow: 0,
-                                                    shrink: 0
+                                                    grow: false,
+                                                    shrink: false
                                                 }
                                             ),
                                             preview,
@@ -478,19 +482,19 @@ const pdfButton = new layout.Button({
                                                         printButton,
                                                         pdfButton
                                                     ],
-                                                    childSpacing: '8px'
+                                                    childSpacing: 8
                                                 },
                                                 {
                                                     direction: 'horizontal',
-                                                    grow: 0,
-                                                    shrink: 0,
+                                                    grow: false,
+                                                    shrink: false,
                                                     align: 'end',
 
                                                     padding: 0
                                                 }
                                             )
                                         ],
-                                        childSpacing: '8px'
+                                        childSpacing: 8
                                     },
                                     {
                                         direction: 'vertical'
@@ -498,7 +502,7 @@ const pdfButton = new layout.Button({
                                 )
                             ],
 
-                            minWidth: 222,
+                            minWidth: 228,
                             size: 60
                         })
                     ],

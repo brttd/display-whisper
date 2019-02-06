@@ -111,7 +111,7 @@ const sectionsBar = new layout.Block({
         updateSectionsButton
     ],
 
-    childSpacing: '8px'
+    childSpacing: 8
 })
 
 const displayEditor = new layout.DisplayEdit({})
@@ -155,7 +155,7 @@ backgroundControl.connect(displayEditor)
     })
     layout.change(fitTextButton, {
         align: 'end',
-        margin: '4px'
+        margin: 4
     })
     layout.change(showSectionOverlay, {
         align: 'center'
@@ -169,8 +169,8 @@ backgroundControl.connect(displayEditor)
 
         size: '35px',
 
-        grow: 0,
-        shrink: 0,
+        grow: false,
+        shrink: false,
 
         padding: 0
     })
@@ -185,7 +185,7 @@ backgroundControl.connect(displayEditor)
     songsBlock.add(
         new layout.Block(
             {
-                childSpacing: '8px',
+                childSpacing: 8,
                 items: [songNameInput, songAuthorInput, songCopyrightInput]
             },
             {
@@ -200,7 +200,7 @@ backgroundControl.connect(displayEditor)
     songsBlock.add(
         new layout.Block(
             {
-                childSpacing: '8px',
+                childSpacing: 8,
                 items: [editButton, saveButton, saveNewButton, reloadButton]
             },
             {
@@ -265,8 +265,7 @@ backgroundControl.connect(displayEditor)
                                                                             templateSelector,
                                                                             applyTemplateButton
                                                                         ],
-                                                                        childSpacing:
-                                                                            '8px'
+                                                                        childSpacing: 8
                                                                     },
                                                                     {
                                                                         direction:
@@ -275,12 +274,12 @@ backgroundControl.connect(displayEditor)
                                                                     }
                                                                 )
                                                             ],
-                                                            childSpacing: '8px'
+                                                            childSpacing: 8
                                                         },
                                                         {
                                                             direction:
                                                                 'vertical',
-                                                            grow: 0,
+                                                            grow: false,
 
                                                             align: 'end',
 
@@ -291,7 +290,7 @@ backgroundControl.connect(displayEditor)
                                             },
                                             {
                                                 direction: 'horizontal',
-                                                padding: '4px'
+                                                padding: 4
                                             }
                                         )
                                     ],
@@ -314,7 +313,7 @@ backgroundControl.connect(displayEditor)
                                                     sectionsBar,
                                                     displayEditor
                                                 ],
-                                                childSpacing: '8px'
+                                                childSpacing: 8
                                             },
                                             {
                                                 direction: 'vertical',
@@ -353,7 +352,7 @@ backgroundControl.connect(displayEditor)
                                     applyButton,
                                     cancelButton
                                 ],
-                                childSpacing: '8px'
+                                childSpacing: 8
                             },
                             {
                                 direction: 'horizontal'
