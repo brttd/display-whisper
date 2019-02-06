@@ -283,7 +283,7 @@ let activeIndex = -1
                                                     shrink: false,
                                                     grow: false,
                                                     padding: 4,
-                                                    paddingBottom: '0'
+                                                    paddingBottom: 0
                                                 }
                                             ),
                                             sourceEditor

@@ -12,13 +12,18 @@ let increaseSizeOnFit = true
 
 let itemLocked = false
 
-const sectionEditor = new layout.List({
-    reorderable: true,
-    editButton: true,
-    removeButton: true,
+const sectionEditor = new layout.List(
+    {
+        reorderable: true,
+        editButton: true,
+        removeButton: true,
 
-    addInput: true
-})
+        addInput: true
+    },
+    {
+        border: false
+    }
+)
 
 const templateSelector = new layout.SelectInput({})
 const applyTemplateButton = new layout.Button({
