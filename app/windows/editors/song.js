@@ -22,14 +22,19 @@ layout.window.setSize({
     }
 })
 
-const playOrderEditor = new layout.List({
-    label: 'Play Order',
-    editButton: false,
-    removeButton: true,
-    reorderable: true,
+const playOrderEditor = new layout.List(
+    {
+        label: 'Play Order',
+        editButton: false,
+        removeButton: true,
+        reorderable: true,
 
-    addInput: ["You shouldn't see this!"]
-})
+        addInput: ["You shouldn't see this!"]
+    },
+    {
+        border: false
+    }
+)
 
 const songsBlock = new layout.Block({}, { direction: 'vertical', padding: 0 })
 
@@ -141,12 +146,6 @@ boxControl.connect(endOverlayTextBox)
 backgroundControl.connect(displayEditor)
 
 {
-    layout.change(playOrderEditor, {
-        size: '100%',
-        shrink: 1,
-        grow: 1
-    })
-
     layout.change(maxLines, {
         align: 'center'
     })
@@ -220,17 +219,7 @@ backgroundControl.connect(displayEditor)
                     items: [
                         /* Sections */
                         new layout.LayoutBlock({
-                            items: [
-                                new layout.Block(
-                                    {
-                                        items: [playOrderEditor],
-                                        childSpacing: '4px'
-                                    },
-                                    {
-                                        direction: 'vertical'
-                                    }
-                                )
-                            ],
+                            items: [playOrderEditor],
 
                             size: 20,
                             minWidth: 150,
