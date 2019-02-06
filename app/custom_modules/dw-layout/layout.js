@@ -7675,7 +7675,6 @@ exports.change = addStyles
         A list of text items, can be edited, reordered, removed, and added.
 
         Constructor data:
-            direction ('vertical' || 'horizontal'): The axis in which to show items. 'vertical' by default
             editButton (boolean): Show a edit button to user to allow changes to individual text items. False by default
             removeButton (boolean): Show a remove button to user to allow individual items to be removed. False by default
             reorderable (boolean): Allow the user to drag items to new positions. False by default
@@ -7685,7 +7684,6 @@ exports.change = addStyles
             items (array): List of strings to be added to list
         
         Properties:
-            direction (get/set) (boolean): the axis in which to show items.
             editButton (get/set) (boolean): Show a edit button to user to allow changes to individual text items. False by default
             removeButton (get/set) (boolean): Show a remove button to user to allow individual items to be removed. False by default
             reorderable (get/set) (boolean): Allow the user to drag items to new positions. False by default
@@ -7749,8 +7747,6 @@ exports.change = addStyles
             this.node.append(this.addNode)
 
             this.options = {
-                direction: 'vertical',
-
                 editButton: false,
                 removeButton: false,
                 reorderable: false,
@@ -7768,7 +7764,6 @@ exports.change = addStyles
 
             this._selected = []
 
-            this.direction = data.direction
             this.editButton = data.editButton
             this.removeButton = data.removeButton
             this.reorderable = data.reorderable
@@ -7966,17 +7961,6 @@ exports.change = addStyles
             }
 
             this.addSelectInput.disabled = this.addTextInput.disabled = disabled
-        }
-
-        get direction() {
-            return this.options.direction
-        }
-        set direction(direction) {
-            if (direction === 'vertical' || direction === 'horizontal') {
-                this.options.direction = direction
-            }
-
-            addStyles(this, { direction: this.options.direction })
         }
 
         get editButton() {

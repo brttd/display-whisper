@@ -1139,6 +1139,8 @@ $img-max-width: 10em;
     display: inline-flex;
     overflow: hidden;
 
+    flex-direction: column;
+
     padding: 0;
 
     border-radius: 0px;
