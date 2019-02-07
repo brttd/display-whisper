@@ -2792,6 +2792,20 @@ exports.change = addStyles
 
     let inputAutoFocusSkipClasses = [exports.Filler, exports.Text]
 
+    function enableOnFocus(item, list) {
+        item.onEvent('focus', () => {
+            for (let i = 0; i < list.length; i++) {
+                layout.menu.change(list[i][0], list[i][1], { enabled: true })
+            }
+        })
+        item.onEvent('blur', () => {
+            for (let i = 0; i < list.length; i++) {
+                layout.menu.change(list[i][0], list[i][1], { enabled: false })
+            }
+        })
+    }
+
+    //TODO: remove this class, only two inputs extend it
     class InputItem extends focusItem {
         /*
         Used as wrapper for input items
@@ -2833,6 +2847,13 @@ exports.change = addStyles
             addStyles(this, styles)
 
             this.autoFocusNext = false
+
+            enableOnFocus(this, [
+                ['edit', 'cut'],
+                ['edit', 'copy'],
+                ['edit', 'paste'],
+                ['edit', 'selectAll']
+            ])
 
             this.inputNode.addEventListener('focus', () => {
                 this._focused = true
@@ -3606,6 +3627,14 @@ exports.change = addStyles
                 this.inputNode.value = data.value
             }
 
+            enableOnFocus(
+                this,
+                ['edit', 'cut'],
+                ['edit', 'copy'],
+                ['edit', 'paste'],
+                ['edit', 'selectAll']
+            )
+
             this.inputNode.addEventListener('focus', () => {
                 this._focused = true
 
@@ -3970,6 +3999,13 @@ exports.change = addStyles
             )
 
             this.value = data.value
+
+            enableOnFocus(this, [
+                ['edit', 'cut'],
+                ['edit', 'copy'],
+                ['edit', 'paste'],
+                ['edit', 'selectAll']
+            ])
 
             this.inputNode.addEventListener('focus', () => {
                 this._focused = true
@@ -6788,6 +6824,27 @@ exports.change = addStyles
             this.disabled = data.disabled
 
             setupRichTextContextMenu()
+
+            enableOnFocus(this, [
+                ['edit', 'cut'],
+                ['edit', 'copy'],
+                ['edit', 'paste'],
+                ['edit', 'selectAll'],
+                ['edit', 'font'],
+                ['font', 'bold'],
+                ['font', 'italic'],
+                ['font', 'underline'],
+                ['font', 'strikethrough'],
+                ['font', 'subscript'],
+                ['font', 'superscript'],
+                ['font', 'removeFormat']
+            ])
+
+            layout.menu.onEvent('font', event => {
+                if (this._focused) {
+                    this.textEdit(event.value)
+                }
+            })
 
             this.node.addEventListener('click', () => {
                 if (this.textNode) {
@@ -15589,11 +15646,23 @@ class BoxEdit {
                 return false
             }
 
+            if (typeof item.window === 'string') {
+                exports.window.openWindow(item.window)
+
+                return
+            }
+
+            if (typeof item.sendMessage === 'string') {
+                ipcRenderer.send('menu-accelerator', item.sendMessage)
+
+                return
+            }
+
             let eventName = item.parentItem.toLowerCase()
 
             if (Array.isArray(listeners[eventName])) {
                 for (let i = 0; i < listeners[eventName].length; i++) {
-                    listeners[eventName][i](item.message)
+                    listeners[eventName][i](item.value)
                 }
             }
         }
@@ -15605,7 +15674,7 @@ class BoxEdit {
                 if (
                     acceleratorItems[i].parentItem.toLowerCase() ===
                         label.toLowerCase() &&
-                    (acceleratorItems[i].message.toLowerCase() ===
+                    (acceleratorItems[i].value.toLowerCase() ===
                         item.toLowerCase() ||
                         acceleratorItems[i].label === item.toLowerCase())
                 ) {
@@ -15631,12 +15700,12 @@ class BoxEdit {
             listeners[eventName].push(listener)
         }
 
-        ipcRenderer.on('menu', (event, eventName, value) => {
-            eventName = eventName.toLowerCase()
+        ipcRenderer.on('menu', (event, item) => {
+            let eventName = (item.parentItem || '').toLowerCase()
 
             if (Array.isArray(listeners[eventName])) {
                 for (let i = 0; i < listeners[eventName].length; i++) {
-                    listeners[eventName][i](value)
+                    listeners[eventName][i](item)
                 }
             }
         })
