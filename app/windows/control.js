@@ -3211,7 +3211,7 @@ const item_add = {
                 value: 'add-end'
             },
             {
-                label: 'Edit in Library',
+                label: 'Edit in Library...',
                 value: 'edit'
             }
         ])
@@ -4551,15 +4551,15 @@ layout.contextMenu.add(
     'library',
     [
         {
-            label: 'Open Image Library',
+            label: 'Open Image Library...',
             window: 'imageDatabase'
         },
         {
-            label: 'Open Song Library',
+            label: 'Open Song Library...',
             window: 'songDatabase'
         },
         {
-            label: 'Open Template Editor',
+            label: 'Open Template Editor...',
             window: 'templateEditor'
         }
     ],
