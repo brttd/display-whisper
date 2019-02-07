@@ -15,16 +15,11 @@ REQUIRED:
 
     FontInput item: Drop down list lags, change so that DOM only contains rows that are visible in scroll position.
     
-    Control window:
-        Add context menu actions for all items (displays, playlist editor, etc)
-    
     Settings "keys": Allow multiple keyboard shortcuts for actions
 
     Installers - Windows & Mac
 
 REQUIRED - long term:
-    Layout: context menu for all items.
-
     Create single source for interface text (file, instead of hard coded strings), allowing for translation + Win/Mac differences
         change keyboard shortcut display based on language, win/mac, keyboard, etc..
         (Including stuff like ⌘)
