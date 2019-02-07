@@ -343,37 +343,6 @@
                     "default": "Alt+Shift+Digit3"
                 }
             }
-        },
-        "control": {
-            "description": "Presentation Keyboard Shortcuts",
-            "map": "control.keyboard",
-
-            "entries": {
-                "newPlaylist": {
-                    "description": "New Presentation",
-                    "type": "key",
-
-                    "default": "Control+KeyN"
-                },
-                "openPlaylist": {
-                    "description": "Open Presentation",
-                    "type": "key",
-
-                    "default": "Control+KeyO"
-                },
-                "savePlaylist": {
-                    "description": "Save Presentation",
-                    "type": "key",
-
-                    "default": "Control+KeyS"
-                },
-                "savePlaylistAs": {
-                    "description": "Save Presentation As",
-                    "type": "key",
-
-                    "default": "Control+Shift+KeyS"
-                }
-            }
         }
     },
     "display": {
