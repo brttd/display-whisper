@@ -2264,7 +2264,6 @@ const item_menu = {
 let displaying = false
 {
     let displayScreen = -1
-    let screenCount = 0
 
     const toggleDisplayButton = new layout.Button({
         icon: 'display',
@@ -2297,28 +2296,32 @@ let displaying = false
     item_menu.main.add(new layout.Filler())
     item_menu.main.add(fitTextAllButton)
 
-    layout.contextMenu.add('display-menu', [
-        {
-            label: 'Display',
-            type: 'checkbox'
-        },
-        {
-            label: 'Screen 1',
-            type: 'checkbox'
-        },
-        {
-            label: 'Screen 2',
-            type: 'checkbox'
-        },
-        {
-            label: 'Screen 3',
-            type: 'checkbox'
-        },
-        {
-            label: 'Screen 4',
-            type: 'checkbox'
-        }
-    ])
+    layout.contextMenu.add(
+        'display-menu',
+        [
+            {
+                label: 'Display',
+                type: 'checkbox'
+            },
+            {
+                label: 'Screen 1',
+                type: 'checkbox'
+            },
+            {
+                label: 'Screen 2',
+                type: 'checkbox'
+            },
+            {
+                label: 'Screen 3',
+                type: 'checkbox'
+            },
+            {
+                label: 'Screen 4',
+                type: 'checkbox'
+            }
+        ],
+        true
+    )
 
     function toggleDisplay() {
         displaying = !displaying
@@ -2345,31 +2348,6 @@ let displaying = false
     toggleDisplayButton.onEvent('click', toggleDisplay)
 
     fitTextAllButton.onEvent('click', playlist.fitTextAll)
-
-    item_menu.main.onEvent('contextmenu', () => {
-        layout.contextMenu.change('display-menu', [
-            {
-                checked: displaying
-            },
-            {
-                checked: displayScreen === 0,
-                visible: screenCount >= 1
-            },
-            {
-                checked: displayScreen === 1,
-                visible: screenCount >= 2
-            },
-            {
-                checked: displayScreen === 2,
-                visible: screenCount >= 3
-            },
-            {
-                checked: displayScreen === 3,
-                visible: screenCount >= 4
-            }
-        ])
-        layout.contextMenu.enable('display-menu')
-    })
 
     layout.contextMenu.onEvent('display-menu', event => {
         if (event.label === 'Display') {
@@ -2402,8 +2380,6 @@ let displaying = false
             }
         }
 
-        screenCount = display.screenCount
-
         //the first time the 'display-info' message is sent, displayScreen == -1
         if (displayScreen >= 0 && displayScreen < screenButtons.length) {
             screenButtons[displayScreen].active = false
@@ -2413,6 +2389,28 @@ let displaying = false
         screenButtons[displayScreen].active = true
 
         toggleDisplayButton.active = displaying = display.show
+
+        layout.contextMenu.change('display-menu', [
+            {
+                checked: displaying
+            },
+            {
+                checked: displayScreen === 0,
+                visible: display.screenCount >= 1
+            },
+            {
+                checked: displayScreen === 1,
+                visible: display.screenCount >= 2
+            },
+            {
+                checked: displayScreen === 2,
+                visible: display.screenCount >= 3
+            },
+            {
+                checked: displayScreen === 3,
+                visible: display.screenCount >= 4
+            }
+        ])
 
         if (displaying) {
             blankButton.disabled = false
