@@ -1901,31 +1901,8 @@ const playlist = {}
 
     //Settings, and keyboard shortcuts
     {
-        let shortcutFunctions = {
-            'control.keyboard.newPlaylist': fileNewPlaylist,
-            'control.keyboard.openPlaylist': fileOpenPlaylist,
-            'control.keyboard.savePlaylist': fileSavePlaylist,
-            'control.keyboard.savePlaylistAs': fileSavePlaylistAs
-        }
-
-        let keyboardListenerIDs = {}
-
         ipcRenderer.on('setting', (event, key, value) => {
-            if (shortcutFunctions.hasOwnProperty(key)) {
-                if (keyboardListenerIDs[key]) {
-                    keyboard.unregister(keyboardListenerIDs[key])
-                }
-
-                keyboardListenerIDs[key] = keyboard.register(
-                    value,
-                    shortcutFunctions[key],
-                    {
-                        repeat: false
-                    }
-                )
-
-                return
-            } else if (key.startsWith('defaults.')) {
+            if (key.startsWith('defaults.')) {
                 defaultDisplay[key.slice(9)] = value
 
                 return
@@ -2061,23 +2038,18 @@ const playlist = {}
 
             ['general.autoSaveInterval', 30],
 
-            ['general.removeHistoryCount', 3],
-
-            ['control.keyboard.newPlaylist', 'Control+KeyN'],
-            ['control.keyboard.openPlaylist', 'Control+KeyO'],
-            ['control.keyboard.savePlaylist', 'Control+KeyS'],
-            ['control.keyboard.savePlaylistAs', 'Control+Shift+KeyS']
+            ['general.removeHistoryCount', 3]
         ])
     }
 
     layout.menu.onEvent('file', item => {
-        if (item === 'new') {
+        if (item.value === 'new') {
             fileNewPlaylist()
-        } else if (item === 'open') {
+        } else if (item.value === 'open') {
             fileOpenPlaylist()
-        } else if (item === 'save-as') {
+        } else if (item.value === 'save-as') {
             fileSavePlaylistAs()
-        } else if (item === 'save') {
+        } else if (item.value === 'save') {
             fileSavePlaylist()
         }
     })
