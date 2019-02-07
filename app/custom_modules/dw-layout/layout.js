@@ -15511,6 +15511,40 @@ class BoxEdit {
             }
         }
 
+        //When the context menu event has bubbled up fully
+        function onEventFinish() {
+            if (enabled.length > 0 || globalEnabled.length > 0) {
+                let allContexts = enabled.concat(globalEnabled)
+
+                let menuId = allContexts.join('|')
+
+                //If there isn't a pre-built menu, build one
+                if (!builtMenus[menuId]) {
+                    builtMenus[menuId] = new Menu()
+
+                    for (let i = 0; i < allContexts.length; i++) {
+                        if (i !== 0) {
+                            builtMenus[menuId].append(
+                                new MenuItem({ type: 'separator' })
+                            )
+                        }
+
+                        for (
+                            let j = 0;
+                            j < menuItems[allContexts[i]].length;
+                            j++
+                        ) {
+                            builtMenus[menuId].append(
+                                menuItems[allContexts[i]][j]
+                            )
+                        }
+                    }
+                }
+
+                builtMenus[menuId].popup({ window: thisWin })
+            }
+        }
+
         exports.contextMenu.add = (context, items, global = false) => {
             if (typeof context !== 'string' || typeof items !== 'object' || items === null) {
                 return false
@@ -15575,6 +15609,19 @@ class BoxEdit {
             }
 
             listeners[context].push(listener)
+        }
+
+        exports.contextMenu.captureIframe = iframe => {
+            iframe.contentWindow.addEventListener(
+                'contextmenu',
+                () => {
+                    enabled = []
+                },
+                {
+                    capture: true
+                }
+            )
+            iframe.contentWindow.addEventListener('contextmenu', onEventFinish)
         }
 
         //Default Menu
