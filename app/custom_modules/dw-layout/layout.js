@@ -6659,8 +6659,9 @@ exports.change = addStyles
         'italic',
         'underline',
         'strikethrough',
+        'superscript',
         'subscript',
-        'superscript'
+        'removeFormat'
     ]
 
     let activeRichTextContextMenu = false
@@ -6674,13 +6675,45 @@ exports.change = addStyles
 
         exports.contextMenu.add(
             'rich-text',
-            richTextCommands.map(commandName => {
-                return {
-                    label: commandName[0].toUpperCase() + commandName.slice(1),
+            [
+                {
+                    label: 'Bold',
                     type: 'checkbox',
-                    value: commandName
-                }
-            })
+                    value: 'bold'
+                },
+                {
+                    label: 'Italic',
+                    type: 'checkbox',
+                    value: 'italic'
+                },
+                {
+                    label: 'Underline',
+                    type: 'checkbox',
+                    value: 'underline'
+                },
+                {
+                    label: 'Strikethrough',
+                    type: 'checkbox',
+                    value: 'strikethrough'
+                },
+                {
+                    label: 'Superscript',
+                    type: 'checkbox',
+                    value: 'superscript'
+                },
+                {
+                    label: 'Subscript',
+                    type: 'checkbox',
+                    value: 'subscript'
+                },
+                {
+                    type: 'separator'
+                },
+                {
+                    label: 'Remove Formatting',
+                    value: 'removeFormat'
+                },
+            ]
         )
         exports.contextMenu.onEvent('rich-text', event => {
             if (activeRichTextContextMenu) {
