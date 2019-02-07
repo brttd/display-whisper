@@ -13016,14 +13016,17 @@ class BoxEdit {
 
         exports.contextMenu.add('playlist-item', [
             {
-                label: 'Edit'
+                label: 'Edit...',
+                value: 'edit'
             },
             {
-                label: 'Remove'
+                label: 'Remove',
+                value: 'remove'
             },
             {
                 label: 'Minimize',
-                type: 'checkbox'
+                type: 'checkbox',
+                value: 'toggle-minimize'
             }
         ])
 
@@ -13032,7 +13035,7 @@ class BoxEdit {
                 return false
             }
 
-            if (event.label === 'Edit') {
+            if (event.value === 'edit') {
                 sendEventTo(
                     {
                         fromUser: true,
@@ -13040,7 +13043,7 @@ class BoxEdit {
                     },
                     activePlaylistItemContextMenu.events['edit-click']
                 )
-            } else if (event.label === 'Remove') {
+            } else if (event.value === 'remove') {
                 sendEventTo(
                     {
                         fromUser: true,
@@ -13048,7 +13051,7 @@ class BoxEdit {
                     },
                     activePlaylistItemContextMenu.events['remove-click']
                 )
-            } else if (event.label === 'Minimize') {
+            } else if (event.value === 'toggle-minimize') {
                 if (activePlaylistItemContextMenu.minimized) {
                     activePlaylistItemContextMenu.expand()
                 } else {
