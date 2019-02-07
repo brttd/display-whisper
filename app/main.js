@@ -1548,6 +1548,10 @@ const appMenu = new Menu()
     }
 
     function updateMenuToWindow(win) {
+        if (!win) {
+            return false
+        }
+
         if (typeof win.menuChanges !== 'object') {
             win.menuChanges = {}
         }
@@ -1581,6 +1585,10 @@ const appMenu = new Menu()
     }
 
     function modifyWindowItem(win, itemID, changes) {
+        if (!win) {
+            return false
+        }
+
         if (typeof win.menuChanges !== 'object') {
             win.menuChanges = {}
         }
