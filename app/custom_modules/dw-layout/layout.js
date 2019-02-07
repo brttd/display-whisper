@@ -2852,7 +2852,10 @@ exports.change = addStyles
                 this._codeFocused = false
             })
 
-            this.inputNode.addEventListener('contextmenu', exports.contextMenu.enable.bind(null, 'edit'))
+            this.inputNode.addEventListener(
+                'contextmenu',
+                exports.contextMenu.enable.bind(null, 'edit')
+            )
 
             this.inputNode.addEventListener('blur', () => {
                 this._focused = false
@@ -3315,6 +3318,11 @@ exports.change = addStyles
                 this.onEvent('change', data.onChange)
             }
 
+            this.inputNode.addEventListener(
+                'contextmenu',
+                exports.contextMenu.disable.bind(null, 'edit')
+            )
+
             this._oldValue = this.inputNode.checked
 
             this.inputNode.addEventListener('change', () => {
@@ -3615,7 +3623,10 @@ exports.change = addStyles
                 this._codeFocused = false
             })
 
-            this.inputNode.addEventListener('contextmenu', exports.contextMenu.enable.bind(null, 'edit'))
+            this.inputNode.addEventListener(
+                'contextmenu',
+                exports.contextMenu.enable.bind(null, 'edit')
+            )
 
             this.inputNode.addEventListener('blur', () => {
                 this._focused = false
@@ -3983,7 +3994,10 @@ exports.change = addStyles
                 this._codeFocused = false
             })
 
-            this.inputNode.addEventListener('contextmenu', exports.contextMenu.enable.bind(null, 'edit'))
+            this.inputNode.addEventListener(
+                'contextmenu',
+                exports.contextMenu.enable.bind(null, 'edit')
+            )
 
             this.inputNode.addEventListener('input', () => {
                 this._value = round(
@@ -6622,6 +6636,32 @@ exports.change = addStyles
         'superscript'
     ]
 
+    let activeRichTextContextMenu = false
+
+    function setupRichTextContextMenu() {
+        if (activeRichTextContextMenu !== false) {
+            return false
+        }
+
+        activeRichTextContextMenu = null
+
+        exports.contextMenu.add(
+            'rich-text',
+            richTextCommands.map(commandName => {
+                return {
+                    label: commandName[0].toUpperCase() + commandName.slice(1),
+                    type: 'checkbox',
+                    value: commandName
+                }
+            })
+        )
+        exports.contextMenu.onEvent('rich-text', event => {
+            if (activeRichTextContextMenu) {
+                activeRichTextContextMenu.textEdit(event.value)
+            }
+        })
+    }
+
     //TODO: this code is a bit of a mess, needs to be reviewed
     class RichTextInput extends focusItem {
         /*
@@ -6756,6 +6796,8 @@ exports.change = addStyles
 
             this.disabled = data.disabled
 
+            setupRichTextContextMenu()
+
             this.node.addEventListener('click', () => {
                 if (this.textNode) {
                     this._codeFocused = false
@@ -6864,6 +6906,8 @@ exports.change = addStyles
                     from: this
                 }
 
+                let contextMenuChanges = []
+
                 for (let i = 0; i < richTextCommands.length; i++) {
                     event[richTextCommands[i]] = {
                         state: this.textDocument.queryCommandState(
@@ -6873,9 +6917,15 @@ exports.change = addStyles
                             richTextCommands[i]
                         )
                     }
+
+                    contextMenuChanges.push({
+                        checked: event[richTextCommands[i]].state
+                    })
                 }
 
                 sendEventTo(event, this.events['select-change'])
+
+                exports.contextMenu.change('rich-text', contextMenuChanges)
             })
 
             this.textNode.addEventListener('focus', () => {
@@ -6901,6 +6951,21 @@ exports.change = addStyles
                 )
 
                 this._codeFocused = false
+            })
+
+            this.container.addEventListener('contextmenu', () => {
+                activeRichTextContextMenu = this
+
+                exports.contextMenu.enable('rich-text')
+                exports.contextMenu.enable('edit')
+
+                sendEventTo(
+                    {
+                        fromUser: true,
+                        from: this
+                    },
+                    this.events.contextmenu
+                )
             })
 
             //When the container is clicked, .textNode is focused anyway
@@ -6933,6 +6998,8 @@ exports.change = addStyles
                     event.preventDefault()
                 }
             })
+
+            exports.contextMenu.captureIframe(this.iframe)
         }
         _onIframeUnload() {
             this.textDocument = null
@@ -7498,6 +7565,12 @@ exports.change = addStyles
                     },
                     this.events.remove
                 )
+            })
+
+            this.textNode.addEventListener('contextmenu', () => {
+                if (!this.textNode.disabled) {
+                    exports.contextMenu.enable('edit')
+                }
             })
 
             //send a drag event when the user moves the mouse outside the element, after clicking down on it
@@ -10558,6 +10631,8 @@ exports.change = addStyles
 
 //Display items
 
+const positionPrecision = 1
+
 let boxHitSize = 7
 let cursorNames = {
     '': '',
@@ -10573,7 +10648,45 @@ let cursorNames = {
     m: 'move'
 }
 
-const positionPrecision = 1
+let activeBoxEditContextMenu = false
+
+function setupBoxEditContextMenu() {
+    if (activeBoxEditContextMenu !== false) {
+        return false
+    }
+
+    activeBoxEditContextMenu = null
+
+    exports.contextMenu.add('box-edit', [
+        {
+            label: 'Center'
+        }
+    ])
+
+    exports.contextMenu.onEvent('box-edit', event => {
+        if (activeBoxEditContextMenu) {
+            if (event.label === 'Center') {
+                let width =
+                    activeBoxEditContextMenu.values.right -
+                    activeBoxEditContextMenu.left
+                let height =
+                    activeBoxEditContextMenu.values.bottom -
+                    activeBoxEditContextMenu.top
+
+                activeBoxEditContextMenu.edit(
+                    {
+                        top: 50 - height / 2,
+                        left: 50 - width / 2,
+                        right: 50 + width / 2,
+                        bottom: 50 + height / 2
+                    },
+                    true
+                )
+            }
+        }
+    })
+}
+
 class BoxEdit {
     /*
     Wrapper class for display edit items, handles position/size (does not extend base item class).
@@ -10648,6 +10761,14 @@ class BoxEdit {
         this.mouseOffset = { x: 0, y: 0 }
 
         bindFunctions(this, this.updatePosition)
+
+        setupBoxEditContextMenu()
+
+        this.node.addEventListener('contextmenu', () => {
+            activeBoxEditContextMenu = this
+
+            exports.contextMenu.enable('box-edit')
+        })
 
         this.node.addEventListener('mousedown', () => {
             if (!this.parent) {
@@ -11673,6 +11794,12 @@ class BoxEdit {
 
             this.text.onEvent('focus', event => {
                 this.focus(event.fromUser)
+            })
+
+            this.text.onEvent('contextmenu', () => {
+                activeBoxEditContextMenu = this
+
+                exports.contextMenu.enable('box-edit')
             })
 
             this.set(data)
@@ -12823,6 +12950,59 @@ class BoxEdit {
 {
     loadCSS('special.css')
 
+    let activePlaylistItemContextMenu = false
+
+    function setupPlaylistItemContextMenu() {
+        if (activePlaylistItemContextMenu !== false) {
+            return false
+        }
+
+        activePlaylistItemContextMenu = null
+
+        exports.contextMenu.add('playlist-item', [
+            {
+                label: 'Edit'
+            },
+            {
+                label: 'Remove'
+            },
+            {
+                label: 'Minimize',
+                type: 'checkbox'
+            }
+        ])
+
+        exports.contextMenu.onEvent('playlist-item', event => {
+            if (!activePlaylistItemContextMenu) {
+                return false
+            }
+
+            if (event.label === 'Edit') {
+                sendEventTo(
+                    {
+                        fromUser: true,
+                        from: activePlaylistItemContextMenu
+                    },
+                    activePlaylistItemContextMenu.events['edit-click']
+                )
+            } else if (event.label === 'Remove') {
+                sendEventTo(
+                    {
+                        fromUser: true,
+                        from: activePlaylistItemContextMenu
+                    },
+                    activePlaylistItemContextMenu.events['remove-click']
+                )
+            } else if (event.label === 'Minimize') {
+                if (activePlaylistItemContextMenu.minimized) {
+                    activePlaylistItemContextMenu.expand()
+                } else {
+                    activePlaylistItemContextMenu.minimize()
+                }
+            }
+        })
+    }
+
     class PlaylistItem extends Item {
         /*
         A block, for a whole item in the playlist.
@@ -13050,6 +13230,21 @@ class BoxEdit {
                 if (this.minimized) {
                     this.minimize()
                 }
+            })
+
+            setupPlaylistItemContextMenu()
+
+            this.node.addEventListener('contextmenu', () => {
+                activePlaylistItemContextMenu = this
+
+                exports.contextMenu.change('playlist-item', [
+                    {},
+                    {},
+                    {
+                        checked: this.minimized
+                    }
+                ])
+                exports.contextMenu.enable('playlist-item')
             })
         }
 
