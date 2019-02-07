@@ -15546,7 +15546,11 @@ class BoxEdit {
         }
 
         exports.contextMenu.add = (context, items, global = false) => {
-            if (typeof context !== 'string' || typeof items !== 'object' || items === null) {
+            if (
+                typeof context !== 'string' ||
+                typeof items !== 'object' ||
+                items === null
+            ) {
                 return false
             }
 
@@ -15569,7 +15573,11 @@ class BoxEdit {
             }
         }
         exports.contextMenu.change = (context, changes) => {
-            if (typeof context !== 'string' || typeof items !== 'object' || items === null) {
+            if (
+                typeof context !== 'string' ||
+                typeof items !== 'object' ||
+                items === null
+            ) {
                 return false
             }
 
@@ -15581,7 +15589,11 @@ class BoxEdit {
                 return false
             }
 
-            for (let i = 0; i < menuItems[context].length && i < changes.length; i++) {
+            for (
+                let i = 0;
+                i < menuItems[context].length && i < changes.length;
+                i++
+            ) {
                 if (typeof changes[i].checked === 'boolean') {
                     menuItems[context][i].checked = changes[i].checked
                 }
@@ -15593,9 +15605,19 @@ class BoxEdit {
                 }
             }
         }
-        exports.contextMenu.enable = (context) => {
-            if (Array.isArray(menuItems[context]) && !globalEnabled.includes(context)) {
+        exports.contextMenu.enable = context => {
+            if (
+                Array.isArray(menuItems[context]) &&
+                !globalEnabled.includes(context)
+            ) {
                 enabled.push(context)
+            }
+        }
+        exports.contextMenu.disable = context => {
+            let index = enabled.indexOf(context)
+
+            if (index !== -1) {
+                enabled.splice(index, 1)
             }
         }
 
@@ -15641,7 +15663,7 @@ class BoxEdit {
             {
                 role: 'selectAll',
                 value: 'selectAll'
-            },
+            }
         ])
 
         body.onEvent('input-focused', () => {
@@ -15649,36 +15671,17 @@ class BoxEdit {
         })
 
         //Before bubbling
-        window.addEventListener('contextmenu', () => {
-            enabled = []
-        }, {
-            capture: true
-        })
-        //After bubbling
-        window.addEventListener('contextmenu', () => {
-            if (enabled.length > 0 || globalEnabled.length > 0) {
-                let allContexts = enabled.concat(globalEnabled)
-
-                let menuId = allContexts.join('|')
-
-                //If there isn't a pre-built menu, build one
-                if (!builtMenus[menuId]) {
-                    builtMenus[menuId] = new Menu()
-
-                    for (let i = 0; i < allContexts.length; i++) {
-                        if (i !== 0) {
-                            builtMenus[menuId].append(new MenuItem({type: 'separator'}))
-                        }
-
-                        for (let j = 0; j < menuItems[allContexts[i]].length; j++) {
-                            builtMenus[menuId].append(menuItems[allContexts[i]][j])
-                        }
-                    }
-                }
-
-                builtMenus[menuId].popup({window: thisWin})
+        window.addEventListener(
+            'contextmenu',
+            () => {
+                enabled = []
+            },
+            {
+                capture: true
             }
-        })
+        )
+        //After bubbling
+        window.addEventListener('contextmenu', onEventFinish)
     }
 }
 
