@@ -6556,15 +6556,6 @@ exports.change = addStyles
     }
     exports.ImageInput = items.ImageInput = ImageInput
 
-    let basicTextCommands = [
-        'bold',
-        'italic',
-        'underline',
-        'strikethrough',
-        'subscript',
-        'superscript'
-    ]
-
     let richTextIframeStyles = `
     html {
         overflow: hidden;
@@ -7364,7 +7355,7 @@ exports.change = addStyles
 
         textEdit(command, arg, fromUser = false) {
             if (this.textNode) {
-                if (basicTextCommands.includes(command)) {
+                if (richTextCommands.includes(command)) {
                     this.textDocument.execCommand(command, false, null)
 
                     this._onTextNodeChange(fromUser)
@@ -10604,7 +10595,7 @@ exports.change = addStyles
     itemStylesMap.PlayStyleEdit = {
         margin: (item, value) => {
             value = mapToPx(value)
-            
+
             item.playBlock.style.margin = item.transitionBlock.style.margin =
                 '0'
 
@@ -10998,7 +10989,6 @@ class BoxEdit {
 
         sendEventTo(
             {
-                //TODO: only include values which changed
                 top: this.values.top,
                 left: this.values.left,
                 right: this.values.right,
@@ -11013,10 +11003,18 @@ class BoxEdit {
 
     getMouseDirections(mouse) {
         //Multiple the top/left/right/bottom percentage values by the actual parent box size, to get the absolute pixel positions
-        mouse.top = Math.round(mouse.y - (this.values.top / 100) * this.parent.client.height)
-        mouse.left = Math.round(mouse.x - (this.values.left / 100) * this.parent.client.width)
-        mouse.right = Math.round(mouse.x - (this.values.right / 100) * this.parent.client.width)
-        mouse.bottom = Math.round(mouse.y - (this.values.bottom / 100) * this.parent.client.height)
+        mouse.top = Math.round(
+            mouse.y - (this.values.top / 100) * this.parent.client.height
+        )
+        mouse.left = Math.round(
+            mouse.x - (this.values.left / 100) * this.parent.client.width
+        )
+        mouse.right = Math.round(
+            mouse.x - (this.values.right / 100) * this.parent.client.width
+        )
+        mouse.bottom = Math.round(
+            mouse.y - (this.values.bottom / 100) * this.parent.client.height
+        )
 
         let directions = ''
 
