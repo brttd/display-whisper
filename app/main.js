@@ -1689,6 +1689,8 @@ const appMenu = new Menu()
                         label: 'Preferences...',
                         window: 'preferences',
 
+                        accelerator: 'CmdOrCtrl+,',
+
                         static: true
                     },
                     //On MacOS the menu should also include a 'Quit' option
@@ -1697,13 +1699,15 @@ const appMenu = new Menu()
                               type: 'separator'
                           },
                           {
-                              label: 'Quit',
+                              label: 'Quit Display Whisper',
 
                               function: () => {
                                   if (windows.control) {
                                       windows.control.close()
                                   }
                               },
+
+                              accelerator: 'CmdOrCtrl+Q',
 
                               static: true
                           })
@@ -1714,22 +1718,29 @@ const appMenu = new Menu()
         file: new MenuItem(
             cleanItem({
                 label: 'File',
-                context: 'file',
 
                 submenu: [
                     {
                         label: 'New Presentation',
 
-                        sendTo: 'control',
-                        message: 'new',
+                        function: sendToControlWindow.bind(null, 'menu', {
+                            parentItem: 'File',
+                            value: 'new'
+                        }),
+
+                        accelerator: 'CmdOrCtrl+N',
 
                         static: true
                     },
                     {
                         label: 'Open Presentation...',
 
-                        sendTo: 'control',
-                        message: 'open',
+                        function: sendToControlWindow.bind(null, 'menu', {
+                            parentItem: 'File',
+                            value: 'open'
+                        }),
+
+                        accelerator: 'CmdOrCtrl+O',
 
                         static: true
                     },
@@ -1739,16 +1750,24 @@ const appMenu = new Menu()
                     {
                         label: 'Save',
 
-                        sendTo: 'control',
-                        message: 'save',
+                        function: sendToControlWindow.bind(null, 'menu', {
+                            parentItem: 'File',
+                            value: 'save'
+                        }),
+
+                        accelerator: 'CmdOrCtrl+S',
 
                         static: true
                     },
                     {
                         label: 'Save As...',
 
-                        sendTo: 'control',
-                        message: 'save-as',
+                        function: sendToControlWindow.bind(null, 'menu', {
+                            parentItem: 'File',
+                            value: 'save-as'
+                        }),
+
+                        accelerator: 'CmdOrCtrl+Shift+S',
 
                         static: true
                     }
@@ -1759,15 +1778,13 @@ const appMenu = new Menu()
             cleanItem({
                 label: 'Edit',
 
-                context: 'edit',
-
                 submenu: [
                     {
                         label: 'Undo',
                         accelerator: 'CmdOrCtrl+Z',
 
                         sendTo: 'active',
-                        message: 'undo',
+                        value: 'undo',
 
                         defaults: {
                             enabled: false
@@ -1775,10 +1792,10 @@ const appMenu = new Menu()
                     },
                     {
                         label: 'Redo',
-                        accelerator: 'Shift+CmdOrCtrl+Z',
+                        accelerator: 'CmdOrCtrl+Shift+Z',
 
                         sendTo: 'active',
-                        message: 'redo',
+                        value: 'redo',
 
                         defaults: {
                             enabled: false
@@ -1789,19 +1806,132 @@ const appMenu = new Menu()
                     },
                     {
                         role: 'cut',
-                        sendTo: 'active'
+                        sendTo: 'active',
+                        value: 'cut',
+
+                        defaults: {
+                            enabled: false
+                        }
                     },
                     {
                         role: 'copy',
-                        sendTo: 'active'
+                        sendTo: 'active',
+                        value: 'copy',
+
+                        defaults: {
+                            enabled: false
+                        }
                     },
                     {
                         role: 'paste',
-                        sendTo: 'active'
+                        sendTo: 'active',
+                        value: 'paste',
+
+                        defaults: {
+                            enabled: false
+                        }
                     },
                     {
                         role: 'selectAll',
-                        sendTo: 'active'
+                        sendTo: 'active',
+                        value: 'selectAll',
+
+                        defaults: {
+                            enabled: false
+                        }
+                    },
+                    {
+                        type: 'separator'
+                    },
+                    {
+                        label: 'Font',
+
+                        sendTo: 'active',
+                        value: 'font',
+
+                        defaults: {
+                            enabled: false
+                        },
+
+                        submenu: [
+                            {
+                                label: 'Bold',
+                                accelerator: 'CmdOrCtrl+B',
+
+                                sendTo: 'active',
+                                value: 'bold',
+
+                                defaults: {
+                                    enabled: false
+                                }
+                            },
+                            {
+                                label: 'Italic',
+                                accelerator: 'CmdOrCtrl+I',
+
+                                sendTo: 'active',
+                                value: 'italic',
+
+                                defaults: {
+                                    enabled: false
+                                }
+                            },
+                            {
+                                label: 'Underline',
+                                accelerator: 'CmdOrCtrl+U',
+
+                                sendTo: 'active',
+                                value: 'underline',
+
+                                defaults: {
+                                    enabled: false
+                                }
+                            },
+                            {
+                                label: 'Strikethrough',
+
+                                sendTo: 'active',
+                                value: 'strikethrough',
+
+                                defaults: {
+                                    enabled: false
+                                }
+                            },
+                            {
+                                label: 'Superscript',
+
+                                sendTo: 'active',
+                                value: 'superscript',
+
+                                defaults: {
+                                    enabled: false
+                                }
+                            },
+                            {
+                                label: 'Subscript',
+
+                                sendTo: 'active',
+                                value: 'subscript',
+
+                                defaults: {
+                                    enabled: false
+                                }
+                            },
+                            {
+                                type: 'separator'
+                            },
+                            {
+                                label: 'Remove Formatting',
+                                accelerator: 'CmdOrCtrl+Shift+T',
+
+                                sendTo: 'active',
+                                value: 'removeFormat',
+
+                                defaults: {
+                                    enabled: false
+                                }
+                            }
+                        ]
                     }
                 ]
             })
