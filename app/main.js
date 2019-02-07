@@ -1429,6 +1429,10 @@ function checkForUpdate() {
 //Application Menu
 const appMenu = new Menu()
 {
+    const dynamicItems = {}
+    const allAcceleratorItems = []
+    const acceleratorItemFunctions = {}
+
     function onMenuClick(item) {
         if (typeof item.window === 'string') {
             openWindow(item.window)
@@ -1444,38 +1448,30 @@ const appMenu = new Menu()
             return
         }
 
+        let event = {
+            parentItem: item.parentItem,
+
+            label: item.label,
+            value: item.value
+        }
+
         if (item.sendTo === 'active') {
             let activeWindow = BrowserWindow.getFocusedWindow()
 
             if (activeWindow) {
-                if (Array.isArray(item.message)) {
-                    activeWindow.webContents.send(
-                        'menu',
-                        item.parentItem,
-                        ...item.message
-                    )
+                if (Array.isArray(item.value)) {
+                    activeWindow.webContents.send('menu', event)
                 } else {
-                    activeWindow.webContents.send(
-                        'menu',
-                        item.parentItem,
-                        item.message
-                    )
+                    activeWindow.webContents.send('menu', event)
                 }
             }
 
             return
         } else {
-            if (Array.isArray(item.message)) {
-                openWindowAndSend(
-                    item.sendTo,
-                    ['menu', item.parentItem].concat(item.message)
-                )
+            if (Array.isArray(item.value)) {
+                openWindowAndSend(item.sendTo, ['menu', event])
             } else {
-                openWindowAndSend(item.sendTo, [
-                    'menu',
-                    item.parentItem,
-                    item.message
-                ])
+                openWindowAndSend(item.sendTo, ['menu', event])
             }
         }
     }
@@ -1533,7 +1529,7 @@ const appMenu = new Menu()
             parentItem: item.parentItem || '',
 
             sendTo: item.sendTo || null,
-            message: item.message || item.label || '',
+            value: item.value || item.label || '',
 
             click: onMenuClick,
             role: item.role,
@@ -1614,8 +1610,59 @@ const appMenu = new Menu()
         }
     }
 
-    const dynamicItems = {}
-    const allAcceleratorItems = []
+    //Populate the dynamicItems object with menu items
+    //Also populate the allAcceleratorItems array
+    function addMenuItemToList(item) {
+        let itemId = item.label.toLowerCase() + '-'
+
+        let toCheck = item.submenu.items
+
+        for (let i = 0; i < toCheck.length; i++) {
+            if (toCheck[i].static !== true) {
+                dynamicItems[
+                    itemId +
+                        (toCheck[i].value || toCheck[i].label).toLowerCase()
+                ] = toCheck[i]
+            }
+
+            if (toCheck[i].accelerator && !toCheck[i].role) {
+                if (typeof toCheck[i].function === 'function') {
+                    let name = toCheck[i].parentItem + '-' + toCheck[i].label
+
+                    acceleratorItemFunctions[name] = toCheck[i].function
+
+                    allAcceleratorItems.push({
+                        parentItem: toCheck[i].parentItem,
+
+                        sendMessage: name,
+
+                        type: toCheck[i].type,
+                        label: toCheck[i].label,
+                        sublabel: toCheck[i].sublabel,
+                        accelerator: toCheck[i].accelerator,
+                        enabled: toCheck[i].enabled
+                    })
+                } else {
+                    allAcceleratorItems.push({
+                        parentItem: toCheck[i].parentItem,
+
+                        window: toCheck[i].window,
+                        value: toCheck[i].value,
+
+                        type: toCheck[i].type,
+                        label: toCheck[i].label,
+                        sublabel: toCheck[i].sublabel,
+                        accelerator: toCheck[i].accelerator,
+                        enabled: toCheck[i].enabled
+                    })
+                }
+            }
+
+            if (toCheck[i].submenu) {
+                addMenuItemToList(toCheck[i])
+            }
+        }
+    }
 
     const items = {
         app: new MenuItem(
@@ -1907,38 +1954,9 @@ const appMenu = new Menu()
         )
     }
 
-    //Populate the dynamicItems object with menu items
-    //Also populate the allAcceleratorItems array
     for (let label in items) {
         if (items.hasOwnProperty(label)) {
-            let itemId = items[label].label.toLowerCase() + '-'
-
-            let toCheck = items[label].submenu.items
-
-            for (let i = 0; i < toCheck.length; i++) {
-                if (toCheck[i].static !== true) {
-                    dynamicItems[
-                        itemId +
-                            (
-                                toCheck[i].message || toCheck[i].label
-                            ).toLowerCase()
-                    ] = toCheck[i]
-                }
-
-                if (toCheck[i].accelerator && !toCheck[i].role) {
-                    allAcceleratorItems.push({
-                        parentItem: toCheck[i].parentItem,
-
-                        message: toCheck[i].message,
-
-                        type: toCheck[i].type,
-                        label: toCheck[i].label,
-                        sublabel: toCheck[i].sublabel,
-                        accelerator: toCheck[i].accelerator,
-                        enabled: toCheck[i].enabled
-                    })
-                }
-            }
+            addMenuItemToList(items[label])
         }
     }
 
@@ -1984,6 +2002,12 @@ const appMenu = new Menu()
                 itemID,
                 itemChanges
             )
+        }
+    })
+
+    ipcMain.on('menu-accelerator', (event, menuItemName) => {
+        if (typeof acceleratorItemFunctions[menuItemName] === 'function') {
+            acceleratorItemFunctions[menuItemName]()
         }
     })
 
