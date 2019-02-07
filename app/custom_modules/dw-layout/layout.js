@@ -9334,15 +9334,6 @@ exports.change = addStyles
                     {}
                 )
                 this.inputItems.push(this.strikethrough)
-                this.subscript = new exports.Button(
-                    {
-                        focus: false,
-                        disabled: true,
-                        icon: 'text-subscript'
-                    },
-                    {}
-                )
-                this.inputItems.push(this.subscript)
                 this.superscript = new exports.Button(
                     {
                         focus: false,
@@ -9352,6 +9343,15 @@ exports.change = addStyles
                     {}
                 )
                 this.inputItems.push(this.superscript)
+                this.subscript = new exports.Button(
+                    {
+                        focus: false,
+                        disabled: true,
+                        icon: 'text-subscript'
+                    },
+                    {}
+                )
+                this.inputItems.push(this.subscript)
 
                 if (data.style !== false) {
                     if (data.bold !== false) {
@@ -9370,12 +9370,12 @@ exports.change = addStyles
                         this.styleBlock.appendChild(this.strikethrough.node)
                     }
 
-                    if (data.subscript !== false) {
-                        this.styleBlock.appendChild(this.subscript.node)
-                    }
-
                     if (data.superscript !== false) {
                         this.styleBlock.appendChild(this.superscript.node)
+                    }
+
+                    if (data.subscript !== false) {
+                        this.styleBlock.appendChild(this.subscript.node)
                     }
                 }
 
@@ -9399,13 +9399,13 @@ exports.change = addStyles
                     'click',
                     this.sendEdit.bind(this, 'strikethrough', true)
                 )
-                this.subscript.onEvent(
-                    'click',
-                    this.sendEdit.bind(this, 'subscript', true)
-                )
                 this.superscript.onEvent(
                     'click',
                     this.sendEdit.bind(this, 'superscript', true)
+                )
+                this.subscript.onEvent(
+                    'click',
+                    this.sendEdit.bind(this, 'subscript', true)
                 )
             }
 
