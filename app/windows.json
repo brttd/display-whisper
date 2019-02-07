@@ -2,8 +2,6 @@
     "about": {
         "title": "About",
 
-        "modal": true,
-
         "width": 600,
         "height": 600,
 
@@ -99,8 +97,6 @@
     "songImport": {
         "title": "Import Songs",
 
-        "modal": true,
-
         "width": 400,
         "height": 350,
 
@@ -108,8 +104,6 @@
     },
     "songExport": {
         "title": "Export Songs",
-
-        "modal": true,
 
         "width": 200,
         "height": 160,
