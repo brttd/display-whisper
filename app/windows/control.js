@@ -224,20 +224,6 @@ const playlist = {}
         return path.basename(filename, '.dpl')
     }
 
-    layout.contextMenu.add('playlist-item', [
-        {
-            label: 'Edit'
-        },
-        {
-            label: 'Remove'
-        },
-        {
-            label: 'Minimize',
-            type: 'checkbox',
-            checked: false
-        }
-    ])
-
     //save functions
     function editHasOccured() {
         lastEditTime = Date.now()
@@ -1135,20 +1121,6 @@ const playlist = {}
         item.onEvent('edit-click', onItemEdit)
         item.onEvent('drag-click', onItemDrag)
         item.onEvent('remove-click', onItemRemove)
-
-        item.onEvent('contextmenu', () => {
-            lastClicked = item
-
-            layout.contextMenu.change('playlist-item', [
-                {},
-                {},
-                {
-                    checked: lastClicked.minimized
-                }
-            ])
-
-            layout.contextMenu.enable('playlist-item')
-        })
     }
     playlist.add = add
 
