@@ -1660,9 +1660,9 @@ editor.onEvent('history', () => {
 })
 
 layout.menu.onEvent('edit', item => {
-    if (item === 'undo') {
+    if (item.value === 'undo') {
         editor.undo()
-    } else if (item === 'redo') {
+    } else if (item.value === 'redo') {
         editor.redo()
     }
 })

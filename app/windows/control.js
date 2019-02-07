@@ -3899,8 +3899,8 @@ const item_control = {
         ipcRenderer.send('display-blank', blankButton.active)
     })
     undoRemoveButton.onEvent('click', playlist.undoRemove)
-    layout.menu.onEvent('edit', label => {
-        if (label === 'undo') {
+    layout.menu.onEvent('edit', item => {
+        if (item.value === 'undo') {
             playlist.undoRemove()
         }
     })
