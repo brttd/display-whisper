@@ -1,4 +1,4 @@
-const ipcRenderer = require('electron').ipcRenderer
+const { ipcRenderer, shell } = require('electron')
 
 const path = require('path')
 const { existsSync } = require('fs')
@@ -4736,3 +4736,19 @@ const interfaceItems = {
 
     ipcRenderer.send('get-setting', 'firstOpen', true)
 }
+
+ipcRenderer.on('update-available', (event, version) => {
+    layout.dialog.showNotification(
+        {
+            autoHide: false,
+            type: 'success',
+            message:
+                'There is a new version (' +
+                version +
+                ') available! Click to update.'
+        },
+        () => {
+            shell.openExternal('https://display-whisper.brettdoyle.art/update/')
+        }
+    )
+})

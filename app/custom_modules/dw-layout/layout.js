@@ -16009,22 +16009,4 @@ class BoxEdit {
             message: text
         })
     })
-
-    ipcRenderer.on('update-available', (event, version) => {
-        exports.dialog.showNotification(
-            {
-                autoHide: false,
-                type: 'success',
-                message:
-                    'There is a new version (' +
-                    version +
-                    ') available! Click to update.'
-            },
-            () => {
-                exports.window.openExternal(
-                    'https://brettdoyle.art/display-whisper/update'
-                )
-            }
-        )
-    })
 }
