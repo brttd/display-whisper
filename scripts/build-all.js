@@ -278,7 +278,17 @@ execCommand('git pull', '', error => {
                                             return console.error(error)
                                         }
 
-                                        console.log('finished')
+                                        console.log('Cleaning directory...')
+                                        clearDirs(
+                                            [outDir, packageDir],
+                                            error => {
+                                                if (error) {
+                                                    return console.error(error)
+                                                }
+
+                                                console.log('Finished')
+                                            }
+                                        )
                                     })
                                 }
                             )
