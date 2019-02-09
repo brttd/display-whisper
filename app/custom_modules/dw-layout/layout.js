@@ -15716,7 +15716,7 @@ class BoxEdit {
 
             if (Array.isArray(listeners[eventName])) {
                 for (let i = 0; i < listeners[eventName].length; i++) {
-                    listeners[eventName][i](item.value)
+                    listeners[eventName][i](item)
                 }
             }
         }
