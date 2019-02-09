@@ -407,11 +407,22 @@ function disableStyle() {
 }
 
 //Functions to quickly create nodes with standard attributes
+let spareSeparators = []
 function getSeparatorNode() {
+    if (spareSeparators.length > 0) {
+        let elem = spareSeparators.pop()
+        return elem
+    }
+
     let elem = document.createElement('div')
     elem.className = 'separator'
 
     return elem
+}
+function recycleSeparator(elem) {
+    if (elem && elem.childElementCount === 0 && elem.className === 'separator') {
+        spareSeparators.push(elem)
+    }
 }
 
 function getIconSVG(name) {
@@ -2702,6 +2713,8 @@ exports.change = addStyles
 
                 item.parent = null
 
+                recycleSeparator(item.node.previousSibling || item.node.nextSibling)
+
                 this.node.removeChild(
                     item.node.previousSibling || item.node.nextSibling
                 )
@@ -2773,7 +2786,10 @@ exports.change = addStyles
             }
             this.items = []
 
-            //TODO: recycle separators
+            for (let i = this.node.childElementCount - 1; i >= 0; i -= 2) {
+                recycleSeparator(this.node.children[i])
+            }
+
             this.node.innerHTML = ''
 
             this.node.appendChild(getSeparatorNode())
@@ -8352,6 +8368,8 @@ exports.change = addStyles
                     fromUser: fromUser,
                     from: this
                 }
+
+                recycleSeparator(this.items[index].node.nextElementSibling)
 
                 this.listNode.removeChild(
                     this.items[index].node.nextElementSibling
