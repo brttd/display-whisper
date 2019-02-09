@@ -21,7 +21,9 @@
         "minHeight": 600,
 
         "width": 800,
-        "height": 700
+        "height": 700,
+
+        "menu": ["edit", "library", "help"]
     },
     "help": {
         "title": "Help",
@@ -39,7 +41,9 @@
         "minHeight": 350,
 
         "width": 600,
-        "height": 450
+        "height": 450,
+
+        "menu": ["library", "help"]
     },
     "log": {
         "title": "Display Whisper Debug Log",
@@ -59,7 +63,9 @@
         "minHeight": 600,
 
         "width": 1000,
-        "height": 650
+        "height": 650,
+
+        "menu": ["edit", "library", "help"]
     },
     "preferences": {
         "title": "Preferences",
@@ -83,7 +89,9 @@
         "minHeight": 500,
 
         "width": 850,
-        "height": 650
+        "height": 650,
+
+        "menu": ["edit", "library", "help"]
     },
     "songDatabase": {
         "title": "Song Library",
@@ -92,7 +100,9 @@
         "minHeight": 400,
 
         "width": 900,
-        "height": 600
+        "height": 600,
+
+        "menu": ["edit", "library", "help"]
     },
     "songImport": {
         "title": "Import Songs",
@@ -126,7 +136,9 @@
         "minHeight": 700,
 
         "width": 1000,
-        "height": 750
+        "height": 750,
+
+        "menu": ["edit", "library", "help"]
     },
     "test": {
         "title": "TEST",
