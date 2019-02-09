@@ -962,6 +962,12 @@ function openWindow(name) {
         win.maximize()
     }
 
+    if (windowDefaults[name].menu) {
+        win.setMenu(appMenus.get(windowDefaults[name].menu))
+    } else if (!debug) {
+        win.setMenu(null)
+    }
+
     win.on('close', () => {
         bounds = win.getContentBounds()
 
@@ -1044,10 +1050,6 @@ function openWindow(name) {
             pathname: path.join(appPath, 'windows', name + '.html')
         })
     )
-
-    if (!debug) {
-        win.setMenu(null)
-    }
 
     return win
 }
@@ -1163,6 +1165,12 @@ function openItemEditor(type, id, data = {}) {
 
     editors[id] = win
 
+    if (windowDefaults.editor.menu) {
+        win.setMenu(appMenus.get(windowDefaults.editor.menu))
+    } else {
+        win.setMenu(null)
+    }
+
     win.on('closed', () => {
         delete editors[id]
 
@@ -1192,10 +1200,6 @@ function openItemEditor(type, id, data = {}) {
             pathname: path.join(appPath, 'windows/editors/', type + '.html')
         })
     )
-
-    if (!debug) {
-        win.setMenu(null)
-    }
 }
 
 let updateDisplayPosition
@@ -1427,11 +1431,15 @@ function checkForUpdate() {
 }
 
 //Application Menu
-const appMenu = new Menu()
+const appMenus = {
+    main: new Menu()
+}
 {
     const dynamicItems = {}
     const allAcceleratorItems = []
     const acceleratorItemFunctions = {}
+
+    const prebuiltMenus = {}
 
     function onMenuClick(item) {
         if (typeof item.window === 'string') {
@@ -2099,26 +2107,58 @@ const appMenu = new Menu()
     }
 
     if (process.platform === 'darwin') {
-        appMenu.append(items.app)
-        appMenu.append(items.file)
+        appMenus.main.append(items.app)
+        appMenus.main.append(items.file)
     } else {
-        appMenu.append(items.file)
-        appMenu.append(items.app)
+        appMenus.main.append(items.file)
+        appMenus.main.append(items.app)
     }
-    appMenu.append(items.edit)
-    appMenu.append(items.library)
-    appMenu.append(items.tools)
-    appMenu.append(items.help)
+    appMenus.main.append(items.edit)
+    appMenus.main.append(items.library)
+    appMenus.main.append(items.tools)
+    appMenus.main.append(items.help)
+
+    appMenus.get = list => {
+        if (!Array.isArray(list)) {
+            return null
+        }
+
+        let menuId = list.join('-')
+
+        if (prebuiltMenus[menuId]) {
+            return prebuiltMenus[menuId]
+        }
+
+        prebuiltMenus[menuId] = new Menu()
+
+        for (let i = 0; i < list.length; i++) {
+            if (items[list[i]]) {
+                prebuiltMenus[menuId].append(items[list[i]])
+            }
+        }
+
+        if (settings.get('debug.enable', false)) {
+            prebuiltMenus[menuId].append(items.debug)
+        }
+
+        return prebuiltMenus[menuId]
+    }
 
     if (settings.get('debug.enable', false)) {
-        appMenu.append(items.debug)
+        appMenus.main.append(items.debug)
+
+        for (let menuId in prebuiltMenus) {
+            if (prebuiltMenus.hasOwnProperty(menuId)) {
+                prebuiltMenus[menuId].append(items.debug)
+            }
+        }
     }
 
     settings.listen('debug.enable', value => {
         if (value) {
-            appMenu.append(items.debug)
+            appMenus.main.append(items.debug)
 
-            Menu.setApplicationMenu(appMenu)
+            Menu.setApplicationMenu(appMenus.main)
         }
     })
 
@@ -2514,7 +2554,7 @@ function setupDisplays() {
             debug = value
         })
 
-        Menu.setApplicationMenu(appMenu)
+        Menu.setApplicationMenu(appMenus.main)
 
         setupDisplays()
 
