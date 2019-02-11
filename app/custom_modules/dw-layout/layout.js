@@ -420,7 +420,11 @@ function getSeparatorNode() {
     return elem
 }
 function recycleSeparator(elem) {
-    if (elem && elem.childElementCount === 0 && elem.className === 'separator') {
+    if (
+        elem &&
+        elem.childElementCount === 0 &&
+        elem.className === 'separator'
+    ) {
         spareSeparators.push(elem)
     }
 }
@@ -2737,7 +2741,9 @@ exports.change = addStyles
 
                 item.parent = null
 
-                recycleSeparator(item.node.previousSibling || item.node.nextSibling)
+                recycleSeparator(
+                    item.node.previousSibling || item.node.nextSibling
+                )
 
                 this.node.removeChild(
                     item.node.previousSibling || item.node.nextSibling
@@ -6721,48 +6727,45 @@ exports.change = addStyles
 
         activeRichTextContextMenu = null
 
-        exports.contextMenu.add(
-            'rich-text',
-            [
-                {
-                    label: 'Bold',
-                    type: 'checkbox',
-                    value: 'bold'
-                },
-                {
-                    label: 'Italic',
-                    type: 'checkbox',
-                    value: 'italic'
-                },
-                {
-                    label: 'Underline',
-                    type: 'checkbox',
-                    value: 'underline'
-                },
-                {
-                    label: 'Strikethrough',
-                    type: 'checkbox',
-                    value: 'strikethrough'
-                },
-                {
-                    label: 'Superscript',
-                    type: 'checkbox',
-                    value: 'superscript'
-                },
-                {
-                    label: 'Subscript',
-                    type: 'checkbox',
-                    value: 'subscript'
-                },
-                {
-                    type: 'separator'
-                },
-                {
-                    label: 'Remove Formatting',
-                    value: 'removeFormat'
-                },
-            ]
-        )
+        exports.contextMenu.add('rich-text', [
+            {
+                label: 'Bold',
+                type: 'checkbox',
+                value: 'bold'
+            },
+            {
+                label: 'Italic',
+                type: 'checkbox',
+                value: 'italic'
+            },
+            {
+                label: 'Underline',
+                type: 'checkbox',
+                value: 'underline'
+            },
+            {
+                label: 'Strikethrough',
+                type: 'checkbox',
+                value: 'strikethrough'
+            },
+            {
+                label: 'Superscript',
+                type: 'checkbox',
+                value: 'superscript'
+            },
+            {
+                label: 'Subscript',
+                type: 'checkbox',
+                value: 'subscript'
+            },
+            {
+                type: 'separator'
+            },
+            {
+                label: 'Remove Formatting',
+                value: 'removeFormat'
+            }
+        ])
         exports.contextMenu.onEvent('rich-text', event => {
             if (activeRichTextContextMenu) {
                 activeRichTextContextMenu.textEdit(event.value)
