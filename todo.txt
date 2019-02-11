@@ -1,9 +1,4 @@
 REQUIRED:
-    Bold, Italic, font options for text nodes.
-
-    When editor gets second 'edit-data':
-        Add all editor.data as a change, filtered by 'edit-data' data
-
     Display window - Fix:
         Occasionally flashes white (Only when looping?).
         When changing screens or opening, it briefly shows at smaller size before resizing to full screen.
@@ -13,19 +8,18 @@ REQUIRED:
         Long paragraphs don't break over pages.
         Add user options to filter song searching.
 
-    FontInput item: Drop down list lags, change so that DOM only contains rows that are visible in scroll position.
-    
-    Settings "keys": Allow multiple keyboard shortcuts for actions
-
     Installers - Windows & Mac
 
 REQUIRED - long term:
+    Settings "keys": Allow multiple keyboard shortcuts for actions
+
+    FontInput item: Drop down list lags, change so that DOM only contains rows that are visible in scroll position.
+
     Create single source for interface text (file, instead of hard coded strings), allowing for translation + Win/Mac differences
         change keyboard shortcut display based on language, win/mac, keyboard, etc..
         (Including stuff like ⌘)
 
     Control window taskbar:
-        Use progress bar to show automatic advance time.
         Use "Jumplist" (addRecentDocument) to show presentation files opened by user.
         (Mac) Use '.setRepresentedFilename(filename)', 'setDocumentEdited(edited)' to show state of active presentation file.
 
