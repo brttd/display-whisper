@@ -2127,6 +2127,15 @@ const playlist = {}
         })
     })
 
+    itemsBlock.onEvent('cancel-drop', () => {
+        if (typeof dropping === 'object') {
+            dropping = false
+        }
+
+        if (typeof dragging === 'number') {
+            dragging = false
+        }
+    })
     itemsBlock.onEvent('drop', event => {
         if (typeof dropping === 'object') {
             add(dropping.input, dropping.template, event.index)

@@ -2565,6 +2565,27 @@ exports.change = addStyles
                 }
             })
 
+            this.events['cancel-drop'] = []
+
+            this.node.addEventListener('mousedown', event => {
+                if (this.lastIndexHover >= 0) {
+                    this.node.children[
+                        this.lastIndexHover * 2
+                    ].classList.remove('active')
+
+                    this.lastIndexHover = -1
+                }
+
+                if (event.button === 2 && this.hovering) {
+                    this.hovering = false
+
+                    sendEventTo({
+                        fromUser: true,
+                        from: this
+                    }, this.events['cancel-drop'])
+                }
+            })
+
             this.node.addEventListener('scroll', () => {
                 body.onFrame.start(this.readScroll)
             })
