@@ -1,7 +1,7 @@
 {
     "productName": "Display Whisper",
     "name": "display-whisper",
-    "version": "0.20.2",
+    "version": "0.20.3",
     "icon": "icons/main",
     "main": "main.js",
     "dependencies": {
