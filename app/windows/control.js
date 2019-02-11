@@ -1385,6 +1385,19 @@ const playlist = {}
             }
         }
 
+        if (selected.index < itemsBlock.items.length) {
+            itemsBlock.items[selected.index].selected = true
+
+            if (
+                selected.subIndex <
+                itemsBlock.items[selected.index].items.length
+            ) {
+                itemsBlock.items[selected.index].items[
+                    selected.subIndex
+                ].selected = true
+            }
+        }
+
         if (active.index === newIndex) {
             scrollTo(active)
         } else if (selected.index === newIndex) {
