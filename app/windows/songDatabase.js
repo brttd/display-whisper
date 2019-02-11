@@ -406,6 +406,8 @@ let currentSection = ''
 
 let searchResults = []
 
+let removingLibrary = false
+
 //Different functions for filtering songs
 const searchFilters = {
     all: function(item) {
@@ -1086,9 +1088,13 @@ function selectSection(name) {
             (error, answer) => {
                 if (answer === 'Remove') {
                     layout.showLoader(layout.body, 'Removing songs')
+                    removingLibrary = true
 
                     Songs.removeAll(() => {
                         layout.hideLoader(layout.body)
+                        removingLibrary = false
+
+                        resetSong()
                     })
                 }
             }
@@ -1262,6 +1268,10 @@ Songs.onEvent('update-start', () => {
 layout.showLoader(resultsBox)
 Songs.onEvent('update', changed => {
     layout.hideLoader(resultsBox)
+
+    if (removingLibrary) {
+        return false
+    }
 
     if (Array.isArray(changed) && editor.data.group) {
         let activeSongChanged = false
