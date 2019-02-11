@@ -2164,8 +2164,11 @@ exports.change = addStyles
             }
 
             let mousedown = false
-            this.node.addEventListener('mousedown', () => {
-                if (this.parent instanceof LayoutBlock === false) {
+            this.node.addEventListener('mousedown', event => {
+                if (
+                    this.parent instanceof LayoutBlock === false ||
+                    event.button !== 0
+                ) {
                     return false
                 }
 
@@ -3222,8 +3225,10 @@ exports.change = addStyles
 
                 this._mousedown = false
 
-                this.node.addEventListener('mousedown', () => {
-                    this._mousedown = true
+                this.node.addEventListener('mousedown', event => {
+                    if (event.button === 0) {
+                        this._mousedown = true
+                    }
                 })
 
                 this.node.addEventListener('mouseleave', event => {
@@ -3886,10 +3891,12 @@ exports.change = addStyles
         })
 
         numberPopup.node.addEventListener('mousedown', event => {
-            mouseDown = true
-            sliderNode.classList.add('active')
+            if (event.button === 0) {
+                mouseDown = true
+                sliderNode.classList.add('active')
 
-            onMouseMove(event)
+                onMouseMove(event)
+            }
         })
         body.onEvent('mouseup', () => {
             mouseDown = false
@@ -4728,20 +4735,24 @@ exports.change = addStyles
         }
 
         sbNode.addEventListener('mousedown', event => {
-            removeActiveHighlight()
-            currentInput = 'sb'
+            if (event.button === 0) {
+                removeActiveHighlight()
+                currentInput = 'sb'
 
-            sbSlider.classList.add('active')
+                sbSlider.classList.add('active')
 
-            onDrag(event)
+                onDrag(event)
+            }
         })
         hueNode.addEventListener('mousedown', event => {
-            removeActiveHighlight()
-            currentInput = 'hue'
+            if (event.button === 0) {
+                removeActiveHighlight()
+                currentInput = 'hue'
 
-            hueSlider.classList.add('active')
+                hueSlider.classList.add('active')
 
-            onDrag(event)
+                onDrag(event)
+            }
         })
 
         body.onEvent('mouseup', () => {
@@ -7673,8 +7684,9 @@ exports.change = addStyles
             //send a drag event when the user moves the mouse outside the element, after clicking down on it
             let mouseDown = false
             this.node.addEventListener('mousedown', () => {
-                //TODO: only listen for left-click
-                mouseDown = true
+                if (event.button === 0) {
+                    mouseDown = true
+                }
             })
             body.onEvent('mouseup', () => {
                 mouseDown = false
@@ -8707,6 +8719,10 @@ exports.change = addStyles
             let mousedown = false
 
             this.listNode.addEventListener('mousedown', event => {
+                if (event.button !== 0) {
+                    return false
+                }
+
                 if (event.target.tagName === 'TR') {
                     this.select(
                         Array.prototype.indexOf.call(
@@ -10870,9 +10886,10 @@ class BoxEdit {
         })
 
         this.node.addEventListener('mousedown', () => {
-            if (!this.parent) {
+            if (!this.parent || event.button !== 0) {
                 return false
             }
+
             this.focus()
             this.resizing = this.previewResizing
             this.previewResizing = ''
@@ -11553,7 +11570,9 @@ class BoxEdit {
 
                 let mousedown = false
                 this.node.addEventListener('mousedown', () => {
-                    mousedown = true
+                    if (event.button === 0) {
+                        mousedown = true
+                    }
                 })
                 body.onEvent('mouseup', () => {
                     mousedown = false
@@ -12361,7 +12380,9 @@ class BoxEdit {
 
                 let mousedown = false
                 this.node.addEventListener('mousedown', () => {
-                    mousedown = true
+                    if (event.button === 0) {
+                        mousedown = true
+                    }
                 })
                 body.onEvent('mouseup', () => {
                     mousedown = false
@@ -13213,13 +13234,17 @@ class BoxEdit {
                 this.events['edit-click'] = []
                 this.events['remove-click'] = []
 
-                this.dragButton.node.addEventListener(
-                    'mousedown',
-                    passEventTo.bind(this, this.events['drag-click'], {
-                        fromUser: true,
-                        from: this
-                    })
-                )
+                this.dragButton.node.addEventListener('mousedown', event => {
+                    if (event.button === 0) {
+                        sendEventTo(
+                            {
+                                fromUser: true,
+                                from: this
+                            },
+                            this.events['drag-click']
+                        )
+                    }
+                })
                 this.editButton.onEvent(
                     'click',
                     passEventTo.bind(this, this.events['edit-click'], {
@@ -13256,8 +13281,10 @@ class BoxEdit {
                 })
 
                 let titleMouseDown = false
-                this.titleNode.addEventListener('mousedown', () => {
-                    titleMouseDown = true
+                this.titleNode.addEventListener('mousedown', event => {
+                    if (event.button === 0) {
+                        titleMouseDown = true
+                    }
                 })
                 this.titleNode.addEventListener('mouseout', () => {
                     if (titleMouseDown) {
