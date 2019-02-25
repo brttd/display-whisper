@@ -3800,11 +3800,12 @@ exports.change = addStyles
     exports.TextMultiLineInput = items.TextMultiLineInput = TextMultiLineInput
 
     //Number input popup control
+    const numberPopupHeight = 11 + 2 * 2 + 1 * 2 //12px slider size, 2px padding (x2), 1px border (x2)
     let numberPopup = new InputPopup({
         maxWidth: 200,
 
-        minHeight: 18,
-        maxHeight: 18
+        minHeight: numberPopupHeight,
+        maxHeight: numberPopupHeight
     })
     {
         numberPopup.node.classList.add('number')

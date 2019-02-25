@@ -415,7 +415,7 @@ input::-webkit-inner-spin-button {
         border-bottom-right-radius: 0;
     }
 }
-$slider-button-size: 12px;
+$slider-button-size: 11px;
 $slider-padding: 2px;
 .popup.number {
     border-radius: $slider-button-size;
@@ -437,11 +437,11 @@ $slider-padding: 2px;
         left: $slider-padding + $slider-button-size / 2;
 
         width: calc(100% - #{$slider-padding + $slider-button-size + 2px});
-        height: 2px;
+        height: 1px;
 
         background: $bkg-dark;
 
-        border-radius: 2px;
+        border-radius: 1px;
 
         z-index: -1;
     }
@@ -457,7 +457,7 @@ $slider-padding: 2px;
         box-sizing: border-box;
         position: absolute;
 
-        top: 2px;
+        top: $slider-padding;
 
         width: $slider-button-size;
         height: $slider-button-size;
