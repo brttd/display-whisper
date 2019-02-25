@@ -919,7 +919,7 @@ const playlist = {}
     }
 
     //public playlist functions
-    function setActive(position, autoPlay = true) {
+    function setActive(position, updateScroll = true) {
         if (timeout) {
             clearTimeout(timeout)
         }
@@ -953,13 +953,9 @@ const playlist = {}
         }
 
         //The setSelected function calls updateOutput, so setActive doesn't need to call it
-        setSelected(active)
+        setSelected(active, updateScroll)
 
-        if (
-            output.active.autoPlay === true &&
-            autoPlay &&
-            playMode !== 'manual'
-        ) {
+        if (output.active.autoPlay === true && playMode !== 'manual') {
             let time = output.active.playTime + output.active.transition.time
 
             //if the transition is 10% or more of the playTime, show the extra time in brackets
@@ -994,7 +990,7 @@ const playlist = {}
     }
     playlist.setActive = setActive
 
-    function setSelected(position) {
+    function setSelected(position, updateScroll = true) {
         if (typeof position.index !== 'number') {
             position.index = 0
         }
@@ -1034,7 +1030,9 @@ const playlist = {}
             }
         }
 
-        scrollTo(selected)
+        if (updateScroll) {
+            scrollTo(selected)
+        }
 
         updateOutput()
     }
@@ -1082,16 +1080,23 @@ const playlist = {}
             itemsBlock.add(item, index)
 
             if (index <= active.index) {
-                setActive({
-                    index: active.index + 1,
-                    subIndex: active.subIndex
-                })
+                setActive(
+                    {
+                        index: active.index + 1,
+                        subIndex: active.subIndex
+                    },
+                    false
+                )
             }
+
             if (index <= lastSelected.index) {
-                setSelected({
-                    index: lastSelected.index + 1,
-                    subIndex: lastSelected.subIndex
-                })
+                setSelected(
+                    {
+                        index: lastSelected.index + 1,
+                        subIndex: lastSelected.subIndex
+                    },
+                    false
+                )
             }
         } else {
             list.push(data)
@@ -1250,19 +1255,12 @@ const playlist = {}
             subIndex: selected.subIndex
         }
 
-        if (index < active.index) {
-            setActive({ index: active.index - 1, subIndex: active.subIndex })
-        } else if (index === active.index) {
-            setActive({ index: active.index - 1, subIndex: 0 })
+        if (index <= active.index) {
+            setActive({ index: active.index - 1, subIndex: 0 }, false)
         }
 
-        if (index < lastSelected.index) {
-            setSelected({
-                index: lastSelected.index - 1,
-                subIndex: lastSelected.subIndex
-            })
-        } else if (index === lastSelected.index) {
-            setSelected({ index: lastSelected.index - 1, subIndex: 0 })
+        if (index <= lastSelected.index) {
+            setSelected({ index: lastSelected.index - 1, subIndex: 0 }, false)
         }
 
         if (list.length === 0) {
@@ -1305,16 +1303,22 @@ const playlist = {}
             itemsBlock.add(history.item, history.index)
 
             if (history.index <= active.index) {
-                setActive({
-                    index: active.index + 1,
-                    subIndex: active.subIndex
-                })
+                setActive(
+                    {
+                        index: active.index + 1,
+                        subIndex: active.subIndex
+                    },
+                    false
+                )
             }
             if (history.index <= lastSelected.index) {
-                setSelected({
-                    index: lastSelected.index + 1,
-                    subIndex: lastSelected.subIndex
-                })
+                setSelected(
+                    {
+                        index: lastSelected.index + 1,
+                        subIndex: lastSelected.subIndex
+                    },
+                    false
+                )
             }
         } else {
             list.push(history.data)
@@ -1624,13 +1628,16 @@ const playlist = {}
             updatePreviews()
         } else if (typeof data.active === 'object') {
             layout.body.onFrame.end(() => {
-                setActive(
-                    {
-                        index: data.active.index || 0,
-                        subIndex: data.active.subIndex || 0
-                    },
-                    false
-                )
+                //Need to set it to 'manual', so that going to the active item doesn't start the autoplay timer
+                let actualPlayMode = playMode
+                playMode === 'manual'
+
+                setActive({
+                    index: data.active.index || 0,
+                    subIndex: data.active.subIndex || 0
+                })
+
+                playMode = actualPlayMode
             })
         }
 
