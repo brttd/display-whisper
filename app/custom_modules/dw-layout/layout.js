@@ -14628,7 +14628,10 @@ class BoxEdit {
                 this.writeSize,
                 this.writePageLayout,
                 this.updateContentLayout,
-                this.offsetScroll
+                this.offsetScroll,
+
+                this.print,
+                this.save
             )
         }
 
