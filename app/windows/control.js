@@ -2734,7 +2734,7 @@ const item_add = {
 
     //song add
     {
-        const punctuationCharacters = new RegExp(/[\(\)\*\-\[\]!"&'+,.:;?_`]/g)
+        const punctuationCharacters = new RegExp(/[\(\)\-\[\]!"&'+,.:;?_`]/g)
 
         const Songs = new Database.Group('songs', {
             load: true,

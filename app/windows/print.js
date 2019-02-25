@@ -6,7 +6,7 @@ const logger = require('dw-log')
 const Database = require('dw-database')
 const editor = require('dw-editor')
 
-const punctuationCharacters = new RegExp(/[\(\)\*\-\[\]!"&'+,.:;?_`]/g)
+const punctuationCharacters = new RegExp(/[\(\)\-\[\]!"&'+,.:;?_`]/g)
 
 const Songs = new Database.Group('songs', {
     load: true,
