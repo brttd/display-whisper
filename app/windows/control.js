@@ -276,6 +276,7 @@ const playlist = {}
         })
     }
     function onItemDrag(event) {
+        event.from.dragActive = true
         dragging = itemsBlock.indexOf(event.from)
 
         itemsBlock.hovering = true
@@ -2161,6 +2162,10 @@ const playlist = {}
             dragging >= 0 &&
             dragging < list.length
         ) {
+            if (itemsBlock.items.length > dragging) {
+                itemsBlock.items[dragging].dragActive = false
+            }
+
             move(dragging, event.index)
 
             dragging = false
