@@ -7720,6 +7720,8 @@ exports.change = addStyles
             })
             this.node.addEventListener('mouseleave', () => {
                 if (mouseDown) {
+                    this.node.classList.add('dragging')
+                    
                     sendEventTo(
                         {
                             fromUser: true,
@@ -7727,7 +7729,6 @@ exports.change = addStyles
                         },
                         this.events.drag
                     )
-                    this.node.classList.add('dragging')
                 }
             })
         }
@@ -8355,22 +8356,29 @@ exports.change = addStyles
                     }
                 })
                 item.onEvent('drag', event => {
+                    body.inputFocused(this, event.fromUser)
+                    
                     if (this.options.reorderable) {
                         this.dragging = item
+
+                        this.select(
+                            this.items.indexOf(item),
+                            event.fromUser
+                        )
+                        
+                        sendEventTo(
+                            {
+                                index: this.items.indexOf(item),
+                                text: item.text,
+
+                                fromUser: event.fromUser,
+                                from: this
+                            },
+                            this.events.drag
+                        )
+                    } else {
+                        item.node.classList.remove('dragging')
                     }
-
-                    body.inputFocused(this, event.fromUser)
-
-                    sendEventTo(
-                        {
-                            index: this.items.indexOf(item),
-                            text: item.text,
-
-                            fromUser: event.fromUser,
-                            from: this
-                        },
-                        this.events.drag
-                    )
                 })
             }
         }
