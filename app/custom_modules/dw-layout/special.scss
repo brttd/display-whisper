@@ -89,16 +89,13 @@
 
         flex: 0 0 auto;
 
-        border-color: $bkg-dark;
-
         .info {
             box-sizing: border-box;
 
             flex: 1 1 auto;
 
-            border: 1px solid $bkg-dark;
-            border-left: none;
-            border-right: none;
+            border-top: 1px solid $bkg-dark;
+            border-bottom: 1px solid $bkg-dark;
 
             overflow: hidden;
 
