@@ -13,22 +13,20 @@ $bkg-main-light: lighten($bkg-main, $light);
 $bkg-main-dark: darken($bkg-main, $dark);
 
 $bkg-success: hsl(120, 60%, 75%);
-$bkg-success-dark: darken($bkg-success, $dark);
-
-$text-success: $text;
-$text-success-dark: darken($text-success, $dark);
+$bkg-success-dark: hsl(120, 66%, 55%);
 
 $bkg-warning: hsl(50, 60%, 75%);
-$bkg-warning-dark: darken($bkg-warning, $dark);
+$bkg-warning-dark: hsl(50, 66%, 55%);
 
 $bkg-error: hsl(0, 60%, 75%);
-$bkg-error-dark: darken($bkg-error, $dark);
+$bkg-error-dark: hsl(0, 66%, 55%);
 
 $bkg-active: hsl(200, 60%, 80%);
-$bkg-active-dark: darken($bkg-active, $dark);
+$bkg-active-dark: hsl(200, 66%, 60%);
 
-$text-active: $text;
-$text-active-dark: darken($text-active, $dark);
+$text-active: hsl(200, 69%, 20%);
 
 $bkg-active-highlight: hsl(27, 80%, 70%);
-$bkg-active-highlight-dark: darken($bkg-active-highlight, $dark);
+$bkg-active-highlight-dark: hsl(27, 88%, 50%);
+
+$text-active-highlight: hsl(27, 92%, 20%);
