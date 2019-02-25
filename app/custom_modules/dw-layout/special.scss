@@ -24,6 +24,9 @@
         &.active {
             background: $bkg-active-highlight;
             border-color: $bkg-active-highlight-dark;
+
+            color: $text-active-highlight;
+            fill: $text-active-highlight;
         }
     }
 
