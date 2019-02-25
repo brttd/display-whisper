@@ -1468,13 +1468,6 @@ $img-max-width: 10em;
             }
         }
 
-        &.select,
-        &.drag {
-            span {
-                background: transparent;
-            }
-        }
-
         &.select {
             background: $bkg-active;
         }
