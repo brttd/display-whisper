@@ -533,7 +533,10 @@ $slider-padding: 2px;
             &:active,
             &:focus,
             &.active {
-                @include colors(active);
+                &,
+                div {
+                    @include colors(active);
+                }
             }
         }
     }
