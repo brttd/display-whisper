@@ -1329,7 +1329,7 @@ $img-max-width: 10em;
             }
 
             &:focus {
-                @include colors(active, $color: false);
+                @include colors(active);
             }
         }
         button {
@@ -1367,15 +1367,17 @@ $img-max-width: 10em;
         }
 
         &.active {
-            @include colors(active);
-
-            input:focus {
-                background: $bkg;
+            input:not(:focus) {
+                @include colors(active);
+                border-color: $bkg-active;
             }
         }
         &.dragging {
-            background: $bkg-active-dark;
-            opacity: 0.5;
+            input:not(:focus) {
+                background: $bkg-active-dark;
+                border-color: $bkg-active-dark;
+                color: $bkg;
+            }
         }
 
         &.error {
@@ -1471,8 +1473,10 @@ $img-max-width: 10em;
         &.select {
             background: $bkg-active;
         }
+
         &.drag {
             background: $bkg-active-dark;
+            color: $bkg;
         }
     }
 }
