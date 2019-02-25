@@ -1364,11 +1364,6 @@ $img-max-width: 10em;
                     fill: $text-dark;
                 }
             }
-            &:active {
-                svg {
-                    fill: $text-active-dark;
-                }
-            }
         }
 
         &.active {
