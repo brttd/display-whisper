@@ -43,7 +43,7 @@ REQUIRED - long term:
     Auto update?
 
 WANTED:
-    Add templates for playlists (when creating playlist from template, it gives options for 3 songs, 1 text with string insertion, etc)
+    Add templates for presentations (when creating presentation from template, it gives options for 3 songs, 1 text with string insertion, etc)
 
     Template editor: song 'show name' option should show/hide the name box
 

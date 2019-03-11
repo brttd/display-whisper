@@ -39,19 +39,19 @@
 - Choose templates in control + item editors
 
 ### Song Items
-- Add Song to playlist
-    - Drag song into playlist, drag add button, click add button
+- Add Song to presentation
+    - Drag song into presentation, drag add button, click add button
     - Add with different templates
     - Add with different settings for show intro & outro, + blank
-- Remove song from playlist
-- Edit song in playlist
+- Remove song from presentation
+- Edit song in presentation
     - Add, remove, and reorder sections
     - Change display properties of sections
     - Change play properties of sections
     - Change text content of intro, outro
     - Change text content of song section
     - Change text content of section overlay, and end overlay
-    - Fit text
+    - Scale text
     - Undo, redo changes
     - Ok, Apply, and Cancel changes
     - Close without applying changes
@@ -62,16 +62,16 @@
         - Undo & Redo applying template
 
 ### Text Items
-- Add text to playlist
+- Add text to presentation
     - Change preview display & text properties
     - Click, drag add button
     - Add with different templates
-- Remove text from playlist
-- Edit text in playlist
+- Remove text from presentation
+- Edit text in presentation
     - Add, remove, reorder, and rename sections
     - Change display & play properties
     - Change text
-    - Fit text
+    - Scale text
     - Undo, redo changes
     - Ok, Apply, and Cancel changes
     - Close without applying changes
@@ -79,12 +79,12 @@
         - Undo & Redo applying template
 
 ### Image Items
-- Add image to playlist
+- Add image to presentation
     - Change preview display properties
     - Click, drag add button
     - Add with different templates
-- Remove image from playlist
-- Edit image in playlist
+- Remove image from presentation
+- Edit image in presentation
     - Change display & play properties
     - Change image
     - Undo, redo changes
@@ -94,30 +94,30 @@
         - Undo & Redo applying template
 
 ### Items
-- "Fit text when adding" setting
-- "Fit text when opening" setting
-- "Increase text size when fitting" setting
+- "Scale text when adding" setting
+- "Scale text when opening" setting
+- "Increase text size when scaled" setting
 - "Minimum text size" setting
-- "Always scale down to fit" setting
+- "Always scale text which is too large" setting
 
-### Playlist
-- Save playlist
-- Save playlist as
-- Create new playlist
-- Open playlist
+### Presentation
+- Save presentation
+- Save presentation as
+- Create new presentation
+- Open presentation
 - Above with keyboard shortcuts
-- Open playlist by opening file
-- Open playlist by dragging file to Display Whisper
-- Open recent playlist
+- Open presentation by opening file
+- Open presentation by dragging file to Display Whisper
+- Open recent presentation
 - Close without saving
 - Autosave
 
 ### Control
 - Change previews
 - Change "auto minimize" and "show first section" settings
-- Move through playlist
+- Move through presentation
     - from display window
-- Select items in playlist
+- Select items in presentation
     - with keyboard shortcuts
     - from display window
 - Have items automatically advance
@@ -130,7 +130,7 @@
     - Close
     - Move to different screen
     - With keyboard shortcuts
-- Fit text and unify all
+- Scale text and unify all
 
 ### Print
 - Change "show info setup" setting
