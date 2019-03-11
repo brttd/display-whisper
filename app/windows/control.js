@@ -16,7 +16,7 @@ const items = require('dw-items')
 
 //**********************
 //Timer
-//(Because the timer needs to be used by both playlist (code), and item_control (interface), it needs to be declared globally)
+//(Because the timer needs to be used by both presentation (code), and item_control (interface), it needs to be declared globally)
 //**********************
 const timer = new layout.Timer({}, {})
 
@@ -109,7 +109,7 @@ const undoRemoveButton = new layout.Button({
 })
 
 //**********************
-//Playlist
+//Presentation
 //**********************
 let itemIdCounter = 0
 const itemsBlock = new layout.ReorderableBlock(
@@ -124,7 +124,7 @@ const itemsBlock = new layout.ReorderableBlock(
     }
 )
 
-const playlist = {}
+const presentation = {}
 {
     let lastSaveTime = 0
     let lastAutoSaveTime = 0
@@ -191,7 +191,7 @@ const playlist = {}
         shuffle: false
     }
 
-    Object.defineProperties(playlist, {
+    Object.defineProperties(presentation, {
         file: {
             enumerable: true,
             get: () => {
@@ -592,7 +592,7 @@ const playlist = {}
         scrollPosition.subIndex = position.subIndex
 
         //The scrollTo function waits for the end of an animation frame to actually update
-        //This is because items may get maximized/minimized when going through the playlist
+        //This is because items may get maximized/minimized when going through the presentation
         //And their height only updates on an animation frame, so by waiting for the end of one, all items should be at the correct height when scrolling
         layout.onFrame.end(updateScroll)
     }
@@ -918,7 +918,7 @@ const playlist = {}
         return itemsBlock.items[position.index].items[position.subIndex].display
     }
 
-    //public playlist functions
+    //public presentation functions
     function setActive(position, updateScroll = true) {
         if (timeout) {
             clearTimeout(timeout)
@@ -988,7 +988,7 @@ const playlist = {}
             timer.value = 0
         }
     }
-    playlist.setActive = setActive
+    presentation.setActive = setActive
 
     function setSelected(position, updateScroll = true) {
         if (typeof position.index !== 'number') {
@@ -1044,7 +1044,7 @@ const playlist = {}
 
         let data = new items[input.itemType](input, template)
 
-        let item = new layout.PlaylistItem({
+        let item = new layout.PresentationItem({
             title: data.title,
 
             showSectionWhenMinimized: options.showSectionWhenMinimized
@@ -1128,7 +1128,7 @@ const playlist = {}
         item.onEvent('drag-click', onItemDrag)
         item.onEvent('remove-click', onItemRemove)
     }
-    playlist.add = add
+    presentation.add = add
 
     function addDrop(input, template = {}) {
         if (!items.has(input.itemType)) {
@@ -1142,7 +1142,7 @@ const playlist = {}
 
         itemsBlock.hovering = true
     }
-    playlist.addDrop = addDrop
+    presentation.addDrop = addDrop
 
     function fitText(index) {
         if (index < 0 || index >= list.length) {
@@ -1222,9 +1222,9 @@ const playlist = {}
             onResult
         )
     }
-    playlist.fitText = fitText
+    presentation.fitText = fitText
 
-    playlist.fitTextAll = () => {
+    presentation.fitTextAll = () => {
         for (let i = 0; i < list.length; i++) {
             fitText(i)
         }
@@ -1271,7 +1271,7 @@ const playlist = {}
 
         editHasOccured()
     }
-    playlist.remove = remove
+    presentation.remove = remove
 
     function undoRemove() {
         if (removeHistory.length === 0) {
@@ -1339,7 +1339,7 @@ const playlist = {}
 
         editHasOccured()
     }
-    playlist.undoRemove = undoRemove
+    presentation.undoRemove = undoRemove
 
     function move(index, newIndex) {
         if (typeof index !== 'number') {
@@ -1413,7 +1413,7 @@ const playlist = {}
 
         editHasOccured()
     }
-    playlist.move = move
+    presentation.move = move
 
     function beginFirst() {
         if (list.length === 0) {
@@ -1422,7 +1422,7 @@ const playlist = {}
 
         setActive({ index: 0, subIndex: 0 })
     }
-    playlist.beginFirst = beginFirst
+    presentation.beginFirst = beginFirst
 
     function beginLast() {
         if (list.length === 0) {
@@ -1433,7 +1433,7 @@ const playlist = {}
 
         setActive({ index: list.length, subIndex: subIndex })
     }
-    playlist.beginLast = beginLast
+    presentation.beginLast = beginLast
 
     function forward() {
         if (list.length === 0) {
@@ -1481,7 +1481,7 @@ const playlist = {}
             setActive(getNewPosition(active, 1))
         }
     }
-    playlist.forward = forward
+    presentation.forward = forward
 
     function back() {
         if (list.length === 0) {
@@ -1528,7 +1528,7 @@ const playlist = {}
             setActive(getNewPosition(active, -1))
         }
     }
-    playlist.back = back
+    presentation.back = back
 
     function selectForward() {
         if (list.length === 0) {
@@ -1537,7 +1537,7 @@ const playlist = {}
 
         setSelected(getNewPosition(selected, 1))
     }
-    playlist.selectForward = selectForward
+    presentation.selectForward = selectForward
 
     function selectBack() {
         if (list.length === 0) {
@@ -1546,7 +1546,7 @@ const playlist = {}
 
         setSelected(getNewPosition(selected, -1))
     }
-    playlist.selectBack = selectBack
+    presentation.selectBack = selectBack
 
     function selectItemForward() {
         if (list.length === 0) {
@@ -1557,7 +1557,7 @@ const playlist = {}
             setSelected({ index: selected.index + 1, subIndex: 0 })
         }
     }
-    playlist.selectItemForward = selectItemForward
+    presentation.selectItemForward = selectItemForward
     function selectItemBackward() {
         if (list.length === 0) {
             return false
@@ -1567,29 +1567,29 @@ const playlist = {}
             setSelected({ index: selected.index - 1, subIndex: 0 })
         }
     }
-    playlist.selectItemBackward = selectItemBackward
+    presentation.selectItemBackward = selectItemBackward
 
     function playSelected() {
         setActive(selected)
     }
-    playlist.playSelected = playSelected
+    presentation.playSelected = playSelected
 
     function moveSelectedUp() {
         move(selected.index, selected.index - 1)
     }
-    playlist.moveSelectedUp = moveSelectedUp
+    presentation.moveSelectedUp = moveSelectedUp
     function moveSelectedDown() {
         move(selected.index, selected.index + 2)
     }
-    playlist.moveSelectedDown = moveSelectedDown
+    presentation.moveSelectedDown = moveSelectedDown
     function moveSelectedTop() {
         move(selected.index, 0)
     }
-    playlist.moveSelectedTop = moveSelectedTop
+    presentation.moveSelectedTop = moveSelectedTop
     function moveSelectedBottom() {
         move(selected.index, list.length)
     }
-    playlist.moveSelectedBottom = moveSelectedBottom
+    presentation.moveSelectedBottom = moveSelectedBottom
 
     function load(data = {}) {
         file = ''
@@ -1643,14 +1643,14 @@ const playlist = {}
 
         lastEditTime = 0
 
-        playlist.saved = true
+        presentation.saved = true
     }
-    playlist.load = load
+    presentation.load = load
 
     function reset() {
         load({})
     }
-    playlist.reset = reset
+    presentation.reset = reset
 
     function getSaveData() {
         let data = {
@@ -1669,7 +1669,7 @@ const playlist = {}
 
         return data
     }
-    playlist.getSaveData = getSaveData
+    presentation.getSaveData = getSaveData
 
     function setPlayMode(mode, options) {
         if (mode === 'manual' || mode === 'auto') {
@@ -1702,7 +1702,7 @@ const playlist = {}
 
         updatePreviews()
     }
-    playlist.setPlayMode = setPlayMode
+    presentation.setPlayMode = setPlayMode
 
     function autoSaveCheck() {
         if (
@@ -1737,14 +1737,14 @@ const playlist = {}
         options.autoSaveInterval * 1000
     )
 
-    //Checks if the playlist has been saved, callback(error, canContinue)
+    //Checks if the presentation has been saved, callback(error, canContinue)
     //If not, asks the user if they want to: Save, Discard, or Cancel
     //Save option will do all neccesary save actions
     //Save & Discard will give 'canContinue': true,
     //Cancel will give 'canContinue': false
     //If canContinue is false, no further action should be taken by the callee
     function checkSave(callback) {
-        if (!playlist.saved) {
+        if (!presentation.saved) {
             if (typeof callback !== 'function') {
                 return false
             }
@@ -1753,10 +1753,10 @@ const playlist = {}
                 {
                     title: 'Save Presentation?',
 
-                    message: playlist.file
+                    message: presentation.file
                         ? 'You have made changes to the presentation which have not been saved!'
                         : 'The presentation has not been saved!',
-                    detail: playlist.file
+                    detail: presentation.file
                         ? 'Do you want to save your changes?'
                         : 'Do you want to save the presentation?',
 
@@ -1764,7 +1764,7 @@ const playlist = {}
                 },
                 (error, result) => {
                     if (result === 'Save') {
-                        fileSavePlaylist(error => {
+                        fileSavePresentation(error => {
                             callback(error, true)
                         })
                     } else if (result === 'Discard') {
@@ -1803,17 +1803,17 @@ const playlist = {}
                     })
                 }
 
-                logger.error('Error loading playlist file', file, error)
+                logger.error('Error loading presentation file', file, error)
 
                 return false
             }
             data.file = file
 
-            playlist.load(data)
+            presentation.load(data)
         })
     }
     //User file functions
-    function fileSavePlaylistAs(callback) {
+    function fileSavePresentationAs(callback) {
         layout.dialog.showSave(
             {
                 title: 'Save Presentation As...',
@@ -1838,33 +1838,33 @@ const playlist = {}
                         callback(error, file)
                     }
                 } else if (file) {
-                    playlist.file = file
-                    fileSavePlaylist(callback)
+                    presentation.file = file
+                    fileSavePresentation(callback)
                 } else if (typeof callback === 'function') {
                     callback(null)
                 }
             }
         )
     }
-    function fileSavePlaylist(callback) {
-        if (!playlist.file) {
-            fileSavePlaylistAs(callback)
+    function fileSavePresentation(callback) {
+        if (!presentation.file) {
+            fileSavePresentationAs(callback)
             return false
         }
 
-        files.save(playlist.file, playlist.getSaveData(), error => {
+        files.save(presentation.file, presentation.getSaveData(), error => {
             if (error) {
                 layout.dialog.showError({
                     message: 'Unable to save file',
                     detail: error.message || error.toString()
                 })
-                logger.error('Error saving playlist file', file, error)
+                logger.error('Error saving presentation file', file, error)
 
                 if (typeof callback === 'function') {
                     callback(error, false)
                 }
             } else {
-                playlist.saved = true
+                presentation.saved = true
 
                 if (typeof callback === 'function') {
                     callback(null, true)
@@ -1872,14 +1872,14 @@ const playlist = {}
             }
         })
     }
-    function fileNewPlaylist() {
+    function fileNewPresentation() {
         checkSave((error, canContinue) => {
             if (canContinue) {
-                playlist.reset()
+                presentation.reset()
             }
         })
     }
-    function fileOpenPlaylist() {
+    function fileOpenPresentation() {
         checkSave((error, canContinue) => {
             if (!canContinue) {
                 return false
@@ -2065,13 +2065,13 @@ const playlist = {}
 
     layout.menu.onEvent('file', item => {
         if (item.value === 'new') {
-            fileNewPlaylist()
+            fileNewPresentation()
         } else if (item.value === 'open') {
-            fileOpenPlaylist()
+            fileOpenPresentation()
         } else if (item.value === 'save-as') {
-            fileSavePlaylistAs()
+            fileSavePresentationAs()
         } else if (item.value === 'save') {
-            fileSavePlaylist()
+            fileSavePresentation()
         }
     })
 
@@ -2207,22 +2207,22 @@ const playlist = {}
             }
         })
 
-        ipcRenderer.on('playlist', (event, argument) => {
+        ipcRenderer.on('presentation', (event, argument) => {
             switch (argument) {
                 case 'play-next':
-                    playlist.forward()
+                    presentation.forward()
                     break
                 case 'play-previous':
-                    playlist.back()
+                    presentation.back()
                     break
                 case 'select-next':
-                    playlist.selectForward()
+                    presentation.selectForward()
                     break
                 case 'select-previous':
-                    playlist.selectBack()
+                    presentation.selectBack()
                     break
                 case 'play-selected':
-                    playlist.playSelected()
+                    presentation.playSelected()
             }
         })
     }
@@ -2266,9 +2266,9 @@ const playlist = {}
 }
 
 //======================
-//Playlist Block
+//Presentation Block
 //======================
-const item_playlist = {
+const item_presentation = {
     minWidth: 350,
     minHeight: 250,
 
@@ -2381,7 +2381,7 @@ let displaying = false
 
     toggleDisplayButton.onEvent('click', toggleDisplay)
 
-    fitTextAllButton.onEvent('click', playlist.fitTextAll)
+    fitTextAllButton.onEvent('click', presentation.fitTextAll)
 
     layout.contextMenu.onEvent('display-menu', event => {
         if (event.label === 'Display') {
@@ -3230,7 +3230,7 @@ const item_add = {
                 selectedTemplate[key] = songAddOptions[key]
             }
 
-            playlist.add(songData, selectedTemplate, index)
+            presentation.add(songData, selectedTemplate, index)
 
             warnUserMissingInfo(songData)
         }
@@ -3354,7 +3354,7 @@ const item_add = {
                     selectedTemplate[key] = songAddOptions[key]
                 }
 
-                playlist.addDrop(song, selectedTemplate)
+                presentation.addDrop(song, selectedTemplate)
 
                 warnUserMissingInfo(song)
             }
@@ -3375,7 +3375,7 @@ const item_add = {
                     selectedTemplate[key] = songAddOptions[key]
                 }
 
-                playlist.add(song, selectedTemplate, songAddOptions)
+                presentation.add(song, selectedTemplate, songAddOptions)
 
                 warnUserMissingInfo(song)
             }
@@ -3421,7 +3421,7 @@ const item_add = {
                 for (let key in songAddOptions) {
                     selectedTemplate[key] = songAddOptions[key]
                 }
-                playlist.addDrop(song, selectedTemplate)
+                presentation.addDrop(song, selectedTemplate)
                 warnUserMissingInfo(song)
             }
         })
@@ -3526,7 +3526,7 @@ const item_add = {
         preview.onEvent('drag', () => {
             let textSection = textEditor.getData()
             textSection.name = 'Text 1'
-            playlist.addDrop(
+            presentation.addDrop(
                 {
                     itemType: 'text',
                     sections: [textSection]
@@ -3541,7 +3541,7 @@ const item_add = {
             }
             let textSection = textEditor.getData()
             textSection.name = 'Text 1'
-            playlist.addDrop(
+            presentation.addDrop(
                 {
                     itemType: 'text',
                     sections: [textSection]
@@ -3556,7 +3556,7 @@ const item_add = {
             }
             let textSection = textEditor.getData()
             textSection.name = 'Text 1'
-            playlist.add(
+            presentation.add(
                 {
                     itemType: 'text',
                     sections: [textSection]
@@ -3645,7 +3645,7 @@ const item_add = {
             for (let i = 0; i < event.files.length; i++) {
                 imageData.url = event.files[i]
 
-                playlist.add(imageData, selectedTemplate)
+                presentation.add(imageData, selectedTemplate)
             }
         })
 
@@ -3673,12 +3673,12 @@ const item_add = {
                         }
                         if (answer === 'Yes') {
                             imageData.url = ''
-                            playlist.addDrop(imageData, selectedTemplate)
+                            presentation.addDrop(imageData, selectedTemplate)
                         }
                     }
                 )
             } else {
-                playlist.addDrop(imageData, selectedTemplate)
+                presentation.addDrop(imageData, selectedTemplate)
             }
         })
 
@@ -3709,12 +3709,12 @@ const item_add = {
                         }
                         if (answer === 'Yes') {
                             imageData.url = ''
-                            playlist.addDrop(imageData, selectedTemplate)
+                            presentation.addDrop(imageData, selectedTemplate)
                         }
                     }
                 )
             } else {
-                playlist.addDrop(imageData, selectedTemplate)
+                presentation.addDrop(imageData, selectedTemplate)
             }
         })
 
@@ -3745,12 +3745,12 @@ const item_add = {
                         }
                         if (answer === 'Yes') {
                             imageData.url = ''
-                            playlist.add(imageData, selectedTemplate)
+                            presentation.add(imageData, selectedTemplate)
                         }
                     }
                 )
             } else {
-                playlist.add(imageData, selectedTemplate)
+                presentation.add(imageData, selectedTemplate)
             }
         })
 
@@ -3880,7 +3880,7 @@ const item_control = {
     )
 
     loopInput.onEvent('change', event => {
-        playlist.setPlayMode(modeSelect.value.toLowerCase(), {
+        presentation.setPlayMode(modeSelect.value.toLowerCase(), {
             loop: event.value
         })
 
@@ -3889,7 +3889,7 @@ const item_control = {
         }
     })
     shuffleInput.onEvent('change', event => {
-        playlist.setPlayMode(modeSelect.value.toLowerCase, {
+        presentation.setPlayMode(modeSelect.value.toLowerCase, {
             shuffle: event.value
         })
 
@@ -3898,7 +3898,7 @@ const item_control = {
         }
     })
     modeSelect.onEvent('change', event => {
-        playlist.setPlayMode(event.value.toLowerCase())
+        presentation.setPlayMode(event.value.toLowerCase())
 
         if (typeof item_control.onOption === 'function') {
             item_control.onOption.call(null, 'playMode', event.value)
@@ -3906,16 +3906,16 @@ const item_control = {
     })
 
     firstButton.onEvent('click', () => {
-        playlist.beginFirst()
+        presentation.beginFirst()
     })
     prevButton.onEvent('click', () => {
-        playlist.back()
+        presentation.back()
     })
     nextButton.onEvent('click', () => {
-        playlist.forward()
+        presentation.forward()
     })
     lastButton.onEvent('click', () => {
-        playlist.beginLast()
+        presentation.beginLast()
     })
 
     blankButton.onEvent('click', event => {
@@ -3932,10 +3932,10 @@ const item_control = {
 
         ipcRenderer.send('display-blank', blankButton.active)
     })
-    undoRemoveButton.onEvent('click', playlist.undoRemove)
+    undoRemoveButton.onEvent('click', presentation.undoRemove)
     layout.menu.onEvent('edit', item => {
         if (item.value === 'undo') {
-            playlist.undoRemove()
+            presentation.undoRemove()
         }
     })
 
@@ -3960,20 +3960,22 @@ const item_control = {
         const shortcutFunctions = {
             'control.keyboard.toggleBlank': blankButton.click,
 
-            'control.keyboard.playNext': playlist.forward,
-            'control.keyboard.playPrevious': playlist.back,
+            'control.keyboard.playNext': presentation.forward,
+            'control.keyboard.playPrevious': presentation.back,
 
-            'control.keyboard.selectNext': playlist.selectForward,
-            'control.keyboard.selectPrevious': playlist.selectBack,
-            'control.keyboard.selectNextItem': playlist.selectItemForward,
-            'control.keyboard.selectPreviousItem': playlist.selectItemBackward,
+            'control.keyboard.selectNext': presentation.selectForward,
+            'control.keyboard.selectPrevious': presentation.selectBack,
+            'control.keyboard.selectNextItem': presentation.selectItemForward,
+            'control.keyboard.selectPreviousItem':
+                presentation.selectItemBackward,
 
-            'control.keyboard.playSelected': playlist.playSelected,
+            'control.keyboard.playSelected': presentation.playSelected,
 
-            'control.keyboard.moveSelectedUp': playlist.moveSelectedUp,
-            'control.keyboard.moveSelectedDown': playlist.moveSelectedDown,
-            'control.keyboard.moveSelectedTop': playlist.moveSelectedTop,
-            'control.keyboard.moveSelectedBottom': playlist.moveSelectedBottom
+            'control.keyboard.moveSelectedUp': presentation.moveSelectedUp,
+            'control.keyboard.moveSelectedDown': presentation.moveSelectedDown,
+            'control.keyboard.moveSelectedTop': presentation.moveSelectedTop,
+            'control.keyboard.moveSelectedBottom':
+                presentation.moveSelectedBottom
         }
 
         const keyboardListeners = {}
@@ -4608,7 +4610,7 @@ layout.contextMenu.add(
 const interfaceItems = {
     menu: item_menu,
     add: item_add,
-    playlist: item_playlist,
+    playlist: item_presentation,
     control: item_control,
     'preview 1': item_display1,
     'preview 2': item_display2

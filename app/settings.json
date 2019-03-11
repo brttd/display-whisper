@@ -43,8 +43,8 @@
             }
         },
 
-        "playlist": {
-            "description": "Playlist",
+        "presentation": {
+            "description": "Presentation",
             "map": "general",
 
             "entries": {

@@ -2,7 +2,7 @@
 @import 'fonts';
 @import 'all';
 
-.playlistItem {
+.presentationItem {
     display: flex;
     flex-direction: row;
 
@@ -141,7 +141,7 @@
             }
         }
 
-        & + .playlistItemSection {
+        & + .presentationItemSection {
             .info {
                 border-top: none;
             }

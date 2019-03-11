@@ -69,7 +69,7 @@ If no fallback is specified, then the referenced empty value is used.
 Space characters (**" "**) will be ignored when checking if a text expression value is empty or not.
 
 >**Note:**  
-To provide warning when a song in the playlist might be using a expression which references no actual text information, a notification is shown in the Control window when a song is added to the playlist, and it does not have any text for its name, author, or copyright. This can be changed in Preferences, under _Songs_ > _Missing Information_ > _Show warning..._  
+To provide warning when a song in the presentation might be using a expression which references no actual text information, a notification is shown in the Control window when a song is added to the presentation, and it does not have any text for its name, author, or copyright. This can be changed in Preferences, under _Songs_ > _Missing Information_ > _Show warning..._  
 Another tool to fix songs with incomplete information is the [Check Songs](#checking-songs) tool. 
 
 # Viewing & Editing Songs

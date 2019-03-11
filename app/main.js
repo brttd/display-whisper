@@ -2353,7 +2353,7 @@ ipcMain.on('close', event => {
 
     ipcMain.on('display-command', (event, argument) => {
         if (windows.control) {
-            windows.control.webContents.send('playlist', argument)
+            windows.control.webContents.send('presentation', argument)
         }
     })
 

@@ -13110,16 +13110,16 @@ class BoxEdit {
 {
     loadCSS('special.css')
 
-    let activePlaylistItemContextMenu = false
+    let activePresentationItemContextMenu = false
 
-    function setupPlaylistItemContextMenu() {
-        if (activePlaylistItemContextMenu !== false) {
+    function setupPresentationItemContextMenu() {
+        if (activePresentationItemContextMenu !== false) {
             return false
         }
 
-        activePlaylistItemContextMenu = null
+        activePresentationItemContextMenu = null
 
-        exports.contextMenu.add('playlist-item', [
+        exports.contextMenu.add('presentation-item', [
             {
                 label: 'Edit...',
                 value: 'edit'
@@ -13135,8 +13135,8 @@ class BoxEdit {
             }
         ])
 
-        exports.contextMenu.onEvent('playlist-item', event => {
-            if (!activePlaylistItemContextMenu) {
+        exports.contextMenu.onEvent('presentation-item', event => {
+            if (!activePresentationItemContextMenu) {
                 return false
             }
 
@@ -13144,36 +13144,36 @@ class BoxEdit {
                 sendEventTo(
                     {
                         fromUser: true,
-                        from: activePlaylistItemContextMenu
+                        from: activePresentationItemContextMenu
                     },
-                    activePlaylistItemContextMenu.events['edit-click']
+                    activePresentationItemContextMenu.events['edit-click']
                 )
             } else if (event.value === 'remove') {
                 sendEventTo(
                     {
                         fromUser: true,
-                        from: activePlaylistItemContextMenu
+                        from: activePresentationItemContextMenu
                     },
-                    activePlaylistItemContextMenu.events['remove-click']
+                    activePresentationItemContextMenu.events['remove-click']
                 )
             } else if (event.value === 'toggle-minimize') {
-                if (activePlaylistItemContextMenu.minimized) {
-                    activePlaylistItemContextMenu.expand()
+                if (activePresentationItemContextMenu.minimized) {
+                    activePresentationItemContextMenu.expand()
                 } else {
-                    activePlaylistItemContextMenu.minimize()
+                    activePresentationItemContextMenu.minimize()
                 }
             }
         })
     }
 
-    class PlaylistItem extends Item {
+    class PresentationItem extends Item {
         /*
-        A block, for a whole item in the playlist.
+        A block, for a whole item in the presentation.
 
         Constructor data:
             title (String): Shown at top of item (if the item has only one section, or if title is empty, will not be shown)
             showSectionWhenMinimized: If true, will display the first section when the item is minimized. True by default.
-            items (Array: PlaylistItemSection): Sections added to item
+            items (Array: PresentationItemSection): Sections added to item
         
         Properties:
             previewHeight (get/set) (number): Preview height in pixels.
@@ -13186,9 +13186,9 @@ class BoxEdit {
             sections (get/set) (Array)
         
         Methods:
-            add (section: PlaylistItemSection, index?: number): Adds the provided section to the item. If an index is provided, it is inserted at that position, otherwise at the end
-            remove (item: PlaylistItemSection / index: number): Removes the specified section from the item.
-            indexOf (item: PlaylistItemSection): Returns the index of the specified section in the items list of sections
+            add (section: PresentationItemSection, index?: number): Adds the provided section to the item. If an index is provided, it is inserted at that position, otherwise at the end
+            remove (item: PresentationItemSection / index: number): Removes the specified section from the item.
+            indexOf (item: PresentationItemSection): Returns the index of the specified section in the items list of sections
             expand
             minimize
         
@@ -13201,7 +13201,7 @@ class BoxEdit {
         constructor(data = {}, styles = {}) {
             super(document.createElement('div'), styles)
 
-            this.addClass('playlistItem')
+            this.addClass('presentationItem')
 
             //buttons & other items
             {
@@ -13401,19 +13401,19 @@ class BoxEdit {
                 }
             })
 
-            setupPlaylistItemContextMenu()
+            setupPresentationItemContextMenu()
 
             this.node.addEventListener('contextmenu', () => {
-                activePlaylistItemContextMenu = this
+                activePresentationItemContextMenu = this
 
-                exports.contextMenu.change('playlist-item', [
+                exports.contextMenu.change('presentation-item', [
                     {},
                     {},
                     {
                         checked: this.minimized
                     }
                 ])
-                exports.contextMenu.enable('playlist-item')
+                exports.contextMenu.enable('presentation-item')
             })
         }
 
@@ -13597,7 +13597,7 @@ class BoxEdit {
                 return false
             }
 
-            let item = new PlaylistItemSection()
+            let item = new PresentationItemSection()
 
             item.height = this.properties.previewHeight
             item.parent = this
@@ -13640,7 +13640,7 @@ class BoxEdit {
         }
 
         remove(itemOrIndex) {
-            if (itemOrIndex instanceof PlaylistItemSection) {
+            if (itemOrIndex instanceof PresentationItemSection) {
                 itemOrIndex = this.indexOf(itemOrIndex)
             }
 
@@ -13824,11 +13824,11 @@ class BoxEdit {
             }
         }
     }
-    exports.PlaylistItem = items.PlaylistItem = PlaylistItem
+    exports.PresentationItem = items.PresentationItem = PresentationItem
 
-    class PlaylistItemSection extends Item {
+    class PresentationItemSection extends Item {
         /*
-        A section (individual slide) to use in a playlist item block.
+        A section (individual slide) to use in a presentation item block.
 
         Constructor data:
             display (Display Object): Shown in display, returned by .display
@@ -14096,7 +14096,7 @@ class BoxEdit {
             }
         }
     }
-    exports.playlistItemSection = items.PlaylistItemSection = PlaylistItemSection
+    items.PresentationItemSection = PresentationItemSection
 
     exports.showLoader = (item, text = 'Loading', animate = true) => {
         if (!validItem(item)) {
