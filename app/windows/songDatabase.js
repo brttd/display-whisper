@@ -1274,35 +1274,73 @@ Songs.onEvent('update', changed => {
     }
 
     if (Array.isArray(changed) && editor.data.group) {
-        let activeSongChanged = false
+        let changeIndex = -1
 
         for (let i = 0; i < changed.length; i++) {
             if (
                 changed[i].group === editor.data.group &&
                 changed[i].ID === editor.data.groupID
             ) {
-                activeSongChanged = true
+                changeIndex = i
 
                 break
             }
         }
 
-        if (activeSongChanged) {
-            layout.dialog.showQuestion(
-                {
-                    title: 'Reload Song?',
+        if (changeIndex !== -1) {
+            Songs.get(
+                changed[changeIndex].group,
+                changed[changeIndex].ID,
+                (error, song) => {
+                    if (error) {
+                        logger.error(
+                            'Could not get song ',
+                            changed[changeIndex].group,
+                            changed[changeIndex].ID,
+                            '!'
+                        )
+                        return false
+                    }
+                    if (
+                        !editor.util.same(
+                            editor.util.filterObj(song, {
+                                author: true,
+                                copyright: true,
+                                name: true,
+                                playOrder: true,
+                                sections: true
+                            }),
+                            editor.util.filterObj(editor.data, {
+                                author: true,
+                                copyright: true,
+                                name: true,
+                                playOrder: true,
+                                sections: true
+                            })
+                        )
+                    ) {
+                        layout.dialog.showQuestion(
+                            {
+                                title: 'Reload Song?',
 
-                    message:
-                        'The song you currently have selected has been changed!\nIf you do not reload, the song you see might be different to what is saved in the library.',
-                    detail: editor.hasChanges
-                        ? 'If you do reload, any changes you have made will be lost!'
-                        : '',
+                                message:
+                                    'The song you currently have selected has been changed!\nIf you do not reload, the song you see might be different to what is saved in the library.',
+                                detail: editor.hasChanges
+                                    ? 'If you do reload, any changes you have made will be lost!'
+                                    : '',
 
-                    options: ['Reload', 'Cancel']
-                },
-                (error, answer) => {
-                    if (answer === 'Reload') {
-                        loadSong(editor.data.group, editor.data.groupID, true)
+                                options: ['Reload', 'Cancel']
+                            },
+                            (error, answer) => {
+                                if (answer === 'Reload') {
+                                    loadSong(
+                                        editor.data.group,
+                                        editor.data.groupID,
+                                        true
+                                    )
+                                }
+                            }
+                        )
                     }
                 }
             )
