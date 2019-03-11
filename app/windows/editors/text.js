@@ -84,7 +84,7 @@ const maxLinesEditor = new layout.NumberInput({
 })
 
 const fitTextButton = new layout.Button({
-    text: 'Fit Text & Unify',
+    text: 'Scale Text & Unify',
     size: 'large'
 })
 

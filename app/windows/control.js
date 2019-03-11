@@ -2319,7 +2319,7 @@ let displaying = false
     )
 
     const fitTextAllButton = new layout.Button({
-        text: 'Fit Text & Unify - All',
+        text: 'Scale Text & Unify - All',
         size: 'large'
     })
 
@@ -3489,7 +3489,7 @@ const item_add = {
         textBlock.add(boxEditor)
 
         const fitTextButton = new layout.Button({
-            text: 'Fit Text'
+            text: 'Scale Text'
         })
         textBlock.add(fitTextButton)
 
