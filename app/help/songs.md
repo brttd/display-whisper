@@ -10,8 +10,8 @@ A song item in the presentation will show its content as listed in its play orde
 Each of these sections can be added or removed from the song item from within its editor.  
 When adding a song item to the presentation, these section can be automatically added to the start and end of the song.  
 By default a **Blank** section will be added at the start and end. This can be changed in the Preferences, under _Songs_ > _Play Order_.  
-If **Add intro section** is enabled it will add the intro section to the start of the song. If **Add blank section at start** is enabled, the intro section will be added after the blank section.  
-If **Add outro section** is enabled it will add the outro section to the end of the song. If **Add blank section at end** is enabled, the outro section will be added before the blank section.
+If **Add intro section to start** is enabled it will add the intro section to the start of the song. If **Add blank section to start** is enabled, the intro section will be added after the blank section.  
+If **Add outro section to end** is enabled it will add the outro section to the end of the song. If **Add blank section to end** is enabled, the outro section will be added before the blank section.
 
 The text in the **Intro** and **Outro** use [Text expressions](#song-text-expressions).
 

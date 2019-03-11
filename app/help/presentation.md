@@ -1,10 +1,5 @@
 # Saving And Opening Presentations
-Options to create, open, or save presentations can be selected in _File_ from the _Menu_ in the Control window.  
-You can also use keyboard shortcuts:
-* `control.keyboard.newPlaylist` Create new presentation.
-* `control.keyboard.openPlaylist` Open presentation.
-* `control.keyboard.savePlaylist` Save presentation.
-* `control.keyboard.savePlaylistAs` Save presentation as.
+Options to create, open, or save presentations can be selected in _File_ from the _Menu_ in the Control window.
 
 The current presentation is auto-saved, how often this is done can be changed in the Preferences, under _General_ > _Main_ > _Auto-save time_.  
 When **Display Whisper** is opened, the last auto-save will be loaded.
@@ -36,7 +31,7 @@ The presentation can also be controlled with keyboard shortcuts:
 * `control.keyboard.playSelected` Display the selected section.
 * `control.keyboard.toggleBlank` Toggle blank option.
 
-When keeping a keyboard shortcut pressed, the action can be repeatedly activated. By default this is disabled, you can change it in the Preferences, under _Shortcuts_ > _General Keyboard Shortcuts_ > _Activate shortcuts repeatedly whilst pressed_.  
+When keeping a keyboard shortcut pressed, the action can be repeatedly activated. By default this is disabled, you can change it in the Preferences, under _Shortcuts_ > _General Keyboard Shortcuts_ > _Execute actions repeatedly while shortcut is pressed_.  
 The speed at which it is repeated is dependent on the OS keyboard settings.
 
 >**Note:**  
@@ -49,7 +44,7 @@ You can also reorder items in the presentation with keyboard shortcuts:
 * `control.keyboard.moveSelectedTop` Move the selected item to the start.
 
 >**Note:**  
-These, and all other keyboard shortcuts can be changed in the Preferences, under _Shortcuts_ > _General Keyboard Shortcuts_.
+These, and all other keyboard shortcuts can be changed in the Preferences, under _Shortcuts_ > _Control Keyboard Shortcuts_.
 
 # Changing Display
 The display can be enabled & disabled with the _Display_ (![display](#display)) button in the _Display Menu_ of the Control window.  
@@ -73,7 +68,7 @@ The _Display_ > _Screen_ preferences are:
 * **Hide cursor on display**: When enabled, the cursor will not show when it is over the display.
 * **Use set size for display**: When enabled, the display will be the chosen size, regardless of what resolution the screen being used is. The display will be scaled up or down to fit into the chosen screen.
 * **Display size**: What size to use for the display. As presentation elements use **px** values for text size, different display sizes will change the size at which text is shown on screen.
-* **Background bar color**: If the chosen screen is a different ratio to the custom display size, the display will be scaled to fit. Bars above & below, or to the left & right will be shown, with the given color.
+* **Display letterbox bar color**: If the chosen screen is a different ratio to the custom display size, the display will be scaled to fit. Bars above & below, or to the left & right will be shown, with the given color.
 
 # Previews
 The _Previews_ in the Control window can each be set to one of four options:
