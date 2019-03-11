@@ -1,12 +1,11 @@
 # Usage
 **Display Whisper** is for presenting songs, text, and images.  
-When you first use **Display Whisper**, there will be no items in the presentation.
 
 In the Control window, there are 4 main sections:  
-The _Add_ panel is on the left, and contains tabs for adding [songs](#adding-songs), [text](#adding-text), or [images](#adding-images) to the presentation.  
+The _Add_ panel is on the left, and contains tabs for adding [songs](#adding-songs), [text](#adding-text), and [images](#adding-images) to the presentation.  
 The _Presentation_ list is in the center, and shows all items in the presentation. The list contains previews and information for each item in the presentation, and controls for changing the list.  
 Below the _Presentation_ list are _Presentation Controls_. These are controls and options for moving through the presentation.  
-The _Previews_ are on the right, and show where you are in the presentation. This allows you to see what will be displayed before you move to it, or whilst the display is disabled.  
+The _Previews_ are on the right, and show where you are in the presentation. This allows you to see what will be displayed before you move to it, or enable the display.  
 The _Display Menu_ is at the top, and contains controls for enabling & disabling the [display](#presentation), and switching which screen is used for displaying.
 
 You can view this help at any time by selecting _Help_ > _Help_ from the _Menu_ in the Control window.
