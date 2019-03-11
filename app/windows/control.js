@@ -298,32 +298,8 @@ const presentation = {}
     function onItemRemove(event) {
         remove(itemsBlock.indexOf(event.from))
     }
-    function onContextClick(event) {
-        if (lastClicked !== null) {
-            if (event.label === 'Minimize') {
-                if (lastClicked.minimized) {
-                    lastClicked.expand()
-                } else {
-                    lastClicked.minimize()
-                }
-            } else if (event.label === 'Edit') {
-                ipcRenderer.send(
-                    'start-edit',
-                    lastClicked._itemType,
-                    lastClicked._data.id,
-                    lastClicked._data.getEditData()
-                )
 
-                activeEditors.push(lastClicked._data.id)
-
-                lastClicked.editActive = true
-            } else if (event.label === 'Remove') {
-                remove(itemsBlock.indexOf(lastClicked))
-            }
-        }
-    }
-
-    //playlist functions
+    //presentation functions
     function ensureImageExists(image) {
         return existsSync(image.url)
     }
@@ -2091,8 +2067,6 @@ const presentation = {}
             })
         }
     })
-
-    layout.contextMenu.onEvent('playlist-item', onContextClick)
 
     let closing = false
     let canClose = false
