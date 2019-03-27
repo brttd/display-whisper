@@ -5,6 +5,7 @@
     "icon": "app/icons/main",
     "main": "main.js",
     "scripts": {
+        "process-icons": "node scripts/process-icons.js",
         "start": "node scripts/check-asar.js && electron app",
         "fresh-start": "node scripts/asar.js && electron app",
         "launch": "electron app",
