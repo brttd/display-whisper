@@ -15421,7 +15421,7 @@ class BoxEdit {
 
     const notifClose = document.createElement('div')
     notifClose.className = 'icon close'
-    notifClose.appendChild(getIconSVG('close'))
+    notifClose.appendChild(getIconSVG('remove'))
 
     notifContain.appendChild(notifBox)
     notifBox.appendChild(notifText)
