@@ -11,7 +11,7 @@ function modifyIconFile(fileName) {
             /<[\W\w]*<svg.*>/gim,
             '<svg xmlns="http://www.w3.org/2000/svg">'
         )
-        content = content.replace(/<g/gim, '<symbol viewbox="0 0 18 18"')
+        content = content.replace(/<g/gim, '<symbol viewBox="0 0 18 18"')
         content = content.replace(/<\/g/gim, '</symbol')
 
         content = content.replace(/fill:white;/gim, '')
