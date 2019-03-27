@@ -150,30 +150,29 @@ layout.body.add(
         {
             items: [
                 new layout.Button({ icon: 'add' }),
-                new layout.Button({ icon: 'close' }),
-                new layout.Button({ icon: 'display' }),
+                new layout.Button({ icon: 'remove' }),
+                new layout.Button({ icon: 'move-y' }),
+                new layout.Button({ icon: 'move-x' }),
                 new layout.Button({ icon: 'edit' }),
                 new layout.Button({ icon: 'expand-x' }),
                 new layout.Button({ icon: 'expand-y' }),
-                new layout.Button({ icon: 'move-x' }),
-                new layout.Button({ icon: 'move-y' }),
+                new layout.Button({ icon: 'display' }),
+                new layout.Button({ icon: 'settings' }),
                 new layout.Button({ icon: 'play' }),
                 new layout.Button({ icon: 'play-first' }),
                 new layout.Button({ icon: 'play-last' }),
                 new layout.Button({ icon: 'play-next' }),
                 new layout.Button({ icon: 'play-previous' }),
-                new layout.Button({ icon: 'remove' }),
-                new layout.Button({ icon: 'settings' }),
 
-                new layout.Button({ icon: 'text-align-center' }),
-                new layout.Button({ icon: 'text-align-left' }),
-                new layout.Button({ icon: 'text-align-right' }),
                 new layout.Button({ icon: 'text-bold' }),
                 new layout.Button({ icon: 'text-italic' }),
+                new layout.Button({ icon: 'text-underline' }),
                 new layout.Button({ icon: 'text-strikethrough' }),
                 new layout.Button({ icon: 'text-subscript' }),
                 new layout.Button({ icon: 'text-superscript' }),
-                new layout.Button({ icon: 'text-underline' })
+                new layout.Button({ icon: 'text-align-center' }),
+                new layout.Button({ icon: 'text-align-left' }),
+                new layout.Button({ icon: 'text-align-right' })
             ]
         },
         {
