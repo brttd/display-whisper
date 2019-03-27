@@ -1,18 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg">
-    <symbol id="program" viewBox="0 0 180 180">
-        <path d="M76.5,49.5l90,-13.5l0,108l-90,-13.5l0,-4.5l18,0l0,-72l-18,0l0,-4.5Z" style="fill:rgb(204,204,204);"/>
-        <clipPath id="_clip1">
-            <path d="M76.5,49.5l90,-13.5l0,108l-90,-13.5l0,-4.5l18,0l0,-72l-18,0l0,-4.5Z"/>
-        </clipPath>
-        <g clip-path="url(#_clip1)">
-            <path d="M135,118.8l0,9.9l-36,-4.5l0,-8.1l36,2.7Zm18,-24.3l0,11.7l-72,-2.7l0,-9l72,0Zm-54,-18.9l36,-3.6l0,11.7l-36,0.9l0,-9Zm45,-26.1l0,11.7l-54,5.4l0,-9.9l54,-7.2Z" style="fill:white;"/>
-        </g>
-        <path d="M9,54l0,72l81,-4.5l0,-63l-81,-4.5" style="fill:white;"/>
-        <clipPath id="_clip2">
-            <path d="M9,54l0,72l81,-4.5l0,-63l-81,-4.5"/>
-        </clipPath>
-        <g clip-path="url(#_clip2)">
-            <path d="M40.5,72l0,36l27,-18l-27,-18Z" style="fill:rgb(204,204,204);"/>
-        </g>
+    <symbol viewBox="0 0 18 18" id="program">
+        <path d="M16,2l0,14l-14,-2l0,-10l14,-2Zm-9,5l0,4l5,-2l-5,-2Z"/>
     </symbol>
 </svg>
