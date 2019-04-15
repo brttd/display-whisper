@@ -2581,10 +2581,13 @@ exports.change = addStyles
                 if (event.button === 2 && this.hovering) {
                     this.hovering = false
 
-                    sendEventTo({
-                        fromUser: true,
-                        from: this
-                    }, this.events['cancel-drop'])
+                    sendEventTo(
+                        {
+                            fromUser: true,
+                            from: this
+                        },
+                        this.events['cancel-drop']
+                    )
                 }
             })
 
@@ -7723,7 +7726,7 @@ exports.change = addStyles
             this.node.addEventListener('mouseleave', () => {
                 if (mouseDown) {
                     this.node.classList.add('dragging')
-                    
+
                     sendEventTo(
                         {
                             fromUser: true,
@@ -8359,15 +8362,12 @@ exports.change = addStyles
                 })
                 item.onEvent('drag', event => {
                     body.inputFocused(this, event.fromUser)
-                    
+
                     if (this.options.reorderable) {
                         this.dragging = item
 
-                        this.select(
-                            this.items.indexOf(item),
-                            event.fromUser
-                        )
-                        
+                        this.select(this.items.indexOf(item), event.fromUser)
+
                         sendEventTo(
                             {
                                 index: this.items.indexOf(item),
