@@ -2,8 +2,7 @@ const ipcRenderer = require('electron').ipcRenderer
 
 const path = require('path')
 
-const color = require('dw-color')
-const keyboard = require('dw-keyboard')
+const { isColor } = require('dw-color')
 
 const displayNode = document.createElement('div')
 displayNode.id = 'display'
@@ -135,7 +134,7 @@ function addNode(data = {}, parentNode = displayNode.lastChild) {
             node.style.fontSize = defaults.size + 'px'
         }
 
-        if (color.isColor(data.color)) {
+        if (isColor(data.color)) {
             node.firstChild.style.color = data.color
         } else {
             node.firstChild.style.color = defaults.color
@@ -224,7 +223,7 @@ function display(data = {}) {
     requestAnimationFrame(() => {
         let newDisplay = document.createElement('div')
 
-        if (color.isColor(data.background)) {
+        if (isColor(data.background)) {
             newDisplay.style.backgroundColor = data.background
         } else {
             newDisplay.style.backgroundColor = defaults.background
@@ -416,6 +415,8 @@ function toggleBlank() {
 
 //Settings, keyboard shortcuts, etc
 {
+    const keyboard = require('dw-keyboard')
+
     let listeners = {}
     let repeat = false
 
