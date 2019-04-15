@@ -10,13 +10,11 @@ const { dialog, Menu, MenuItem } = remote
 const fs = require('fs')
 const path = require('path')
 
-const fontList = require('font-list')
-
+const logger = require('dw-log')
+const Database = require('dw-database')
+const keyboard = require('dw-keyboard')
 const richText = require('dw-rich-text')
 const color = require('dw-color')
-const logger = require('dw-log')
-const keyboard = require('dw-keyboard')
-const Database = require('dw-database')
 
 const objUtil = require('dw-editor').util
 
