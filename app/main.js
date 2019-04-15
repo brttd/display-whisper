@@ -1311,90 +1311,100 @@ function isLatestVersion(callback) {
     if (typeof callback !== 'function') {
         return false
     }
+    let https = require('https')
 
     try {
-        getURL(
-            'https://raw.githubusercontent.com/brttd/display-whisper/builds/latest/info.json',
-            response => {
-                let text = ''
+        https
+            .get(
+                'https://raw.githubusercontent.com/brttd/display-whisper/builds/latest/info.json',
+                response => {
+                    let text = ''
 
-                response.on('data', data => {
-                    text += data
-                })
+                    response.on('data', data => {
+                        text += data
+                    })
 
-                response.on('end', () => {
-                    if (text) {
-                        try {
-                            let data = JSON.parse(text)
+                    response.on('end', () => {
+                        if (text) {
+                            try {
+                                let data = JSON.parse(text)
 
-                            if (typeof data.version === 'string') {
-                                let exit = false
+                                if (typeof data.version === 'string') {
+                                    let exit = false
 
-                                let currentVersion = app.getVersion().split('.')
-                                let newVersion = data.version.split('.')
+                                    let currentVersion = app
+                                        .getVersion()
+                                        .split('.')
+                                    let newVersion = data.version.split('.')
 
-                                logger.info(
-                                    'Checking versions, current:',
-                                    currentVersion,
-                                    'new:',
-                                    newVersion,
-                                    'text',
-                                    text
-                                )
+                                    logger.info(
+                                        'Checking versions, current:',
+                                        currentVersion,
+                                        'new:',
+                                        newVersion,
+                                        'text',
+                                        text
+                                    )
 
-                                for (
-                                    let i = 0;
-                                    i < currentVersion.length &&
-                                    i < newVersion.length &&
-                                    exit === false;
-                                    i++
-                                ) {
-                                    let current = parseInt(currentVersion[i])
-                                    let latest = parseInt(newVersion[i])
+                                    for (
+                                        let i = 0;
+                                        i < currentVersion.length &&
+                                        i < newVersion.length &&
+                                        exit === false;
+                                        i++
+                                    ) {
+                                        let current = parseInt(
+                                            currentVersion[i]
+                                        )
+                                        let latest = parseInt(newVersion[i])
 
-                                    if (isFinite(current) && isFinite(latest)) {
-                                        if (current < latest) {
-                                            callback(null, data.version)
-                                            exit = true
-                                        } else if (current > latest) {
-                                            callback(null, false)
-                                            exit = true
+                                        if (
+                                            isFinite(current) &&
+                                            isFinite(latest)
+                                        ) {
+                                            if (current < latest) {
+                                                callback(null, data.version)
+                                                exit = true
+                                            } else if (current > latest) {
+                                                callback(null, false)
+                                                exit = true
+                                            }
                                         }
                                     }
-                                }
 
-                                if (!exit) {
+                                    if (!exit) {
+                                        callback(null, false)
+                                    }
+                                } else {
                                     callback(null, false)
+
+                                    logger.error(
+                                        'latest/info.json did not contain version!'
+                                    )
                                 }
-                            } else {
-                                callback(null, false)
+                            } catch (error) {
+                                callback(error, false)
 
                                 logger.error(
-                                    'latest/info.json did not contain version!'
+                                    'Unable to get latest version info:',
+                                    error
                                 )
                             }
-                        } catch (error) {
-                            callback(error, false)
+                        } else {
+                            callback(true, false)
 
                             logger.error(
-                                'Unable to get latest version info:',
-                                error
+                                'Get latest version response ended with no data!'
                             )
                         }
-                    } else {
-                        callback(true, false)
+                    })
+                }
+            )
+            .on('error', error => {
+                logger.error('https.get error:', error)
 
-                        logger.error(
-                            'Get latest version response ended with no data!'
-                        )
-                    }
-                })
-            }
-        ).on('error', error => {
-            logger.error('https.get error:', error)
-
-            callback(null, false)
-        })
+                callback(null, false)
+            })
     } catch (error) {
         logger.error('Unable to send version request!', error)
 
