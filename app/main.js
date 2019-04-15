@@ -1,5 +1,5 @@
 const electron = require('electron')
-const { app, BrowserWindow, dialog, ipcMain, shell, Menu, MenuItem } = electron
+const { app, BrowserWindow, dialog, ipcMain, Menu, MenuItem } = electron
 
 const url = require('url')
 const path = require('path')
@@ -515,7 +515,7 @@ function makeWindowBoundsSafe(bounds) {
 
 function onWinNewWindow(event, url) {
     event.preventDefault()
-    shell.openExternal(url)
+    electron.shell.openExternal(url)
 
     logger.log('A window opened url:', url)
 }
@@ -1447,7 +1447,7 @@ const appMenus = {
 
             return
         } else if (typeof item.url === 'string') {
-            shell.openExternal(item.url)
+            electron.shell.openExternal(item.url)
 
             return
         } else if (typeof item.function === 'function') {
