@@ -1,10 +1,11 @@
 const { ipcRenderer } = require('electron')
 
-const logger = require('dw-log')
 const layout = require('dw-layout')
-const richText = require('dw-rich-text')
-const editor = require('dw-editor')
+
+const logger = require('dw-log')
 const Database = require('dw-database')
+const editor = require('dw-editor')
+const richText = require('dw-rich-text')
 
 const Songs = new Database.Group('songs', { load: false, parse: true })
 const Templates = new Database.Group('templates', { load: true, parse: true })

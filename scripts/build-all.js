@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const child_process = require('child_process')
+
 const rmdir = require('rimraf')
 const ncp = require('ncp')
 const packager = require('electron-packager')

@@ -1,7 +1,8 @@
 const { ipcRenderer } = require('electron')
-const path = require('path')
 
 const fs = require('fs')
+const path = require('path')
+
 const logger = require('dw-log')
 
 const dir = path.join(

@@ -1,9 +1,10 @@
-const layout = require('dw-layout')
-const Database = require('dw-database')
-const richText = require('dw-rich-text')
-
 const fs = require('fs')
 const path = require('path')
+
+const layout = require('dw-layout')
+
+const Database = require('dw-database')
+const richText = require('dw-rich-text')
 
 const Songs = new Database.Group('songs', {
     load: false

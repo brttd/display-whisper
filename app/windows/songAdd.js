@@ -1,8 +1,9 @@
 const layout = require('dw-layout')
+
 const logger = require('dw-log')
-const richText = require('dw-rich-text')
-const editor = require('dw-editor')
 const Database = require('dw-database')
+const editor = require('dw-editor')
+const richText = require('dw-rich-text')
 
 const Songs = new Database.Group('songs', {
     load: true,

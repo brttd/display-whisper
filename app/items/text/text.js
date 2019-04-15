@@ -1,5 +1,5 @@
 const richText = require('dw-rich-text')
-const isColor = require('dw-color').isColor
+const { isColor } = require('dw-color')
 
 function applySectionData(target, source = {}) {
     if (typeof source.name === 'string') {

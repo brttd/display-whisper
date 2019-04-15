@@ -1,10 +1,11 @@
 const { ipcRenderer } = require('electron')
 
 const layout = require('dw-layout')
-const editor = require('dw-editor')
-const richText = require('dw-rich-text')
+
 const logger = require('dw-log')
 const Database = require('dw-database')
+const editor = require('dw-editor')
+const richText = require('dw-rich-text')
 
 const Templates = new Database.Group('templates', { load: true, parse: true })
 
