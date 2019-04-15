@@ -1,13 +1,12 @@
 const electron = require('electron')
-const ipcRenderer = electron.ipcRenderer
-const userDataPath = (electron.app || electron.remote.app).getPath('userData')
+const { ipcRenderer } = electron
 
 const fs = require('fs')
-const path = require('path')
 
-const util = require('util')
-
-const logFilePath = path.join(userDataPath, 'log.txt')
+const logFilePath = require('path').join(
+    (electron.app || electron.remote.app).getPath('userData'),
+    'log.txt'
+)
 
 let debug = false
 
