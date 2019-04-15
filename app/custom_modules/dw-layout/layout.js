@@ -7,8 +7,8 @@ document.body.style.opacity = 0
 const { remote, ipcRenderer } = require('electron')
 const { dialog, Menu, MenuItem } = remote
 
-const fs = require('fs')
 const path = require('path')
+let fs
 
 const logger = require('dw-log')
 const Database = require('dw-database')
@@ -5875,6 +5875,8 @@ exports.change = addStyles
             super(document.createElement('button'), styles, data.focus)
             this.addClass('input-file')
 
+            fs = require('fs')
+
             this.node.id = getUniqueId('file')
 
             this.textNode = document.createElement('span')
@@ -6399,6 +6401,8 @@ exports.change = addStyles
         constructor(data = {}, styles = {}) {
             super(document.createElement('div'), {}, data.focus)
             this.addClass('input-image')
+
+            fs = require('fs')
 
             this.buttonNode = document.createElement('button')
             this.buttonNode.id = getUniqueId(this.buttonNode.tagName)
