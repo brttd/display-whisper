@@ -1,10 +1,9 @@
-const { ipcRenderer } = require('electron')
-
 const layout = require('dw-layout')
-const richText = require('dw-rich-text')
+
 const logger = require('dw-log')
-const editor = require('dw-editor')
 const Database = require('dw-database')
+const editor = require('dw-editor')
+const richText = require('dw-rich-text')
 
 //Song search items
 const searchBox = new layout.TextInput({
@@ -1455,7 +1454,7 @@ function showSong(songGroup, songID) {
     }
 }
 
-ipcRenderer.on('show-song', (event, songGroup, songID) => {
+require('electron').ipcRenderer.on('show-song', (event, songGroup, songID) => {
     if (typeof songGroup !== 'string' || typeof songID !== 'number') {
         return false
     }

@@ -1,12 +1,9 @@
-const fs = require('fs')
-const path = require('path')
-
 const layout = require('dw-layout')
+
 const logger = require('dw-log')
-const editor = require('dw-editor')
 const Database = require('dw-database')
+const editor = require('dw-editor')
 const richText = require('dw-rich-text')
-const dwItems = require('dw-items')
 
 const Templates = new Database.Group('templates', {
     load: true,
@@ -772,7 +769,7 @@ function updateTemplateListAndSelect() {
         itemsBar.add(itemButton)
     }
 
-    let templates = dwItems.templateList
+    let templates = require('dw-items').templateList
 
     for (let i = 0; i < templates.length; i++) {
         addItemFormat(templates[i], dwItems.templates[templates[i]])
@@ -934,8 +931,9 @@ removeButton.onEvent('click', () => {
 
 //Until the default template is loaded, don't allow user to add/remove any templates
 list.disabled = true
-fs.readFile(
-    path.join(__dirname, '..', 'default-template.json'),
+
+require('fs').readFile(
+    require('path').join(__dirname, '..', 'default-template.json'),
     'utf8',
     (error, data) => {
         if (error) {

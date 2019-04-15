@@ -1,8 +1,7 @@
-const fs = require('fs')
-
 const layout = require('dw-layout')
-const Database = require('dw-database')
+
 const logger = require('dw-log')
+const Database = require('dw-database')
 
 const Songs = new Database.Group('songs', {
     load: true,
@@ -89,7 +88,7 @@ function save(filename) {
         return false
     }
 
-    fs.writeFile(filename, data, 'utf8', error => {
+    require('fs').writeFile(filename, data, 'utf8', error => {
         closeButton.disabled = false
         fileSelect.disabled = false
 

@@ -1,6 +1,4 @@
 const { remote, shell } = require('electron')
-const fs = require('fs')
-const path = require('path')
 
 const links = document.querySelectorAll('a')
 const licenses_elem = document.getElementById('licenses')
@@ -201,8 +199,8 @@ addLicense({
     OTHER DEALINGS IN THE FONT SOFTWARE.`
 })
 
-fs.readFile(
-    path.join(__dirname, '../', 'licenses.json'),
+require('fs').readFile(
+    require('path').join(__dirname, '../', 'licenses.json'),
     'utf8',
     (error, data) => {
         if (error) {

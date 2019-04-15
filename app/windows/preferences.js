@@ -1,12 +1,10 @@
-const ipcRenderer = require('electron').ipcRenderer
-
-const fs = require('fs')
-const path = require('path')
+const { ipcRenderer } = require('electron')
 
 const layout = require('dw-layout')
+
 const logger = require('dw-log')
 
-const settingsFile = path.join(__dirname, '..', 'settings.json')
+const settingsFile = require('path').join(__dirname, '..', 'settings.json')
 
 let entryInputs = {}
 
@@ -247,7 +245,7 @@ function displaySettings(data) {
     )
 }
 
-fs.readFile(settingsFile, (error, data) => {
+require('fs').readFile(settingsFile, (error, data) => {
     if (error) {
         logger.error('Unable to read settings display file:', error)
 
