@@ -4,7 +4,6 @@ const { app, BrowserWindow, dialog, ipcMain, Menu, MenuItem } = electron
 const url = require('url')
 const path = require('path')
 const fs = require('fs')
-const getURL = require('https').get
 
 const logger = require('dw-log')
 
