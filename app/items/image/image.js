@@ -1,5 +1,8 @@
-const path = require('path')
-const isColor = require('dw-color').isColor
+const { isColor } = require('dw-color')
+
+function basename(name) {
+    return name.split(/[\/\\]/).pop()
+}
 
 function applyData(target, source = {}) {
     if (typeof source.url === 'string') {
@@ -136,9 +139,9 @@ module.exports = class Image {
     get sections() {
         return [
             {
-                title: path.basename(this.data.url),
+                title: basename(this.data.url),
                 content: this.data.database
-                    ? path.win32.basename(this.data.url)
+                    ? basename(this.data.url)
                     : this.data.url,
 
                 display: {
