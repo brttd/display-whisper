@@ -537,7 +537,7 @@ const fonts = {}
         body.onIdle(preloadNext)
     }
 
-    fontList
+    require('font-list')
         .getFonts()
         .then(fontNames => {
             fonts.all = fontNames
