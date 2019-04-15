@@ -13,10 +13,30 @@ let debug = false
 
 let shownError = false
 
+function getCircularReplacer() {
+    const seen = new WeakSet()
+
+    return (key, value) => {
+        if (typeof value === 'object' && value !== null) {
+            if (seen.has(value)) {
+                return
+            }
+
+            seen.add(value)
+        }
+
+        return value
+    }
+}
+
 function argsToString(args) {
     return Array.prototype.slice
         .apply(args)
-        .map(arg => (typeof arg === 'string' ? arg : util.inspect(arg)))
+        .map(arg =>
+            typeof arg === 'string'
+                ? arg
+                : JSON.stringify(arg, getCircularReplacer(), 2)
+        )
         .join(' ')
 }
 
