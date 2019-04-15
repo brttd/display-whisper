@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const child_process = require('child_process')
+
 const asar = require('asar')
 const rmdir = require('rimraf')
 const ncp = require('ncp')

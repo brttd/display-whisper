@@ -3,10 +3,10 @@ const { ipcRenderer } = require('electron')
 const fs = require('fs')
 const pathJoin = require('path').join
 
-const appPath = pathJoin(__dirname, '..')
-
 const marked = require('marked')
 const renderer = new marked.Renderer()
+
+const appPath = pathJoin(__dirname, '..')
 
 const sections = {}
 let currentSection = ''
