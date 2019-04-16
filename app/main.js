@@ -1288,6 +1288,7 @@ function setDisplay(options) {
                 }
             } else {
                 windows.display.hide()
+                windows.display.close()
             }
         } else if (display.show === true) {
             openDisplay()
