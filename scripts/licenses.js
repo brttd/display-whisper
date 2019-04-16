@@ -9,7 +9,6 @@ const ignore = [
     'dw-color',
     'dw-database',
     'dw-editor',
-    'dw-files',
     'dw-items',
     'dw-keyboard',
     'dw-layout',
