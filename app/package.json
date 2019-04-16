@@ -17,6 +17,6 @@
         "dw-keyboard": "file:custom_modules\\dw-keyboard",
         "dw-layout": "file:custom_modules\\dw-layout",
         "dw-rich-text": "file:custom_modules\\dw-rich-text",
-        "marked": "^0.3.6"
+        "marked": "^0.6.2"
     }
 }
