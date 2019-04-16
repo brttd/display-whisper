@@ -229,16 +229,22 @@ class EmptyDatabase {
         //If sendUpdate is called before minUpdateSendTime is elapsed, don't send out an update
         setTimeout(() => {
             if (Date.now() - this._lastSendAttempt >= minUpdateSendTime) {
-                ipcRenderer.send(
-                    'database-updated',
-                    this._name,
-                    process.pid,
-                    this._changesToSend
-                )
-
-                this._changesToSend = []
+                this.sendUpdates()
             }
         }, minUpdateSendTime + 2)
+    }
+
+    sendUpdates() {
+        if (this._changesToSend.length > 0) {
+            ipcRenderer.send(
+                'database-updated',
+                this._name,
+                process.pid,
+                this._changesToSend
+            )
+
+            this._changesToSend = []
+        }
     }
 
     //(Synchronously) Checks that the library directory exists, and if not creates it.
