@@ -301,7 +301,7 @@ const presentation = {}
 
     //presentation functions
     function ensureImageExists(image) {
-        return existsSync(image.url)
+        return false
     }
 
     function reduceItemTextSize(index, sections) {
