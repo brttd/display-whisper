@@ -1018,6 +1018,8 @@ layout.window.onEvent('close', event => {
             (error, answer) => {
                 if (answer === 'Save') {
                     save(() => {
+                        Templates.sendUpdates()
+
                         event.close()
                     })
                 } else if (answer === 'Cancel') {
