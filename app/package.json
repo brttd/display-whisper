@@ -12,7 +12,6 @@
         "dw-color": "file:custom_modules\\dw-color",
         "dw-database": "file:custom_modules\\dw-database",
         "dw-editor": "file:custom_modules\\dw-editor",
-        "dw-files": "file:custom_modules\\dw-files",
         "dw-items": "file:custom_modules\\dw-items",
         "dw-keyboard": "file:custom_modules\\dw-keyboard",
         "dw-layout": "file:custom_modules\\dw-layout",
