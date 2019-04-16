@@ -341,7 +341,10 @@ function filter(source, filters, blackList = false, ignoreCache = []) {
 
 //Returns true if the two objects have the same values
 function sameObj(a, b, ignoreCache = []) {
-    if (a === b || (isNaN(a) && isNaN(b))) {
+    if (
+        a === b ||
+        (isNaN(a) && isNaN(b) && typeof a === 'number' && typeof b === 'number')
+    ) {
         return true
     }
 
