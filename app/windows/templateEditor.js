@@ -769,10 +769,13 @@ function updateTemplateListAndSelect() {
         itemsBar.add(itemButton)
     }
 
-    let templates = require('dw-items').templateList
+    let dwItems = require('dw-items')
 
-    for (let i = 0; i < templates.length; i++) {
-        addItemFormat(templates[i], dwItems.templates[templates[i]])
+    for (let i = 0; i < dwItems.templateList.length; i++) {
+        addItemFormat(
+            dwItems.templateList[i],
+            dwItems.templates[dwItems.templateList[i]]
+        )
     }
 
     if (itemsBar.items.length > 0) {
