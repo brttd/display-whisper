@@ -105,7 +105,7 @@ addLicense({
     repository: 'https://github.com/rsms/inter/',
     licenses: 'SIL OPEN FONT LICENSE',
 
-    licenseText: `Copyright (c) 2017 The Inter UI Project Authors (me@rsms.me)
+    licenseText: `Copyright (c) 2016-2018 The Inter Project Authors (me@rsms.me)
 
     This Font Software is licensed under the SIL Open Font License, Version 1.1.
     This license is copied below, and is also available with a FAQ at:
