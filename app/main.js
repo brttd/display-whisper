@@ -1,9 +1,9 @@
 const electron = require('electron')
 const { app, BrowserWindow, dialog, ipcMain, Menu, MenuItem } = electron
 
-const url = require('url')
 const path = require('path')
-const fs = require('fs')
+let url
+let fs
 
 const logger = require('dw-log')
 
@@ -2581,6 +2581,9 @@ function setupDisplays() {
     }
 
     app.on('ready', () => {
+        fs = require('fs')
+        url = require('url')
+
         settings.load()
 
         debug = settings.get('debug.enable', false)
