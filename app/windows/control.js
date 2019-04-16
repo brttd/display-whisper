@@ -1,5 +1,7 @@
-const { ipcRenderer, shell } = require('electron')
+const electron = require('electron')
+const { ipcRenderer } = electron
 
+const fs = require('fs')
 const path = require('path')
 
 const layout = require('dw-layout')
@@ -8,9 +10,10 @@ const logger = require('dw-log')
 const Database = require('dw-database')
 const editor = require('dw-editor')
 const keyboard = require('dw-keyboard')
-const files = require('dw-files')
 
 const items = require('dw-items')
+
+const appDataPath = electron.remote.app.getPath('userData')
 
 //**********************
 //Timer
@@ -1683,26 +1686,30 @@ const presentation = {}
             lastEditTime >= lastAutoSaveTime &&
             Date.now() - lastAutoSaveTime >= options.autoSaveInterval * 1000
         ) {
-            files.save('autosave.dpl', getSaveData(), error => {
-                if (error) {
-                    layout.dialog.showNotification({
-                        type: 'error',
-                        message:
-                            'Unable to autosave!\n' + error.message ||
-                            error.toString()
-                    })
+            fs.writeFile(
+                path.join(appDataPath, 'autosave.dpl'),
+                JSON.stringify(getSaveData()),
+                error => {
+                    if (error) {
+                        layout.dialog.showNotification({
+                            type: 'error',
+                            message:
+                                'Unable to autosave!\n' + error.message ||
+                                error.toString()
+                        })
 
-                    logger.error('Unable to save autosave:', error)
+                        logger.error('Unable to save autosave:', error)
 
-                    return false
+                        return false
+                    }
+
+                    lastAutoSaveTime = Date.now()
+
+                    layout.window.setTitle(
+                        'Display Whisper | ' + displayFilename(file) + '^'
+                    )
                 }
-
-                lastAutoSaveTime = Date.now()
-
-                layout.window.setTitle(
-                    'Display Whisper | ' + displayFilename(file) + '^'
-                )
-            })
+            )
         }
     }
 
@@ -1760,7 +1767,7 @@ const presentation = {}
 
     //File functions
     function loadFile(file) {
-        files.load(file, (error, data) => {
+        fs.readFile(file, (error, data) => {
             if (error) {
                 if (error.code === 'ENOENT') {
                     layout.dialog.showNotification({
@@ -1781,6 +1788,23 @@ const presentation = {}
 
                 return false
             }
+
+            try {
+                data = JSON.parse(data)
+            } catch (error) {
+                layout.dialog.showError({
+                    title: "Couldn't load file",
+                    message: 'Unable to load selected file!',
+                    detail:
+                        'The contents of the file were invalid:\n' +
+                        (error.message || error.toString())
+                })
+
+                logger.error('Error loading presentation file', file, error)
+
+                return false
+            }
+
             data.file = file
 
             presentation.load(data)
@@ -1826,25 +1850,29 @@ const presentation = {}
             return false
         }
 
-        files.save(presentation.file, presentation.getSaveData(), error => {
-            if (error) {
-                layout.dialog.showError({
-                    message: 'Unable to save file',
-                    detail: error.message || error.toString()
-                })
-                logger.error('Error saving presentation file', file, error)
+        fs.writeFile(
+            presentation.file,
+            JSON.stringify(presentation.getSaveData()),
+            error => {
+                if (error) {
+                    layout.dialog.showError({
+                        message: 'Unable to save file',
+                        detail: error.message || error.toString()
+                    })
+                    logger.error('Error saving presentation file', file, error)
 
-                if (typeof callback === 'function') {
-                    callback(error, false)
-                }
-            } else {
-                presentation.saved = true
+                    if (typeof callback === 'function') {
+                        callback(error, false)
+                    }
+                } else {
+                    presentation.saved = true
 
-                if (typeof callback === 'function') {
-                    callback(null, true)
+                    if (typeof callback === 'function') {
+                        callback(null, true)
+                    }
                 }
             }
-        })
+        )
     }
     function fileNewPresentation() {
         checkSave((error, canContinue) => {
@@ -2073,13 +2101,17 @@ const presentation = {}
         if (lastEditTime >= lastAutoSaveTime) {
             layout.showLoader(layout.body, 'Auto-Saving')
 
-            files.save('autosave.dpl', getSaveData(), error => {
-                if (error) {
-                    logger.error('Unable to autosave on close:', error)
-                }
+            fs.writeFile(
+                path.join(appDataPath, 'autosave.dpl'),
+                JSON.stringify(getSaveData()),
+                error => {
+                    if (error) {
+                        logger.error('Unable to autosave on close:', error)
+                    }
 
-                layout.window.close()
-            })
+                    layout.window.close()
+                }
+            )
         } else {
             layout.window.close()
         }
@@ -2215,9 +2247,17 @@ const presentation = {}
 
     //Loading autosave
     {
-        files.load('autosave.dpl', (error, data) => {
+        fs.readFile(path.join(appDataPath, 'autosave.dpl'), (error, data) => {
             if (error) {
                 logger.error('Unable to load autosave:', error)
+
+                return false
+            }
+
+            try {
+                data = JSON.parse(data)
+            } catch (error) {
+                logger.error('Unable to parse autosave:', error)
 
                 return false
             }
@@ -2635,10 +2675,27 @@ const item_add = {
                 defaultTemplate.ID = Templates.getUniqueID('t')
                 Templates.save('t', defaultTemplate.ID, defaultTemplate)
             } else {
-                files.load(
+                fs.readFile(
                     path.join(__dirname, '../', 'default-template.json'),
                     (error, data) => {
                         if (error) {
+                            logger.error(
+                                'Unable to load default template!',
+                                error
+                            )
+
+                            layout.dialog.showNotification({
+                                type: 'error',
+                                message:
+                                    'Unable to set default template!\nYour version of Display Whisper may be corrupt!'
+                            })
+
+                            return false
+                        }
+
+                        try {
+                            data = JSON.parse(data)
+                        } catch (error) {
                             logger.error(
                                 'Unable to load default template!',
                                 error
