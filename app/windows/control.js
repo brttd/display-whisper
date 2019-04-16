@@ -1,16 +1,14 @@
 const { ipcRenderer, shell } = require('electron')
 
 const path = require('path')
-const { existsSync } = require('fs')
+
+const layout = require('dw-layout')
 
 const logger = require('dw-log')
-const files = require('dw-files')
-const layout = require('dw-layout')
-const richText = require('dw-rich-text')
-const keyboard = require('dw-keyboard')
 const Database = require('dw-database')
-
 const editor = require('dw-editor')
+const keyboard = require('dw-keyboard')
+const files = require('dw-files')
 
 const items = require('dw-items')
 
