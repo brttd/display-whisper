@@ -2773,12 +2773,9 @@ const item_add = {
                                 'string'
                             ) {
                                 data._content +=
-                                    richText
-                                        .removeFormat(
-                                            data.sections[data.playOrder[i]]
-                                                .text
-                                        )
-                                        .toLowerCase() + '\n'
+                                    data.sections[
+                                        data.playOrder[i]
+                                    ].plainText.toLowerCase() + '\n'
                             }
                         }
                     }
