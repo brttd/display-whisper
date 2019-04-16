@@ -2,7 +2,7 @@
     "productName": "Display Whisper",
     "name": "displaywhisper",
     "version": "0.12.0",
-    "icon": "app/icons/main",
+    "icon": "app/icons/app",
     "main": "main.js",
     "scripts": {
         "process-icons": "node scripts/process-icons.js",
