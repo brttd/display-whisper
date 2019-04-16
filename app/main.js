@@ -57,8 +57,10 @@ const settings = {}
 {
     const settingsPath = path.join(app.getPath('userData'), 'settings.json')
 
-    const saveInterval = 2 * 1000
-    let lastSaveAttempt = 0
+    let lastSaveTime = 0
+    let lastChangeTime = 0
+
+    let saveDelay = 2000
 
     let loaded = false
 
@@ -67,7 +69,9 @@ const settings = {}
     let listeners = {}
 
     function save(callback) {
-        fs.writeFile(settingsPath, JSON.stringify(cache), error => {
+        let actualLastSaveTime = lastSaveTime
+        lastSaveTime = Date.now()
+
             if (error) {
                 logger.error('Unable to save settings file:', error)
 
@@ -76,7 +80,20 @@ const settings = {}
                     'An error occurred while saving application preferences! View log for more details.',
                     'error'
                 )
+
+                if (typeof callback === 'function') {
+                    callback(error)
+                }
+
+                lastSaveTime = actualLastSaveTime
+
+                saveDelay += 1000
+                attemptSave()
+
+                return false
             }
+
+            saveDelay = 2000
 
             if (typeof callback === 'function') {
                 callback(error)
@@ -85,13 +102,13 @@ const settings = {}
     }
 
     function attemptSave() {
-        lastSaveAttempt = Date.now()
-
-        setTimeout(() => {
-            if (Date.now() - lastSaveAttempt > saveInterval) {
-                save()
-            }
-        }, saveInterval + 1)
+        if (lastChangeTime >= lastSaveTime) {
+            setTimeout(() => {
+                if (Date.now() - saveDelay > lastSaveTime) {
+                    save()
+                }
+            }, saveDelay + 20)
+        }
     }
 
     function addListener(key, listener) {
@@ -142,6 +159,7 @@ const settings = {}
     }
 
     function keyChanged(key, value) {
+        lastChangeTime = Date.now()
         attemptSave()
 
         alertListeners(key, value)
@@ -168,6 +186,8 @@ const settings = {}
                         error
                     )
                 }
+
+                lastSaveTime = Date.now() + 1
 
                 for (let section in data) {
                     for (let subSection in data[section]) {
@@ -353,8 +373,11 @@ const settings = {}
         return true
     }
     settings.forceSave = callback => {
-        save(callback)
-        lastSaveAttempt = Date.now()
+        if (lastChangeTime >= lastSaveTime) {
+            save(callback)
+        } else {
+            callback()
+        }
     }
 
     ipcMain.on('get-setting-sync', (event, key, defaultValue) => {
