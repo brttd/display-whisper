@@ -4810,7 +4810,9 @@ ipcRenderer.on('update-available', (event, version) => {
                 ') available! Click to update.'
         },
         () => {
-            shell.openExternal('https://display-whisper.brettdoyle.art/update/')
+            electron.shell.openExternal(
+                'https://display-whisper.brettdoyle.art/update/'
+            )
         }
     )
 })
