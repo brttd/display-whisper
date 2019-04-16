@@ -72,6 +72,7 @@ const settings = {}
         let actualLastSaveTime = lastSaveTime
         lastSaveTime = Date.now()
 
+        fs.writeFile(settingsPath, JSON.stringify(cache, null, 2), error => {
             if (error) {
                 logger.error('Unable to save settings file:', error)
 
