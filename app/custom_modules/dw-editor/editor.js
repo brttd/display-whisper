@@ -353,7 +353,7 @@ function sameObj(a, b, ignoreCache = []) {
         ignoreCache.push(a, b)
 
         for (let i = 0; i < a.length; i++) {
-            if (a[i] !== b[i] && !same(a[i], b[i], ignoreCache.slice(0))) {
+            if (a[i] !== b[i] && !sameObj(a[i], b[i], ignoreCache.slice(0))) {
                 return false
             }
         }
@@ -381,7 +381,7 @@ function sameObj(a, b, ignoreCache = []) {
         for (let i = 0; i < keys.length; i++) {
             if (
                 a[keys[i]] !== b[keys[i]] &&
-                !same(a[keys[i]], b[keys[i]], ignoreCache.slice(0))
+                !sameObj(a[keys[i]], b[keys[i]], ignoreCache.slice(0))
             ) {
                 return false
             }
