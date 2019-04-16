@@ -1410,6 +1410,8 @@ layout.window.onEvent('close', event => {
             (error, answer) => {
                 if (answer === 'Save') {
                     save(() => {
+                        Songs.sendUpdates()
+
                         event.close()
                     })
                 } else if (answer === 'Cancel') {
