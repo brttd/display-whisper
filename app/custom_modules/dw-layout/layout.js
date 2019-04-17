@@ -5062,7 +5062,7 @@ exports.change = addStyles
     let selectPopup = new InputPopup({
         extends: true,
         height: false,
-        maxHeight: 200
+        maxHeight: 350
     })
     {
         selectPopup.node.classList.add('select')
@@ -5083,9 +5083,7 @@ exports.change = addStyles
 
             document.body.appendChild(selectPopup.node)
         }
-        selectPopup.move = function(position) {
-            selectPopup._move(position)
-        }
+        selectPopup.move = selectPopup._move
         selectPopup.hide = function() {
             selectPopup.selectCallback = null
 
