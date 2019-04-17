@@ -876,6 +876,8 @@ $slider-padding: 2px;
 .font-dropdown {
     @include borders;
 
+    @extend %scrollbars;
+
     box-sizing: border-box;
 
     position: absolute;
@@ -891,19 +893,6 @@ $slider-padding: 2px;
 
     background: $bkg-main;
     border-color: $bkg-main-dark;
-
-    &::-webkit-scrollbar {
-        width: 1ch;
-    }
-    &::-webkit-scrollbar-button {
-        display: none;
-    }
-    &::-webkit-scrollbar-track {
-        background: $bkg-main;
-    }
-    &::-webkit-scrollbar-thumb {
-        background: $bkg-main-dark;
-    }
 
     .list {
         list-style: none;
@@ -1096,20 +1085,9 @@ $img-max-width: 10em;
     }
 
     .list-scroll {
-        overflow: auto;
+        @extend %scrollbars;
 
-        &::-webkit-scrollbar {
-            width: 1ch;
-        }
-        &::-webkit-scrollbar-button {
-            display: none;
-        }
-        &::-webkit-scrollbar-track {
-            background: $bkg-main;
-        }
-        &::-webkit-scrollbar-thumb {
-            background: $bkg-main-dark;
-        }
+        overflow: auto;
     }
 
     .list {
@@ -1213,16 +1191,6 @@ $img-max-width: 10em;
 
     border-radius: 0px;
 
-    /*
-    scrollbar
-    scrollbar-button
-    scrollbar-track
-    scrollbar-track-piece
-    scrollbar-thumb
-    scrollbar-corner
-    resizer
-    */
-
     .list-scroll {
         overflow: auto;
         overflow-x: hidden;
@@ -1230,27 +1198,6 @@ $img-max-width: 10em;
         flex: auto 1 1;
 
         padding: 2px 4px;
-
-        &::-webkit-scrollbar {
-            width: 1ch;
-            height: 1ch;
-        }
-        &::-webkit-scrollbar-button {
-            display: none;
-        }
-        &::-webkit-scrollbar-track,
-        &::-webkit-scrollbar-corner {
-            background: $bkg;
-        }
-        &::-webkit-scrollbar-thumb {
-            background: $bkg-main;
-            &:hover {
-                background: mix($bkg-main, $bkg-main-dark);
-            }
-            &:active {
-                background: $bkg-main-dark;
-            }
-        }
     }
 
     .add {
@@ -1496,30 +1443,14 @@ $img-max-width: 10em;
 
     @include fonts;
 
+    @extend %scrollbars;
+
     display: inline-flex;
 
     overflow: auto;
     overflow-y: scroll;
 
     outline: none;
-
-    &::-webkit-scrollbar {
-        width: 1ch;
-        height: 1ch;
-    }
-    &::-webkit-scrollbar-button {
-        display: none;
-    }
-    &::-webkit-scrollbar-track,
-    &::-webkit-scrollbar-corner {
-        background: $bkg-main-light;
-    }
-    &::-webkit-scrollbar-thumb {
-        background: $bkg-main;
-        &:active {
-            background: $bkg-main-dark;
-        }
-    }
 
     table {
         table-layout: fixed;
