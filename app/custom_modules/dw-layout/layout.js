@@ -5059,6 +5059,77 @@ exports.change = addStyles
     }
     exports.ColorInput = items.ColorInput = ColorInput
 
+    let selectPopup = new InputPopup({
+        extends: true,
+        height: false,
+        maxHeight: 200
+    })
+    {
+        selectPopup.node.classList.add('select')
+
+        selectPopup.show = function(position, data) {
+            selectPopup.move(position)
+
+            selectPopup.node.innerHTML = ''
+
+            for (let i = 0; i < data.options.length; i++) {
+                selectPopup.node.appendChild(document.createElement('li'))
+                selectPopup.node.lastChild.textContent = data.options[i]
+
+                if (data.options[i] === data.value) {
+                    selectPopup.node.lastChild.className = 'active'
+                }
+            }
+
+            document.body.appendChild(selectPopup.node)
+        }
+        selectPopup.move = function(position) {
+            selectPopup._move(position)
+        }
+        selectPopup.hide = function() {
+            selectPopup.selectCallback = null
+
+            if (selectPopup.node.parentNode === document.body) {
+                document.body.removeChild(selectPopup.node)
+            }
+        }
+
+        Object.defineProperty(selectPopup, 'search', {
+            set: value => {
+                value = value.toLowerCase()
+
+                for (let i = 0; i < selectPopup.node.childElementCount; i++) {
+                    if (
+                        selectPopup.node.children[i].textContent
+                            .toLowerCase()
+                            .includes(value) ||
+                        value.includes(
+                            selectPopup.node.children[
+                                i
+                            ].textContent.toLowerCase()
+                        )
+                    ) {
+                        selectPopup.node.children[i].style.opacity = ''
+                    } else {
+                        selectPopup.node.children[i].style.opacity = '0.5'
+                    }
+                }
+            }
+        })
+
+        selectPopup.node.addEventListener('click', event => {
+            if (event.target.tagName === 'LI') {
+                if (typeof selectPopup.selectCallback === 'function') {
+                    selectPopup.selectCallback({
+                        value: event.target.textContent,
+
+                        fromUser: true,
+                        from: selectPopup
+                    })
+                }
+            }
+        })
+    }
     class SelectInput extends focusItem {
         /*
         Standard drop-down select input.
@@ -5069,7 +5140,6 @@ exports.change = addStyles
             tooltip (string)
             options (array: string)
             value (string)
-            index (number)
         
         Properties:
             disabled (get/set) (boolean)
@@ -5093,7 +5163,8 @@ exports.change = addStyles
         */
         constructor(data = {}, styles = {}) {
             super(document.createElement('div'), {}, data.focus)
-            this.inputNode = document.createElement('select')
+            this.inputNode = document.createElement('input')
+            this.inputNode.type = 'text'
             this.inputNode.id = getUniqueId(this.inputNode.tagName)
 
             if (typeof data.label === 'string') {
@@ -5104,6 +5175,7 @@ exports.change = addStyles
             }
 
             this.node.appendChild(this.inputNode)
+            this.node.appendChild(getIconSVG('expand-x'))
 
             addStyles(this, styles)
 
@@ -5113,46 +5185,39 @@ exports.change = addStyles
 
             this.tooltip = data.tooltip
 
+            this._options = []
+            this._value = ''
+
             this.options = data.options
 
-            if (typeof data.value === 'string') {
-                for (let i = 0; i < this.inputNode.children.length; i++) {
-                    if (this.inputNode.children[i].value === data.value) {
-                        this.inputNode.selectedIndex = i
-                    }
-                }
-            } else if (typeof data.index === 'number') {
-                if (
-                    data.index >= 0 &&
-                    data.index < this.inputNode.childElementCount
-                ) {
-                    this.inputNode.selectedIndex = data.index
-                }
-            }
+            this.value = data.value
 
-            //TODO: check difference between 'input' and 'change' events
+            bindFunctions(
+                this,
+                this.showPopup,
+                this.movePopup,
+                this.onPopupSelect
+            )
+
             this._oldValue = this.inputNode.value
+
             this.inputNode.addEventListener('input', () => {
-                this.blur()
-
-                sendEventTo(
-                    {
-                        value: this.inputNode.value,
-                        oldValue: this._oldValue,
-
-                        index: this.options.indexOf(this.inputNode.value),
-
-                        fromUser: true,
-                        from: this
-                    },
-                    this.events.change
-                )
-
-                this._oldValue = this.inputNode.value
+                if (this._focused) {
+                    selectPopup.search = this.inputNode.value
+                } else {
+                    this.inputNode.value = this._value
+                }
             })
 
             this.inputNode.addEventListener('focus', () => {
                 this._focused = true
+
+                this.inputNode.classList.add('active')
+                this.inputNode.style.zIndex = '11'
+                this.node.lastChild.style.zIndex = '11'
+                this.inputNode.value = ''
+
+                this.openPopup()
 
                 if (this._globalFocus) {
                     body.inputFocused(this, !this._codeFocused)
@@ -5169,7 +5234,20 @@ exports.change = addStyles
                 this._codeFocused = false
             })
 
-            //TODO: Create custom drop down list
+            body.onEvent('blur', this.blur.bind(this))
+            body.onEvent('mousedown', event => {
+                if (
+                    this.node !== event.target &&
+                    this.node.contains(event.target) === false &&
+                    selectPopup.node !== event.target &&
+                    selectPopup.node.contains(event.target) === false
+                ) {
+                    this.blur()
+                }
+            })
+
+            body.onEvent('resize', this.movePopup)
+            body.onEvent('scroll', this.movePopup)
         }
 
         get disabled() {
@@ -5191,49 +5269,36 @@ exports.change = addStyles
         }
 
         get options() {
-            let list = []
-
-            for (let i = 0; i < this.inputNode.options.length; i++) {
-                list.push(this.inputNode.options[i].value)
-            }
-
-            return list
+            return this._options
         }
         set options(options) {
             if (!Array.isArray(options)) {
                 return false
             }
 
-            for (let i = this.inputNode.options.length - 1; i >= 0; i--) {
-                this.inputNode.remove(0)
-            }
-
-            for (let i = 0; i < options.length; i++) {
-                let elem = document.createElement('option')
-                elem.value = elem.textContent = options[i]
-                this.inputNode.add(elem)
-            }
+            this._options = options.filter(option => typeof option === 'string')
         }
 
         get value() {
-            return this.inputNode.value
+            return this._value
         }
         set value(value) {
             if (typeof value === 'string') {
-                let index = this.indexOf(value)
+                let index = this._options.indexOf(value)
 
                 if (index === -1) {
                     return false
                 }
 
-                this.inputNode.selectedIndex = index
+                this._value = value
+                this.inputNode.value = this._value
 
                 sendEventTo(
                     {
-                        value: this.inputNode.value,
+                        value: this._value,
                         oldValue: this._oldValue,
 
-                        index: this.options.indexOf(this.inputNode.value),
+                        index: index,
 
                         fromUser: false,
                         from: this
@@ -5241,68 +5306,108 @@ exports.change = addStyles
                     this.events.change
                 )
 
-                this._oldValue = this.inputNode.value
+                this._oldValue = this._value
             }
         }
+
         get index() {
-            return this.inputNode.selectedIndex
+            return this._options.indexOf(this._value)
         }
         set index(index) {
-            if (index >= 0 && index < this.inputNode.length) {
-                this.value = this.inputNode.children[index].value
+            if (index >= 0 && index < this._options.length) {
+                this.value = this._options[index]
             }
+        }
+
+        onPopupSelect(event) {
+            let index = this._options.indexOf(event.value)
+
+            if (index === -1) {
+                return false
+            }
+
+            this._value = event.value
+
+            this.inputNode.value = this._value
+
+            sendEventTo(
+                {
+                    value: this._value,
+                    oldValue: this._oldValue,
+
+                    index: index,
+
+                    fromUser: event.fromUser,
+                    from: this
+                },
+                this.events.change
+            )
+
+            this._oldValue = this._value
+
+            this.blur()
+        }
+
+        showPopup() {
+            selectPopup.show(this.inputNode.getBoundingClientRect(), {
+                value: this._value,
+                options: this._options
+            })
+        }
+        movePopup() {
+            if (this._focused) {
+                selectPopup.move(this.inputNode.getBoundingClientRect())
+            }
+        }
+
+        openPopup() {
+            body.onFrame.start(this.showPopup)
+
+            selectPopup.selectCallback = this.onPopupSelect
         }
 
         indexOf(string) {
-            if (typeof string !== 'string') {
-                return -1
-            }
-
-            for (let i = 0; i < this.inputNode.children.length; i++) {
-                if (this.inputNode.children[i].value === string) {
-                    return i
-                }
-            }
-
-            return -1
+            return this._options.indexOf(string)
         }
 
-        add(option, index = this.inputNode.length) {
-            if (typeof option === 'string' && !this.options.includes(option)) {
-                let newElem = document.createElement('option')
-                newElem.value = option
-                newElem.innerText = option
-
-                if (index < this.inputNode.length && index >= 0) {
-                    this.inputNode.add(option, index)
-                } else {
-                    this.inputNode.add(newElem)
-                }
+        add(option, index = this._options.length) {
+            if (typeof option === 'string' && !this._options.includes(option)) {
+                this._options.push(option)
             }
         }
         remove(item) {
+            if (typeof item === 'string') {
+                item = this._options.indexOf(item)
+            }
+
             if (
                 typeof item === 'number' &&
                 item >= 0 &&
-                item < this.data.options.length
+                item <= this._options.length
             ) {
-                this.data.options.splice(item, 1)
-                this.inputNode.remove(item)
-            } else if (typeof item === 'string') {
-                let index = this.data.options.indexOf(item)
-                if (index !== -1) {
-                    this.data.options.splice(index, 1)
-                    this.node.remove(index)
-                }
+                this._options.splice(item, 1)
             }
         }
 
-        focus() {
-            this._codeFocused = true
+        focus(fromUser = false) {
+            this._codeFocused = !fromUser
+
             this.inputNode.focus()
         }
         blur() {
+            if (!this._focused) {
+                return false
+            }
+            this._focused = false
+
             this.inputNode.blur()
+            this.inputNode.classList.remove('active')
+            this.inputNode.style.zIndex = ''
+            this.node.lastChild.style.zIndex = ''
+
+            this.inputNode.value = this._value
+
+            selectPopup.hide()
         }
     }
     exports.SelectInput = items.SelectInput = SelectInput
