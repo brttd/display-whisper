@@ -882,46 +882,31 @@ $slider-padding: 2px;
         }
     }
 }
-.font-dropdown {
-    @include borders;
-
+.popup.font {
     @extend %scrollbars;
-
-    box-sizing: border-box;
-
-    position: absolute;
-
-    display: block;
 
     overflow: auto;
     overflow-x: hidden;
 
-    z-index: 10;
-
-    padding: 1px 0;
-
-    background: $bkg-main;
+    background: $bkg;
     border-color: $bkg-main-dark;
 
-    .list {
-        list-style: none;
+    font-size: 16px;
+    line-height: 1.2;
 
-        margin: 0;
-        padding: 0;
+    list-style: none;
 
-        font-size: 16px;
-        line-height: 1.2;
+    cursor: pointer;
 
-        cursor: pointer;
+    li {
+        padding: $input-padding;
 
-        li {
-            white-space: nowrap;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
 
-            padding: 2px 4px;
-
-            &:hover {
-                background: $bkg-dark;
-            }
+        &:hover {
+            @include colors(active);
         }
     }
 }
