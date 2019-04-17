@@ -3032,11 +3032,10 @@ exports.change = addStyles
             this.node = document.createElement('div')
             this.node.className = 'popup'
 
-            this.arrowNode = document.createElement('div')
-            this.arrowNode.className = 'arrow'
-            this.node.appendChild(this.arrowNode)
-
             this.box = {
+                extends: false,
+                setHeight: true,
+
                 maxWidth: 100,
                 minWidth: 0,
                 maxHeight: 100,
@@ -3051,6 +3050,17 @@ exports.change = addStyles
                 left: 0,
                 right: 0,
                 bottom: 0
+            }
+
+            this.popupArrowHeight = popupArrowHeight
+
+            if (typeof data.extends === 'boolean') {
+                this.box.extends = data.extends
+
+                this.popupArrowHeight = -1
+            }
+            if (typeof data.height === 'boolean') {
+                this.box.setHeight = data.height
             }
 
             if (isFinite(data.maxWidth) && data.maxWidth > 0) {
@@ -3069,9 +3079,22 @@ exports.change = addStyles
             if (isFinite(data.padding) && data.padding > 0) {
                 this.box.padding = data.padding
             }
+
+            if (!this.box.extends) {
+                this.arrowNode = document.createElement('div')
+                this.arrowNode.className = 'arrow'
+                this.node.appendChild(this.arrowNode)
+            }
         }
 
         _move(position) {
+            position.y = Math.max(0, position.y)
+            position.x = Math.max(0, position.x)
+
+            if (this.box.extends) {
+                this.box.maxWidth = this.box.minWidth = position.width
+            }
+
             this.box.left =
                 position.x + position.width / 2 - this.box.maxWidth / 2
 
@@ -3094,13 +3117,16 @@ exports.change = addStyles
             let spaceBelow =
                 window.innerHeight -
                 (position.y + position.height) -
-                popupArrowHeight
-            let spaceAbove = position.y - popupArrowHeight
+                this.popupArrowHeight
+            let spaceAbove = position.y - this.popupArrowHeight
 
             if (spaceBelow < this.box.maxHeight && spaceBelow < spaceAbove) {
                 //Show popup above position
                 this.node.style.bottom =
-                    window.innerHeight - position.y + popupArrowHeight + 'px'
+                    window.innerHeight -
+                    position.y +
+                    this.popupArrowHeight +
+                    'px'
                 this.node.style.top = ''
 
                 this.node.classList.add('above')
@@ -3111,11 +3137,12 @@ exports.change = addStyles
                 )
                 this.box.height = Math.max(this.box.minHeight, this.box.height)
 
-                this.box.top = position.y - popupArrowHeight - this.box.height
+                this.box.top =
+                    position.y - this.popupArrowHeight - this.box.height
             } else {
                 //Show popup below position
                 this.node.style.top =
-                    position.y + position.height + popupArrowHeight + 'px'
+                    position.y + position.height + this.popupArrowHeight + 'px'
                 this.node.style.bottom = ''
 
                 this.node.classList.remove('above')
@@ -3126,15 +3153,23 @@ exports.change = addStyles
                 )
                 this.box.height = Math.max(this.box.minHeight, this.box.height)
 
-                this.box.top = position.y + position.height + popupArrowHeight
+                this.box.top =
+                    position.y + position.height + this.popupArrowHeight
             }
-            this.node.style.height = this.box.height + 'px'
 
-            this.arrowNode.style.left =
-                Math.min(
-                    this.box.width - 22,
-                    position.x - this.box.left + (position.width / 2 - 6)
-                ) + 'px'
+            if (this.box.setHeight) {
+                this.node.style.height = this.box.height + 'px'
+            } else {
+                this.node.style.maxHeight = this.box.height + 'px'
+            }
+
+            if (!this.box.extends) {
+                this.arrowNode.style.left =
+                    Math.min(
+                        this.box.width - 22,
+                        position.x - this.box.left + (position.width / 2 - 6)
+                    ) + 'px'
+            }
         }
 
         hide() {
