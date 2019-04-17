@@ -8006,14 +8006,12 @@ exports.change = addStyles
             this.addNode = document.createElement('div')
             this.addNode.className = 'add'
 
-            this.addSelectInput = document.createElement('select')
-
-            this.addSelectIconNode = document.createElement('div')
-            this.addSelectIconNode.className = 'icon'
-            this.addSelectIconNode.appendChild(getIconSVG('expand-x'))
+            this.addSelectInput = new SelectInput({})
+            this.addSelectInput.shareFocusWith(this)
 
             this.addTextInput = document.createElement('input')
             this.addTextInput.type = 'text'
+            this.addTextInput.className = 'text'
 
             this.addButton = document.createElement('button')
             this.addButton.appendChild(getIconSVG('add'))
@@ -8065,18 +8063,19 @@ exports.change = addStyles
             {
                 let oldValue = ''
 
-                this.addSelectInput.addEventListener('input', () => {
+                this.addSelectInput.onEvent('change', event => {
                     sendEventTo(
                         {
-                            value: this.addSelectInput.value,
-                            oldValue: oldValue,
+                            value: event.value,
+                            oldValue: event.oldValue,
 
                             fromUser: true,
                             from: this
                         },
                         this.events['add-change']
                     )
-                    oldValue = this.addSelectInput.value
+
+                    oldValue = event.value
                 })
 
                 this.addTextInput.addEventListener('input', () => {
@@ -8113,7 +8112,7 @@ exports.change = addStyles
                     )
                 }
 
-                this.addSelectInput.addEventListener('focus', onFocus)
+                this.addSelectInput.onEvent('focus', onFocus)
                 this.addTextInput.addEventListener('focus', onFocus)
 
                 this.addButton.addEventListener('click', () => {
@@ -8309,12 +8308,7 @@ exports.change = addStyles
                 }
 
                 this.addNode.insertBefore(
-                    this.addSelectIconNode,
-                    this.addNode.firstChild
-                )
-
-                this.addNode.insertBefore(
-                    this.addSelectInput,
+                    this.addSelectInput.node,
                     this.addNode.firstChild
                 )
 
@@ -8326,32 +8320,12 @@ exports.change = addStyles
                     lastIndex = 0
                 }
 
-                while (this.addSelectInput.childElementCount > 0) {
-                    this.addSelectInput.removeChild(
-                        this.addSelectInput.firstChild
-                    )
-                }
+                this.addSelectInput.options = this.options.addInput
 
-                for (let i = 0; i < this.options.addInput.length; i++) {
-                    this.addSelectInput.appendChild(
-                        document.createElement('option')
-                    )
-
-                    this.addSelectInput.lastChild.textContent = this.options.addInput[
-                        i
-                    ]
-                    this.addSelectInput.lastChild.value = this.options.addInput[
-                        i
-                    ]
-                }
-
-                this.addSelectInput.selectedIndex = lastIndex
-
-                this.addSelectInput.dispatchEvent(new Event('input'))
+                this.addSelectInput.index = lastIndex
             } else {
-                if (this.addSelectInput.parentNode) {
-                    this.addNode.removeChild(this.addSelectInput)
-                    this.addNode.removeChild(this.addSelectIconNode)
+                if (this.addSelectInput.node.parentNode) {
+                    this.addNode.removeChild(this.addSelectInput.node)
                 }
 
                 this.addNode.insertBefore(

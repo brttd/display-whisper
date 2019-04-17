@@ -1211,8 +1211,15 @@ $img-max-width: 10em;
 
         border-top: 1px solid $bkg-dark;
 
-        input,
-        select {
+        .input-select {
+            flex: 1 1 100%;
+
+            input {
+                width: calc(100% - 29px);
+            }
+        }
+
+        input.text {
             @include fonts;
             @include colors;
             @include borders;
@@ -1223,12 +1230,11 @@ $img-max-width: 10em;
 
             width: 0;
 
+            /* Inputs width is wrong, needs to be 100% - button size (1.5em) - 2px (button left margin) - input horizontal padding*/
+            max-width: calc(100% - 1.5em - 2px - #{last($input-padding) * 2});
+
             margin: 0;
             padding: $input-padding;
-
-            option {
-                background: lighten($bkg, $light);
-            }
 
             &[disabled] {
                 @include colors(disabled);
@@ -1246,39 +1252,6 @@ $img-max-width: 10em;
             }
 
             background: none;
-        }
-
-        select {
-            padding-right: 20px;
-        }
-
-        input {
-            /* Inputs width is wrong, needs to be 100% - button size (1.5em) - 2px (button left margin) - input horizontal padding*/
-            max-width: calc(100% - 1.5em - 2px - #{last($input-padding) * 2});
-        }
-
-        .icon {
-            display: inline-flex;
-
-            position: relative;
-
-            left: -$icon-size - first($input-padding) - 1px;
-            pointer-events: none;
-
-            flex: auto 0 0;
-            width: 0;
-
-            flex-direction: row;
-            align-items: center;
-
-            svg {
-                flex: auto 0 0;
-
-                width: $icon-size;
-                height: $icon-size;
-
-                fill: $text;
-            }
         }
 
         button {
@@ -1309,8 +1282,7 @@ $img-max-width: 10em;
             }
         }
 
-        button,
-        .icon {
+        button {
             &:hover,
             &:focus {
                 svg {
