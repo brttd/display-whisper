@@ -514,14 +514,14 @@ const fonts = {}
 
         elem.textContent = 'Hello World'
 
-        elem.style.fontFamily = fonts.all[0]
+        elem.style.fontFamily = '"' + fonts.all[0] + '"'
 
         document.body.appendChild(elem)
 
         let index = 1
 
         let preloadNext = () => {
-            elem.style.fontFamily = fonts.all[index]
+            elem.style.fontFamily = '"' + fonts.all[index] + '"'
             index += 1
 
             if (index < fonts.all.length) {
@@ -7149,7 +7149,7 @@ exports.change = addStyles
             this.textNode.className = 'textContainer'
             this.textNode.contentEditable = true
 
-            this.textNode.style.fontFamily = this.textInfo.font
+            this.textNode.style.fontFamily = '"' + this.textInfo.font + '"'
             this.textNode.style.fontSize = this.textInfo.size.toString() + 'em'
             this.textNode.style.lineHeight = this.textInfo.lineHeight.toString()
             this.textNode.style.color = this.textInfo.color
@@ -7377,7 +7377,7 @@ exports.change = addStyles
             this.textInfo.font = font
 
             if (this.textNode) {
-                this.textNode.style.fontFamily = this.textInfo.font
+                this.textNode.style.fontFamily = '"' + this.textInfo.font + '"'
             }
 
             sendEventTo(
@@ -7559,7 +7559,8 @@ exports.change = addStyles
                 this.textInfo.font = data.font
 
                 if (this.textNode) {
-                    this.textNode.style.fontFamily = this.textInfo.font
+                    this.textNode.style.fontFamily =
+                        '"' + this.textInfo.font + '"'
                 }
 
                 allChanges.font = this.textInfo.font
@@ -11468,7 +11469,7 @@ class BoxEdit {
             this.textNode.className = 'text'
             this.node.appendChild(this.textNode)
 
-            this.textNode.style.fontFamily = 'arial'
+            this.textNode.style.fontFamily = 'Arial'
             this.textNode.style.fontSize = '10px'
             this.textNode.style.color = 'grey'
 
@@ -11521,7 +11522,8 @@ class BoxEdit {
                 typeof data.font === 'string' &&
                 data.font !== this.values.font
             ) {
-                this.textNode.style.fontFamily = this.values.font = data.font
+                this.values.font = data.font
+                this.textNode.style.fontFamily = '"' + this.values.font + '"'
             }
 
             if (
@@ -13050,7 +13052,7 @@ class BoxEdit {
             testElements[i].style.right = textSizeQueue[i].right
             testElements[i].style.bottom = textSizeQueue[i].bottom
 
-            testElements[i].style.fontFamily = textSizeQueue[i].font
+            testElements[i].style.fontFamily = '"' + textSizeQueue[i].font + '"'
             testElements[i].style.fontSize = testSize + 'px'
             testElements[i].style.lineHeight = textSizeQueue[i].lineHeight
 
@@ -14948,7 +14950,7 @@ class BoxEdit {
             if (fonts.isFont(font)) {
                 this._options.font = font
 
-                this.pagesNode.style.fontFamily = font
+                this.pagesNode.style.fontFamily = '"' + font + '"'
 
                 this.updateContentLayout()
             } else if (!fonts.loaded) {
@@ -15182,7 +15184,7 @@ class BoxEdit {
                 printElem.lastChild.style.columns = this._options.columns
             }
 
-            printElem.style.fontFamily = this._options.font
+            printElem.style.fontFamily = '"' + this._options.font + '"'
             printElem.style.fontSize = this._options.fontSize + 'pt'
 
             setPageSize(this._options.size)

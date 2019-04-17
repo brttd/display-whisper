@@ -123,9 +123,9 @@ function addNode(data = {}, parentNode = displayNode.lastChild) {
         }
 
         if (typeof data.font === 'string') {
-            node.firstChild.style.fontFamily = data.font
+            node.firstChild.style.fontFamily = '"' + data.font + '"'
         } else {
-            node.firstChild.style.fontFamily = defaults.font
+            node.firstChild.style.fontFamily = '"' + defaults.font + '"'
         }
 
         if (typeof data.size === 'number' && isFinite(data.size)) {
