@@ -1015,7 +1015,7 @@ const presentation = {}
     }
 
     function add(input, template = {}, index = -1) {
-        if (!items.has(input.itemType)) {
+        if (!items.list.includes(input.itemType)) {
             return false
         }
 
@@ -1108,7 +1108,7 @@ const presentation = {}
     presentation.add = add
 
     function addDrop(input, template = {}) {
-        if (!items.has(input.itemType)) {
+        if (!items.list.includes(input.itemType)) {
             return false
         }
 

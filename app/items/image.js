@@ -228,3 +228,21 @@ module.exports = class Image {
         return this.getAllSaveData()
     }
 }
+
+module.exports.template = {
+    nodes: [
+        {
+            type: 'image',
+            map: '',
+            name: 'Main',
+            properties: {
+                scale: true,
+                top: true,
+                left: true,
+                right: true,
+                bottom: true
+            }
+        }
+    ],
+    options: []
+}

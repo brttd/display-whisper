@@ -478,3 +478,44 @@ module.exports = class Text {
         return this.getAllSaveData()
     }
 }
+
+module.exports.template = {
+    nodes: [
+        {
+            type: 'text',
+            map: '',
+            name: 'Main',
+            properties: {
+                font: true,
+                size: true,
+                color: true,
+
+                lineHeight: true,
+
+                align: true,
+
+                y: true,
+
+                top: true,
+                left: true,
+                right: true,
+                bottom: true
+            }
+        }
+    ],
+    options: [
+        {
+            map: '',
+            type: 'number',
+            property: 'maxLines',
+            label: 'Max lines',
+            value: 6,
+
+            max: 100,
+            min: 0,
+            precision: 0,
+
+            popupMax: 20
+        }
+    ]
+}
