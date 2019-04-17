@@ -738,6 +738,7 @@ $slider-padding: 2px;
     @extend %all-inputs;
 
     display: inline-block;
+    position: relative;
 
     cursor: pointer;
 
@@ -747,22 +748,29 @@ $slider-padding: 2px;
         display: block;
     }
 
-    select {
+    input {
         @include fonts;
         @include colors;
         @include borders;
         -webkit-appearance: none;
 
+        position: relative;
+
         box-sizing: content-box;
 
         padding: $input-padding;
+        padding-right: $icon-size + last($input-padding) / 2;
 
-        width: $input_width;
+        width: 48.75 - $icon-size + last($input-padding) / 2;
+
+        text-overflow: ellipsis;
+
+        cursor: pointer;
 
         outline: none;
 
-        option {
-            background: lighten($bkg, $light);
+        &.active {
+            cursor: initial;
         }
 
         &[disabled] {
@@ -775,9 +783,46 @@ $slider-padding: 2px;
             }
 
             &:active,
+            &.active,
             &:focus {
                 @include colors(active);
             }
+        }
+    }
+
+    svg {
+        position: absolute;
+        right: 3px;
+        bottom: 3px;
+
+        pointer-events: none;
+
+        width: $icon-size;
+        height: $icon-size;
+    }
+}
+.popup.select {
+    @include fonts;
+
+    @extend %scrollbars;
+
+    background: $bkg;
+    list-style: none;
+
+    overflow: auto;
+
+    li {
+        padding: $input-padding;
+
+        cursor: pointer;
+
+        &.active {
+            @include colors(hover);
+        }
+
+        &:hover {
+            @include colors(active);
+            opacity: 1 !important;
         }
     }
 }
