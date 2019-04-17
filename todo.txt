@@ -13,8 +13,6 @@ REQUIRED:
 REQUIRED - long term:
     Settings "keys": Allow multiple keyboard shortcuts for actions
 
-    FontInput item: Drop down list lags, change so that DOM only contains rows that are visible in scroll position.
-
     Create single source for interface text (file, instead of hard coded strings), allowing for translation + Win/Mac differences
         change keyboard shortcut display based on language, win/mac, keyboard, etc..
         (Including stuff like ⌘)
@@ -51,10 +49,6 @@ WANTED:
         Make box handles respond to background images (CSS Blending function)?
 
     FontInput item: Option to choose style (regular/bold/italic), and filter by weight, serif, etc.
-    
-    SelectInput item:
-        Create custom drop down list.
-        Add placeholder option.
 
 CODE CHANGES:
     Change displayEdit.add to public nodeEdits, with .add the same as block.add
