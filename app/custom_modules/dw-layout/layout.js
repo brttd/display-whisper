@@ -5428,127 +5428,93 @@ exports.change = addStyles
     }
 
     //Font input dropdown list
-    let fontDropDown = {}
+    let fontPopup = new InputPopup({
+        extends: true,
+        height: false,
+        maxHeight: 700
+    })
     {
-        let mainNode = document.createElement('div')
-        mainNode.className = 'font-dropdown'
+        fontPopup.node.classList.add('font')
 
-        let listNode = document.createElement('div')
-        listNode.className = 'list'
+        fontPopup.show = function(position, data) {
+            fontPopup.move(position)
 
-        let maxHeight = 700
-        let minHeight = 200
-
-        mainNode.appendChild(listNode)
-
-        fontDropDown.node = mainNode
-
-        fontDropDown.hoverCallback = null
-        fontDropDown.clickCallback = null
-
-        listNode.addEventListener('mouseover', event => {
-            if (
-                typeof fontDropDown.hoverCallback === 'function' &&
-                event.target.tagName === 'LI'
-            ) {
-                fontDropDown.hoverCallback({
-                    value: event.target.textContent,
-
-                    fromUser: true,
-                    from: fontDropDown
-                })
+            for (let i = 0; i < fontPopup.node.childElementCount; i++) {
+                fontPopup.node.children[i].style.display = ''
             }
-        })
-        listNode.addEventListener('click', event => {
-            if (
-                typeof fontDropDown.clickCallback === 'function' &&
-                event.target.tagName === 'LI'
-            ) {
-                fontDropDown.clickCallback({
-                    value: event.target.textContent,
 
-                    fromUser: true,
-                    from: fontDropDown
-                })
-            }
-        })
+            document.body.appendChild(fontPopup.node)
+        }
+        fontPopup.move = fontPopup._move
+        fontPopup.hide = function() {
+            fontPopup.hoverCallback = null
+            fontPopup.clickCallback = null
 
-        function updateList() {
-            listNode.innerHTML = ''
-
-            for (let i = 0; i < fonts.all.length; i++) {
-                listNode.appendChild(document.createElement('li'))
-
-                listNode.lastChild.textContent = fonts.all[i]
-                listNode.lastChild.style.fontFamily = fonts.all[i]
+            if (fontPopup.node.parentNode === document.body) {
+                document.body.removeChild(fontPopup.node)
             }
         }
 
-        fontDropDown.show = function(position) {
-            fontDropDown.move(position)
-
-            for (let i = 0; i < listNode.childNodes.length; i++) {
-                listNode.childNodes[i].style.display = ''
-            }
-
-            document.body.appendChild(mainNode)
-        }
-        fontDropDown.move = function(position) {
-            mainNode.style.left = position.left + 'px'
-            mainNode.style.width = position.width + 'px'
-
-            //If the space above is greather than below, and the space below is less than the minimum height
-            if (
-                window.innerHeight - position.bottom < minHeight &&
-                position.top > window.innerHeight - position.bottom
-            ) {
-                mainNode.style.bottom =
-                    window.innerHeight - position.top - 2 + 'px'
-                mainNode.style.top = ''
-
-                mainNode.style.maxHeight =
-                    Math.min(maxHeight, position.top - 4) + 'px'
-            } else {
-                mainNode.style.top = position.bottom - 2 + 'px'
-                mainNode.style.bottom = ''
-
-                mainNode.style.maxHeight =
-                    Math.min(
-                        maxHeight,
-                        window.innerHeight - position.bottom - 4
-                    ) + 'px'
-            }
-        }
-        fontDropDown.hide = function() {
-            if (mainNode.parentNode === document.body) {
-                document.body.removeChild(mainNode)
-            }
-
-            fontDropDown.hoverCallback = null
-            fontDropDown.clickCallback = null
-        }
-
-        Object.defineProperty(fontDropDown, 'search', {
+        Object.defineProperty(fontPopup, 'search', {
             set: search => {
                 search = search.toLowerCase()
 
-                for (let i = 0; i < listNode.childNodes.length; i++) {
+                for (let i = 0; i < fontPopup.node.childElementCount; i++) {
                     if (
-                        listNode.childNodes[i].textContent
+                        fontPopup.node.children[i].textContent
                             .toLowerCase()
-                            .includes(search)
+                            .includes(search) ||
+                        search.includes(
+                            fontPopup.node.children[i].textContent.toLowerCase()
+                        )
                     ) {
-                        listNode.childNodes[i].style.display = ''
+                        fontPopup.node.children[i].style.display = ''
                     } else {
-                        listNode.childNodes[i].style.display = 'none'
+                        fontPopup.node.children[i].style.display = 'none'
                     }
                 }
             }
         })
 
-        fonts.onEvent('update', updateList)
-    }
+        fontPopup.node.addEventListener('mouseover', event => {
+            if (
+                typeof fontPopup.hoverCallback === 'function' &&
+                event.target.tagName === 'LI'
+            ) {
+                fontPopup.hoverCallback({
+                    value: event.target.textContent,
 
+                    fromUser: true,
+                    from: fontPopup
+                })
+            }
+        })
+        fontPopup.node.addEventListener('click', event => {
+            if (
+                typeof fontPopup.clickCallback === 'function' &&
+                event.target.tagName === 'LI'
+            ) {
+                fontPopup.clickCallback({
+                    value: event.target.textContent,
+
+                    fromUser: true,
+                    from: fontPopup
+                })
+            }
+        })
+
+        fonts.onEvent('update', () => {
+            fontPopup.node.innerHTML = ''
+
+            for (let i = 0; i < fonts.all.length; i++) {
+                fontPopup.node.appendChild(document.createElement('li'))
+
+                fontPopup.node.lastChild.textContent = fonts.all[i]
+                fontPopup.node.lastChild.style.fontFamily =
+                    '"' + fonts.all[i] + '"'
+        }
+        })
+    }
     class FontInput extends focusItem {
         /*
         A drop-down input for selecting a font.
@@ -5629,7 +5595,7 @@ exports.change = addStyles
 
             this.inputNode.addEventListener('input', () => {
                 if (this._focused) {
-                    fontDropDown.search = this.inputNode.value.toLowerCase()
+                    fontPopup.search = this.inputNode.value
                 }
             })
 
@@ -5639,9 +5605,9 @@ exports.change = addStyles
                 if (
                     !(
                         this.node === event.target ||
-                        fontDropDown.node === event.target ||
+                        fontPopup.node === event.target ||
                         this.node.contains(event.target) ||
-                        fontDropDown.node.contains(event.target)
+                        fontPopup.node.contains(event.target)
                     )
                 ) {
                     this.blur()
@@ -5739,38 +5705,21 @@ exports.change = addStyles
         }
 
         showDropDown() {
-            let bounds = this.inputNode.getBoundingClientRect()
-
-            fontDropDown.show({
-                top: bounds.y,
-                bottom: bounds.y + bounds.height,
-
-                left: bounds.x,
-
-                width: bounds.width
-            })
+            fontPopup.show(this.inputNode.getBoundingClientRect())
         }
         moveDropDown() {
             if (!this._focused) {
                 return false
             }
-            let bounds = this.inputNode.getBoundingClientRect()
 
-            fontDropDown.move({
-                top: bounds.y,
-                bottom: bounds.y + bounds.height,
-
-                left: bounds.x,
-
-                width: bounds.width
-            })
+            fontPopup.move(this.inputNode.getBoundingClientRect())
         }
 
         openDropDown() {
             body.onFrame.start(this.showDropDown)
 
-            fontDropDown.hoverCallback = this.onDropDownHover
-            fontDropDown.clickCallback = this.onDropDownClick
+            fontPopup.hoverCallback = this.onDropDownHover
+            fontPopup.clickCallback = this.onDropDownClick
 
             this.inputNode.classList.add('active')
         }
@@ -5808,7 +5757,7 @@ exports.change = addStyles
 
             this._oldValue = this._value
 
-            fontDropDown.hide()
+            fontPopup.hide()
         }
     }
     exports.FontInput = items.FontInput = FontInput
