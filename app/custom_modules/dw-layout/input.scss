@@ -752,6 +752,7 @@ $slider-padding: 2px;
         @include fonts;
         @include colors;
         @include borders;
+
         -webkit-appearance: none;
 
         position: relative;
@@ -799,6 +800,14 @@ $slider-padding: 2px;
 
         width: $icon-size;
         height: $icon-size;
+
+        fill: $text;
+    }
+
+    &:hover {
+        svg {
+            fill: $text-dark;
+        }
     }
 }
 .popup.select {
