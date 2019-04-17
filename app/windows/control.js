@@ -3794,7 +3794,7 @@ const item_add = {
 //Control Block
 //======================
 const item_control = {
-    minWidth: 400,
+    minWidth: 410,
     minHeight: 72,
     maxHeight: 72,
 
@@ -3839,6 +3839,7 @@ const item_control = {
             options: ['Auto', 'Manual']
         },
         {
+            width: 52,
             margin: 4
         }
     )
