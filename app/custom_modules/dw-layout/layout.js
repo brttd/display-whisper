@@ -1201,9 +1201,13 @@ const body = new Item(document.body)
 
         body.onFrame.end(sendResizeEvent)
     })
-    document.body.addEventListener('scroll', () => {
-        body.onFrame.end(sendScrollEvent)
-    })
+    document.addEventListener(
+        'scroll',
+        () => {
+            body.onFrame.end(sendScrollEvent)
+        },
+        true
+    )
     window.addEventListener('focus', () => {
         sendEventTo(
             {
