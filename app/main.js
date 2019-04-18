@@ -579,7 +579,6 @@ function openDisplay() {
         //thickFrame: false,
         skipTaskbar: true,
         hasShadow: false,
-        kiosk: settings.get('display.kiosk', false),
 
         title: 'Display Whisper | Display',
 
@@ -1229,9 +1228,9 @@ let updateDisplayPosition
 
 if (process.platform === 'darwin') {
     updateDisplayPosition = () => {
-        windows.display.minimize()
+        windows.display.setFullScreen(false)
         windows.display.setBounds(display.bounds)
-        windows.display.maximize()
+        windows.display.setFullScreen(true)
     }
 } else {
     updateDisplayPosition = () => {
@@ -2530,13 +2529,7 @@ function setupDisplays() {
             sendToAllWindows('display-info', getDisplayInfo())
         }
     })
-
-    settings.listen('display.kiosk', value => {
-        if (windows.display) {
-            windows.display.setKiosk(value)
         }
-    })
-}
 
 //App events
 //============================================
