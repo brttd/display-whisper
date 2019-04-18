@@ -8418,6 +8418,10 @@ exports.change = addStyles
                     body.inputFocused(this, event.fromUser)
 
                     if (this.options.reorderable) {
+                        if (this.dragging === item) {
+                            return false
+                        }
+
                         this.dragging = item
 
                         this.select(this.items.indexOf(item), event.fromUser)
@@ -8702,6 +8706,10 @@ exports.change = addStyles
             }
         }
         blur(fromUser = false) {
+            if (!this._focused) {
+                return false
+            }
+
             this._focused = false
 
             this.dragging = null
