@@ -2,8 +2,14 @@ node_modules
 package-lock.json
 .DS_STORE
 
+node_modules
+
+package-lock.json
+
 app.asar
 app.asar.unpacked
+
+app/licenses.json
 
 out
 build
