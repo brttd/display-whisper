@@ -608,10 +608,11 @@ function updateTemplateList() {
 
 function updateTemplateListAndSelect() {
     updateTemplateList()
+
     if (selectedIndex >= 0 && selectedIndex < list.items.length) {
         list.select(selectedIndex)
     } else {
-        list.select(0)
+        list.select(0, false, true)
     }
 }
 
@@ -783,7 +784,11 @@ function updateTemplateListAndSelect() {
 //selecting, deleting, & adding templates
 {
     list.onEvent('select', event => {
-        if (event.index < 0 || event.index >= Templates.list.length) {
+        if (
+            !event.fromUser ||
+            event.index < 0 ||
+            event.index >= Templates.list.length
+        ) {
             return false
         }
 
@@ -853,7 +858,7 @@ function updateTemplateListAndSelect() {
             Templates.save(templateGroup, newTemplate.ID, newTemplate)
 
             updateTemplateList()
-            list.select(newTemplate.name)
+            list.select(newTemplate.name, false, true)
         }
     })
 
