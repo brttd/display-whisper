@@ -1058,6 +1058,8 @@ $img-max-width: 10em;
     display: flex;
     flex-direction: column;
 
+    height: fit-content;
+
     padding: 2px;
 
     color: $text;
@@ -1111,7 +1113,7 @@ $img-max-width: 10em;
     }
 
     .list-scroll {
-        @extend %scrollbars;
+        @extend %scrollbars-main;
 
         overflow: auto;
     }

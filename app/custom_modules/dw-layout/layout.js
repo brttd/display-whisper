@@ -6201,16 +6201,16 @@ exports.change = addStyles
     //Image input dropdown box
     let imagePopup = new InputPopup({
         maxWidth: 600,
-        minWidth: 100,
-        maxHeight: 500,
-        minHeight: 71
+        minWidth: 248,
+
+        height: false,
+        maxHeight: 500
     })
     {
         imagePopup.node.classList.add('image')
 
         let imageMaxWidth = 100
         let boxExtraWidth = 13
-        let boxExtraHeight = 79
 
         let maxRows = 6
         let maxColumns = 4
@@ -6236,7 +6236,7 @@ exports.change = addStyles
             emptyLibraryNode.lastChild.textContent = 'Image library is empty.'
 
             let openLibraryButton = document.createElement('button')
-            openLibraryButton.textContent = 'Open Library'
+            openLibraryButton.textContent = 'Add Images'
 
             emptyLibraryNode.appendChild(openLibraryButton)
 
@@ -6345,20 +6345,11 @@ exports.change = addStyles
             imagePopup.box.minWidth = position.width
 
             if (Images.files.length === 0) {
-                imagePopup.box.maxWidth = 255
-                imagePopup.box.maxHeight = imagePopup.box.minHeight
+                imagePopup.box.maxWidth = 252
             } else {
                 imagePopup.box.maxWidth =
                     boxExtraWidth +
                     imageMaxWidth * Math.min(maxRows, Images.files.length)
-
-                imagePopup.box.maxHeight =
-                    boxExtraHeight +
-                    imageMaxWidth *
-                        Math.min(
-                            maxColumns,
-                            Math.max(1, Images.files.length / maxRows)
-                        )
             }
 
             imagePopup._move(position)
