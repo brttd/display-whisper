@@ -326,12 +326,6 @@
                     "type": "color",
 
                     "default": "black"
-                },
-                "kiosk": {
-                    "description": "Use kiosk mode for display",
-                    "type": "boolean",
-
-                    "default": false
                 }
             }
         },
