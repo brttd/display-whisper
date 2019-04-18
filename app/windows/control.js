@@ -4039,6 +4039,8 @@ const item_control = {
             ['control.keyboard.playPrevious', 'Control+Space'],
             ['control.keyboard.selectNext', 'ArrowDown'],
             ['control.keyboard.selectPrevious', 'ArrowUp'],
+            ['control.keyboard.selectNextItem', 'Control+ArrowDown'],
+            ['control.keyboard.selectPreviousItem', 'Control+ArrowUp'],
             ['control.keyboard.playSelected', 'Enter'],
 
             ['control.keyboard.moveSelectedUp', 'PageUp'],
