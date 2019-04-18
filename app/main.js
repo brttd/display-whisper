@@ -563,7 +563,7 @@ function openDisplay() {
 
         icon: path.join(
             appPath,
-            process.platform === 'darwin' ? 'icons/app.icns' : 'icons/app.ico'
+            'icons/app.ico'
         ),
 
         show: false,
@@ -713,7 +713,7 @@ function openControl() {
 
         icon: path.join(
             appPath,
-            process.platform === 'darwin' ? 'icons/app.icns' : 'icons/app.ico'
+            'icons/app.ico'
         ),
 
         webPreferences: {
@@ -916,7 +916,7 @@ function openWindow(name) {
 
         icon: path.join(
             appPath,
-            process.platform === 'darwin' ? 'icons/app.icns' : 'icons/app.ico'
+            'icons/app.ico'
         ),
 
         webPreferences: {
@@ -1174,7 +1174,7 @@ function openItemEditor(type, id, data = {}) {
 
         icon: path.join(
             appPath,
-            process.platform === 'darwin' ? 'icons/app.icns' : 'icons/app.ico'
+            'icons/app.ico'
         ),
 
         webPreferences: {
