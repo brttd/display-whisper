@@ -13819,7 +13819,7 @@ class BoxEdit {
                             this.properties.previewHeight.toString() + 'px'
 
                         this.toggleButton.icon = 'expand-x'
-                    } else if (this.items.length >= 1) {
+                    } else if (this.items.length > 1) {
                         //Minimized, not showing first section
                         this.itemsBlock.node.style.height = '0px'
 
