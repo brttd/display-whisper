@@ -1607,7 +1607,7 @@ const presentation = {}
             layout.body.onFrame.end(() => {
                 //Need to set it to 'manual', so that going to the active item doesn't start the autoplay timer
                 let actualPlayMode = playMode
-                playMode === 'manual'
+                playMode = 'manual'
 
                 setActive({
                     index: data.active.index || 0,
