@@ -13684,8 +13684,14 @@ class BoxEdit {
             item.onEvent('active-click', this.onItemActiveClick)
 
             item.onEvent('selected', () => {
-                if (this.indexOf(item) !== 0) {
+                if (this.properties.minimized) {
+                    if (this.indexOf(item) === 0) {
+                        if (!this._showSectionWhenMinimized) {
                     this.expand()
+                }
+                    } else {
+                        this.expand()
+                    }
                 }
             })
 
