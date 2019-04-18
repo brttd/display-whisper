@@ -135,7 +135,14 @@ function displaySection(name) {
     selected = document.getElementById(name)
 
     selected.classList.add('selected')
-    selected.scrollIntoView()
+
+    navigationElem.firstElementChild.scrollTo({
+        left:
+            selected.offsetLeft +
+            selected.offsetWidth / 2 -
+            navigationElem.firstElementChild.offsetWidth / 2,
+        behavior: 'smooth'
+    })
 
     showContent(sections[name])
 }
