@@ -6201,7 +6201,7 @@ exports.change = addStyles
     //Image input dropdown box
     let imagePopup = new InputPopup({
         maxWidth: 600,
-        minWidth: 248,
+        minWidth: 0,
 
         height: false,
         maxHeight: 500
@@ -6209,11 +6209,10 @@ exports.change = addStyles
     {
         imagePopup.node.classList.add('image')
 
-        let imageMaxWidth = 100
-        let boxExtraWidth = 13
+        let imageMaxWidth = 115
+        let boxExtraWidth = 5
 
         let maxRows = 6
-        let maxColumns = 4
 
         let fileNode = document.createElement('button')
         imagePopup.node.appendChild(fileNode)
@@ -6342,8 +6341,6 @@ exports.change = addStyles
             document.body.appendChild(imagePopup.node)
         }
         imagePopup.move = function(position) {
-            imagePopup.box.minWidth = position.width
-
             if (Images.files.length === 0) {
                 imagePopup.box.maxWidth = 252
             } else {
