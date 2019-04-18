@@ -433,6 +433,12 @@ function toggleBlank() {
         'control.keyboard.selectPrevious': () => {
             ipcRenderer.send('display-command', 'select-previous')
         },
+        'control.keyboard.selectNextItem': () => {
+            ipcRenderer.send('display-command', 'select-next-item')
+        },
+        'control.keyboard.selectPreviousItem': () => {
+            ipcRenderer.send('display-command', 'select-previous-item')
+        },
         'control.keyboard.playSelected': () => {
             ipcRenderer.send('display-command', 'play-selected')
         },
@@ -606,6 +612,8 @@ function toggleBlank() {
 
         ['control.keyboard.selectNext', 'ArrowDown'],
         ['control.keyboard.selectPrevious', 'ArrowUp'],
+        ['control.keyboard.selectNextItem', 'Control+ArrowDown'],
+        ['control.keyboard.selectPreviousItem', 'Control+ArrowUp'],
 
         ['control.keyboard.playSelected', 'Enter'],
 

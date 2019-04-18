@@ -2225,6 +2225,12 @@ const presentation = {}
                 case 'select-previous':
                     presentation.selectBack()
                     break
+                case 'select-next-item':
+                    presentation.selectItemForward()
+                    break
+                case 'select-previous-item':
+                    presentation.selectItemBackward()
+                    break
                 case 'play-selected':
                     presentation.playSelected()
             }
