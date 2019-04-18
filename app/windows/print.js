@@ -629,6 +629,7 @@ function resetSong(item) {
             type: 'Header',
 
             data: 'name',
+            section: '',
 
             text:
                 (options.boldName ? '<b>' : '') +
@@ -641,6 +642,7 @@ function resetSong(item) {
             type: 'Text',
 
             data: 'author',
+            section: '',
 
             text:
                 (options.italicizeAuthor ? '<i>' : '') +
@@ -655,6 +657,7 @@ function resetSong(item) {
         item.sections.push({
             type: 'Paragraph',
 
+            data: '',
             section: item.song.playOrder[i],
 
             text:
@@ -676,6 +679,7 @@ function resetSong(item) {
             type: 'Text',
 
             data: 'author',
+            section: '',
 
             text:
                 (options.italicizeAuthor ? '<i>' : '') +
@@ -688,6 +692,7 @@ function resetSong(item) {
             type: 'Text',
 
             data: 'copyright',
+            section: '',
 
             text: richText.format(item.song.copyright),
             plainText: item.song.copyright,
