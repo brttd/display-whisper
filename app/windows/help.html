@@ -27,6 +27,26 @@ header #help-sections {
     white-space: nowrap;
     overflow: auto;
 }
+#help-sections::-webkit-scrollbar {
+    height: 1ch;
+    background: hsl(0, 0%, 95%);
+}
+#help-sections::-webkit-scrollbar-button {
+    display: none;
+}
+#help-sections::-webkit-scrollbar-track,
+#help-sections::-webkit-scrollbar-corner {
+    background: transparent;
+}
+#help-sections::-webkit-scrollbar-thumb {
+    background: hsl(0, 0%, 85%);
+}
+#help-sections::-webkit-scrollbar-thumb:hover {
+    background: hsl(0, 0%, 65%);
+}
+#help-sections::-webkit-scrollbar-thumb:active {
+    background: hsl(0, 0%, 45%);
+}
 header #help-quick-nav {
     padding: 0.5em;
 
@@ -63,6 +83,26 @@ header a {
 article {
     padding: 0 1em;
     overflow: auto;
+}
+article::-webkit-scrollbar {
+    width: 1.2ch;
+    background: hsl(0, 0%, 95%);
+}
+article::-webkit-scrollbar-button {
+    display: none;
+}
+article::-webkit-scrollbar-track,
+article::-webkit-scrollbar-corner {
+    background: transparent;
+}
+article::-webkit-scrollbar-thumb {
+    background: hsl(0, 0%, 85%);
+}
+article::-webkit-scrollbar-thumb:hover {
+    background: hsl(0, 0%, 65%);
+}
+article::-webkit-scrollbar-thumb:active {
+    background: hsl(0, 0%, 45%);
 }
 p {
     line-height: 1.5;
