@@ -1224,9 +1224,6 @@ $img-max-width: 10em;
 
             width: 0;
 
-            /* Inputs width is wrong, needs to be 100% - button size (1.5em) - 2px (button left margin) - input horizontal padding*/
-            max-width: calc(100% - 1.5em - 2px - #{last($input-padding) * 2});
-
             margin: 0;
             padding: $input-padding;
 
@@ -1250,12 +1247,13 @@ $img-max-width: 10em;
 
         button {
             display: inline-flex;
+            box-sizing: content-box;
 
             width: 1.5em;
             height: 1.5em;
 
             margin-left: 2px;
-            padding: 0;
+            padding: 2px;
 
             flex: auto 0 0;
 
@@ -1274,9 +1272,7 @@ $img-max-width: 10em;
 
                 fill: $text;
             }
-        }
 
-        button {
             &:hover,
             &:focus {
                 svg {
