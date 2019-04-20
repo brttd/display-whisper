@@ -691,19 +691,6 @@ function resetSong(item) {
             plainText: item.song.name,
 
             align: 'center'
-        },
-        {
-            type: 'Text',
-
-            data: 'author',
-            section: '',
-
-            text:
-                (options.italicizeAuthor ? '<i>' : '') +
-                richText.format(item.song.author),
-            plainText: item.song.author,
-
-            align: 'center'
         }
     ]
 
@@ -728,32 +715,23 @@ function resetSong(item) {
         })
     }
 
-    item.sections.push(
-        {
-            type: 'Text',
+    item.sections.push({
+        type: 'Paragraph',
 
-            data: 'author',
-            section: '',
+        data: 'author + copyright',
+        section: '',
 
-            text:
+        text:
+            richText.clean(
                 (options.italicizeAuthor ? '<i>' : '') +
-                richText.format(item.song.author),
-            plainText: item.song.author,
+                    richText.format(item.song.author)
+            ) +
+            '\n' +
+            richText.format(item.song.copyright),
+        plainText: item.song.author + '\n' + item.song.copyright,
 
-            align: 'center'
-        },
-        {
-            type: 'Text',
-
-            data: 'copyright',
-            section: '',
-
-            text: richText.format(item.song.copyright),
-            plainText: item.song.copyright,
-
-            align: 'center'
-        }
-    )
+        align: 'center'
+    })
 
     return item
 }
@@ -1258,8 +1236,22 @@ function updatePrintSettings() {
         if (section.data) {
             section.type = 'Text'
 
-            section.text = richText.format(item.song[section.data])
-            section.plainText = item.song[section.data]
+            if (item.song.hasOwnProperty(section.data)) {
+                section.text = richText.format(item.song[section.data])
+                section.plainText = item.song[section.data]
+            } else {
+                if (section.data === 'author + copyright') {
+                    section.text =
+                        richText.clean(
+                            (options.italicizeAuthor ? '<i>' : '') +
+                                item.song.author
+                        ) +
+                        '\n' +
+                        richText.format(item.song.copyright)
+                    section.plainText =
+                        item.song.author + '\n' + item.song.copyright
+                }
+            }
 
             if (section.data === 'name') {
                 section.type = 'Header'
