@@ -14312,8 +14312,6 @@ class BoxEdit {
 
 //Print item
 {
-    loadCSS('print.css')
-
     let fs
 
     const printSizes = {
@@ -14343,17 +14341,215 @@ class BoxEdit {
         }
     }
 
-    let printElem = null
+    let printElem
 
     let printStyleNode = document.createElement('style')
     let setPageSize = null
     let setPageLandscape = null
-    {
-        document.head.appendChild(printStyleNode)
 
-        let printStyleSheet = printStyleNode.sheet
+    let getTextHeight
+    let getColumnHeight
+
+    let setupPrinting
+
+    {
+        let printStyleSheet
         let landscape = false
         let size = 'A4'
+
+        let printPageTestElem
+
+        //get height functions
+        {
+            let testQueue = []
+            let awaitingTest = false
+
+            function doTest() {
+                if (testQueue.length === 0) {
+                    return false
+                }
+
+                let text = testQueue.shift()
+
+                if (text.__COLUMN_TEST === true) {
+                    doColumnTest(text.options, text.callback)
+
+                    return false
+                }
+
+                text._testCacheOptions = text._cacheOptions
+
+                if (text._cacheOptions.landscape) {
+                    printPageTestElem.style.width =
+                        printSizes[text._cacheOptions.size].height + 'mm'
+                    printPageTestElem.style.height =
+                        printSizes[text._cacheOptions.size].width + 'mm'
+                } else {
+                    printPageTestElem.style.width =
+                        printSizes[text._cacheOptions.size].width + 'mm'
+                    printPageTestElem.style.height =
+                        printSizes[text._cacheOptions.size].height + 'mm'
+                }
+
+                printPageTestElem.style.padding =
+                    text._cacheOptions.margin + 'cm'
+
+                printPageTestElem.firstChild.style.width =
+                    100 / text._cacheOptions.columns + '%'
+
+                printPageTestElem.style.fontFamily =
+                    '"' + text._cacheOptions.font + '"'
+                printPageTestElem.style.fontSize =
+                    text._cacheOptions.fontSize + 'pt'
+
+                printPageTestElem.firstChild.innerHTML = ''
+
+                let elem = null
+                if (text.type.toLowerCase() === 'header') {
+                    elem = document.createElement('h1')
+                } else {
+                    elem = document.createElement('p')
+                }
+
+                if (
+                    text.align === 'left' ||
+                    text.align === 'center' ||
+                    text.align === 'right'
+                ) {
+                    elem.style.textAlign = text.align
+                }
+
+                if (typeof text.text === 'string') {
+                    elem.innerHTML = richText.clean(text.text)
+                } else if (typeof text.plainText === 'string') {
+                    elem.textContent = text.plainText
+                }
+
+                printPageTestElem.firstChild.appendChild(elem)
+
+                body.onFrame.start(() => {
+                    if (text._testCacheOptions !== text._cacheOptions) {
+                        if (!testQueue.includes(text)) {
+                            testQueue.push(text)
+                        }
+
+                        if (!awaitingTest) {
+                            awaitingTest = true
+                            body.onFrame.end(doTest)
+                        }
+
+                        return false
+                    }
+
+                    text._callback(null, elem.offsetHeight)
+
+                    if (testQueue.length === 0) {
+                        awaitingTest = false
+                    } else {
+                        awaitingTest = true
+                        body.onFrame.end(doTest)
+                    }
+                })
+            }
+
+            function doColumnTest(options, callback) {
+                if (options.landscape) {
+                    printPageTestElem.style.width =
+                        printSizes[options.size].height + 'mm'
+                    printPageTestElem.style.height =
+                        printSizes[options.size].width + 'mm'
+                } else {
+                    printPageTestElem.style.width =
+                        printSizes[options.size].width + 'mm'
+                    printPageTestElem.style.height =
+                        printSizes[options.size].height + 'mm'
+                }
+
+                printPageTestElem.style.padding = options.margin + 'cm'
+
+                printPageTestElem.firstChild.style.width =
+                    100 / options.columns + '%'
+
+                printPageTestElem.firstChild.innerHTML = ''
+
+                body.onFrame.start(() => {
+                    callback(null, printPageTestElem.firstChild.offsetHeight)
+
+                    if (testQueue.length === 0) {
+                        awaitingTest = false
+                    } else {
+                        awaitingTest = true
+                        body.onFrame.end(doTest)
+                    }
+                })
+            }
+
+            getTextHeight = (text, options, callback) => {
+                if (typeof callback !== 'function') {
+                    return false
+                }
+
+                if (
+                    typeof text._cacheHeight === 'number' &&
+                    text._cacheHeight >= 0
+                ) {
+                    if (
+                        text._cacheOptions.size === options.size &&
+                        text._cacheOptions.landscape === options.landscape &&
+                        text._cacheOptions.margin === options.margin &&
+                        text._cacheOptions.columns === options.columns &&
+                        text._cacheOptions.font === options.font &&
+                        text._cacheOptions.fontSize === options.fontSize
+                    ) {
+                        callback(null, text._cacheHeight)
+
+                        return true
+                    }
+                }
+
+                text._cacheHeight = -1
+                text._cacheOptions = {
+                    size: options.size,
+                    landscape: options.landscape,
+
+                    margin: options.margin,
+                    columns: options.columns,
+
+                    font: options.font,
+                    fontSize: options.fontSize
+                }
+                text._callback = callback
+
+                if (!testQueue.includes(text)) {
+                    testQueue.push(text)
+                }
+
+                if (!awaitingTest) {
+                    awaitingTest = true
+                    body.onFrame.end(doTest)
+                }
+            }
+
+            getColumnHeight = (options, callback) => {
+                testQueue.push({
+                    __COLUMN_TEST: true,
+
+                    options: {
+                        size: options.size,
+                        landscape: options.landscape,
+
+                        margin: options.margin,
+                        columns: options.columns
+                    },
+                    callback: callback
+                })
+
+                if (!awaitingTest) {
+                    awaitingTest = true
+                    body.onFrame.end(doTest)
+                }
+            }
+        }
 
         function updateStyle() {
             while (printStyleSheet.cssRules.length > 0) {
@@ -14386,7 +14582,7 @@ class BoxEdit {
             }
         }
 
-        setPageLandscape = function(newLandscape) {
+        setPageLandscape = newLandscape => {
             if (landscape !== !!newLandscape) {
                 landscape = !!newLandscape
 
@@ -14394,7 +14590,7 @@ class BoxEdit {
             }
         }
 
-        setPageSize = function(newSize) {
+        setPageSize = newSize => {
             if (printSizes.hasOwnProperty(newSize)) {
                 size = newSize
 
@@ -14402,7 +14598,29 @@ class BoxEdit {
             }
         }
 
+        setupPrinting = () => {
+            setupPrinting = () => {}
+
+            printElem = document.createElement('div')
+            printElem.className = 'printElement'
+            document.body.appendChild(printElem)
+
+            document.head.appendChild(printStyleNode)
+
+            printStyleSheet = printStyleNode.sheet
+
         setPageLandscape('portrait')
+
+            printPageTestElem = document.createElement('div')
+            printPageTestElem.className = 'printTestElement'
+
+            printPageTestElem.style.position = 'fixed'
+
+            printPageTestElem.appendChild(document.createElement('div'))
+            printPageTestElem.lastChild.style.height = '100%'
+
+            document.body.appendChild(printPageTestElem)
+    }
     }
 
     class PrintPreview extends Item {
@@ -14688,6 +14906,11 @@ class BoxEdit {
                 zoom: 1
             }
 
+            this._rendering = false
+            this._needsRender = false
+
+            this._content = []
+
             this._oldWidth = 0
             this._width = 0
 
@@ -14704,19 +14927,15 @@ class BoxEdit {
                 this.setColumns(data.columns)
             }
 
-            if (printElem === null) {
-                printElem = document.createElement('div')
-                printElem.className = 'printElement'
-                document.body.appendChild(printElem)
-            }
+            setupPrinting()
 
             bindFunctions(
                 this,
+                this.render,
+
                 this.onResize,
                 this.readSize,
                 this.writeSize,
-                this.writePageLayout,
-                this.updateContentLayout,
                 this.offsetScroll,
 
                 this.print,
@@ -14777,7 +14996,7 @@ class BoxEdit {
 
                 this.sizeControl.value = size
 
-                body.onFrame.end(this.writePageLayout)
+                this.render()
 
                 sendEventTo(
                     {
@@ -14820,7 +15039,7 @@ class BoxEdit {
                         printSizes[this._options.size].height
                 }
 
-                body.onFrame.end(this.writePageLayout)
+                this.render()
 
                 sendEventTo(
                     {
@@ -14855,7 +15074,7 @@ class BoxEdit {
                     this.marginControl.value = round(this._options.margin, 2)
                 }
 
-                this.writePageLayout()
+                this.render()
 
                 sendEventTo(
                     {
@@ -14887,7 +15106,7 @@ class BoxEdit {
                     this.columnControl.value = this._options.columns
                 }
 
-                this.writePageLayout()
+                this.render()
 
                 sendEventTo(
                     {
@@ -14908,9 +15127,7 @@ class BoxEdit {
             if (fonts.isFont(font)) {
                 this._options.font = font
 
-                this.pagesNode.style.fontFamily = '"' + font + '"'
-
-                this.updateContentLayout()
+                this.render()
             } else if (!fonts.loaded) {
                 //fonts.onEvent('update')
             }
@@ -14926,47 +15143,293 @@ class BoxEdit {
                 fontSize > 0
             ) {
                 this._options.fontSize = fontSize
-                this.pagesNode.style.fontSize = fontSize + 'pt'
 
-                this.updateContentLayout()
+                this.render()
             }
         }
 
-        updateContentLayout() {
-            if (this.contentNodes.length === 0) {
+        _addTextNode(text, pageIndex, columnIndex) {
+            let elem = document.createElement('div')
+
+            if (text.type.toLowerCase() === 'header') {
+                elem = document.createElement('h1')
+            } else {
+                elem = document.createElement('p')
+            }
+
+            if (
+                text.align === 'left' ||
+                text.align === 'center' ||
+                text.align === 'right'
+            ) {
+                elem.style.textAlign = text.align
+            }
+
+            if (typeof text.text === 'string') {
+                elem.innerHTML = richText.clean(text.text)
+            } else if (typeof text.plainText === 'string') {
+                elem.textContent = text.plainText
+            }
+
+            this.pageNodes[pageIndex].children[columnIndex].appendChild(elem)
+        }
+
+        _addPage(options = this._options) {
+            this.pageNodes.push(document.createElement('div'))
+            this.pageNodes[this.pageNodes.length - 1].className = 'page-scale'
+
+            this._updatePage(this.pageNodes.length - 1, options)
+        }
+        _updatePage(index, options = this._options) {
+            if (index >= this.pageNodes.length) {
+                this._addPage(options)
+                return true
+            }
+
+            let page = this.pageNodes[index]
+
+            page.style.width = printSizes[options.size].width + 'mm'
+            page.style.height = printSizes[options.size].height + 'mm'
+
+            if (options.landscape) {
+                page.style.width = printSizes[options.size].height + 'mm'
+                page.style.height = printSizes[options.size].width + 'mm'
+            }
+
+            page.style.padding = options.margin + 'cm'
+
+            while (page.childElementCount > options.columns) {
+                page.removeChild(page.lastElementChild)
+            }
+
+            while (page.childElementCount < options.columns) {
+                page.appendChild(document.createElement('div'))
+                page.lastElementChild.className = 'column'
+            }
+
+            for (let i = 0; i < page.childElementCount; i++) {
+                page.children[i].style.width = 100 / options.columns + '%'
+            }
+
+            page.style.fontFamily = '"' + options.font + '"'
+            page.style.fontSize = options.fontSize + 'pt'
+        }
+        render() {
+            if (this._rendering) {
+                this._needsRender = true
+
                 return false
             }
 
-            if (this.pageNodes.length === 0) {
-                this._addPage()
+            this._rendering = true
+
+            let optionsCache = {
+                size: this._options.size,
+                landscape: this._options.landscape,
+
+                margin: this._options.margin,
+                columns: this._options.columns,
+
+                font: this._options.font,
+                fontSize: this._options.fontSize
             }
 
-            this.pageNodes[0].innerHTML = ''
+            let columnHeight = 0
 
+            let content = this._content.slice(0)
+            let contentIndex = 0
+
+            let pagesLayout = []
             let pageIndex = 0
+            let columnIndex = 0
 
-            for (let i = 0; i < this.contentNodes.length; i++) {
-                let height = this.pageNodes[pageIndex].offsetHeight
+            let writePage = pageIndex => {
+                this._updatePage(pageIndex, optionsCache)
 
-                this.pageNodes[pageIndex].appendChild(this.contentNodes[i])
+                for (
+                    let columnIndex = 0;
+                    columnIndex < pagesLayout[pageIndex].length;
+                    columnIndex++
+                ) {
+                    this.pageNodes[pageIndex].children[columnIndex].innerHTML =
+                        ''
 
-                if (this.pageNodes[pageIndex].offsetHeight > height) {
-                    pageIndex += 1
+                    for (
+                        let textIndex = 0;
+                        textIndex < pagesLayout[pageIndex][columnIndex].length;
+                        textIndex++
+                    ) {
+                        this._addTextNode(
+                            pagesLayout[pageIndex][columnIndex][textIndex],
+                            pageIndex,
+                            columnIndex
+                        )
+                    }
+                }
 
-                    if (pageIndex === this.pageNodes.length) {
-                        this._addPage()
+                if (this.pagesNode.childElementCount <= pageIndex) {
+                    this.pagesNode.appendChild(document.createElement('div'))
+                    this.pagesNode.lastElementChild.className = 'page'
+                } else {
+                    this.pagesNode.children[pageIndex].innerHTML = ''
+                }
+
+                this.pagesNode.children[pageIndex].appendChild(
+                    this.pageNodes[pageIndex]
+                )
+            }
+
+            let writePages = () => {
+                while (this.pageNodes.length > pagesLayout.length) {
+                    this.pageNodes.pop()
+                }
+
+                while (this.pagesNode.childElementCount > pagesLayout.length) {
+                    this.pagesNode.removeChild(this.pagesNode.lastElementChild)
+                }
+
+                for (let i = 0; i < pagesLayout.length; i++) {
+                    writePage(i)
+                }
+
+                this.writeSize()
+
+                this.pagesNode.style.opacity = ''
+            }
+
+            let addPageLayout = () => {
+                pagesLayout.push([])
+
+                for (let i = 0; i < optionsCache.columns; i++) {
+                    pagesLayout[pagesLayout.length - 1].push([])
+                }
+
+                pageIndex = pagesLayout.length - 1
+                columnIndex = 0
+            }
+
+            let renderNext = () => {
+                if (this._needsRender) {
+                    this._rendering = false
+                    this._needsRender = false
+
+                    this.render()
+
+                    return false
+                }
+
+                if (contentIndex >= content.length) {
+                    this._rendering = false
+
+                    writePages()
+
+                    return false
+                }
+
+                let text = content[contentIndex]
+
+                getTextHeight(text, this._options, (err, height) => {
+                    if (err) {
+                        console.error('Could not get text height!', err)
+
+                        renderNext()
                     }
 
-                    this.pageNodes[pageIndex].innerHTML = ''
+                    let spaceLeft = columnHeight
 
-                    this.pageNodes[pageIndex].appendChild(this.contentNodes[i])
+                    text.displayHeight = height
+
+                    for (
+                        let textNodeIndex = 0;
+                        textNodeIndex <
+                        pagesLayout[pageIndex][columnIndex].length;
+                        textNodeIndex++
+                    ) {
+                        spaceLeft -=
+                            pagesLayout[pageIndex][columnIndex][textNodeIndex]
+                                .displayHeight
+                    }
+
+                    if (height <= spaceLeft) {
+                        //Enough space in current column for text
+                        pagesLayout[pageIndex][columnIndex].push(text)
+                    } else if (height < columnHeight) {
+                        //Enough space in new column for text
+                        columnIndex += 1
+
+                        if (columnIndex >= optionsCache.columns) {
+                            addPageLayout()
+                        }
+
+                        pagesLayout[pageIndex][columnIndex].push(text)
+                    } else {
+                        //Not enough space in new column, text needs to be split
+                        let textLines = richText.lines(text.text)
+
+                        if (textLines.length === 1) {
+                            //Only one line of text, it cannot be split, just put it into its own column
+                            columnIndex += 1
+
+                            if (columnIndex >= optionsCache.columns) {
+                                addPageLayout()
+                            }
+
+                            pagesLayout[pageIndex][columnIndex].push(text)
+                        } else {
+                            //Take as many lines as fit in the current column
+                            let lineIndex = Math.floor(
+                                (spaceLeft / height) * textLines.length
+                            )
+
+                            if (lineIndex === 0) {
+                                //No lines fit in current column
+
+                                //Get as many lines as fit in a empty column
+                                lineIndex = Math.floor(
+                                    (columnHeight / height) * textLines.length
+                                )
+                    }
+
+                            //Split the current text into two, the first part being small enough to fit into the current column
+                            let newText1 = objUtil.copyObj(text)
+                            let newText2 = objUtil.copyObj(text)
+
+                            let parts = richText.splitLines(
+                                text.text,
+                                lineIndex
+                            )
+
+                            newText1.text = parts[0]
+                            newText2.text = parts[1]
+
+                            content.splice(contentIndex, 1, newText1, newText2)
+
+                            //The next renderNext call will go to the next index, when it actually needs to stay on the current index
+                            contentIndex -= 1
                 }
             }
 
-            //Remove all excess pages
-            for (let i = this.pageNodes.length - 1; i > pageIndex; i--) {
-                this.pagesNode.removeChild(this.pageNodes.pop().parentNode)
+                    contentIndex += 1
+                    renderNext()
+                })
             }
+
+            getColumnHeight(optionsCache, (err, height) => {
+                if (err) {
+                    console.error('Could not get height!')
+                    this.render()
+
+                    return false
+            }
+
+                columnHeight = height
+
+                addPageLayout()
+
+                this.pagesNode.style.opacity = '0.5'
+
+                renderNext()
+            })
         }
 
         readSize() {
@@ -14989,20 +15452,6 @@ class BoxEdit {
                 this._oldWidth = this._width
             }
         }
-        writePageLayout() {
-            for (let i = 0; i < this.pageNodes.length; i++) {
-                this.pageNodes[i].style.width = this._options.print.width + 'mm'
-                this.pageNodes[i].style.minHeight =
-                    this._options.print.height + 'mm'
-
-                this.pageNodes[i].style.padding = this._options.margin + 'cm'
-                this.pageNodes[i].style.columns = this._options.columns
-            }
-
-            body.onFrame.end(this.updateContentLayout)
-
-            body.onFrame.end(this.writeSize)
-        }
         writeSize() {
             for (let i = 0; i < this.pageNodes.length; i++) {
                 this.pageNodes[i].style.transform =
@@ -15017,19 +15466,24 @@ class BoxEdit {
 
         onResize() {
             body.onFrame.start(this.readSize)
+            body.onFrame.end(this.writeSize)
         }
 
         clear() {
+            this._content = []
+
             this.pagesNode.innerHTML = ''
             this.pageNodes = []
             this.contentNodes = []
 
-            this._addPage()
+            this.render()
         }
 
         set(content) {
             if (Array.isArray(content)) {
-                this.clear()
+                this._content = []
+
+                this._content = []
 
                 for (let i = 0; i < content.length; i++) {
                     this.addText(content[i])
@@ -15038,97 +15492,22 @@ class BoxEdit {
         }
 
         addText(data) {
-            if (this.pageNodes.length === 0) {
-                this._addPage()
-            }
-
             if (
                 typeof data === 'object' &&
                 data !== null &&
                 !Array.isArray(data)
             ) {
+                this._content.push(data)
+
                 data.type = data.type || ''
 
-                let elem = null
-
-                if (data.type.toLowerCase() === 'header') {
-                    elem = document.createElement('h1')
-                } else if (data.type.toLowerCase() === 'text') {
-                    elem = document.createElement('span')
-                } else {
-                    elem = document.createElement('p')
+                if (typeof data.text !== 'string') {
+                    data.text = richText.format(data.plainText)
                 }
 
-                if (
-                    data.align === 'left' ||
-                    data.align === 'center' ||
-                    data.align === 'right'
-                ) {
-                    elem.style.textAlign = data.align
+                this.render()
                 }
-
-                if (typeof data.text === 'string') {
-                    elem.innerHTML = richText.clean(data.text)
-                } else if (typeof data.plainText === 'string') {
-                    elem.textContent = data.plainText
                 }
-
-                this.contentNodes.push(elem)
-
-                let height = this.pageNodes[this.pageNodes.length - 1]
-                    .offsetHeight
-
-                this.pageNodes[this.pageNodes.length - 1].appendChild(elem)
-
-                if (
-                    this.pageNodes[this.pageNodes.length - 1].offsetHeight >
-                    height
-                ) {
-                    this._addPage()
-
-                    this.pageNodes[this.pageNodes.length - 1].appendChild(elem)
-                }
-            }
-        }
-
-        _addPage() {
-            this.pageNodes.push(document.createElement('div'))
-            this.pageNodes[this.pageNodes.length - 1].className = 'page-scale'
-
-            this.pageNodes[this.pageNodes.length - 1].style.width =
-                this._options.print.width + 'mm'
-            this.pageNodes[this.pageNodes.length - 1].style.minHeight =
-                this._options.print.height + 'mm'
-
-            this.pageNodes[this.pageNodes.length - 1].style.padding =
-                this._options.margin + 'cm'
-
-            this.pageNodes[
-                this.pageNodes.length - 1
-            ].style.columns = this._options.columns
-
-            this.pagesNode.appendChild(document.createElement('div'))
-            this.pagesNode.lastChild.className = 'page'
-            this.pagesNode.lastChild.appendChild(
-                this.pageNodes[this.pageNodes.length - 1]
-            )
-
-            if (this._oldWidth === 0) {
-                body.onFrame.start(this.readSize)
-            } else {
-                this.pageNodes[this.pageNodes.length - 1].style.transform =
-                    'scale(' + this._options.zoom + ')'
-
-                this.pageNodes[
-                    this.pageNodes.length - 1
-                ].parentNode.style.width =
-                    this._options.print.width * this._options.zoom + 'mm'
-                this.pageNodes[
-                    this.pageNodes.length - 1
-                ].parentNode.style.height =
-                    this._options.print.height * this._options.zoom + 'mm'
-            }
-        }
 
         _updatePrintElem() {
             printElem.innerHTML = ''
@@ -15139,7 +15518,6 @@ class BoxEdit {
 
                 printElem.lastChild.innerHTML = this.pageNodes[i].innerHTML
                 printElem.lastChild.style.padding = this._options.margin + 'cm'
-                printElem.lastChild.style.columns = this._options.columns
             }
 
             printElem.style.fontFamily = '"' + this._options.font + '"'
