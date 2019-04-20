@@ -5519,7 +5519,7 @@ exports.change = addStyles
                 fontPopup.node.lastChild.textContent = fonts.all[i]
                 fontPopup.node.lastChild.style.fontFamily =
                     '"' + fonts.all[i] + '"'
-        }
+            }
         })
     }
     class FontInput extends focusItem {
@@ -13702,8 +13702,8 @@ class BoxEdit {
                 if (this.properties.minimized) {
                     if (this.indexOf(item) === 0) {
                         if (!this._showSectionWhenMinimized) {
-                    this.expand()
-                }
+                            this.expand()
+                        }
                     } else {
                         this.expand()
                     }
@@ -14618,7 +14618,7 @@ class BoxEdit {
 
             printStyleSheet = printStyleNode.sheet
 
-        setPageLandscape('portrait')
+            setPageLandscape('portrait')
 
             printPageTestElem = document.createElement('div')
             printPageTestElem.className = 'printTestElement'
@@ -14630,7 +14630,7 @@ class BoxEdit {
             printPageTestElem.lastChild.style.height = '100%'
 
             document.body.appendChild(printPageTestElem)
-    }
+        }
     }
 
     class PrintPreview extends Item {
@@ -15404,7 +15404,7 @@ class BoxEdit {
                                 lineIndex = Math.floor(
                                     (columnHeight / height) * textLines.length
                                 )
-                    }
+                            }
 
                             //Split the current text into two, the first part being small enough to fit into the current column
                             let newText1 = objUtil.copyObj(text)
@@ -15422,8 +15422,8 @@ class BoxEdit {
 
                             //The next renderNext call will go to the next index, when it actually needs to stay on the current index
                             contentIndex -= 1
-                }
-            }
+                        }
+                    }
 
                     contentIndex += 1
                     renderNext()
@@ -15436,7 +15436,7 @@ class BoxEdit {
                     this.render()
 
                     return false
-            }
+                }
 
                 columnHeight = height
 
@@ -15522,8 +15522,8 @@ class BoxEdit {
                 }
 
                 this.render()
-                }
-                }
+            }
+        }
 
         _updatePrintElem() {
             printElem.innerHTML = ''
