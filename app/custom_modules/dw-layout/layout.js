@@ -14366,18 +14366,17 @@ class BoxEdit {
             let testQueue = []
             let awaitingTest = false
 
+            let marginSizes = {}
+
+            let marginTestElem = document.createElement('div')
+            marginTestElem.style.height = '1em'
+
             function doTest() {
                 if (testQueue.length === 0) {
                     return false
                 }
 
                 let text = testQueue.shift()
-
-                if (text.__COLUMN_TEST === true) {
-                    doColumnTest(text.options, text.callback)
-
-                    return false
-                }
 
                 text._testCacheOptions = text._cacheOptions
 
@@ -14410,6 +14409,12 @@ class BoxEdit {
                     text._cacheOptions.fontSize + 'pt'
 
                 printPageTestElem.firstChild.innerHTML = ''
+
+                if (text.__COLUMN_TEST === true) {
+                    doColumnTest(text._cacheOptions, text.callback)
+
+                    return false
+                }
 
                 let elem = null
                 if (text.type.toLowerCase() === 'header') {
@@ -14460,29 +14465,31 @@ class BoxEdit {
             }
 
             function doColumnTest(options, callback) {
-                if (options.landscape) {
-                    printPageTestElem.style.width =
-                        printSizes[options.size].height + 'mm'
-                    printPageTestElem.style.height =
-                        printSizes[options.size].width + 'mm'
-                } else {
-                    printPageTestElem.style.width =
-                        printSizes[options.size].width + 'mm'
-                    printPageTestElem.style.height =
-                        printSizes[options.size].height + 'mm'
+                let testMargin = false
+
+                if (
+                    !marginSizes.hasOwnProperty(options.font) ||
+                    !marginSizes[options.font].hasOwnProperty(options.fontSize)
+                ) {
+                    testMargin = true
+                    printPageTestElem.appendChild(marginTestElem)
+
+                    if (!marginSizes.hasOwnProperty(options.font)) {
+                        marginSizes[options.font] = {}
+                    }
                 }
 
-                printPageTestElem.style.padding = options.margin + 'cm'
-
-                printPageTestElem.firstChild.style.width =
-                    100 / options.columns + '%'
-                printPageTestElem.firstChild.style.padding =
-                    '0 ' + options.margin * columnMarginPerc + 'cm'
-
-                printPageTestElem.firstChild.innerHTML = ''
-
                 body.onFrame.start(() => {
-                    callback(null, printPageTestElem.firstChild.offsetHeight)
+                    if (testMargin) {
+                        marginSizes[options.font][options.fontSize] =
+                            marginTestElem.offsetHeight
+                    }
+
+                    callback(
+                        null,
+                        printPageTestElem.firstChild.offsetHeight,
+                        marginSizes[options.font][options.fontSize]
+                    )
 
                     if (testQueue.length === 0) {
                         awaitingTest = false
@@ -14543,12 +14550,15 @@ class BoxEdit {
                 testQueue.push({
                     __COLUMN_TEST: true,
 
-                    options: {
+                    _cacheOptions: {
                         size: options.size,
                         landscape: options.landscape,
 
                         margin: options.margin,
-                        columns: options.columns
+                        columns: options.columns,
+
+                        font: options.font,
+                        fontSize: options.fontSize
                     },
                     callback: callback
                 })
@@ -15251,6 +15261,7 @@ class BoxEdit {
             }
 
             let columnHeight = 0
+            let marginHeight = 0
 
             let content = this._content.slice(0)
             let contentIndex = 0
@@ -15366,24 +15377,17 @@ class BoxEdit {
                                 .displayHeight
                     }
 
-                    if (height <= spaceLeft) {
+                    if (height - marginHeight <= spaceLeft) {
                         //Enough space in current column for text
                         pagesLayout[pageIndex][columnIndex].push(text)
-                    } else if (height < columnHeight) {
-                        //Enough space in new column for text
-                        columnIndex += 1
-
-                        if (columnIndex >= optionsCache.columns) {
-                            addPageLayout()
-                        }
-
-                        pagesLayout[pageIndex][columnIndex].push(text)
                     } else {
-                        //Not enough space in new column, text needs to be split
                         let textLines = richText.lines(text.text)
 
-                        if (textLines.length === 1) {
-                            //Only one line of text, it cannot be split, just put it into its own column
+                        if (
+                            height - marginHeight < columnHeight ||
+                            textLines.length === 1
+                        ) {
+                            //Enough space in new column for text
                             columnIndex += 1
 
                             if (columnIndex >= optionsCache.columns) {
@@ -15392,9 +15396,12 @@ class BoxEdit {
 
                             pagesLayout[pageIndex][columnIndex].push(text)
                         } else {
+                            //Not enough space in new column, text needs to be split
+
                             //Take as many lines as fit in the current column
                             let lineIndex = Math.floor(
-                                (spaceLeft / height) * textLines.length
+                                (spaceLeft / (height - marginHeight)) *
+                                    textLines.length
                             )
 
                             if (lineIndex === 0) {
@@ -15402,7 +15409,8 @@ class BoxEdit {
 
                                 //Get as many lines as fit in a empty column
                                 lineIndex = Math.floor(
-                                    (columnHeight / height) * textLines.length
+                                    (columnHeight / (height - marginHeight)) *
+                                        textLines.length
                                 )
                             }
 
@@ -15430,7 +15438,7 @@ class BoxEdit {
                 })
             }
 
-            getColumnHeight(optionsCache, (err, height) => {
+            getColumnHeight(optionsCache, (err, height, margin) => {
                 if (err) {
                     console.error('Could not get height!')
                     this.render()
@@ -15439,6 +15447,7 @@ class BoxEdit {
                 }
 
                 columnHeight = height
+                marginHeight = margin
 
                 addPageLayout()
 
