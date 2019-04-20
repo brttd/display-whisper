@@ -14341,6 +14341,8 @@ class BoxEdit {
         }
     }
 
+    const columnMarginPerc = 0.2
+
     let printElem
 
     let printStyleNode = document.createElement('style')
@@ -14392,10 +14394,15 @@ class BoxEdit {
                 }
 
                 printPageTestElem.style.padding =
-                    text._cacheOptions.margin + 'cm'
+                    text._cacheOptions.margin +
+                    'cm ' +
+                    text._cacheOptions.margin * (1 - columnMarginPerc) +
+                    'cm'
 
                 printPageTestElem.firstChild.style.width =
                     100 / text._cacheOptions.columns + '%'
+                printPageTestElem.firstChild.style.padding =
+                    '0 ' + text._cacheOptions.margin * columnMarginPerc + 'cm'
 
                 printPageTestElem.style.fontFamily =
                     '"' + text._cacheOptions.font + '"'
@@ -14469,6 +14476,8 @@ class BoxEdit {
 
                 printPageTestElem.firstChild.style.width =
                     100 / options.columns + '%'
+                printPageTestElem.firstChild.style.padding =
+                    '0 ' + options.margin * columnMarginPerc + 'cm'
 
                 printPageTestElem.firstChild.innerHTML = ''
 
@@ -14617,6 +14626,7 @@ class BoxEdit {
             printPageTestElem.style.position = 'fixed'
 
             printPageTestElem.appendChild(document.createElement('div'))
+            printPageTestElem.lastChild.className = 'column'
             printPageTestElem.lastChild.style.height = '100%'
 
             document.body.appendChild(printPageTestElem)
@@ -15196,7 +15206,11 @@ class BoxEdit {
                 page.style.height = printSizes[options.size].width + 'mm'
             }
 
-            page.style.padding = options.margin + 'cm'
+            page.style.padding =
+                options.margin +
+                'cm ' +
+                options.margin * (1 - columnMarginPerc) +
+                'cm'
 
             while (page.childElementCount > options.columns) {
                 page.removeChild(page.lastElementChild)
@@ -15209,6 +15223,8 @@ class BoxEdit {
 
             for (let i = 0; i < page.childElementCount; i++) {
                 page.children[i].style.width = 100 / options.columns + '%'
+                page.children[i].style.padding =
+                    '0 ' + options.margin * columnMarginPerc + 'cm'
             }
 
             page.style.fontFamily = '"' + options.font + '"'
