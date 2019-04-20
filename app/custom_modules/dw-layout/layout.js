@@ -158,12 +158,19 @@ const styleValuesMap = {
 //Each item can add it's own functions, which are called when that property is changed for the item
 const itemStylesMap = {}
 
+const loadedCSS = []
+
 let idCounter = 0
 
 //Each exported layout item type, stored by name
 let items = {}
 
 function loadCSS(name) {
+    if (loadedCSS.includes(name)) {
+        return false
+    }
+    loadedCSS.push(name)
+
     name = __dirname + '/' + name
 
     document.head.appendChild(document.createElement('link'))
@@ -14423,6 +14430,8 @@ class BoxEdit {
         */
         constructor(data = {}, styles = {}) {
             super(document.createElement('div'), styles)
+
+            loadCSS('print.css')
 
             if (!fs) {
                 fs = require('fs')
