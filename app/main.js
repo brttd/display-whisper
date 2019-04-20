@@ -55,10 +55,7 @@ let lastDisplayData = null
 //All logic is done inside the main JS script, so that there's a simple system for requesting & setting values, and sending updates to windows which requested values
 const settings = {}
 {
-	const settingsPath = path.join(
-		app.getPath('userData'),
-		'settings.json'
-	)
+    const settingsPath = path.join(app.getPath('userData'), 'settings.json')
 
     let lastSaveTime = 0
     let lastChangeTime = 0
@@ -176,7 +173,10 @@ const settings = {}
             'utf8',
             (error, data) => {
                 if (error) {
-					return logger.error('Unable to read app/settings.json:', error)
+                    return logger.error(
+                        'Unable to read app/settings.json:',
+                        error
+                    )
                 }
 
                 try {
@@ -194,7 +194,10 @@ const settings = {}
                     for (let subSection in data[section]) {
                         if (typeof data[section][subSection] === 'object') {
                             let keyGroup = section + '.' + subSection
-							if (typeof data[section][subSection].map === 'string') {
+                            if (
+                                typeof data[section][subSection].map ===
+                                'string'
+                            ) {
                                 keyGroup = data[section][subSection].map
                             }
                             keyGroup += '.'
@@ -558,7 +561,7 @@ function openDisplay() {
         x: display.bounds.x,
         y: display.bounds.y,
 
-		icon: path.join(appPath, 'icons/app.ico'),
+        icon: path.join(appPath, 'icons/app.ico'),
 
         show: false,
 
@@ -704,7 +707,7 @@ function openControl() {
         minWidth: windowDefaults.control.minWidth,
         minHeight: windowDefaults.control.minHeight,
 
-		icon: path.join(appPath, 'icons/app.ico'),
+        icon: path.join(appPath, 'icons/app.ico'),
 
         webPreferences: {
             //devTools: debug
@@ -904,7 +907,7 @@ function openWindow(name) {
         maxWidth: windowDefaults[name].maxWidth,
         maxHeight: windowDefaults[name].maxHeight,
 
-		icon: path.join(appPath, 'icons/app.ico'),
+        icon: path.join(appPath, 'icons/app.ico'),
 
         webPreferences: {
             //devTools: debug
@@ -1073,10 +1076,7 @@ function openWindowAndSend(windowName, messageArray) {
         return false
     }
 
-	if (
-		!Array.isArray(messageArray) ||
-		typeof messageArray[0] !== 'string'
-	) {
+    if (!Array.isArray(messageArray) || typeof messageArray[0] !== 'string') {
         openWindow(windowName)
 
         return false
@@ -1162,7 +1162,7 @@ function openItemEditor(type, id, data = {}) {
         minWidth: windowDefaults.editor.minWidth,
         minHeight: windowDefaults.editor.minHeight,
 
-		icon: path.join(appPath, 'icons/app.ico'),
+        icon: path.join(appPath, 'icons/app.ico'),
 
         webPreferences: {
             //devTools: debug
@@ -1192,11 +1192,7 @@ function openItemEditor(type, id, data = {}) {
 
     win.webContents.on('crashed', (event, killed) => {
         logger.error(
-			'Editor ' +
-				type +
-				' crashed (killed = ' +
-				killed.toString() +
-				'):',
+            'Editor ' + type + ' crashed (killed = ' + killed.toString() + '):',
             event
         )
     })
@@ -1266,10 +1262,7 @@ function setDisplay(options) {
         change = true
     }
 
-	if (
-		typeof options.show === 'boolean' &&
-		options.show !== display.show
-	) {
+    if (typeof options.show === 'boolean' && options.show !== display.show) {
         display.show = options.show
 
         if (windows.display) {
@@ -1350,7 +1343,9 @@ function isLatestVersion(callback) {
                                 if (typeof data.version === 'string') {
                                     let exit = false
 
-									let currentVersion = app.getVersion().split('.')
+                                    let currentVersion = app
+                                        .getVersion()
+                                        .split('.')
                                     let newVersion = data.version.split('.')
 
                                     logger.info(
@@ -1369,10 +1364,15 @@ function isLatestVersion(callback) {
                                         exit === false;
                                         i++
                                     ) {
-										let current = parseInt(currentVersion[i])
+                                        let current = parseInt(
+                                            currentVersion[i]
+                                        )
                                         let latest = parseInt(newVersion[i])
 
-										if (isFinite(current) && isFinite(latest)) {
+                                        if (
+                                            isFinite(current) &&
+                                            isFinite(latest)
+                                        ) {
                                             if (current < latest) {
                                                 callback(null, data.version)
                                                 exit = true
@@ -1396,7 +1396,10 @@ function isLatestVersion(callback) {
                             } catch (error) {
                                 callback(error, false)
 
-								logger.error('Unable to get latest version info:', error)
+                                logger.error(
+                                    'Unable to get latest version info:',
+                                    error
+                                )
                             }
                         } else {
                             callback(true, false)
@@ -1585,14 +1588,16 @@ const appMenus = {
         for (let itemId in dynamicItems) {
             if (win.menuChanges[itemId]) {
                 if (typeof win.menuChanges[itemId].enabled === 'boolean') {
-					dynamicItems[itemId].enabled = win.menuChanges[itemId].enabled
+                    dynamicItems[itemId].enabled =
+                        win.menuChanges[itemId].enabled
                 } else {
                     dynamicItems[itemId].enabled =
                         dynamicItems[itemId].defaults.enabled
                 }
 
                 if (typeof win.menuChanges[itemId].visible === 'boolean') {
-					dynamicItems[itemId].visible = win.menuChanges[itemId].visible
+                    dynamicItems[itemId].visible =
+                        win.menuChanges[itemId].visible
                 } else {
                     dynamicItems[itemId].visible =
                         dynamicItems[itemId].defaults.visible
@@ -1652,7 +1657,8 @@ const appMenus = {
         for (let i = 0; i < toCheck.length; i++) {
             if (toCheck[i].static !== true) {
                 dynamicItems[
-					itemId + (toCheck[i].value || toCheck[i].label).toLowerCase()
+                    itemId +
+                        (toCheck[i].value || toCheck[i].label).toLowerCase()
                 ] = toCheck[i]
             }
 
@@ -2050,7 +2056,8 @@ const appMenus = {
                     },
                     {
                         label: 'Report Issue (GitHub)...',
-						url: 'https://github.com/brttd/display-whisper/issues/new',
+                        url:
+                            'https://github.com/brttd/display-whisper/issues/new',
 
                         static: true
                     },
@@ -2288,14 +2295,22 @@ ipcMain.on('close', event => {
             case 'open':
                 dialog.showOpenDialog(win, options, files => {
                     if (!event.sender.isDestroyed()) {
-						event.sender.send('open-dialog-return', files, options.id)
+                        event.sender.send(
+                            'open-dialog-return',
+                            files,
+                            options.id
+                        )
                     }
                 })
                 break
             case 'save':
                 dialog.showSaveDialog(win, options, filename => {
                     if (!event.sender.isDestroyed()) {
-						event.sender.send('save-dialog-return', filename, options.id)
+                        event.sender.send(
+                            'save-dialog-return',
+                            filename,
+                            options.id
+                        )
                     }
                 })
                 break
@@ -2320,12 +2335,9 @@ ipcMain.on('close', event => {
         }
     })
 
-	ipcMain.on(
-		'database-updated',
-		(event, databaseName, from, changes) => {
+    ipcMain.on('database-updated', (event, databaseName, from, changes) => {
         sendToAllWindows('database-updated', databaseName, from, changes)
-		}
-	)
+    })
 
     ipcMain.on('check-version', event => {
         checkForUpdate()
@@ -2462,9 +2474,7 @@ function setupDisplays() {
     })
 
     screen.on('display-removed', (event, oldDisplay) => {
-		let index = displays.findIndex(
-			display => display.id === oldDisplay.id
-		)
+        let index = displays.findIndex(display => display.id === oldDisplay.id)
 
         displays = screen.getAllDisplays()
         //displays.splice(index, 1)
@@ -2507,7 +2517,7 @@ function setupDisplays() {
             sendToAllWindows('display-info', getDisplayInfo())
         }
     })
-        }
+}
 
 //App events
 //============================================
@@ -2582,7 +2592,10 @@ function setupDisplays() {
             if (version) {
                 setTimeout(() => {
                     if (windows.control) {
-						windows.control.webContents.send('update-available', version)
+                        windows.control.webContents.send(
+                            'update-available',
+                            version
+                        )
                     }
                 }, 5000)
             }
