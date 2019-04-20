@@ -78,6 +78,9 @@ const resultsBox = new layout.TableList({
     columns: 4,
     columnWidths: ['50%', '50%', '3ch', '5ch']
 })
+const addSongButton = new layout.Button({
+    text: 'Add Song'
+})
 
 //(print) Item list + add text button
 const itemList = new layout.List({
@@ -96,7 +99,7 @@ const songOptionsBlock = new layout.Block(
         childSpacing: 8
     },
     {
-        direction: 'vertical'
+        direction: 'horizontal'
     }
 )
 
@@ -233,64 +236,91 @@ const pdfButton = new layout.Button({
         align: 'stretch'
     })
 
-    layout.change(addTextButton, {
-        align: 'end'
-    })
-    songOptionsBlock.add(songSectionList)
     songOptionsBlock.add(
         new layout.Block(
             {
-                childSpacing: 8,
-
                 items: [
                     new layout.Block(
                         {
+                            childSpacing: 8,
                             items: [
-                                new layout.Text(
-                                    { text: 'Type' },
-                                    {
-                                        marginBottom: 4
-                                    }
-                                ),
-                                songType
+                                songResetButton,
+                                new layout.Filler(),
+                                songResetAllButton
                             ]
                         },
                         {
-                            direction: 'vertical',
-                            grow: false,
-                            shrink: false,
+                            direction: 'horizontal',
 
-                            margin: 4
+                            padding: 0,
+
+                            grow: false,
+                            shrink: false
                         }
                     ),
-                    songStyleEditor
-                ]
+                    songSectionList
+                ],
+
+                childSpacing: '8'
             },
             {
-                direction: 'horizontal',
+                direction: 'vertical',
 
-                grow: false,
-                shrink: false,
+                maxWidth: 450,
 
                 padding: 0
             }
         )
     )
-    songOptionsBlock.add(songTextEditor)
     songOptionsBlock.add(
         new layout.Block(
             {
-                childSpacing: 8,
-                items: [songResetButton, songResetAllButton]
+                items: [
+                    new layout.Block(
+                        {
+                            childSpacing: 8,
+
+                            items: [
+                                new layout.Block(
+                                    {
+                                        items: [
+                                            new layout.Text(
+                                                { text: 'Type' },
+                                                {
+                                                    marginBottom: 4
+                                                }
+                                            ),
+                                            songType
+                                        ]
+                                    },
+                                    {
+                                        direction: 'vertical',
+                                        grow: false,
+                                        shrink: false,
+
+                                        margin: 4
+                                    }
+                                ),
+                                songStyleEditor
+                            ]
+                        },
+                        {
+                            direction: 'horizontal',
+
+                            grow: false,
+                            shrink: false,
+
+                            padding: 0
+                        }
+                    ),
+                    songTextEditor
+                ],
+                childSpacing: 8
             },
             {
-                direction: 'horizontal',
-                align: 'end',
+                direction: 'vertical',
 
-                padding: 0,
-
-                grow: false,
-                shrink: false
+                padding: 0
             }
         )
     )
@@ -374,34 +404,36 @@ const pdfButton = new layout.Button({
             items: [
                 new layout.LayoutBlock({
                     items: [
-                        new layout.Block(
-                            {
-                                items: [searchBox, resultsBox],
-                                childSpacing: 8
-                            },
-                            {
-                                direction: 'vertical'
-                            }
-                        )
-                    ],
-
-                    minWidth: 80,
-                    maxWidth: 300,
-                    minHeight: 100,
-
-                    size: 30
-                }),
-                new layout.LayoutBlock({
-                    items: [
+                        //Items
                         new layout.LayoutBlock({
                             items: [
+                                //Add song/text
                                 new layout.LayoutBlock({
                                     items: [
                                         new layout.Block(
                                             {
                                                 items: [
-                                                    itemList,
-                                                    addTextButton
+                                                    searchBox,
+                                                    resultsBox,
+                                                    new layout.Block(
+                                                        {
+                                                            items: [
+                                                                addTextButton,
+                                                                new layout.Filler(),
+                                                                addSongButton
+                                                            ],
+                                                            childSpacing: 8
+                                                        },
+                                                        {
+                                                            shrink: false,
+                                                            grow: false,
+
+                                                            padding: 0,
+
+                                                            direction:
+                                                                'horizontal'
+                                                        }
+                                                    )
                                                 ],
                                                 childSpacing: 8
                                             },
@@ -410,19 +442,19 @@ const pdfButton = new layout.Button({
                                             }
                                         )
                                     ],
-                                    minWidth: 100,
-                                    minHeight: 100,
 
-                                    size: 30
+                                    minWidth: 200,
+                                    minHeight: 200,
+
+                                    size: 50
                                 }),
+                                //Item list
                                 new layout.LayoutBlock({
                                     items: [
                                         new layout.Block(
                                             {
-                                                items: [
-                                                    songOptionsBlock,
-                                                    textOptionsBlock
-                                                ]
+                                                items: [itemList],
+                                                childSpacing: 8
                                             },
                                             {
                                                 direction: 'vertical'
@@ -430,72 +462,27 @@ const pdfButton = new layout.Button({
                                         )
                                     ],
 
-                                    minWidth: 319,
+                                    minWidth: 200,
                                     minHeight: 200,
 
-                                    size: 70
+                                    size: 50
                                 })
                             ],
-                            minWidth: 200,
+
                             size: 40,
+
+                            direction: 'horizontal',
                             small: true
                         }),
+                        //Editing block
                         new layout.LayoutBlock({
                             items: [
                                 new layout.Block(
                                     {
                                         items: [
-                                            new layout.Block(
-                                                {
-                                                    items: [
-                                                        new layout.Block(
-                                                            {
-                                                                items: [
-                                                                    fontInput,
-                                                                    sizeInput
-                                                                ],
-                                                                childSpacing: 8
-                                                            },
-                                                            {
-                                                                direction:
-                                                                    'horizontal',
-                                                                grow: false,
-                                                                shrink: false,
-
-                                                                padding: 0
-                                                            }
-                                                        )
-                                                    ]
-                                                },
-                                                {
-                                                    direction: 'horizontal',
-                                                    wrap: true,
-
-                                                    grow: false,
-                                                    shrink: false
-                                                }
-                                            ),
-                                            preview,
-                                            landscapeWarning,
-                                            new layout.Block(
-                                                {
-                                                    items: [
-                                                        printButton,
-                                                        pdfButton
-                                                    ],
-                                                    childSpacing: 8
-                                                },
-                                                {
-                                                    direction: 'horizontal',
-                                                    grow: false,
-                                                    shrink: false,
-                                                    align: 'end',
-
-                                                    padding: 0
-                                                }
-                                            )
-                                        ],
-                                        childSpacing: 8
+                                            songOptionsBlock,
+                                            textOptionsBlock
+                                        ]
                                     },
                                     {
                                         direction: 'vertical'
@@ -503,16 +490,83 @@ const pdfButton = new layout.Button({
                                 )
                             ],
 
-                            minWidth: 228,
+                            minWidth: 572,
+                            minHeight: 240,
+
                             size: 60
                         })
                     ],
                     minWidth: 200,
-                    minHeight: 200,
-                    size: 70,
+                    maxWidth: 300,
+                    minHeight: 100,
 
-                    direction: 'horizontal',
+                    size: 50,
+
+                    direction: 'vertical',
                     small: true
+                }),
+
+                new layout.LayoutBlock({
+                    items: [
+                        new layout.Block(
+                            {
+                                items: [
+                                    new layout.Block(
+                                        {
+                                            items: [
+                                                new layout.Block(
+                                                    {
+                                                        items: [
+                                                            fontInput,
+                                                            sizeInput
+                                                        ],
+                                                        childSpacing: 8
+                                                    },
+                                                    {
+                                                        direction: 'horizontal',
+                                                        grow: false,
+                                                        shrink: false,
+
+                                                        padding: 0
+                                                    }
+                                                )
+                                            ]
+                                        },
+                                        {
+                                            direction: 'horizontal',
+                                            wrap: true,
+
+                                            grow: false,
+                                            shrink: false
+                                        }
+                                    ),
+                                    preview,
+                                    landscapeWarning,
+                                    new layout.Block(
+                                        {
+                                            items: [printButton, pdfButton],
+                                            childSpacing: 8
+                                        },
+                                        {
+                                            direction: 'horizontal',
+                                            grow: false,
+                                            shrink: false,
+                                            align: 'end',
+
+                                            padding: 0
+                                        }
+                                    )
+                                ],
+                                childSpacing: 8
+                            },
+                            {
+                                direction: 'vertical'
+                            }
+                        )
+                    ],
+
+                    minWidth: 228,
+                    size: 50
                 })
             ],
 
@@ -912,6 +966,39 @@ function updatePrintSettings() {
             lastDragged = song
 
             itemList.drop()
+        }
+    })
+
+    addSongButton.onEvent('click', () => {
+        if (resultsBox.selected) {
+            let song = Songs.get(
+                resultsBox.selected[2],
+                parseFloat(resultsBox.selected[3])
+            )
+
+            if (song) {
+                addItem(
+                    resetSong({
+                        type: 'song',
+                        song: song,
+                        sections: []
+                    })
+                )
+            }
+        }
+    })
+    addSongButton.onEvent('drag', () => {
+        if (resultsBox.selected) {
+            let song = Songs.get(
+                resultsBox.selected[2],
+                parseFloat(resultsBox.selected[3])
+            )
+
+            if (song) {
+                lastDragged = song
+
+                itemList.drop()
+            }
         }
     })
 
