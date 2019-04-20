@@ -481,6 +481,19 @@ function distributeLines(text, maxLines, trimEnd = false) {
     return parts
 }
 
+function splitLines(text, lineIndex) {
+    let lines = split(text, '\n')
+
+    if (lineIndex < 0 || lineIndex >= lines.length) {
+        return [text]
+    }
+
+    return [
+        lines.slice(0, lineIndex).join('\n'),
+        lines.slice(lineIndex).join('\n')
+    ]
+}
+
 function dataReplace(text, data) {
     if (
         typeof text !== 'string' ||
@@ -573,6 +586,8 @@ exports.split = split
 exports.lines = text => split(text, '\n')
 
 exports.fromNode = fromNode
+
 exports.distributeLines = distributeLines
+exports.splitLines = splitLines
 
 exports.dataReplace = dataReplace
