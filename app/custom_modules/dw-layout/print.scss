@@ -20,6 +20,8 @@
     .column {
         display: inline-block;
         vertical-align: top;
+
+        box-sizing: border-box;
     }
 
     p,
@@ -27,6 +29,9 @@
         margin: 0;
 
         display: block;
+
+        box-sizing: border-box;
+
         font-weight: normal;
     }
 
@@ -170,12 +175,8 @@
 
     box-sizing: border-box;
 
-    background: white;
-    transform: scale(0.5);
-
     p,
     h1 {
-        box-sizing: border-box;
         margin: 0 !important;
     }
     p {
