@@ -764,17 +764,17 @@ let lastRequestTime = 0
 let minCoolTime = 250
 
 function doUpdate() {
-    preview.clear()
-
     preview.font = editor.data.font
     preview.fontSize = editor.data.fontSize
     preview.margin = editor.data.margin
     preview.columns = editor.data.columns
 
+    let allText = []
+
     for (let i = 0; i < editor.data.items.length; i++) {
         let item = editor.data.items[i]
         if (item.type === 'text') {
-            preview.addText({
+            allText.push({
                 type: item.data.type,
 
                 align: item.data.align,
@@ -784,7 +784,7 @@ function doUpdate() {
             })
         } else if (item.type === 'song') {
             for (let j = 0; j < item.sections.length; j++) {
-                preview.addText({
+                allText.push({
                     type: item.sections[j].type,
 
                     text: item.sections[j].text,
@@ -795,6 +795,8 @@ function doUpdate() {
             }
         }
     }
+
+    preview.set(allText)
 }
 //Updates the print preview
 function updatePreview() {
