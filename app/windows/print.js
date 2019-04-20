@@ -118,7 +118,7 @@ const songSectionList = new layout.List(
 )
 const songType = new layout.SelectInput(
     {
-        options: ['Header', 'Paragraph', 'Text']
+        options: ['Header', 'Paragraph']
     },
     {
         width: '5em'
@@ -168,7 +168,7 @@ const textStyling = new layout.TextStyleEdit({
 })
 const textType = new layout.SelectInput(
     {
-        options: ['Header', 'Paragraph', 'Text'],
+        options: ['Header', 'Paragraph'],
 
         focus: false
     },
@@ -610,7 +610,7 @@ Item format:
     type: 'text',
 
     data: {
-        type: 'Text' | 'Heading' | 'Paragraph',
+        type: 'Heading' | 'Paragraph',
 
         align: ...,
 
@@ -627,7 +627,7 @@ Item format:
 
     sections: [
         {
-            type: 'Text' | 'Heading' | 'Paragraph',
+            type: 'Heading' | 'Paragraph',
 
             data: '...'?,
             section: '...'?,
@@ -984,7 +984,7 @@ function updatePrintSettings() {
         addItem({
             type: 'text',
             data: {
-                type: 'Text',
+                type: 'Paragraph',
                 align: 'left',
                 text: '',
                 plainText: ''
@@ -1003,7 +1003,7 @@ function updatePrintSettings() {
                     type: 'text',
 
                     data: {
-                        type: 'Text',
+                        type: 'Paragraph',
 
                         align: 'left',
 
@@ -1134,7 +1134,7 @@ function updatePrintSettings() {
                 align: 'center'
             })
         } else {
-            let type = 'Text'
+            let type = 'Paragraph'
             let data = 'name'
 
             switch (event.text.toLowerCase()) {
@@ -1234,7 +1234,7 @@ function updatePrintSettings() {
         section.align = 'center'
 
         if (section.data) {
-            section.type = 'Text'
+            section.type = 'Paragraph'
 
             if (item.song.hasOwnProperty(section.data)) {
                 section.text = richText.format(item.song[section.data])
