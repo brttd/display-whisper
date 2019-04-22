@@ -5,7 +5,6 @@ REQUIRED:
     
     Print tool:
         Output differs to preview (extra blank pages).
-        Long paragraphs don't break over pages.
         Add user options to filter song searching.
 
     Installers - Windows & Mac
