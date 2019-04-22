@@ -4668,6 +4668,7 @@ exports.change = addStyles
                 numberInputs[colors[i]].value = 0
                 numberInputs[colors[i]].id =
                     'color-popup-' + colors[i] + '-input'
+
                 numberInputBox.appendChild(document.createElement('label'))
                 numberInputBox.lastElementChild.textContent = colors[
                     i
@@ -13010,8 +13011,6 @@ class BoxEdit {
             testElements[i].style.fontFamily = '"' + textSizeQueue[i].font + '"'
             testElements[i].style.fontSize = testSize + 'px'
             testElements[i].style.lineHeight = textSizeQueue[i].lineHeight
-
-            //TODO: if text doesn't contain any html characters, set textContent instead? Might be more efficient to bypass html validation, etc
 
             //Set the html content of the block
             //For each line in the text content, convert the line to a <div>

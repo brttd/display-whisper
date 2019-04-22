@@ -492,7 +492,7 @@ function toggleBlank() {
         }
 
         switch (key) {
-			case 'display.hideCursor':
+            case 'display.hideCursor':
                 if (value) {
                     document.body.style.cursor = 'none'
                 } else {
