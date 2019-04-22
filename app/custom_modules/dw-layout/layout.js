@@ -173,10 +173,13 @@ function loadCSS(name) {
 
     name = __dirname + '/' + name
 
-    document.head.appendChild(document.createElement('link'))
-    document.head.lastChild.rel = 'stylesheet'
-    document.head.lastChild.type = 'text/css'
-    document.head.lastChild.href = name
+    let node = document.createElement('link')
+    node.rel
+
+    node.rel = 'stylesheet'
+    node.type = 'text/css'
+    node.href = name
+    document.head.appendChild(node)
 }
 
 //Private utility functions
@@ -4034,12 +4037,14 @@ exports.change = addStyles
             this.node.appendChild(this.inputNode)
 
             if (typeof data.unit === 'string') {
-                this.node.appendChild(document.createElement('label'))
+                let label = document.createElement('label')
 
-                this.node.lastChild.textContent = data.unit
-                this.node.lastChild.className = 'unit'
+                label.textContent = data.unit
+                label.className = 'unit'
 
-                this.node.lastChild.setAttribute('for', this.inputNode.id)
+                label.setAttribute('for', this.inputNode.id)
+
+                this.node.appendChild(label)
             }
 
             addStyles(this, styles)
@@ -6276,20 +6281,20 @@ exports.change = addStyles
             listNode.innerHTML = ''
 
             for (let i = 0; i < Images.files.length; i++) {
-                listNode.appendChild(document.createElement('div'))
+                let node = document.createElement('div')
 
-                listNode.lastChild.appendChild(document.createElement('span'))
-                listNode.lastChild.lastChild.textContent = Images.files[
-                    i
-                ].split('.')[0]
+                node.appendChild(document.createElement('span'))
+                node.lastChild.textContent = Images.files[i].split('.')[0]
 
-                listNode.lastChild.appendChild(document.createElement('img'))
-                listNode.lastChild.lastChild.src = path.join(
+                node.appendChild(document.createElement('img'))
+                node.lastChild.src = path.join(
                     Images.directory,
                     Images.files[i]
                 )
 
-                listNode.lastChild.setAttribute('file', Images.files[i])
+                node.setAttribute('file', Images.files[i])
+
+                listNode.appendChild(node)
             }
         }
 
@@ -14195,19 +14200,19 @@ class BoxEdit {
             item.node.childElementCount === 0 ||
             item.node.lastChild.className !== 'loader'
         ) {
-            item.node.appendChild(document.createElement('div'))
-            item.node.lastChild.className = 'loader'
+            let loaderNode = document.createElement('div')
+            loaderNode.className = 'loader'
 
-            item.node.lastChild.appendChild(document.createElement('div'))
+            loaderNode.appendChild(document.createElement('div'))
 
-            item.node.lastChild.lastChild.appendChild(
-                document.createElement('span')
-            )
-            item.node.lastChild.lastChild.lastChild.textContent = text
+            loaderNode.lastChild.appendChild(document.createElement('span'))
+            loaderNode.lastChild.lastChild.textContent = text
 
             if (animate) {
-                item.node.lastChild.lastChild.className = 'animate'
+                loaderNode.lastChild.className = 'animate'
             }
+
+            item.node.appendChild(loaderNode)
         }
     }
     exports.hideLoader = item => {
@@ -15538,11 +15543,13 @@ class BoxEdit {
             printElem.innerHTML = ''
 
             for (let i = 0; i < this.pageNodes.length; i++) {
-                printElem.appendChild(document.createElement('div'))
-                printElem.lastChild.className = 'page'
+                let pageNode = document.createElement('div')
+                pageNode.className = 'page'
 
-                printElem.lastChild.innerHTML = this.pageNodes[i].innerHTML
-                printElem.lastChild.style.padding = this._options.margin + 'cm'
+                pageNode.innerHTML = this.pageNodes[i].innerHTML
+                pageNode.style.padding = this._options.margin + 'cm'
+
+                printElem.appendChild(pageNode)
             }
 
             printElem.style.fontFamily = '"' + this._options.font + '"'
