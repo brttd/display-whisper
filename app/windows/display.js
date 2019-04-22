@@ -216,9 +216,6 @@ function addNode(data = {}, parentNode = displayNode.lastChild) {
     parentNode.appendChild(node)
 }
 
-//TODO:
-//When the display window is hidden, requestAnimationFrame is delayed until the window is visible again
-//This means all sections show with display hidden are suddenly displayed when it's opened again.
 function display(data = {}) {
     requestAnimationFrame(() => {
         let newDisplay = document.createElement('div')
