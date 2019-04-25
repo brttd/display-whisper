@@ -1482,3 +1482,74 @@ $img-max-width: 10em;
         }
     }
 }
+
+.popup.list {
+    @include fonts;
+
+    display: flex;
+    flex-flow: column nowrap;
+
+    width: fit-content;
+    height: fit-content;
+
+    .bar {
+        display: flex;
+
+        flex: 0 0 auto;
+
+        border-bottom: 1px solid $bkg-main-dark;
+    }
+
+    span {
+        flex: 1 1 auto;
+
+        padding: 4px 6px;
+    }
+
+    button {
+        flex: 0 0 auto;
+
+        box-sizing: content-box;
+
+        width: 1.5em;
+        height: 1.5em;
+
+        margin: 2px;
+        padding: 2px;
+
+        background: transparent;
+        border: none;
+        outline: none;
+
+        svg {
+            flex: auto 0 0;
+            vertical-align: middle;
+
+            width: $icon-size;
+            height: $icon-size;
+
+            fill: $text;
+        }
+
+        &:hover,
+        &:focus {
+            svg {
+                fill: $text-dark;
+            }
+        }
+    }
+
+    p {
+        @extend %scrollbars-main;
+
+        flex: 1 1 auto;
+
+        margin: 0;
+        padding: 4px 6px;
+        padding-top: 0;
+
+        white-space: pre-wrap;
+
+        overflow: auto;
+    }
+}
