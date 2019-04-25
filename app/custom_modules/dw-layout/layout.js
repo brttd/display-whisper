@@ -8070,15 +8070,22 @@ exports.change = addStyles
                 })
             }
 
+            this.client = {
+                top: 0,
+                left: 0,
+                width: 0,
+                height: 0
+            }
+            this._listOffsetTop = 0
+
+            bindFunctions(this, this.onResize, this.readSize)
+
             this.dragging = null
             this.dropping = false
 
             let lastIndex = -1
 
             this.listNode.addEventListener('mousemove', event => {
-                //TODO: Replace with something that doesn't do node offset reads
-                let mouse = convertMouse(event, this.listNode)
-
                 if (this.dragging !== null || this.dropping) {
                     if (lastIndex >= 0 && lastIndex <= this.items.length) {
                         this.listNode.children[lastIndex * 2].classList.remove(
@@ -8086,7 +8093,7 @@ exports.change = addStyles
                         )
                     }
 
-                    lastIndex = this.mouseIndex(mouse)
+                    lastIndex = this.mouseIndex(event)
 
                     if (lastIndex >= 0 && lastIndex <= this.items.length) {
                         this.listNode.children[lastIndex * 2].classList.add(
@@ -8104,9 +8111,6 @@ exports.change = addStyles
                 lastIndex = -1
             })
             this.listNode.addEventListener('mouseup', event => {
-                //TODO: Replace with something that doesn't do node offset reads
-                let mouse = convertMouse(event, this.listNode)
-
                 if (lastIndex >= 0 && lastIndex <= this.items.length) {
                     this.listNode.children[lastIndex * 2].classList.remove(
                         'active'
@@ -8114,7 +8118,7 @@ exports.change = addStyles
                 }
 
                 if (this.dragging !== null) {
-                    lastIndex = this.mouseIndex(mouse)
+                    lastIndex = this.mouseIndex(event)
 
                     this.reorder(
                         this.items.indexOf(this.dragging),
@@ -8124,7 +8128,7 @@ exports.change = addStyles
                 } else if (this.dropping) {
                     this.dropping = false
 
-                    lastIndex = this.mouseIndex(mouse)
+                    lastIndex = this.mouseIndex(event)
 
                     sendEventTo(
                         {
@@ -8306,6 +8310,52 @@ exports.change = addStyles
             return null
         }
 
+        onResize() {
+            body.onFrame.start(this.readSize)
+        }
+        readSize() {
+            this.client = this.node.getBoundingClientRect()
+            this._listOffsetTop = this.listNode.offsetTop
+
+            for (let i = 0; i < this.items.length; i++) {
+                this.items[i]._nodeOffsetTop = this.items[i].node.offsetTop
+                this.items[i]._nodeOffsetHeight = this.items[
+                    i
+                ].node.offsetHeight
+            }
+        }
+
+        mouseIndex(mouse) {
+            if (this.items.length === 0) {
+                return 0
+            }
+
+            let mouseY =
+                mouse.clientY - this.client.top + this.listNode.scrollTop
+
+            if (
+                mouseY <
+                this.items[0]._nodeOffsetTop +
+                    this.items[0]._nodeOffsetHeight / 2 -
+                    this._listOffsetTop
+            ) {
+                return 0
+            }
+
+            for (let i = this.items.length - 1; i >= 0; i--) {
+                if (
+                    mouseY >=
+                    this.items[i]._nodeOffsetTop +
+                        this.items[i]._nodeOffsetHeight / 2 -
+                        this._listOffsetTop
+                ) {
+                    return i + 1
+                }
+            }
+
+            return -1
+        }
+
         indexOf(string) {
             for (let i = 0; i < this.items.length; i++) {
                 if (this.items[i].text === string) {
@@ -8372,6 +8422,8 @@ exports.change = addStyles
 
                     this.listNode.appendChild(getSeparatorNode())
                 }
+
+                this.onResize()
 
                 sendEventTo(event, this.events.add)
 
@@ -8495,6 +8547,8 @@ exports.change = addStyles
                 this.listNode.removeChild(this.items[index].node)
                 this.items.splice(index, 1)
 
+                this.onResize()
+
                 sendEventTo(event, this.events.remove)
             }
         }
@@ -8551,6 +8605,8 @@ exports.change = addStyles
                 } else {
                     this.items.splice(index, 1)
                 }
+
+                this.onResize()
 
                 sendEventTo(event, this.events.reorder)
             }
@@ -8674,37 +8730,6 @@ exports.change = addStyles
                     this.addNode.classList.remove('error')
                 }
             }
-        }
-
-        mouseIndex(mouse) {
-            if (this.items.length === 0) {
-                return 0
-            }
-
-            let mouseY = mouse.layerY + this.listNode.scrollTop
-            let listTop = this.listNode.offsetTop
-
-            if (
-                mouseY <
-                this.items[0].node.offsetTop +
-                    this.items[0].node.offsetHeight / 2 -
-                    listTop
-            ) {
-                return 0
-            }
-
-            for (let i = this.items.length - 1; i >= 0; i--) {
-                if (
-                    mouseY >=
-                    this.items[i].node.offsetTop +
-                        this.items[i].node.offsetHeight / 2 -
-                        listTop
-                ) {
-                    return i + 1
-                }
-            }
-
-            return -1
         }
 
         asArray() {
