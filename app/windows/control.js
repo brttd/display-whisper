@@ -10,6 +10,7 @@ const logger = require('dw-log')
 const Database = require('dw-database')
 const editor = require('dw-editor')
 const keyboard = require('dw-keyboard')
+const richText = require('dw-rich-text')
 
 const items = require('dw-items')
 
@@ -2996,6 +2997,7 @@ const item_add = {
         let resultsBox = new layout.TableList(
             {
                 drag: true,
+                popup: true,
 
                 columns: 4,
                 columnWidths: ['65%', '35%', '3ch', '5ch']
@@ -3257,6 +3259,29 @@ const item_add = {
             })
         }
 
+        function getSongPopupText(song) {
+            let text = ''
+
+            let displayedSections = []
+
+            for (let i = 0; i < song.playOrder.length; i++) {
+                if (
+                    song.sections.hasOwnProperty(song.playOrder[i]) &&
+                    !displayedSections.includes(song.playOrder[i])
+                ) {
+                    text +=
+                        richText.clean(
+                            '<sub><i>' + richText.format(song.playOrder[i])
+                        ) + '\n'
+                    text += song.sections[song.playOrder[i]].text + '\n\n'
+
+                    displayedSections.push(song.playOrder[i])
+                }
+            }
+
+            return { text: text.slice(0, -2), title: song.name }
+        }
+
         function addSong(songData, index = -1) {
             for (let key in songAddOptions) {
                 selectedTemplate[key] = songAddOptions[key]
@@ -3367,6 +3392,19 @@ const item_add = {
                 addButton.disabled = false
             } else {
                 addButton.disabled = true
+            }
+        })
+
+        resultsBox.onEvent('popup', event => {
+            let popupSong = results.find(item => {
+                return (
+                    item.group === event.text[2] &&
+                    item.groupID.toString() === event.text[3]
+                )
+            })
+
+            if (popupSong) {
+                resultsBox.popup(getSongPopupText(popupSong))
             }
         })
 
