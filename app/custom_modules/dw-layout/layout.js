@@ -7889,8 +7889,6 @@ exports.change = addStyles
             }
         }
 
-        //TODO: add 'change'/'edit' methods, and 'drag' method
-
         remove() {
             sendEventTo(
                 {
@@ -14108,7 +14106,6 @@ class BoxEdit {
             }
 
             if (this.needsChange.editing) {
-                //TODO: Move class adding/removing to onFrame call
                 this.editButton.active = this.properties.editing
 
                 this.needsChange.editing = false
