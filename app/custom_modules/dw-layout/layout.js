@@ -3069,6 +3069,10 @@ exports.change = addStyles
 
                 this.popupArrowHeight = -1
             }
+
+            if (typeof data.width === 'boolean') {
+                this.box.setWidth = data.width
+            }
             if (typeof data.height === 'boolean') {
                 this.box.setHeight = data.height
             }
@@ -3122,7 +3126,12 @@ exports.change = addStyles
             )
 
             this.box.width = Math.max(this.box.minWidth, this.box.width)
-            this.node.style.width = this.box.width + 'px'
+
+            if (this.setWidth) {
+                this.node.style.width = this.box.width + 'px'
+            } else {
+                this.node.style.maxWidth = this.box.width + 'px'
+            }
 
             let spaceBelow =
                 window.innerHeight -
