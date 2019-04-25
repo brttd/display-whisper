@@ -8765,6 +8765,77 @@ exports.change = addStyles
     }
     exports.List = items.List = List
 
+    let listPopup = new InputPopup({
+        width: false,
+        height: false,
+        maxWidth: 350,
+        maxHeight: 500
+    })
+    {
+        listPopup.node.classList.add('list')
+        listPopup.node.style.minWidth = '150px'
+
+        let closeButton = document.createElement('button')
+        closeButton.appendChild(getIconSVG('remove'))
+
+        let titleNode = document.createElement('span')
+
+        listPopup.node.appendChild(document.createElement('div'))
+        listPopup.node.lastChild.className = 'bar'
+        listPopup.node.lastChild.appendChild(titleNode)
+        listPopup.node.lastChild.appendChild(closeButton)
+
+        let textNode = document.createElement('p')
+        listPopup.node.appendChild(textNode)
+
+        let closeListeners = []
+
+        listPopup.show = function(position, data) {
+            titleNode.textContent = data.title || ''
+
+            if (typeof data.text === 'string') {
+                textNode.innerHTML = richText.clean(data.text)
+            } else {
+                textNode.textContent = '...'
+            }
+
+            let maxChars = data.title.length
+
+            richText
+                .removeFormat(data.text)
+                .split('\n')
+                .forEach(line => {
+                    maxChars = Math.max(maxChars, line.length)
+                })
+
+            listPopup.box.maxWidth = Math.min(
+                350,
+                Math.max(maxChars * 6.5 + 14, 150)
+            )
+
+            listPopup.move(position)
+
+            document.body.appendChild(listPopup.node)
+        }
+        listPopup.move = listPopup._move
+        listPopup.hide = function() {
+            if (listPopup.node.parentNode === document.body) {
+                document.body.removeChild(listPopup.node)
+
+                for (let i = 0; i < closeListeners.length; i++) {
+                    closeListeners[i]()
+                }
+            }
+        }
+
+        listPopup.onEvent = (eventName, callback) => {
+            if (eventName === 'close' && typeof callback === 'function') {
+                closeListeners.push(callback)
+            }
+        }
+
+        closeButton.addEventListener('click', listPopup.hide.bind(listPopup))
+    }
     class TableList extends focusItem {
         /*
         A table display item.
@@ -8811,6 +8882,7 @@ exports.change = addStyles
 
             this.options = {
                 drag: false,
+                popup: false,
 
                 columns: 1,
                 columnWidths: []
@@ -8824,8 +8896,14 @@ exports.change = addStyles
                 this.options.drag = true
             }
 
+            if (data.popup === true) {
+                this.options.popup = true
+            }
+
             this.items = []
             this._index = -1
+            this._popupVisible = false
+            this._popupIndex = -1
 
             bindFunctions(this, this.writeListContent, this.scrollToElem)
 
@@ -8908,6 +8986,197 @@ exports.change = addStyles
                     this.events.focus
                 )
             })
+
+            if (this.options.popup) {
+                let showPopupData = null
+                let setPopupPosition = () => {
+                    if (
+                        (!this._popupVisible && showPopupData === null) ||
+                        this._popupIndex < 0 ||
+                        this._popupIndex >= this.listNode.childElementCount
+                    ) {
+                        return false
+                    }
+
+                    let position = this.listNode.children[
+                        this._popupIndex
+                    ].getBoundingClientRect()
+
+                    let top = Math.max(
+                        this._nodeOffsetTop - position.height,
+                        Math.min(
+                            this._nodeOffsetTop + this._nodeOffsetHeight,
+                            position.top
+                        )
+                    )
+
+                    if (showPopupData) {
+                        this._popupVisible = true
+
+                        listPopup.show(
+                            {
+                                top: top,
+                                left: position.left,
+                                right: position.right,
+                                bottom: top + position.height,
+
+                                width: position.width,
+                                height: position.height
+                            },
+                            showPopupData
+                        )
+
+                        showPopupData = null
+                    } else {
+                        listPopup.move({
+                            top: top,
+                            left: position.left,
+                            right: position.right,
+                            bottom: top + position.height,
+
+                            width: position.width,
+                            height: position.height
+                        })
+                    }
+                }
+
+                this.getPopupPosition = () => {
+                    let position = this.listNode.children[
+                        this._popupIndex
+                    ].getBoundingClientRect()
+
+                    let top = Math.max(
+                        this._nodeOffsetTop - position.height,
+                        Math.min(
+                            this._nodeOffsetTop + this._nodeOffsetHeight,
+                            position.top
+                        )
+                    )
+
+                    return {
+                        top: top,
+                        left: position.left,
+                        right: position.right,
+                        bottom: top + position.height,
+
+                        width: position.width,
+                        height: position.height
+                    }
+                }
+                this.popup = data => {
+                    if (
+                        this._popupIndex < 0 ||
+                        this._popupIndex >= this.listNode.childElementCount
+                    ) {
+                        return false
+                    }
+
+                    showPopupData = data
+
+                    body.onFrame.start(setPopupPosition)
+                }
+                this.movePopup = () => {
+                    body.onFrame.start(setPopupPosition)
+                }
+
+                this.readSize = () => {
+                    this._nodeOffsetTop = this.node.offsetTop
+                    this._nodeOffsetHeight = this.node.offsetHeight
+                }
+                this.onResize = () => {
+                    body.onFrame.start(this.readSize)
+
+                    if (
+                        this._popupIndex < 0 ||
+                        this._popupIndex >= this.listNode.childElementCount ||
+                        !this._popupVisible
+                    ) {
+                        return false
+                    }
+
+                    this.movePopup()
+                }
+
+                this.listNode.addEventListener('dblclick', event => {
+                    if (event.target.tagName === 'TR') {
+                        this.select(
+                            Array.prototype.indexOf.call(
+                                this.listNode.children,
+                                event.target
+                            ),
+                            true
+                        )
+                    } else if (event.target.tagName === 'TD') {
+                        this.select(
+                            Array.prototype.indexOf.call(
+                                this.listNode.children,
+                                event.target.parentNode
+                            ),
+                            true
+                        )
+                    } else {
+                        mousedown = false
+                        return false
+                    }
+
+                    this._popupIndex = this._index
+
+                    sendEventTo(
+                        {
+                            text: this.items[this._popupIndex],
+
+                            fromUser: true,
+                            from: this
+                        },
+                        this.events.popup
+                    )
+
+                    if (this._focused) {
+                        return false
+                    }
+
+                    this._focused = true
+
+                    if (this._globalFocus) {
+                        body.inputFocused(this, true)
+                    }
+
+                    sendEventTo(
+                        {
+                            fromUser: true,
+                            from: this
+                        },
+                        this.events.focus
+                    )
+                })
+
+                body.onEvent('scroll', () => {
+                    if (
+                        this._popupIndex < 0 ||
+                        this._popupIndex >= this.listNode.childElementCount ||
+                        !this._popupVisible
+                    ) {
+                        return false
+                    }
+
+                    this.movePopup()
+                })
+                body.onEvent('resize', () => {
+                    if (
+                        this._popupIndex < 0 ||
+                        this._popupIndex >= this.listNode.childElementCount ||
+                        !this._popupVisible
+                    ) {
+                        return false
+                    }
+
+                    this.movePopup()
+                })
+
+                listPopup.onEvent('close', () => {
+                    this._popupVisible = false
+                })
+            }
 
             this.listNode.addEventListener('mouseout', event => {
                 if (!mousedown || !this.options.drag) {
@@ -9002,6 +9271,27 @@ exports.change = addStyles
                                 },
                                 this.events.enter
                             )
+                        }
+                    } else if (event.key === ' ' && this.options.popup) {
+                        if (
+                            this._index >= 0 &&
+                            this._index < this.listNode.childElementCount
+                        ) {
+                            this._popupIndex = this._index
+
+                            if (this._popupVisible) {
+                                listPopup.hide()
+                            } else {
+                                sendEventTo(
+                                    {
+                                        text: this.items[this._popupIndex],
+
+                                        fromUser: true,
+                                        from: this
+                                    },
+                                    this.events.popup
+                                )
+                            }
                         }
                     }
 
@@ -9153,6 +9443,22 @@ exports.change = addStyles
 
                 this._scrollIndex = this._index
                 body.onFrame.end(this.scrollToElem)
+
+                if (this.options.popup && this._popupVisible) {
+                    listPopup.hide()
+
+                    this._popupIndex = this._index
+
+                    sendEventTo(
+                        {
+                            text: this.items[this._popupIndex],
+
+                            fromUser: true,
+                            from: this
+                        },
+                        this.events.popup
+                    )
+                }
 
                 sendEventTo(
                     {
