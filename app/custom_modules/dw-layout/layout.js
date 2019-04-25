@@ -3102,8 +3102,8 @@ exports.change = addStyles
         }
 
         _move(position) {
-            position.y = Math.max(0, position.y)
-            position.x = Math.max(0, position.x)
+            position.x = Math.max(0, position.left)
+            position.y = Math.max(0, position.top)
 
             if (this.box.extends) {
                 this.box.maxWidth = this.box.minWidth = position.width
