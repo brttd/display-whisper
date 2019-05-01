@@ -4583,14 +4583,27 @@ exports.change = addStyles
 
             function onInputChange(color) {
                 let value = parseFloat(this.value)
+
                 if (isFinite(value)) {
-                    currentColor[color] = value
+                    currentColor[color] = Math.min(Math.max(value, 0), 255)
+
+                    if (currentColor[color] !== this.value) {
+                        this.value = currentColor[color]
+                    }
 
                     onNumberChange()
+                } else if (this.value !== '') {
+                    this.value = currentColor[color]
                 }
             }
 
             function onInputBlur(color) {
+                if (this.value === '') {
+                    currentColor[color] = 0
+
+                    onNumberChange()
+                }
+
                 this.value = currentColor[color]
             }
 
