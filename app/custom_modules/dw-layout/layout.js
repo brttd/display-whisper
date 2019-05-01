@@ -15261,15 +15261,28 @@ class BoxEdit {
                     this.zoomControl.value = round(this._options.zoom * 100, 2)
                 }
 
-                body.onFrame.end(this.offsetScroll)
-
                 this.writeSize()
+
+                body.onFrame.end(this.offsetScroll)
             }
         }
 
         offsetScroll() {
-            this.scrollNode.scrollLeft +=
-                (this.scrollOffset * this.scrollNode.scrollWidth) / 2
+            //The change in height/width, from before zooming
+            let diffHeight = this.scrollNode.scrollHeight * this.scrollOffset
+            let diffWidth = this.scrollNode.scrollWidth * this.scrollOffset
+
+            //The position (0 - 1) of the center of the viewport (in relation to total scroll size) before zooming
+            let percY =
+                (this.scrollNode.scrollTop + this.scrollNode.offsetHeight / 2) /
+                (this.scrollNode.scrollHeight - diffHeight)
+            let percX =
+                (this.scrollNode.scrollLeft + this.scrollNode.offsetWidth / 2) /
+                (this.scrollNode.scrollWidth - diffWidth)
+
+            this.scrollNode.scrollTop += diffHeight * percY
+            this.scrollNode.scrollLeft += diffWidth * percX
+
             this.scrollOffset = 0
         }
 
