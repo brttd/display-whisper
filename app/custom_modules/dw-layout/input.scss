@@ -165,39 +165,6 @@ input::-webkit-inner-spin-button {
     cursor: pointer;
 }
 
-%scrollbars {
-    /*
-    scrollbar
-    scrollbar-button
-    scrollbar-track
-    scrollbar-track-piece
-    scrollbar-thumb
-    scrollbar-corner
-    resizer
-    */
-
-    &::-webkit-scrollbar {
-        width: 1ch;
-        height: 1ch;
-    }
-    &::-webkit-scrollbar-button {
-        display: none;
-    }
-    &::-webkit-scrollbar-track,
-    &::-webkit-scrollbar-corner {
-        background: $bkg;
-    }
-    &::-webkit-scrollbar-thumb {
-        background: $bkg-main;
-        &:hover {
-            background: mix($bkg-main, $bkg-main-dark);
-        }
-        &:active {
-            background: $bkg-main-dark;
-        }
-    }
-}
-
 %scrollbars-main {
     /*
     scrollbar
