@@ -77,4 +77,6 @@ $cursors: (
 }
 .block {
     @include block;
+
+    @extend %scrollbars;
 }
