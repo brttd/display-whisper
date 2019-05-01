@@ -4629,7 +4629,7 @@ exports.change = addStyles
                     onInputChange.bind(numberInputs[colors[i]], colors[i])
                 )
                 numberInputs[colors[i]].addEventListener(
-                    'keydown',
+                    'keyup',
                     onInputChange.bind(numberInputs[colors[i]], colors[i])
                 )
 
