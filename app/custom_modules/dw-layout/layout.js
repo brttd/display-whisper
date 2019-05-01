@@ -2970,6 +2970,7 @@ exports.change = addStyles
             this.box = {
                 extends: false,
                 setHeight: true,
+                setWidth: true,
 
                 maxWidth: 100,
                 minWidth: 0,
@@ -3052,7 +3053,7 @@ exports.change = addStyles
 
             this.box.width = Math.max(this.box.minWidth, this.box.width)
 
-            if (this.setWidth) {
+            if (this.box.setWidth) {
                 this.node.style.width = this.box.width + 'px'
             } else {
                 this.node.style.maxWidth = this.box.width + 'px'
