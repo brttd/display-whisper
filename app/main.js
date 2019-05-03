@@ -1362,8 +1362,14 @@ function updateMasterDisplay() {
     }
 
     //Otherwise, use custom display size
-    display.bounds.width = settings.get('display.customWidth', 1366)
-    display.bounds.height = settings.get('display.customHeight', 768)
+    display.bounds.width = Math.max(
+        1,
+        settings.get('display.customWidth', 1366)
+    )
+    display.bounds.height = Math.max(
+        1,
+        settings.get('display.customHeight', 768)
+    )
 
     display.masterScreen = -1
 
