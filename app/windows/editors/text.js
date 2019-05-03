@@ -582,6 +582,23 @@ fitTextButton.onEvent('click', () => {
 
         updateSectionsAndSelect()
     })
+
+    let defaultTemplateListenerFunc = (event, key, value) => {
+        if (key === 'general.defaultTemplate') {
+            ipcRenderer.removeListener('setting', defaultTemplateListenerFunc)
+
+            if (Templates.updating) {
+                Templates.onceEvent('update', () => {
+                    templateSelector.value = value
+                })
+            } else {
+                templateSelector.value = value
+            }
+        }
+    }
+
+    ipcRenderer.on('setting', defaultTemplateListenerFunc)
+    ipcRenderer.send('get-setting', 'general.defaultTemplate')
 }
 
 //Section changes

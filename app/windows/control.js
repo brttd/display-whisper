@@ -2731,17 +2731,37 @@ const item_add = {
 
             selectedTemplate = Templates.list[event.index]
 
-            if (typeof item_add.onOption === 'function') {
-                item_add.onOption.call(null, 'template', event.value)
-            }
+            ipcRenderer.send(
+                'set-setting',
+                'general.defaultTemplate',
+                event.value
+            )
         })
+
+        let defaultTemplateListenerFunc = (event, key, value) => {
+            if (key === 'general.defaultTemplate') {
+                ipcRenderer.removeListener(
+                    'setting',
+                    defaultTemplateListenerFunc
+                )
+
+                if (Templates.updating) {
+                    Templates.onceEvent('update', () => {
+                        templateSelect.value = value
+                    })
+                } else {
+                    templateSelect.value = value
+                }
+            }
+        }
+
+        ipcRenderer.on('setting', defaultTemplateListenerFunc)
+        ipcRenderer.send('get-setting', 'general.defaultTemplate')
     }
 
     item_add.setOption = (name, value) => {
         if (name === 'tab') {
             tabBlock.tab = item_add.options.tab = value
-        } else if (name === 'template') {
-            templateSelect.value = item_add.options.template = value
         }
     }
 
