@@ -616,7 +616,6 @@ window.addEventListener('resize', () => {
     window.requestAnimationFrame(updateMasterDisplay)
 })
 ipcRenderer.on('display-info', (event, display) => {
-    console.log('masterDisplay', display.bounds)
     if (
         isFinite(display.bounds.width) &&
         isFinite(display.bounds.height) &&
