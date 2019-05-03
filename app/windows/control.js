@@ -2407,7 +2407,7 @@ let displaying = false
 
         activeScreenList = display.screens
 
-        for (let i = 0; i < display.screenCount.length; i++) {
+        for (let i = 0; i < display.screenCount; i++) {
             screenButtons[i].active = activeScreenList.includes(i)
         }
 
