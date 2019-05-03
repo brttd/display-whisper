@@ -1254,7 +1254,11 @@ function updateMasterDisplay() {
             //So, either use the last set master display size
             //Or use the custom size
 
-            if (display.bounds.width > 0 && display.bounds.height > 0) {
+            if (
+                display.masterScreen !== -1 &&
+                display.bounds.width > 0 &&
+                display.bounds.height > 0
+            ) {
                 //There already is a valid display width & height,
                 //use it without changing anything
 
@@ -2726,12 +2730,12 @@ function setupDisplays() {
     })
 
     settings.listen('display.customWidth', () => {
-        if (display.masterScale === 'Custom') {
+        if (display.masterScale === 'Custom' || display.masterScreen === -1) {
             updateMasterDisplay()
         }
     })
     settings.listen('display.customHeight', () => {
-        if (display.masterScale === 'Custom') {
+        if (display.masterScale === 'Custom' || display.masterScreen === -1) {
             updateMasterDisplay()
         }
     })
