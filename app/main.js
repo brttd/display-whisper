@@ -2491,7 +2491,21 @@ ipcMain.on('close', event => {
     })
 
     ipcMain.on('database-updated', (event, databaseName, from, changes) => {
-        sendToAllWindows('database-updated', databaseName, from, changes)
+        //Don't use the sendToAllWindows function, as it also sends to the display windows, which doesn't need to recieve database events
+
+        for (let i = 0; i < windowNames.length; i++) {
+            if (windows[windowNames[i]]) {
+                windows[windowNames[i]].webContents.send(
+                    databaseName,
+                    from,
+                    changes
+                )
+            }
+        }
+
+        for (let id in editors) {
+            editors[id].webContents.send(databaseName, from, changes)
+        }
     })
 
     ipcMain.on('check-version', event => {
