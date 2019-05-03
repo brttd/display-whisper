@@ -4067,6 +4067,42 @@ exports.change = addStyles
 
                 this._codeFocused = false
             })
+            this.inputNode.addEventListener('blur', () => {
+                this._value = parseFloat(this.inputNode.value)
+
+                if (isNaN(this._value)) {
+                    this._value = 0
+                }
+
+                this._value = round(
+                    Math.max(
+                        this._options.min,
+                        Math.min(this._options.max, this._value)
+                    ),
+                    this._options.precision
+                )
+
+                if (this._value !== parseFloat(this.inputNode.value)) {
+                    this.inputNode.value = this._value
+                }
+
+                if (this._value !== this._oldValue) {
+                    numberPopup.value = this._value
+
+                    sendEventTo(
+                        {
+                            value: this._value,
+                            oldValue: this._oldValue,
+
+                            fromUser: true,
+                            from: this
+                        },
+                        this.events.change
+                    )
+
+                    this._oldValue = this._value
+                }
+            })
 
             this.inputNode.addEventListener(
                 'contextmenu',
@@ -4074,8 +4110,21 @@ exports.change = addStyles
             )
 
             this.inputNode.addEventListener('input', () => {
+                if (this.inputNode.value === '') {
+                    return false
+                }
+
+                this._value = parseFloat(this.inputNode.value)
+
+                if (isNaN(this._value)) {
+                    this._value = 0
+                }
+
                 this._value = round(
-                    parseFloat(this.inputNode.value),
+                    Math.max(
+                        this._options.min,
+                        Math.min(this._options.max, this._value)
+                    ),
                     this._options.precision
                 )
 
