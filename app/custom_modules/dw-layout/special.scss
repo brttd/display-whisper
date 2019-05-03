@@ -12,23 +12,6 @@
     font-size: $font-size;
     font-family: $font-family;
 
-    button:not([disabled]).highlight {
-        &:hover {
-            background: mix($bkg, $bkg-active-highlight, 50%);
-            border-color: mix($bkg-dark, $bkg-active-highlight-dark, 50%);
-        }
-
-        &:active,
-        &:focus,
-        &.active {
-            background: $bkg-active-highlight;
-            border-color: $bkg-active-highlight-dark;
-
-            color: $text-active-highlight;
-            fill: $text-active-highlight;
-        }
-    }
-
     .content {
         display: inline-flex;
 

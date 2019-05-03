@@ -301,6 +301,25 @@ input::-webkit-inner-spin-button {
             margin: first($input-padding) / 2;
         }
     }
+
+    &.highlight {
+        &:not([disabled]) {
+            &:hover {
+                background: mix($bkg, $bkg-active-highlight, 50%);
+                border-color: mix($bkg-dark, $bkg-active-highlight-dark, 50%);
+            }
+
+            &:active,
+            &:focus,
+            &.active {
+                background: $bkg-active-highlight;
+                border-color: $bkg-active-highlight-dark;
+
+                color: $text-active-highlight;
+                fill: $text-active-highlight;
+            }
+        }
+    }
 }
 
 .input-checkbox {
