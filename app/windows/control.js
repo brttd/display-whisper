@@ -2432,9 +2432,13 @@ let displaying = false
 
         if (activeScreenList.length > 0) {
             blankButton.disabled = false
+
+            displaying = true
         } else {
             blankButton.active = false
             blankButton.disabled = true
+
+            displaying = false
         }
     })
 
