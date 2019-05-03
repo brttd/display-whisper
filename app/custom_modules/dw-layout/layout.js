@@ -12012,7 +12012,7 @@ class BoxEdit {
         }
 
         writeSize() {
-            if (this.nodeSize.width === 0 || this.nodeSize.height === 0) {
+            if (this.nodeSize.width === 0 && this.nodeSize.height === 0) {
                 return false
             }
 
@@ -12024,6 +12024,10 @@ class BoxEdit {
                 !this.setNode.width
             ) {
                 //Scale based on width
+                if (this.nodeSize.width === 0) {
+                    return false
+                }
+
                 this.displayScale = this.nodeSize.width / currentDisplay.width
 
                 if (this.setNode.height) {
@@ -12038,6 +12042,10 @@ class BoxEdit {
                 }
             } else {
                 //Scale based on height
+                if (this.nodeSize.height === 0) {
+                    return false
+                }
+
                 this.displayScale = this.nodeSize.height / currentDisplay.height
 
                 if (this.setNode.width) {
