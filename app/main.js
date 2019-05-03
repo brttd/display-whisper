@@ -1263,9 +1263,6 @@ function updateMasterDisplay() {
             //Use the custom size instead
             //(Done at the end of the function)
         } else {
-            display.bounds.width = 0
-            display.bounds.height = 0
-
             if (display.masterScale === 'Smallest') {
                 display.bounds.width = Infinity
                 display.bounds.height = Infinity
@@ -1275,7 +1272,7 @@ function updateMasterDisplay() {
                     screenIndex < display.screens.length;
                     screenIndex++
                 ) {
-                    let newBounds = display.screens[screenIndex].bounds.width
+                    let newBounds = display.screens[screenIndex].bounds
 
                     //If the pixel count is smaller, or if the pixel count is the same and the aspect ratio smaller
                     //(The aspect ratio check is to ensure that the master display selected is not dependant on the order displays were selected as outputs)
@@ -1300,7 +1297,7 @@ function updateMasterDisplay() {
                     screenIndex < display.screens.length;
                     screenIndex++
                 ) {
-                    let newBounds = display.screens[screenIndex].bounds.width
+                    let newBounds = display.screens[screenIndex].bounds
 
                     //If the pixel count is larger, or if the pixel count is the same and the aspect ratio larger
                     //(The aspect ratio check is to ensure that the master display selected is not dependant on the order displays were selected as outputs)
