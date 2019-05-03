@@ -1432,9 +1432,7 @@ function addDisplayScreen(displayIndex) {
         display.screens.map(subDisplay => subDisplay.screen)
     )
 
-    if (display.masterScale === 'Custom') {
-        sendToAllWindows('display-info', getDisplayInfo())
-    } else {
+    if (display.masterScale !== 'Custom') {
         updateMasterDisplay()
     }
 }
@@ -1454,9 +1452,7 @@ function removeDisplayScreen(screenIndex) {
         display.screens.map(subDisplay => subDisplay.screen)
     )
 
-    if (display.masterScale === 'Custom') {
-        sendToAllWindows('display-info', getDisplayInfo())
-    } else {
+    if (display.masterScale !== 'Custom') {
         updateMasterDisplay()
     }
 }
