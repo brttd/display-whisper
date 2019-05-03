@@ -1243,107 +1243,109 @@ function getDisplayInfo() {
 }
 
 function updateMasterDisplay() {
-    if (display.screens.length === 0 && display.masterScale !== 'Custom') {
-        //The current master display is based on the output displays
-        //But there are currently no active output displays
+    if (display.masterScale !== 'Custom') {
+        if (display.screens.length === 0) {
+            //The current master display is based on the output displays
+            //But there are currently no active output displays
 
-        //So, either use the last set master display size
-        //Or use the custom size
+            //So, either use the last set master display size
+            //Or use the custom size
 
-        if (display.bounds.width > 0 && display.bounds.height > 0) {
-            //There already is a valid display width & height,
-            //use it without changing anything
+            if (display.bounds.width > 0 && display.bounds.height > 0) {
+                //There already is a valid display width & height,
+                //use it without changing anything
 
-            sendToAllWindows('display-info', getDisplayInfo())
+                sendToAllWindows('display-info', getDisplayInfo())
 
-            return true
-        }
-        //There isn't a valid display width & height
-        //Use the custom size instead
-        //(Done at the end of the function)
-    } else {
-        display.bounds.width = 0
-        display.bounds.height = 0
-
-        if (display.masterScale === 'Smallest') {
-            display.bounds.width = Infinity
-            display.bounds.height = Infinity
-
-            for (
-                let screenIndex = 0;
-                screenIndex < display.screens.length;
-                screenIndex++
-            ) {
-                let newBounds = display.screens[screenIndex].bounds.width
-
-                //If the pixel count is smaller, or if the pixel count is the same and the aspect ratio smaller
-                //(The aspect ratio check is to ensure that the master display selected is not dependant on the order displays were selected as outputs)
-                if (
-                    newBounds.width * newBounds.height <
-                        display.bounds.width * display.bounds.height ||
-                    (newBounds.width * newBounds.height ===
-                        display.bounds.width * display.bounds.height &&
-                        newBounds.width / newBounds.height <
-                            display.bounds.width / display.bounds.height)
-                ) {
-                    display.bounds.width = newBounds.width
-                    display.bounds.height = newBounds.height
-                }
+                return true
             }
-        } else if (display.masterScale === 'Largest') {
-            display.bounds.width = 0
-            display.bounds.height = 0
-
-            for (
-                let screenIndex = 0;
-                screenIndex < display.screens.length;
-                screenIndex++
-            ) {
-                let newBounds = display.screens[screenIndex].bounds.width
-
-                //If the pixel count is larger, or if the pixel count is the same and the aspect ratio larger
-                //(The aspect ratio check is to ensure that the master display selected is not dependant on the order displays were selected as outputs)
-                if (
-                    newBounds.width * newBounds.height >
-                        display.bounds.width * display.bounds.height ||
-                    (newBounds.width * newBounds.height ===
-                        display.bounds.width * display.bounds.height &&
-                        newBounds.width / newBounds.height >
-                            display.bounds.width / display.bounds.height)
-                ) {
-                    display.bounds.width = newBounds.width
-                    display.bounds.height = newBounds.height
-                }
-            }
+            //There isn't a valid display width & height
+            //Use the custom size instead
+            //(Done at the end of the function)
         } else {
-            //Average
             display.bounds.width = 0
             display.bounds.height = 0
 
-            for (
-                let screenIndex = 0;
-                screenIndex < display.screens.length;
-                screenIndex++
-            ) {
-                display.bounds.width +=
-                    display.screens[screenIndex].bounds.width
-                display.bounds.height +=
-                    display.screens[screenIndex].bounds.height
+            if (display.masterScale === 'Smallest') {
+                display.bounds.width = Infinity
+                display.bounds.height = Infinity
+
+                for (
+                    let screenIndex = 0;
+                    screenIndex < display.screens.length;
+                    screenIndex++
+                ) {
+                    let newBounds = display.screens[screenIndex].bounds.width
+
+                    //If the pixel count is smaller, or if the pixel count is the same and the aspect ratio smaller
+                    //(The aspect ratio check is to ensure that the master display selected is not dependant on the order displays were selected as outputs)
+                    if (
+                        newBounds.width * newBounds.height <
+                            display.bounds.width * display.bounds.height ||
+                        (newBounds.width * newBounds.height ===
+                            display.bounds.width * display.bounds.height &&
+                            newBounds.width / newBounds.height <
+                                display.bounds.width / display.bounds.height)
+                    ) {
+                        display.bounds.width = newBounds.width
+                        display.bounds.height = newBounds.height
+                    }
+                }
+            } else if (display.masterScale === 'Largest') {
+                display.bounds.width = 0
+                display.bounds.height = 0
+
+                for (
+                    let screenIndex = 0;
+                    screenIndex < display.screens.length;
+                    screenIndex++
+                ) {
+                    let newBounds = display.screens[screenIndex].bounds.width
+
+                    //If the pixel count is larger, or if the pixel count is the same and the aspect ratio larger
+                    //(The aspect ratio check is to ensure that the master display selected is not dependant on the order displays were selected as outputs)
+                    if (
+                        newBounds.width * newBounds.height >
+                            display.bounds.width * display.bounds.height ||
+                        (newBounds.width * newBounds.height ===
+                            display.bounds.width * display.bounds.height &&
+                            newBounds.width / newBounds.height >
+                                display.bounds.width / display.bounds.height)
+                    ) {
+                        display.bounds.width = newBounds.width
+                        display.bounds.height = newBounds.height
+                    }
+                }
+            } else {
+                //Average
+                display.bounds.width = 0
+                display.bounds.height = 0
+
+                for (
+                    let screenIndex = 0;
+                    screenIndex < display.screens.length;
+                    screenIndex++
+                ) {
+                    display.bounds.width +=
+                        display.screens[screenIndex].bounds.width
+                    display.bounds.height +=
+                        display.screens[screenIndex].bounds.height
+                }
+
+                display.bounds.width /= display.screens.length
+                display.bounds.height /= display.screens.length
             }
 
-            display.bounds.width /= display.screens.length
-            display.bounds.height /= display.screens.length
-        }
+            if (
+                isFinite(display.bounds.width) &&
+                isFinite(display.bounds.height) &&
+                display.bounds.width > 0 &&
+                display.bounds.height > 0
+            ) {
+                sendToAllWindows('display-info', getDisplayInfo())
 
-        if (
-            isFinite(display.bounds.width) &&
-            isFinite(display.bounds.height) &&
-            display.bounds.width > 0 &&
-            display.bounds.height > 0
-        ) {
-            sendToAllWindows('display-info', getDisplayInfo())
-
-            return true
+                return true
+            }
         }
     }
 
