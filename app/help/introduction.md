@@ -5,8 +5,8 @@ In the Control window, there are 4 main sections:
 The _Add_ panel is on the left, and contains tabs for adding [songs](#adding-songs), [text](#adding-text), and [images](#adding-images) to the presentation.  
 The _Presentation_ list is in the center, and shows all items in the presentation. The list contains previews and information for each item in the presentation, and controls for changing the list.  
 Below the _Presentation_ list are _Presentation Controls_. These are controls and options for moving through the presentation.  
-The _Previews_ are on the right, and show where you are in the presentation. This allows you to see what will be displayed before you move to it, or enable the display.  
-The _Display Menu_ is at the top, and contains controls for enabling & disabling the [display](#presentation), and switching which screen is used for displaying.
+The _Previews_ are on the right, and show where you are in the presentation. This allows you to see what will be displayed next in the presentation.
+The _Display Menu_ is at the top, and contains controls for selecting what screens are used for display output, along with modifying the presentation content.
 
 You can view this help at any time by selecting _Help_ > _Help_ from the _Menu_ in the Control window.
 
@@ -63,7 +63,7 @@ Displaying a section will automatically select it.
 Sections can automatically advance after a set amount of time. The _Timer_ in the the _Presentation Controls_ will show when this happens.
 To stop automatic advancing, set the _Play Mode_ to _Manual_ in the _Presentation Controls_.
 
-If you would like to hide the currently displayed section (without disabling the display), you can click the _Blank_ button in the _Presentation Controls_. This changes the display to black, and can only be done when the display is enabled.
+If you would like to hide the currently displayed section (without disabling a screen output display), you can click the _Blank_ button in the _Presentation Controls_. This changes the display to black, and can only be done when one or more screens are used for display output.
 
 # Program information
 **Display Whisper** will automatically check for updates, and notify you when one is available. You can also manually check if there is a new version by selecting _Help_ > _Check For Updates_ from the _Menu_ in the Control window.  
