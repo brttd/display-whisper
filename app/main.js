@@ -2688,7 +2688,8 @@ function setupDisplays() {
         let displayIndex = displays.findIndex(
             display => display.id === changedDisplay.id
         )
-        displays[displayIndex] = changedDisplay
+
+        displays = screen.getAllDisplays()
 
         for (
             let screenIndex = 0;
@@ -2700,7 +2701,9 @@ function setupDisplays() {
             }
         }
 
-        sendToAllWindows('display-info', getDisplayInfo())
+        if (display.masterScale !== 'Custom') {
+            updateMasterDisplay()
+        }
     })
 
     settings.listen('display.masterScale', value => {
