@@ -2826,6 +2826,10 @@ exports.change = addStyles
                 this.node.firstChild.textContent = label
 
                 this.node.firstChild.setAttribute('for', this.inputNode.id)
+
+                this.inputNode.title = label
+            } else {
+                this.inputNode.title = ' '
             }
 
             this.node.appendChild(this.inputNode)
@@ -3967,6 +3971,10 @@ exports.change = addStyles
                 this.node.firstChild.textContent = data.label
 
                 this.node.firstChild.setAttribute('for', this.inputNode.id)
+
+                this.inputNode.title = data.label
+            } else {
+                this.inputNode.title = ' '
             }
 
             this.node.appendChild(this.inputNode)
@@ -4665,6 +4673,7 @@ exports.change = addStyles
                 numberInputs[colors[i]].value = 0
                 numberInputs[colors[i]].id =
                     'color-popup-' + colors[i] + '-input'
+                numberInputs[colors[i]].title = colors[i]
 
                 numberInputBox.appendChild(document.createElement('label'))
                 numberInputBox.lastElementChild.textContent = colors[
@@ -5180,6 +5189,9 @@ exports.change = addStyles
                 this.node.firstChild.textContent = data.label
 
                 this.node.firstChild.setAttribute('for', this.inputNode.id)
+                this.inputNode.title = data.label
+            } else {
+                this.inputNode.title = ' '
             }
 
             this.node.appendChild(this.inputNode)
@@ -5557,6 +5569,9 @@ exports.change = addStyles
                 this.node.firstChild.textContent = data.label
 
                 this.node.firstChild.setAttribute('for', this.inputNode.id)
+                this.inputNode.title = data.label
+            } else {
+                this.inputNode.title = ' '
             }
 
             this.node.appendChild(this.inputNode)
