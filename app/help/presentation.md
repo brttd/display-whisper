@@ -77,8 +77,8 @@ The options for display appearance, under _Display_ > _Screen_ are:
 
 >**Note:**
 If *Smallest*, *Average*, or *Largest* is selected and no screens have been set as display output, the custom size will be used until a screen is used for display output.  
-When a screen has been set as display output, if all screen are again disabled then the most recently enabled screen will be used.
-If **Master display size** is set to ***Smallest*** or ***Largest*** then the screen being used as master display will be shown with square brackets around its button in the _Display Menu_ in the Control window.
+When a screen has been set as display output, if all screens are again disabled then the most recently enabled screen will be used.  
+If **Master display size** is set to ***Smallest*** or ***Largest*** then the screen being used as master display will be shown with square brackets around its number in the _Display Menu_ in the Control window.
 
 
 # Previews
