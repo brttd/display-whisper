@@ -13,11 +13,12 @@ document.body.style.background = 'black'
 const textNodes = []
 const imageNodes = []
 
-const customDisplay = {
-    use: false,
-
+const masterDisplay = {
     width: 0,
-    height: 0
+    height: 0,
+
+    letterbox: true,
+    letterboxColor: 'black'
 }
 
 const blankNode = document.createElement('div')
@@ -356,32 +357,49 @@ function display(data = {}) {
         } else {
             requestAnimationFrame(removeOldDisplayNode)
         }
+
+        if (!masterDisplay.letterbox) {
+            if (data.transition.time > 0 && data.transition.type === 'fade') {
+                document.body.style.transition =
+                    'background ' + data.transition.time + 'ms'
+
+                requestAnimationFrame(() => {
+                    document.body.style.background =
+                        newDisplay.style.backgroundColor
+                })
+            } else {
+                document.body.style.transition = ''
+
+                document.body.style.background =
+                    newDisplay.style.backgroundColor
+            }
+        }
     })
 }
 
-function updateCustomDisplay() {
-    displayNode.style.width = customDisplay.width + 'px'
-    displayNode.style.height = customDisplay.height + 'px'
+function updateMasterDisplay() {
+    displayNode.style.width = masterDisplay.width + 'px'
+    displayNode.style.height = masterDisplay.height + 'px'
 
     let scale = 1
 
     if (
-        customDisplay.width / customDisplay.height >
+        masterDisplay.width / masterDisplay.height >
         window.innerWidth / window.innerHeight
     ) {
         //Fit width
-        scale = window.innerWidth / customDisplay.width
+        scale = window.innerWidth / masterDisplay.width
 
         displayNode.style.top =
-            (window.innerHeight - customDisplay.height * scale) / 2 + 'px'
+            (window.innerHeight - masterDisplay.height * scale) / 2 + 'px'
 
         displayNode.style.left = ''
     } else {
         //Fit height
-        scale = window.innerHeight / customDisplay.height
+        scale = window.innerHeight / masterDisplay.height
 
         displayNode.style.left =
-            (window.innerWidth - customDisplay.width * scale) / 2 + 'px'
+            (window.innerWidth - masterDisplay.width * scale) / 2 + 'px'
 
         displayNode.style.top = ''
 
@@ -389,13 +407,6 @@ function updateCustomDisplay() {
     }
 
     displayNode.style.transform = 'scale(' + scale + ')'
-}
-function removeCustomDisplay() {
-    displayNode.style.transform = ''
-    displayNode.style.top = ''
-    displayNode.style.left = ''
-    displayNode.style.width = '100%'
-    displayNode.style.height = '100%'
 }
 
 function toggleBlank() {
@@ -419,53 +430,47 @@ function toggleBlank() {
 
     let keyboardFunctions = {
         'control.keyboard.playNext': () => {
-            ipcRenderer.send('display-command', 'play-next')
+            ipcRenderer.send('presentation-command', 'play-next')
         },
         'control.keyboard.playPrevious': () => {
-            ipcRenderer.send('display-command', 'play-previous')
+            ipcRenderer.send('presentation-command', 'play-previous')
         },
         'control.keyboard.selectNext': () => {
-            ipcRenderer.send('display-command', 'select-next')
+            ipcRenderer.send('presentation-command', 'select-next')
         },
         'control.keyboard.selectPrevious': () => {
-            ipcRenderer.send('display-command', 'select-previous')
+            ipcRenderer.send('presentation-command', 'select-previous')
         },
         'control.keyboard.selectNextItem': () => {
-            ipcRenderer.send('display-command', 'select-next-item')
+            ipcRenderer.send('presentation-command', 'select-next-item')
         },
         'control.keyboard.selectPreviousItem': () => {
-            ipcRenderer.send('display-command', 'select-previous-item')
+            ipcRenderer.send('presentation-command', 'select-previous-item')
         },
         'control.keyboard.playSelected': () => {
-            ipcRenderer.send('display-command', 'play-selected')
+            ipcRenderer.send('presentation-command', 'play-selected')
         },
-        'control.keyboard.closeDisplay': () => {
-            ipcRenderer.send('change-display', { show: false })
 
-            if (blanked) {
-                toggleBlank()
-            }
-        },
-        'control.keyboard.toggleDisplay': () => {
-            ipcRenderer.send('change-display', {
-                show: false
-            })
-
-            if (blanked) {
-                toggleBlank()
-            }
-        },
-        'control.keyboard.switchDisplayScreen1': () => {
-            ipcRenderer.send('change-display', { screen: 0 })
-        },
-        'control.keyboard.switchDisplayScreen2': () => {
-            ipcRenderer.send('change-display', { screen: 1 })
-        },
-        'control.keyboard.switchDisplayScreen3': () => {
-            ipcRenderer.send('change-display', { screen: 2 })
-        },
         'control.keyboard.toggleBlank': () => {
             toggleBlank()
+        },
+
+        'control.keyboard.disableDisplay': () => {
+            ipcRenderer.send('disable-display')
+            ipcRenderer.send('display-blank', false)
+        },
+
+        'control.keyboard.toggleDisplayScreen1': () => {
+            ipcRenderer.send('toggle-display-screen', 0)
+        },
+        'control.keyboard.toggleDisplayScreen2': () => {
+            ipcRenderer.send('toggle-display-screen', 1)
+        },
+        'control.keyboard.toggleDisplayScreen3': () => {
+            ipcRenderer.send('toggle-display-screen', 2)
+        },
+        'control.keyboard.toggleDisplayScreen4': () => {
+            ipcRenderer.send('toggle-display-screen', 3)
         }
     }
 
@@ -501,45 +506,30 @@ function toggleBlank() {
 
                 break
 
-            case 'display.setSize':
-                customDisplay.use = value
+            case 'display.useLetterbox':
+                masterDisplay.letterbox = value
 
-                if (value) {
-                    if (customDisplay.height && customDisplay.height) {
-                        window.requestAnimationFrame(updateCustomDisplay)
-                    }
+                if (masterDisplay.letterbox) {
+                    document.body.style.background =
+                        masterDisplay.letterboxColor
                 } else {
-                    window.requestAnimationFrame(removeCustomDisplay)
-                }
-                break
-            case 'display.displaySize':
-                let values = value.split('x')
-
-                let width = values[0]
-                let height = values[1].slice(0, values[1].indexOf(','))
-
-                width = parseFloat(width)
-                height = parseFloat(height)
-
-                if (
-                    !isNaN(width) &&
-                    isFinite(width) &&
-                    width > 0 &&
-                    !isNaN(height) &&
-                    isFinite(height) &&
-                    height > 0
-                ) {
-                    customDisplay.width = width
-                    customDisplay.height = height
-
-                    if (customDisplay.use) {
-                        window.requestAnimationFrame(updateCustomDisplay)
+                    if (displayNode.childElementCount > 0) {
+                        document.body.style.background =
+                            displayNode.lastElementChild.style.backgroundColor
+                    } else {
+                        document.body.style.background = defaults.background
                     }
                 }
                 break
 
-            case 'display.setBackground':
-                document.body.style.background = value
+            case 'display.letterboxColor':
+                if (isColor(value)) {
+                    masterDisplay.letterboxColor = value
+
+                    if (masterDisplay.letterbox) {
+                        document.body.style.background = value
+                    }
+                }
                 break
 
             case 'defaults.background':
@@ -598,9 +588,8 @@ function toggleBlank() {
 
         ['display.hideCursor', false],
 
-        ['display.setSize', false],
-        ['display.displaySize', '1280x720, 16:9 - HD'],
-        ['display.setBackground', 'black'],
+        ['display.useLetterbox', true],
+        ['display.letterboxColor', 'black'],
 
         ['control.keyboard.repeat', false],
 
@@ -614,19 +603,30 @@ function toggleBlank() {
 
         ['control.keyboard.playSelected', 'Enter'],
 
-        ['control.keyboard.closeDisplay', 'Escape'],
-        ['control.keyboard.toggleDisplay', 'Shift+KeyD'],
-        ['control.keyboard.switchDisplayScreen1', 'Alt+Shift+Digit1'],
-        ['control.keyboard.switchDisplayScreen2', 'Alt+Shift+Digit2'],
-        ['control.keyboard.switchDisplayScreen3', 'Alt+Shift+Digit3'],
+        ['control.keyboard.toggleBlank', 'Period'],
 
-        ['control.keyboard.toggleBlank', 'Period']
+        ['control.keyboard.disableDisplay', 'Escape'],
+        ['control.keyboard.toggleDisplayScreen1', 'Alt+Shift+Digit1'],
+        ['control.keyboard.toggleDisplayScreen2', 'Alt+Shift+Digit2'],
+        ['control.keyboard.toggleDisplayScreen3', 'Alt+Shift+Digit3']
     ])
 }
 
 window.addEventListener('resize', () => {
-    if (customDisplay.use) {
-        window.requestAnimationFrame(updateCustomDisplay)
+    window.requestAnimationFrame(updateMasterDisplay)
+})
+ipcRenderer.on('display-info', (event, display) => {
+    console.log('masterDisplay', display.bounds)
+    if (
+        isFinite(display.bounds.width) &&
+        isFinite(display.bounds.height) &&
+        display.bounds.width > 0 &&
+        display.bounds.height > 0
+    ) {
+        masterDisplay.width = display.bounds.width
+        masterDisplay.height = display.bounds.height
+
+        window.requestAnimationFrame(updateMasterDisplay)
     }
 })
 

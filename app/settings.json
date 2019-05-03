@@ -156,7 +156,7 @@
     "control": {
         "name": "Shortcuts",
 
-        "display": {
+        "presentation": {
             "description": "Control Keyboard Shortcuts",
             "map": "control.keyboard",
 
@@ -232,49 +232,49 @@
                     "type": "key",
 
                     "default": "Control+PageUp"
-                },
+                }
+            }
+        },
+        "display": {
+            "description": "Display Keyboard Shortcuts",
+            "map": "control.keyboard",
 
+            "entries": {
                 "toggleBlank": {
                     "description": "Toggle display blanked",
                     "type": "key",
 
                     "default": "Period"
                 },
-                "openDisplay": {
-                    "description": "Turn display on",
-                    "type": "key",
-
-                    "default": "Shift+KeyO"
-                },
-                "closeDisplay": {
-                    "description": "Turn display off",
+                "disableDisplay": {
+                    "description": "Turn all displays off",
                     "type": "key",
 
                     "default": "Escape"
                 },
-                "toggleDisplay": {
-                    "description": "Toggle display on and off",
-                    "type": "key",
-
-                    "default": "Shift+KeyD"
-                },
-                "switchDisplayScreen1": {
-                    "description": "Use screen 1 for display",
+                "toggleDisplayScreen1": {
+                    "description": "Toggle display for screen 1",
                     "type": "key",
 
                     "default": "Alt+Shift+Digit1"
                 },
-                "switchDisplayScreen2": {
-                    "description": "Use screen 2 for display (if available)",
+                "toggleDisplayScreen2": {
+                    "description": "Toggle display for screen 2 (if available)",
                     "type": "key",
 
                     "default": "Alt+Shift+Digit2"
                 },
-                "switchDisplayScreen3": {
-                    "description": "Use screen 3 for display (if available)",
+                "toggleDisplayScreen3": {
+                    "description": "Toggle display for screen 3 (if available)",
                     "type": "key",
 
                     "default": "Alt+Shift+Digit3"
+                },
+                "toggleDisplayScreen4": {
+                    "description": "Toggle display for screen 4 (if available)",
+                    "type": "key",
+
+                    "default": "Alt+Shift+Digit4"
                 }
             }
         }
@@ -293,36 +293,48 @@
 
                     "default": false
                 },
-                "setSize": {
-                    "description": "Use set size for display",
-                    "type": "boolean",
-
-                    "default": false
-                },
-                "displaySize": {
-                    "description": "Display size",
+                "masterScale": {
+                    "description": "Master display size",
                     "type": "select",
 
-                    "default": "1280x720",
+                    "default": "Largest",
 
-                    "options": [
-                        "320x240, 4:3 - QVGA",
-                        "640x480, 4:3 - VGA",
-                        "800x600, 4:3 - SVGA",
-                        "1024x576, 16:9 - PAL",
-                        "1024x768, 4:3 - XGA",
-                        "1280x720, 16:9 - HD",
-                        "1600x900, 16:9 - HD+",
-                        "1920x1080, 16:9 - FHD",
-                        "2048x1080, 17:9 - 2K",
-                        "2560x1080, 21:9 - UWHD",
-                        "2560x1440, 16:9 - WQHD",
-                        "3440x1440, 21:9 - UWQHD",
-                        "4096x2160, 17:9 - 4K"
-                    ]
+                    "options": ["Smallest", "Average", "Largest", "Custom"]
                 },
-                "setBackground": {
-                    "description": "Display letterbox bar color",
+                "customWidth": {
+                    "description": "Custom master display width",
+                    "type": "number",
+
+                    "min": 1,
+                    "default": 1366,
+                    "max": 99999,
+                    "step": 2,
+                    "precision": 0,
+
+                    "popupMin": 320,
+                    "popupMax": 8192
+                },
+                "customHeight": {
+                    "description": "Custom master display height",
+                    "type": "number",
+
+                    "min": 1,
+                    "default": 768,
+                    "max": 99999,
+                    "step": 2,
+                    "precision": 0,
+
+                    "popupMin": 200,
+                    "popupMax": 4320
+                },
+                "useLetterbox": {
+                    "description": "Letterbox displays",
+                    "type": "boolean",
+
+                    "default": true
+                },
+                "letterboxColor": {
+                    "description": "Letterbox color",
                     "type": "color",
 
                     "default": "black"

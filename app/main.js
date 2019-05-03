@@ -29,23 +29,27 @@ let controlMessageBuffer = []
 
 //List of all system displays
 let displays = []
-//Current display being used
+//Current screens(s) being used
 let display = {
+    //Master display size
     bounds: {
-        x: 0,
-        y: 0,
         width: 0,
         height: 0
     },
-    screen: 0,
-    show: false
-}
-//User set display size
-let customDisplaySize = {
-    use: false,
 
-    width: 0,
-    height: 0
+    //List of displays in use:
+    /*
+    {
+        bounds: display.bounds,
+        screen: index of display in displays array
+        window: BrowserWindow instance
+    }
+    */
+    screens: [],
+
+    //Where to get the master display size from
+    //Either "Smallest", "Average", "Largest", or "Custom"
+    masterScale: 'Largest'
 }
 
 //Used when display is re-opened, so that it correctly shows the current section
@@ -548,18 +552,25 @@ function onWinNavigate(event, url) {
     event.preventDefault()
 }
 
-function openDisplay() {
-    if (windows.display) {
-        windows.display.focus()
+function openDisplayWindow(screenIndex) {
+    //screenIndex is the index of the screen in display.screens
 
-        return windows.display
+    if (screenIndex < 0 || screenIndex >= display.screens.length) {
+        return false
     }
 
-    windows.display = new BrowserWindow({
-        width: display.bounds.width,
-        height: display.bounds.height,
-        x: display.bounds.x,
-        y: display.bounds.y,
+    if (display.screens[screenIndex].window) {
+        updateDisplayPosition(screenIndex)
+        display.screens[screenIndex].window.focus()
+
+        return display.screens[screenIndex].window
+    }
+
+    let displayWindow = new BrowserWindow({
+        width: display.screens[screenIndex].bounds.width,
+        height: display.screens[screenIndex].bounds.height,
+        x: display.screens[screenIndex].bounds.x,
+        y: display.screens[screenIndex].bounds.y,
 
         icon: path.join(appPath, 'icons/app.ico'),
 
@@ -586,62 +597,71 @@ function openDisplay() {
         }
     })
 
-    windows.display.on('close', () => {
-        setDisplay({ show: false })
+    display.screens[screenIndex].window = displayWindow
+
+    displayWindow.on('close', () => {
+        let newScreenIndex = display.screens.findIndex(subDisplay => {
+            return subDisplay.window === displayWindow
+        })
+
+        if (newScreenIndex !== -1) {
+            removeDisplayScreen(newScreenIndex)
+        }
     })
-    windows.display.on('closed', () => {
-        windows.display = null
+    displayWindow.on('closed', () => {
+        let newScreenIndex = display.screens.findIndex(subDisplay => {
+            return subDisplay.window === displayWindow
+        })
+
+        if (newScreenIndex !== -1) {
+            display.screens[newScreenIndex].window = null
+        }
+
+        displayWindow = undefined
     })
 
-    windows.display.webContents.on('new-window', onWinNewWindow)
-    windows.display.webContents.on('will-navigate', onWinNavigate)
+    displayWindow.webContents.on('new-window', onWinNewWindow)
+    displayWindow.webContents.on('will-navigate', onWinNavigate)
 
     let isUnresponsive = false
 
-    windows.display.on('unresponsive', () => {
+    displayWindow.on('unresponsive', () => {
         logger.warn('Display became unresponsive')
 
         //Wait 3 seconds, and restart if still unresponsive
         setTimeout(() => {
-            if (isUnresponsive && windows.display) {
-                if (!windows.display.isDestroyed) {
-                    windows.display.destroy()
+            if (isUnresponsive && displayWindow) {
+                if (!displayWindow.isDestroyed) {
+                    displayWindow.close()
                 }
-
-                windows.display = null
-
-                openDisplay()
 
                 sendToControlWindow(
                     'show-message',
-                    'An error occurred with the display! It has been reset.',
+                    'An error occurred with the display!',
                     'warning'
                 )
             }
         }, 3000)
     })
 
-    windows.display.on('responsive', () => {
+    displayWindow.on('responsive', () => {
         isUnresponsive = false
     })
 
-    windows.display.webContents.on('crashed', (event, killed) => {
+    displayWindow.webContents.on('crashed', (event, killed) => {
         logger.error('Display window crashed!', event, killed)
 
-        if (!windows.display.isDestroyed()) {
-            windows.display.destroy()
+        if (!displayWindow.isDestroyed()) {
+            displayWindow.close()
         }
-
-        windows.display = null
-        openDisplay()
 
         sendToControlWindow(
             'show-message',
-            'An error occurred with the display! It has been reset.',
+            'A crash occurred with the display!',
             'warning'
         )
     })
-    windows.display.webContents.on(
+    displayWindow.webContents.on(
         'did-fail-load',
         (event, errorCode, errorDescription, validatedURL, isMainFrame) => {
             logger.error(
@@ -659,20 +679,26 @@ function openDisplay() {
         }
     )
 
-    windows.display.webContents.on('did-finish-load', () => {
+    displayWindow.webContents.on('did-finish-load', () => {
+        displayWindow.webContents.send('display-info', getDisplayInfo())
+
         //when reopening the display window,
         //re-display whatever was last displayed
         if (lastDisplayData !== null) {
-            windows.display.webContents.send('display', lastDisplayData)
+            displayWindow.webContents.send('display', lastDisplayData)
         }
 
-        if (display.show) {
-            updateDisplayPosition()
-            windows.display.show()
+        let newScreenIndex = display.screens.findIndex(subDisplay => {
+            return subDisplay.window === displayWindow
+        })
+
+        if (newScreenIndex !== -1) {
+            updateDisplayPosition(newScreenIndex)
+            displayWindow.show()
         }
     })
 
-    windows.display.loadURL(
+    displayWindow.loadURL(
         url.format({
             protocol: 'file:',
             slashes: true,
@@ -681,12 +707,12 @@ function openDisplay() {
     )
 
     if (debug) {
-        windows.display.webContents.openDevTools()
+        displayWindow.webContents.openDevTools()
     }
 
-    windows.display.setMenu(null)
+    displayWindow.setMenu(null)
 
-    return windows.display
+    return displayWindow
 }
 
 function openControl() {
@@ -779,11 +805,14 @@ function openControl() {
 
         //Control window is fully closed, so program shutdown logic starts
 
-        if (windows.display) {
-            //Need to use destroy method instead of close,
-            //As close method will trigger 'close' listener
-            //Which will then save the display as off
-            windows.display.destroy()
+        for (
+            let screenIndex = 0;
+            screenIndex < display.screens.length;
+            screenIndex++
+        ) {
+            if (display.screens[screenIndex].window) {
+                display.screens[screenIndex].window.destroy()
+            }
         }
 
         //Wait until settings have been written
@@ -880,7 +909,7 @@ function openWindow(name) {
     }
 
     if (name === 'display') {
-        return openDisplay()
+        return openDisplayWindow()
     } else if (name === 'control') {
         return openControl()
     } else if (typeof name !== 'string' || !windowNames.includes(name)) {
@@ -1116,25 +1145,14 @@ function sendToAllWindows() {
         }
     }
 
+    for (let i = 0; i < display.screens.length; i++) {
+        if (display.screens[i].window) {
+            display.screens[i].window.webContents.send(...arguments)
+        }
+    }
+
     for (let id in editors) {
         editors[id].webContents.send(...arguments)
-    }
-}
-
-function getDisplayInfo() {
-    return {
-        bounds: customDisplaySize.use
-            ? {
-                  x: display.bounds.x,
-                  y: display.bounds.y,
-                  width: customDisplaySize.width,
-                  height: customDisplaySize.height
-              }
-            : display.bounds,
-
-        screen: display.screen,
-        screenCount: displays.length,
-        show: display.show
     }
 }
 
@@ -1212,109 +1230,246 @@ function openItemEditor(type, id, data = {}) {
     )
 }
 
+function getDisplayInfo() {
+    return {
+        bounds: {
+            width: display.bounds.width,
+            height: display.bounds.height
+        },
+
+        screens: display.screens.map(subDisplay => subDisplay.screen),
+        screenCount: displays.length
+    }
+}
+
+function updateMasterDisplay() {
+    if (display.screens.length === 0 && display.masterScale !== 'Custom') {
+        //The current master display is based on the output displays
+        //But there are currently no active output displays
+
+        //So, either use the last set master display size
+        //Or use the custom size
+
+        if (display.bounds.width > 0 && display.bounds.height > 0) {
+            //There already is a valid display width & height,
+            //use it without changing anything
+
+            sendToAllWindows('display-info', getDisplayInfo())
+
+            return true
+        }
+        //There isn't a valid display width & height
+        //Use the custom size instead
+        //(Done at the end of the function)
+    } else {
+        display.bounds.width = 0
+        display.bounds.height = 0
+
+        if (display.masterScale === 'Smallest') {
+            display.bounds.width = Infinity
+            display.bounds.height = Infinity
+
+            for (
+                let screenIndex = 0;
+                screenIndex < display.screens.length;
+                screenIndex++
+            ) {
+                let newBounds = display.screens[screenIndex].bounds.width
+
+                //If the pixel count is smaller, or if the pixel count is the same and the aspect ratio smaller
+                //(The aspect ratio check is to ensure that the master display selected is not dependant on the order displays were selected as outputs)
+                if (
+                    newBounds.width * newBounds.height <
+                        display.bounds.width * display.bounds.height ||
+                    (newBounds.width * newBounds.height ===
+                        display.bounds.width * display.bounds.height &&
+                        newBounds.width / newBounds.height <
+                            display.bounds.width / display.bounds.height)
+                ) {
+                    display.bounds.width = newBounds.width
+                    display.bounds.height = newBounds.height
+                }
+            }
+        } else if (display.masterScale === 'Largest') {
+            display.bounds.width = 0
+            display.bounds.height = 0
+
+            for (
+                let screenIndex = 0;
+                screenIndex < display.screens.length;
+                screenIndex++
+            ) {
+                let newBounds = display.screens[screenIndex].bounds.width
+
+                //If the pixel count is larger, or if the pixel count is the same and the aspect ratio larger
+                //(The aspect ratio check is to ensure that the master display selected is not dependant on the order displays were selected as outputs)
+                if (
+                    newBounds.width * newBounds.height >
+                        display.bounds.width * display.bounds.height ||
+                    (newBounds.width * newBounds.height ===
+                        display.bounds.width * display.bounds.height &&
+                        newBounds.width / newBounds.height >
+                            display.bounds.width / display.bounds.height)
+                ) {
+                    display.bounds.width = newBounds.width
+                    display.bounds.height = newBounds.height
+                }
+            }
+        } else {
+            //Average
+            display.bounds.width = 0
+            display.bounds.height = 0
+
+            for (
+                let screenIndex = 0;
+                screenIndex < display.screens.length;
+                screenIndex++
+            ) {
+                display.bounds.width +=
+                    display.screens[screenIndex].bounds.width
+                display.bounds.height +=
+                    display.screens[screenIndex].bounds.height
+            }
+
+            display.bounds.width /= display.screens.length
+            display.bounds.height /= display.screens.length
+        }
+
+        if (
+            isFinite(display.bounds.width) &&
+            isFinite(display.bounds.height) &&
+            display.bounds.width > 0 &&
+            display.bounds.height > 0
+        ) {
+            sendToAllWindows('display-info', getDisplayInfo())
+
+            return true
+        }
+    }
+
+    //Otherwise, use custom display size
+    display.bounds.width = settings.get('display.customWidth', 1366)
+    display.bounds.height = settings.get('display.customHeight', 768)
+
+    sendToAllWindows('display-info', getDisplayInfo())
+}
+
 let updateDisplayPosition
 
 if (process.platform === 'darwin') {
-    updateDisplayPosition = () => {
-        windows.display.setFullScreen(false)
-        windows.display.setBounds(display.bounds)
-        windows.display.setFullScreen(true)
+    updateDisplayPosition = screenIndex => {
+        if (
+            screenIndex < 0 ||
+            screenIndex >= display.screens.length ||
+            !display.screens[screenIndex].window
+        ) {
+            return false
+        }
+
+        display.screens[screenIndex].window.setFullScreen(false)
+        display.screens[screenIndex].window.setBounds(
+            display.screens[screenIndex].bounds
+        )
+        display.screens[screenIndex].window.setFullScreen(true)
     }
 } else {
-    updateDisplayPosition = () => {
-        windows.display.setBounds(display.bounds)
-    }
-}
-
-function setDisplay(options) {
-    let change = false
-
-    //if a screen is set, always update it, ignoring if it's the same or not
-    if (typeof options.screen === 'number') {
-        display.screen = Math.max(
-            0,
-            Math.min(displays.length - 1, options.screen)
-        )
-
-        display.bounds = displays[display.screen].bounds
-
-        if (windows.display && display.show) {
-            updateDisplayPosition()
-        }
-
-        change = true
-    } else if (display.screen < 0 || display.screen >= displays.length) {
-        display.screen = Math.max(
-            0,
-            Math.min(displays.length - 1, display.screen)
-        )
-
-        display.bounds = displays[display.screen].bounds
-
+    updateDisplayPosition = screenIndex => {
         if (
-            windows.display &&
-            display.show &&
-            (typeof options.show !== 'boolean' || options.show)
+            screenIndex < 0 ||
+            screenIndex >= display.screens.length ||
+            !display.screens[screenIndex].window
         ) {
-            updateDisplayPosition()
+            return false
         }
 
-        change = true
-    }
-
-    if (typeof options.show === 'boolean' && options.show !== display.show) {
-        display.show = options.show
-
-        if (windows.display) {
-            if (display.show === true) {
-                updateDisplayPosition()
-                windows.display.show()
-
-                if (lastDisplayData !== null) {
-                    windows.display.webContents.send('display', lastDisplayData)
-                }
-            } else {
-                windows.display.hide()
-                windows.display.close()
-            }
-        } else if (display.show === true) {
-            openDisplay()
-        }
-
-        change = true
-    }
-
-    if (change) {
-        sendToAllWindows('display-info', getDisplayInfo())
-
-        settings.set('display.screen', display.screen)
-        settings.set('display.show', display.show)
+        display.screens[screenIndex].window.setBounds(
+            display.screens[screenIndex].bounds
+        )
     }
 }
 
-function setCustomDisplaySizeFromString(string) {
-    if (typeof string !== 'string' || string.length === 0) {
+function updateDisplayScreen(screenIndex) {
+    if (screenIndex < 0 || screenIndex >= display.screens.length) {
         return false
     }
 
-    let values = string.split('x')
+    display.screens[screenIndex].screen = Math.min(
+        display.screens[screenIndex].screen,
+        displays.length - 1
+    )
 
-    let width = values[0]
-    let height = values[1].slice(0, values[1].indexOf(','))
+    display.screens[screenIndex].bounds =
+        displays[display.screens[screenIndex].screen].bounds
 
-    width = parseFloat(width)
-    height = parseFloat(height)
+    if (display.screens[screenIndex].window) {
+        updateDisplayPosition(screenIndex)
+    } else {
+        openDisplayWindow(screenIndex)
+    }
+}
 
-    if (
-        !isNaN(width) &&
-        isFinite(width) &&
-        width > 0 &&
-        !isNaN(height) &&
-        isFinite(height) &&
-        height > 0
-    ) {
-        customDisplaySize.width = width
-        customDisplaySize.height = height
+function addDisplayScreen(displayIndex) {
+    if (displayIndex < 0 || displayIndex >= displays.length) {
+        return false
+    }
+
+    let alreadyDisplaying = display.screens.find(
+        subDisplay => subDisplay.screen === displayIndex
+    )
+
+    if (alreadyDisplaying) {
+        return false
+    }
+
+    display.screens.push({
+        bounds: displays[displayIndex].bounds,
+        screen: displayIndex
+    })
+
+    openDisplayWindow(display.screens.length - 1)
+
+    settings.set(
+        'display.defaultScreens',
+        display.screens.map(subDisplay => subDisplay.screen)
+    )
+
+    if (display.masterScale === 'Custom') {
+        sendToAllWindows('display-info', getDisplayInfo())
+    } else {
+        updateMasterDisplay()
+    }
+}
+function removeDisplayScreen(screenIndex) {
+    if (screenIndex < 0 || screenIndex >= display.screens.length) {
+        return false
+    }
+
+    let removedDisplay = display.screens.splice(screenIndex, 1)[0]
+
+    if (removedDisplay.window) {
+        removedDisplay.window.destroy()
+    }
+
+    settings.set(
+        'display.defaultScreens',
+        display.screens.map(subDisplay => subDisplay.screen)
+    )
+
+    if (display.masterScale === 'Custom') {
+        sendToAllWindows('display-info', getDisplayInfo())
+    } else {
+        updateMasterDisplay()
+    }
+}
+function toggleDisplayScreen(index) {
+    let screenIndex = display.screens.findIndex(
+        subDisplay => subDisplay.screen === index
+    )
+
+    if (screenIndex === -1) {
+        addDisplayScreen(index)
+    } else {
+        removeDisplayScreen(screenIndex)
     }
 }
 
@@ -2353,42 +2508,64 @@ ipcMain.on('close', event => {
 //Display events
 //============================================
 {
+    //Display a slide
     ipcMain.on('display', (event, data) => {
-        if (windows.display && display.show) {
-            windows.display.webContents.send('display', data)
+        for (
+            let screenIndex = 0;
+            screenIndex < display.screens.length;
+            screenIndex++
+        ) {
+            if (display.screens[screenIndex].window) {
+                display.screens[screenIndex].window.webContents.send(
+                    'display',
+                    data
+                )
+            }
         }
 
         lastDisplayData = data
         lastDisplayData.transition = {}
     })
 
-    ipcMain.on('change-display', (event, data) => {
-        setDisplay(data)
-
-        //If the window sends a show display command, the display window opening will give it focus
-        //But the original window should retain focus, so it needs to be refocused
-        if (!event.sender.isFocused()) {
-            event.sender.focus()
-        }
-    })
-
-    ipcMain.on('display-command', (event, argument) => {
+    //Presentation control command, sent from a window other than the control window
+    ipcMain.on('presentation-command', (event, argument) => {
         if (windows.control) {
             windows.control.webContents.send('presentation', argument)
         }
     })
 
+    //Display blank, instead of the current slide
     ipcMain.on('display-blank', (event, blank) => {
         if (!windows.control) {
             return false
         }
 
         if (event.sender === windows.control.webContents) {
-            if (windows.display) {
-                windows.display.webContents.send('display-blank', blank)
+            for (
+                let screenIndex = 0;
+                screenIndex < display.screens.length;
+                screenIndex++
+            ) {
+                if (display.screens[screenIndex].window) {
+                    display.screens[screenIndex].window.webContents.send(
+                        'display-blank',
+                        blank
+                    )
+                }
             }
         } else {
             windows.control.webContents.send('display-blank', blank)
+        }
+    })
+
+    //Toggle display output to specific screen
+    ipcMain.on('toggle-display-screen', (event, index) => {
+        toggleDisplayScreen(index)
+    })
+
+    ipcMain.on('disable-display', () => {
+        for (let i = display.screens.length - 1; i >= 0; i--) {
+            removeDisplayScreen(i)
         }
     })
 }
@@ -2448,73 +2625,85 @@ function setupDisplays() {
 
     primaryScreen = screen.getPrimaryDisplay()
 
-    customDisplaySize.use = settings.get(
-        'display.setSize',
-        customDisplaySize.use
-    )
-
-    setCustomDisplaySizeFromString(
-        settings.get('display.displaySize', '1280x720, 16:9 - HD')
+    display.masterScale = settings.get(
+        'display.masterScale',
+        display.masterScale
     )
 
     //load default screen, and display show/hide from settings
     //If screen isn't set, use second screen if available, otherwise first
-    setDisplay({
-        screen: settings.get(
-            'display.screen',
-            Math.min(1, displays.length - 1)
-        ),
-        show: settings.get('display.show', false)
-    })
+    let defaultScreens = settings.get('display.screens', [])
+    for (let i = 0; i < defaultScreens.length; i++) {
+        addDisplayScreen(defaultScreens[i])
+    }
+
+    updateMasterDisplay()
 
     screen.on('display-added', (event, newDisplay) => {
-        displays.push(newDisplay)
+        displays = screen.getAllDisplays()
 
         sendToAllWindows('display-info', getDisplayInfo())
     })
 
     screen.on('display-removed', (event, oldDisplay) => {
-        let index = displays.findIndex(display => display.id === oldDisplay.id)
+        let oldDisplayIndex = displays.findIndex(
+            display => display.id === oldDisplay.id
+        )
 
         displays = screen.getAllDisplays()
-        //displays.splice(index, 1)
 
-        if (display.screen === index) {
-            //If the display in use was removed, hide display
-            setDisplay({ show: false })
-        } else {
-            if (display.screen > index) {
-                setDisplay({ screen: display.screen - 1 })
-            } else {
-                sendToAllWindows('display-info', getDisplayInfo())
+        let screenIndex = display.screens.findIndex(subDisplay => {
+            return subDisplay.screen === oldDisplayIndex
+        })
+
+        if (screenIndex !== -1) {
+            removeDisplayScreen(screenIndex)
+        }
+
+        for (let i = 0; i < display.screens.length; i++) {
+            if (display.screens[i].screen >= displayIndex) {
+                display.screens[i].screen -= 1
+
+                updateDisplayScreen(i)
             }
         }
-    })
-
-    screen.on('display-metrics-changed', (event, changedDisplay) => {
-        let index = displays.findIndex(
-            display => display.id === changedDisplay.id
-        )
-        displays[index] = changedDisplay
-
-        if (display.screen === index) {
-            setDisplay({ screen: display.screen })
-        } else {
-            sendToAllWindows('display-info', getDisplayInfo())
-        }
-    })
-
-    settings.listen('display.setSize', value => {
-        customDisplaySize.use = value
 
         sendToAllWindows('display-info', getDisplayInfo())
     })
 
-    settings.listen('display.displaySize', value => {
-        setCustomDisplaySizeFromString(value)
+    screen.on('display-metrics-changed', (event, changedDisplay) => {
+        let displayIndex = displays.findIndex(
+            display => display.id === changedDisplay.id
+        )
+        displays[displayIndex] = changedDisplay
 
-        if (customDisplaySize.use) {
-            sendToAllWindows('display-info', getDisplayInfo())
+        for (
+            let screenIndex = 0;
+            screenIndex < display.screens.length;
+            screenIndex++
+        ) {
+            if (display.screens[screenIndex].screen === displayIndex) {
+                updateDisplayScreen(screenIndex)
+            }
+        }
+
+        sendToAllWindows('display-info', getDisplayInfo())
+    })
+
+    settings.listen('display.masterScale', value => {
+        display.masterScale = value
+
+        updateMasterDisplay()
+    })
+
+    settings.listen('display.customWidth', () => {
+        if (display.masterScale === 'Custom') {
+            updateMasterDisplay()
+        }
+    })
+    settings.listen('display.customHeight', () => {
+        if (display.masterScale === 'Custom') {
+            updateMasterDisplay()
         }
     })
 }

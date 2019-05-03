@@ -2316,12 +2316,7 @@ const item_menu = {
 //This variable needs to be accesible globally, so that blank button logic can use it
 let displaying = false
 {
-    let displayScreen = -1
-
-    const toggleDisplayButton = new layout.Button({
-        icon: 'display',
-        size: 'large'
-    })
+    let activeScreenList = []
 
     const screenButtons = []
     const screenButtonList = new layout.Block(
@@ -2342,7 +2337,6 @@ let displaying = false
         size: 'large'
     })
 
-    item_menu.main.add(toggleDisplayButton)
     item_menu.main.add(screenButtonList)
     item_menu.main.add(new layout.Filler())
     item_menu.main.add(undoRemoveButton)
@@ -2352,10 +2346,6 @@ let displaying = false
     layout.contextMenu.add(
         'display-menu',
         [
-            {
-                label: 'Display',
-                type: 'checkbox'
-            },
             {
                 label: 'Screen 1',
                 type: 'checkbox'
@@ -2376,41 +2366,23 @@ let displaying = false
         true
     )
 
-    function toggleDisplay() {
-        displaying = !displaying
-
-        if (displaying) {
-            ipcRenderer.send('change-display', { show: true })
-
-            toggleDisplayButton.active = true
-            blankButton.disabled = false
-        } else {
-            ipcRenderer.send('change-display', { show: false })
-
-            toggleDisplayButton.active = false
-            blankButton.disabled = true
-        }
-    }
-
     function onScreenButtonPress(event) {
         let index = screenButtons.findIndex(btn => btn === event.from)
 
-        ipcRenderer.send('change-display', { screen: index })
+        ipcRenderer.send('toggle-display-screen', index)
     }
-
-    toggleDisplayButton.onEvent('click', toggleDisplay)
 
     fitTextAllButton.onEvent('click', presentation.fitTextAll)
 
     layout.contextMenu.onEvent('display-menu', event => {
-        if (event.label === 'Display') {
-            toggleDisplay()
-        } else if (event.label === 'Screen 1') {
-            ipcRenderer.send('change-display', { screen: 0 })
+        if (event.label === 'Screen 1') {
+            ipcRenderer.send('toggle-display-screen', 0)
         } else if (event.label === 'Screen 2') {
-            ipcRenderer.send('change-display', { screen: 1 })
+            ipcRenderer.send('toggle-display-screen', 1)
         } else if (event.label === 'Screen 3') {
-            ipcRenderer.send('change-display', { screen: 2 })
+            ipcRenderer.send('toggle-display-screen', 2)
+        } else if (event.label === 'Screen 4') {
+            ipcRenderer.send('toggle-display-screen', 3)
         }
     })
 
@@ -2433,39 +2405,32 @@ let displaying = false
             }
         }
 
-        //the first time the 'display-info' message is sent, displayScreen == -1
-        if (displayScreen >= 0 && displayScreen < screenButtons.length) {
-            screenButtons[displayScreen].active = false
+        activeScreenList = display.screens
+
+        for (let i = 0; i < display.screenCount.length; i++) {
+            screenButtons[i].active = activeScreenList.includes(i)
         }
-
-        displayScreen = display.screen
-        screenButtons[displayScreen].active = true
-
-        toggleDisplayButton.active = displaying = display.show
 
         layout.contextMenu.change('display-menu', [
             {
-                checked: displaying
-            },
-            {
-                checked: displayScreen === 0,
+                checked: activeScreenList.includes(0),
                 visible: display.screenCount >= 1
             },
             {
-                checked: displayScreen === 1,
+                checked: activeScreenList.includes(1),
                 visible: display.screenCount >= 2
             },
             {
-                checked: displayScreen === 2,
+                checked: activeScreenList.includes(2),
                 visible: display.screenCount >= 3
             },
             {
-                checked: displayScreen === 3,
+                checked: activeScreenList.includes(3),
                 visible: display.screenCount >= 4
             }
         ])
 
-        if (displaying) {
+        if (activeScreenList.length > 0) {
             blankButton.disabled = false
         } else {
             blankButton.active = false
@@ -2479,70 +2444,57 @@ let displaying = false
 
         ipcRenderer.on('setting', (event, key, value) => {
             switch (key) {
-                case 'control.keyboard.closeDisplay':
-                    keyboard.unregister(keyboardListeners['cd'])
+                case 'control.keyboard.disableDisplay':
+                    keyboard.unregister(keyboardListeners['dd'])
 
-                    keyboardListeners['cd'] = keyboard.register(
+                    keyboardListeners['dd'] = keyboard.register(
                         value,
                         () => {
-                            ipcRenderer.send('change-display', { show: false })
+                            ipcRenderer.send('disable-display')
                         },
                         { repeat: false }
                     )
                     break
-                case 'control.keyboard.openDisplay':
-                    keyboard.unregister(keyboardListeners['od'])
-
-                    keyboardListeners['od'] = keyboard.register(
-                        value,
-                        () => {
-                            ipcRenderer.send('change-display', { show: true })
-                        },
-                        { repeat: false }
-                    )
-                    break
-                case 'control.keyboard.toggleDisplay':
-                    keyboard.unregister(keyboardListeners['td'])
-
-                    keyboardListeners['td'] = keyboard.register(
-                        value,
-                        () => {
-                            ipcRenderer.send('change-display', {
-                                show: !displaying
-                            })
-                        },
-                        { repeat: false }
-                    )
-                    break
-                case 'control.keyboard.switchDisplayScreen1':
+                case 'control.keyboard.toggleDisplayScreen1':
                     keyboard.unregister(keyboardListeners['s1'])
 
                     keyboardListeners['s1'] = keyboard.register(
                         value,
                         () => {
-                            ipcRenderer.send('change-display', { screen: 0 })
+                            ipcRenderer.send('toggle-display-screen', 0)
                         },
                         { repeat: false }
                     )
                     break
-                case 'control.keyboard.switchDisplayScreen2':
+                case 'control.keyboard.toggleDisplayScreen2':
                     keyboard.unregister(keyboardListeners['s2'])
 
                     keyboardListeners['s2'] = keyboard.register(
                         value,
                         () => {
-                            ipcRenderer.send('change-display', { screen: 1 })
+                            ipcRenderer.send('toggle-display-screen', 1)
                         },
                         { repeat: false }
                     )
                     break
-                case 'control.keyboard.switchDisplayScreen3':
+                case 'control.keyboard.toggleDisplayScreen3':
                     keyboard.unregister(keyboardListeners['s3'])
 
                     keyboardListeners['s3'] = keyboard.register(
                         value,
                         () => {
-                            ipcRenderer.send('change-display', { screen: 2 })
+                            ipcRenderer.send('toggle-display-screen', 2)
+                        },
+                        { repeat: false }
+                    )
+                    break
+                case 'control.keyboard.toggleDisplayScreen4':
+                    keyboard.unregister(keyboardListeners['s4'])
+
+                    keyboardListeners['s4'] = keyboard.register(
+                        value,
+                        () => {
+                            ipcRenderer.send('toggle-display-screen', 3)
                         },
                         { repeat: false }
                     )
@@ -2551,12 +2503,12 @@ let displaying = false
         })
 
         ipcRenderer.send('get-settings', [
-            ['control.keyboard.closeDisplay', 'Escape'],
-            ['control.keyboard.openDisplay', 'Shift+KeyO'],
-            ['control.keyboard.toggleDisplay', 'Shift+KeyD'],
-            ['control.keyboard.switchDisplayScreen1', 'Alt+Shift+Digit1'],
-            ['control.keyboard.switchDisplayScreen2', 'Alt+Shift+Digit2'],
-            ['control.keyboard.switchDisplayScreen3', 'Alt+Shift+Digit3']
+            ['control.keyboard.disableDisplay', 'Escape'],
+
+            ['control.keyboard.toggleDisplayScreen1', 'Alt+Shift+Digit1'],
+            ['control.keyboard.toggleDisplayScreen2', 'Alt+Shift+Digit2'],
+            ['control.keyboard.toggleDisplayScreen3', 'Alt+Shift+Digit3'],
+            ['control.keyboard.toggleDisplayScreen4', 'Alt+Shift+Digit4']
         ])
     }
 }
