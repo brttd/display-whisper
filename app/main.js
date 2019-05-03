@@ -1292,7 +1292,8 @@ function updateMasterDisplay() {
                         display.bounds.width = newBounds.width
                         display.bounds.height = newBounds.height
 
-                        display.masterScreen = display.screens[screenIndex].screen
+                        display.masterScreen =
+                            display.screens[screenIndex].screen
                     }
                 }
             } else if (display.masterScale === 'Largest') {
@@ -1319,7 +1320,8 @@ function updateMasterDisplay() {
                         display.bounds.width = newBounds.width
                         display.bounds.height = newBounds.height
 
-                        display.masterScreen = display.screens[screenIndex].screen
+                        display.masterScreen =
+                            display.screens[screenIndex].screen
                     }
                 }
             } else {
