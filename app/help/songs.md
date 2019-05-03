@@ -3,9 +3,9 @@ Song content (verses, choruses, etc) can be split into multiple parts, and sized
 
 # Special Song Sections
 A song item in the presentation will show its content as listed in its play order. Songs items can also include special sections:
-* **Blank**: An empty section.
-* **Intro**: An introductory section, normally showing the name and author of the song.
-* **Outro**: A concluding section, normally showing the name, copyright, and author of the song.
+* **Blank** An empty section.
+* **Intro** An introductory section, normally showing the name and author of the song.
+* **Outro** A concluding section, normally showing the name, copyright, and author of the song.
 
 Each of these sections can be added or removed from the song item from within its editor.  
 When adding a song item to the presentation, these section can be automatically added to the start and end of the song.  
@@ -35,17 +35,17 @@ The expressions are not case-sensitive, but must include every character from (a
 Song text elements can have any text in them, only when a valid expression is found will the text be modified.
 
 The song expressions are:
-* **"{name}"**: Displays the name of the song.
-* **"{author}"**: Displays the author of the song.
-* **"{copyright}"**: Displays the copyright of the song.
+* **"{name}"** Displays the name of the song.
+* **"{author}"** Displays the author of the song.
+* **"{copyright}"** Displays the copyright of the song.
 
 The _Section_ overlay element has special expressions used to differentiate between sections, and parts within a section which has been split (when using the _Max lines_ option):
-* **"{section}"**: Displays the section name.
-* **"{index}"**: Displays the position (index number) the section is at in the play order (ignoring **Blank**, **Intro**, and **Outro** sections).
-* **"{total}"**: Displays the total amount of sections in the play order (ignoring **Blank**, **Intro**, and **Outro** sections).
-* **"{sectionParts}"**: Displays the amount of parts which the section was split into (when using the _Max lines_ option) (If _Max lines_ is 0, or not split, will be "1").
-* **"{sectionPart}"**: Displays the position (index number) of the part in the split section (If _Max lines_ is 0, or not split, will be "1").
-* **"{sectionSplit}"**: Displays **"{sectionPart}/{sectionParts}"** if the section has been split into multiple parts, otherwise displays nothing.
+* **"{section}"** Displays the section name.
+* **"{index}"** Displays the position (index number) the section is at in the play order (ignoring **Blank**, **Intro**, and **Outro** sections).
+* **"{total}"** Displays the total amount of sections in the play order (ignoring **Blank**, **Intro**, and **Outro** sections).
+* **"{sectionParts}"** Displays the amount of parts which the section was split into (when using the _Max lines_ option) (If _Max lines_ is 0, or not split, will be "1").
+* **"{sectionPart}"** Displays the position (index number) of the part in the split section (If _Max lines_ is 0, or not split, will be "1").
+* **"{sectionSplit}"** Displays **"{sectionPart}/{sectionParts}"** if the section has been split into multiple parts, otherwise displays nothing.
 
 >**Note:**  
 Only text elements in the **Intro** & **Outro** sections, and _Section_ & _End_ overlay elements can use song text expressions.  
@@ -83,17 +83,17 @@ If you want to remove a song from the song library, select it and click the _Rem
 Select _Tools_ > _Check Songs_ from the _Menu_ in the Control window, or from the _Menu_ in the Song Library window.
 
 This will show a list of songs with invalid, or empty song information. At the top are three options, which will display different groups of songs.
-* **Important**:
+* **Important**
     Shows songs which have invalid, or no entry for important song information (Such as having no play order).
-* **All**:
+* **All**
     Shows all the songs from **Important**, in addition to songs which have empty (no text characters) for their *Name*, *Author*, or *Copyright*  information.
-* **Invalid Files**:
+* **Invalid Files**
     Shows files in the song library which have been corrupted. These files do not show up in song lists, as they cannot be properly loaded or used.
 
 For both **Important** and **All** options, clicking a song from the list will open it in the Song Library window. You can then add any missing information.  
 For the the **Invalid Files** option, clicking an item in the list will give two options for dealing with the corrupted file:
-* **Open**: Will open the actual file, allowing you to extract any existing song content, which can then be added back to the Song Library.
-* **Delete**: Will delete the file.
+* **Open** Will open the actual file, allowing you to extract any existing song content, which can then be added back to the Song Library.
+* **Delete** Will delete the file.
 
 The **Fix Missing** button will automatically fix all issues show in the **Important** song list. Each song with invalid or missing song information will have it set to a blank value.
 
