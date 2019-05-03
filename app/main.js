@@ -49,7 +49,8 @@ let display = {
 
     //Where to get the master display size from
     //Either "Smallest", "Average", "Largest", or "Custom"
-    masterScale: 'Largest'
+    masterScale: 'Largest',
+    masterScreen: -1
 }
 
 //Used when display is re-opened, so that it correctly shows the current section
@@ -1238,7 +1239,9 @@ function getDisplayInfo() {
         },
 
         screens: display.screens.map(subDisplay => subDisplay.screen),
-        screenCount: displays.length
+        screenCount: displays.length,
+
+        masterScreen: display.masterScreen
     }
 }
 
@@ -1263,6 +1266,8 @@ function updateMasterDisplay() {
             //Use the custom size instead
             //(Done at the end of the function)
         } else {
+            display.masterScreen = -1
+
             if (display.masterScale === 'Smallest') {
                 display.bounds.width = Infinity
                 display.bounds.height = Infinity
@@ -1286,6 +1291,8 @@ function updateMasterDisplay() {
                     ) {
                         display.bounds.width = newBounds.width
                         display.bounds.height = newBounds.height
+
+                        display.masterScreen = screenIndex
                     }
                 }
             } else if (display.masterScale === 'Largest') {
@@ -1311,6 +1318,8 @@ function updateMasterDisplay() {
                     ) {
                         display.bounds.width = newBounds.width
                         display.bounds.height = newBounds.height
+
+                        display.masterScreen = screenIndex
                     }
                 }
             } else {
@@ -1349,6 +1358,8 @@ function updateMasterDisplay() {
     //Otherwise, use custom display size
     display.bounds.width = settings.get('display.customWidth', 1366)
     display.bounds.height = settings.get('display.customHeight', 768)
+
+    display.masterScreen = -1
 
     sendToAllWindows('display-info', getDisplayInfo())
 }

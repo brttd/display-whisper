@@ -2409,6 +2409,12 @@ let displaying = false
 
         for (let i = 0; i < display.screenCount; i++) {
             screenButtons[i].active = activeScreenList.includes(i)
+
+            if (display.masterScreen === i) {
+                screenButtons[i].text = '[' + (i + 1).toString() + ']'
+            } else {
+                screenButtons[i].text = (i + 1).toString()
+            }
         }
 
         layout.contextMenu.change('display-menu', [
