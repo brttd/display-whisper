@@ -212,8 +212,12 @@
         padding: 0;
 
         .page {
-            page-break-before: always;
+            box-sizing: border-box;
+            overflow: hidden;
+
+            page-break-before: avoid;
             page-break-inside: avoid;
+            page-break-after: avoid;
         }
     }
 
