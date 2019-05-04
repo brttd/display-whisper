@@ -50,7 +50,7 @@ const imageTitle = new layout.Text(
 )
 const imagePreview = new layout.Image(
     {
-        color: 'rgb(128, 128, 128)'
+        color: 'hsl(0, 0%, 90%)'
     },
     {
         shrink: true,
