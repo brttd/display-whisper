@@ -3552,7 +3552,10 @@ const item_add = {
             {
                 shrink: true,
                 grow: true,
-                size: 'auto'
+                size: 'auto',
+
+                border: true,
+                background: 'grey'
             }
         )
         textBlock.add(preview)
@@ -3638,7 +3641,10 @@ const item_add = {
             {
                 shrink: true,
                 grow: true,
-                size: 'auto'
+                size: 'auto',
+
+                border: true,
+                background: 'grey'
             }
         )
 
