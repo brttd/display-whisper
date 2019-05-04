@@ -12704,10 +12704,13 @@ class BoxEdit {
             super(document.createElement('div'))
             this.addClass('display-edit')
 
+            this.wrapperNode = document.createElement('div')
+            this.node.appendChild(this.wrapperNode)
+
             this.screenNode = document.createElement('div')
             this.screenNode.className = 'screen'
 
-            this.node.appendChild(this.screenNode)
+            this.wrapperNode.appendChild(this.screenNode)
 
             this.data = {
                 background: 'black',
@@ -12851,7 +12854,7 @@ class BoxEdit {
                 this.events.drag = [listener]
 
                 let mousedown = false
-                this.node.addEventListener('mousedown', () => {
+                this.wrapperNode.addEventListener('mousedown', () => {
                     if (event.button === 0) {
                         mousedown = true
                     }
@@ -12863,7 +12866,7 @@ class BoxEdit {
                     mousedown = false
                 })
 
-                this.node.addEventListener('mouseleave', () => {
+                this.wrapperNode.addEventListener('mouseleave', () => {
                     if (mousedown) {
                         mousedown = false
 
@@ -12893,11 +12896,13 @@ class BoxEdit {
             this.nodeOffset.top = this.node.offsetTop
             this.nodeOffset.left = this.node.offsetLeft
 
+            if (this.border) {
+                this.nodeSize.width -= 2
+                this.nodeSize.height -= 2
+            }
+
             if (this.nodeSize.width !== 0 && this.nodeSize.height !== 0) {
                 this.ratio = this.nodeSize.width / this.nodeSize.height
-
-                //this.screenNode.width = this.screenNode.offsetWidth
-                //this.screenNode.height = this.screenNode.offsetHeight
             }
         }
 
@@ -12917,7 +12922,7 @@ class BoxEdit {
                 this.displayScale = this.nodeSize.width / currentDisplay.width
 
                 if (this.setNode.height) {
-                    this.node.style.height =
+                    this.wrapperNode.style.height =
                         ~~(currentDisplay.height * this.displayScale + 0.5) +
                         'px'
                 }
@@ -12926,7 +12931,7 @@ class BoxEdit {
                 this.displayScale = this.nodeSize.height / currentDisplay.height
 
                 if (this.setNode.width) {
-                    this.node.style.widows =
+                    this.wrapperNode.style.width =
                         ~~(currentDisplay.width * this.displayScale + 0.5) +
                         'px'
                 } else {
@@ -13156,6 +13161,14 @@ class BoxEdit {
             }
 
             return {}
+        },
+        border: (item, value) => {
+            item.border = value
+
+            return { node: item.wrapperNode }
+        },
+        background: item => {
+            return { node: item.wrapperNode }
         }
     }
 }
