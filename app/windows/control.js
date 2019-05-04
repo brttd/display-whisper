@@ -3555,7 +3555,7 @@ const item_add = {
                 size: 'auto',
 
                 border: true,
-                background: 'grey'
+                background: true
             }
         )
         textBlock.add(preview)
@@ -3644,7 +3644,7 @@ const item_add = {
                 size: 'auto',
 
                 border: true,
-                background: 'grey'
+                background: true
             }
         )
 
@@ -4117,7 +4117,7 @@ const item_display1 = {
             grow: true,
             align: 'stretch',
 
-            background: 'rgb(128, 128, 128)',
+            background: true,
             border: true
         }
     )
@@ -4253,7 +4253,7 @@ const item_display2 = {
             grow: true,
             align: 'stretch',
 
-            background: 'rgb(128, 128, 128)',
+            background: true,
             border: true
         }
     )
@@ -4390,7 +4390,7 @@ const item_display3 = {
             grow: true,
             align: 'stretch',
 
-            background: 'rgb(128, 128, 128)',
+            background: true,
             border: true
         }
     )
@@ -4526,7 +4526,7 @@ const item_display4 = {
             grow: true,
             align: 'stretch',
 
-            background: 'rgb(128, 128, 128)',
+            background: true,
             border: true
         }
     )

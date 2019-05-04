@@ -109,6 +109,11 @@ const styleValuesMap = {
         false: 'none'
     },
 
+    background: {
+        true: 'hsl(0, 0%, 90%)',
+        false: ''
+    },
+
     grow: {
         false: '0',
         true: '1'

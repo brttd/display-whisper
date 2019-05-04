@@ -21,7 +21,8 @@ const displayEditor = new layout.DisplayEdit(
         shrink: true,
         grow: true,
         align: 'stretch',
-        background: 'rgb(128, 128, 128)',
+
+        background: true,
         border: true
     }
 )

@@ -39,7 +39,7 @@ const displayEditor = new layout.DisplayEdit(
         grow: true,
         align: 'stretch',
 
-        background: 'rgb(128, 128, 128)',
+        background: true,
         border: true
     }
 )

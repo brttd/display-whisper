@@ -27,7 +27,7 @@ const itemsBar = new layout.Block(
 const displayEditor = new layout.DisplayEdit(
     {},
     {
-        background: 'rgb(128, 128, 128)',
+        background: true,
         border: true
     }
 )

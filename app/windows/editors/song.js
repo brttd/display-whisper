@@ -178,7 +178,7 @@ backgroundControl.connect(displayEditor)
     layout.change(displayEditor, {
         flex: '1 1 auto',
 
-        background: 'rgb(128, 128, 128)',
+        background: true,
         border: true
     })
 

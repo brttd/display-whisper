@@ -35,7 +35,7 @@ Normal - <b><sub>Bold Sub</sub>Bold Super<sup>sup</sup></b>`,
 
             align: 'stretch',
 
-            background: 'grey',
+            background: true,
             border: true
         }
     )
@@ -50,7 +50,7 @@ Normal - <b><sub>Bold Sub</sub>Bold Super<sup>sup</sup></b>`,
 
             align: 'stretch',
 
-            background: 'grey',
+            background: true,
             border: true
         }
     )
