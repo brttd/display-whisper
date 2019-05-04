@@ -15931,26 +15931,6 @@ class BoxEdit {
             setPageLandscape(this._options.landscape)
         }
 
-        setupTest() {
-            this.clear()
-
-            for (let i = 0; i < 20; i++) {
-                let node = document.createElement('div')
-
-                node.style.background =
-                    'hsl(' + (i * 36).toString() + ', 90%, 50%)'
-                node.style.width = '21mm'
-                node.style.height = '21mm'
-                node.style.display = 'inline-block'
-                node.style.verticalAlign = 'top'
-
-                this.pageNodes[0].appendChild(node)
-            }
-
-            this.margin = 0
-            this.columns = 0
-        }
-
         print(options = {}) {
             exports.showLoader(body, 'Printing')
 
