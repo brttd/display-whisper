@@ -10574,27 +10574,14 @@ exports.change = addStyles
                         label: 'Vertical',
                         options: ['Top', 'Center', 'Bottom']
                     },
-                    {}
+                    {
+                        width: '6ch'
+                    }
                 )
                 this.inputItems.push(this.y)
 
-                this.x = new exports.SelectInput(
-                    {
-                        focus: false,
-                        disabled: true,
-                        label: 'Horizontal',
-                        options: ['Left', 'Center', 'Right']
-                    },
-                    {}
-                )
-                this.inputItems.push(this.x)
-
                 if (data.y !== false) {
                     this.alignBlock.appendChild(this.y.node)
-                }
-
-                if (data.x !== false) {
-                    this.alignBlock.appendChild(this.x.node)
                 }
 
                 if (
@@ -10605,14 +10592,6 @@ exports.change = addStyles
                 }
 
                 this.y.onEvent('change', event => {
-                    if (event.fromUser) {
-                        this.sendEdit(
-                            { y: event.value.toLowerCase() },
-                            event.fromUser
-                        )
-                    }
-                })
-                this.x.onEvent('change', event => {
                     if (event.fromUser) {
                         this.sendEdit(
                             { y: event.value.toLowerCase() },
@@ -10717,9 +10696,6 @@ exports.change = addStyles
 
             item.y.node.firstChild.style.marginBottom = value
             item.y.node.style.marginRight = value
-
-            item.x.node.firstChild.style.marginBottom = value
-            item.x.node.style.marginRight = value
 
             return {}
         }
