@@ -149,6 +149,9 @@ const songResetButton = new layout.Button({
 const songResetAllButton = new layout.Button({
     text: 'Reset All'
 })
+const songRepeatChorusInput = new layout.CheckboxInput({
+    label: 'Repeat Chorus'
+})
 
 //Editing controls for text
 const textOptionsBlock = new layout.Block(
@@ -246,6 +249,7 @@ const pdfButton = new layout.Button({
                             items: [
                                 songResetButton,
                                 new layout.Filler(),
+                                songRepeatChorusInput,
                                 songResetAllButton
                             ]
                         },
@@ -490,7 +494,7 @@ const pdfButton = new layout.Button({
                                 )
                             ],
 
-                            minWidth: 572,
+                            minWidth: 592,
                             minHeight: 240,
 
                             size: 60
@@ -585,7 +589,9 @@ const searchFilters = {
 const options = {
     boldName: true,
     italicizeAuthor: true,
-    italicizeChorus: true
+    italicizeChorus: true,
+
+    repeatChorus: true
 }
 
 let activeIndex = -1
@@ -694,7 +700,25 @@ function resetSong(item) {
         }
     ]
 
+    let chorusList = []
+
     for (let i = 0; i < item.song.playOrder.length; i++) {
+        if (
+            chorusList.includes(item.song.playOrder[i]) &&
+            !options.repeatChorus
+        ) {
+            continue
+        }
+
+        if (
+            item.song.playOrder[i]
+                .toLowerCase()
+                .trim()
+                .startsWith('chorus')
+        ) {
+            chorusList.push(item.song.playOrder[i])
+        }
+
         item.sections.push({
             type: 'Paragraph',
 
@@ -703,7 +727,10 @@ function resetSong(item) {
 
             text:
                 (options.italicizeChorus &&
-                item.song.playOrder[i].toLowerCase().startsWith('chorus')
+                item.song.playOrder[i]
+                    .toLowerCase()
+                    .trim()
+                    .startsWith('chorus')
                     ? '<i>'
                     : '') +
                 item.song.sections[item.song.playOrder[i]].text.trim(),
@@ -1331,6 +1358,14 @@ function updatePrintSettings() {
             })
         )
     })
+
+    songRepeatChorusInput.onEvent('change', event => {
+        options.repeatChorus = event.value
+
+        if (event.fromUser) {
+            ipcRenderer.send('set-setting', 'print.repeatChorus', event.value)
+        }
+    })
 }
 
 //text changes
@@ -1515,6 +1550,12 @@ ipcRenderer.on('setting', (event, key, value) => {
     }
 
     switch (key) {
+        case 'print.repeatChorus':
+            options.repeatChorus = value
+
+            songRepeatChorusInput.value = value
+
+            break
         case 'print.font':
             editor.changeBase('font', value)
 
@@ -1557,6 +1598,8 @@ ipcRenderer.on('setting', (event, key, value) => {
 ipcRenderer.send('get-setting', 'print.showInfo', true)
 
 ipcRenderer.send('get-settings', [
+    ['print.repeatChorus', true],
+
     ['print.font', 'Arial'],
     ['print.fontSize', 12],
     ['print.size', 'A4'],
