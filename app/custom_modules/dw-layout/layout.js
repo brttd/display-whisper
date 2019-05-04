@@ -109,6 +109,11 @@ const styleValuesMap = {
         false: 'none'
     },
 
+    outline: {
+        true: '1px solid hsl(0, 0%, 70%)',
+        false: 'none'
+    },
+
     background: {
         true: 'hsl(0, 0%, 90%)',
         false: ''
@@ -12087,6 +12092,11 @@ class BoxEdit {
             this.nodeSize.width = this.node.offsetWidth
             this.nodeSize.height = this.node.offsetHeight
 
+            if (this.border) {
+                this.nodeSize.width -= 2
+                this.nodeSize.height -= 2
+            }
+
             if (this.nodeSize.width !== 0 && this.nodeSize.height !== 0) {
                 this.ratio = this.nodeSize.width / this.nodeSize.height
             }
@@ -12149,6 +12159,11 @@ class BoxEdit {
                 'px,' +
                 this.screenOffset.y / this.displayScale +
                 'px)'
+
+            if (this.border) {
+                this.screenNode.style.outlineWidth =
+                    1 / this.displayScale + 'px'
+            }
         }
 
         writeNodes() {
@@ -12319,6 +12334,12 @@ class BoxEdit {
             if (value === 'display') {
                 return { value: '' }
             }
+
+            return {}
+        },
+        border: (item, value) => {
+            item.border = value
+            setNodeStyle(item.screenNode, 'outline', value)
 
             return {}
         }
@@ -13169,6 +13190,8 @@ class BoxEdit {
         },
         border: (item, value) => {
             item.border = value
+
+            setNodeStyle(item.screenNode, 'outline', value)
 
             return { node: item.wrapperNode }
         },
