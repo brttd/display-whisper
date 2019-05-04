@@ -9938,7 +9938,9 @@ exports.change = addStyles
                         disabled: true,
                         options: ['Top', 'Center', 'Bottom']
                     },
-                    {}
+                    {
+                        width: '6ch'
+                    }
                 )
                 this.inputItems.push(this.verticalAlign)
 
