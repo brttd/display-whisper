@@ -782,7 +782,7 @@ $slider-padding: 2px;
         padding: $input-padding;
         padding-right: $icon-size + last($input-padding) / 2;
 
-        width: 48.75 - $icon-size + last($input-padding) / 2;
+        width: 6ch;
 
         text-overflow: ellipsis;
 

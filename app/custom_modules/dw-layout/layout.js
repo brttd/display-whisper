@@ -9942,16 +9942,11 @@ exports.change = addStyles
                 )
                 this.inputItems.push(this.alignRight)
 
-                this.verticalAlign = new exports.SelectInput(
-                    {
-                        focus: false,
-                        disabled: true,
-                        options: ['Top', 'Center', 'Bottom']
-                    },
-                    {
-                        width: '6ch'
-                    }
-                )
+                this.verticalAlign = new exports.SelectInput({
+                    focus: false,
+                    disabled: true,
+                    options: ['Top', 'Center', 'Bottom']
+                })
                 this.inputItems.push(this.verticalAlign)
 
                 this.alignBlock.appendChild(this.alignLeft.node)
@@ -10567,17 +10562,12 @@ exports.change = addStyles
                 this.alignBlock = document.createElement('div')
                 this.alignBlock.className = 'section'
 
-                this.y = new exports.SelectInput(
-                    {
-                        focus: false,
-                        disabled: true,
-                        label: 'Vertical',
-                        options: ['Top', 'Center', 'Bottom']
-                    },
-                    {
-                        width: '6ch'
-                    }
-                )
+                this.y = new exports.SelectInput({
+                    focus: false,
+                    disabled: true,
+                    label: 'Vertical',
+                    options: ['Top', 'Center', 'Bottom']
+                })
                 this.inputItems.push(this.y)
 
                 if (data.y !== false) {
@@ -10763,16 +10753,13 @@ exports.change = addStyles
                 )
                 this.inputItems.push(this.image)
 
-                this.scale = new exports.SelectInput(
-                    {
-                        focus: false,
-                        disabled: true,
+                this.scale = new exports.SelectInput({
+                    focus: false,
+                    disabled: true,
 
-                        tooltip: 'image',
-                        options: ['Fill', 'Fit', 'Stretch']
-                    },
-                    {}
-                )
+                    tooltip: 'image',
+                    options: ['Fill', 'Fit', 'Stretch']
+                })
                 this.inputItems.push(this.scale)
 
                 if (data.color !== false) {
@@ -11053,17 +11040,14 @@ exports.change = addStyles
                 this.transitionBlock.firstChild.textContent = 'Transition'
                 this.transitionBlock.firstChild.className = 'title'
 
-                this.type = new exports.SelectInput(
-                    {
-                        focus: false,
-                        disabled: true,
+                this.type = new exports.SelectInput({
+                    focus: false,
+                    disabled: true,
 
-                        tooltip: 'type',
+                    tooltip: 'type',
 
-                        options: ['fade', 'slide', 'zoom']
-                    },
-                    {}
-                )
+                    options: ['fade', 'slide', 'zoom']
+                })
                 this.inputItems.push(this.type)
 
                 this.transitionTime = new exports.NumberInput(
