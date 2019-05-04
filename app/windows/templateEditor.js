@@ -43,9 +43,7 @@ const imageControl = new layout.ImageStyleEdit({
     image: false
 })
 imageControl.visible = false
-const boxControl = new layout.BoxStyleEdit({
-    x: false
-})
+const boxControl = new layout.BoxStyleEdit({})
 const colorControl = new layout.BackgroundStyleEdit({})
 const playControl = new layout.PlayStyleEdit({}, {})
 

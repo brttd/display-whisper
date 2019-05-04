@@ -32,7 +32,6 @@ const imageBox = displayEditor.add({ type: 'image' })
 const imageControl = new layout.ImageStyleEdit({}, { align: 'stretch' })
 const boxControl = new layout.BoxStyleEdit(
     {
-        x: false,
         y: false
     },
     {

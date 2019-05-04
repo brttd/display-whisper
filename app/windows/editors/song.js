@@ -78,7 +78,7 @@ const templateSelector = new layout.SelectInput({})
 const applyTemplateButton = new layout.Button({ text: 'Apply' })
 
 const textControl = new layout.TextStyleEdit({})
-const boxControl = new layout.BoxStyleEdit({ x: false })
+const boxControl = new layout.BoxStyleEdit({})
 const backgroundControl = new layout.BackgroundStyleEdit({})
 const playControl = new layout.PlayStyleEdit({})
 

@@ -55,9 +55,7 @@ const textControl = new layout.TextStyleEdit(
     }
 )
 const boxControl = new layout.BoxStyleEdit(
-    {
-        x: false
-    },
+    {},
     {
         align: 'stretch'
     }
