@@ -3550,13 +3550,9 @@ const item_add = {
         const preview = new layout.DisplayEdit(
             {},
             {
-                shrink: false,
-                grow: false,
-                size: 'auto',
-                height: 'display',
-
-                background: 'grey',
-                border: true
+                shrink: true,
+                grow: true,
+                size: 'auto'
             }
         )
         textBlock.add(preview)
@@ -3640,13 +3636,9 @@ const item_add = {
         let previewEditor = new layout.DisplayEdit(
             {},
             {
-                shrink: false,
-                grow: false,
-                size: 'auto',
-                height: 'display',
-
-                background: 'grey',
-                border: true
+                shrink: true,
+                grow: true,
+                size: 'auto'
             }
         )
 
