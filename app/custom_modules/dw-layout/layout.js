@@ -10166,7 +10166,12 @@ exports.change = addStyles
             item.fontBlock.style.margin = item.lineBlock.style.margin = item.styleBlock.style.margin = item.alignBlock.style.margin =
                 '0'
 
-            item.fontBlock.style.marginRight = item.lineBlock.style.marginRight = item.styleBlock.style.marginRight = value
+            for (let i = 0; i < item.node.childElementCount; i++) {
+                item.node.children[i].style.marginTop = value
+                if (i < item.node.childElementCount - 1) {
+                    item.node.children[i].style.marginRight = value
+                }
+            }
 
             for (let i = 0; i < item.inputItems.length; i++) {
                 item.inputItems[i].node.style.marginTop = value
@@ -10176,7 +10181,10 @@ exports.change = addStyles
 
             item.verticalAlign.node.style.marginLeft = value
 
-            return {}
+            item.node.style.margin = value
+            item.node.style.marginTop = '0px'
+
+            return { value: ' ', property: 'padding' }
         }
     }
 
