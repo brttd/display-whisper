@@ -2530,8 +2530,8 @@ let displaying = false
 //Add Block
 //======================
 const item_add = {
-    //300x470 fits text without any overflow
-    minWidth: 300,
+    //306x470 fits text without any overflow
+    minWidth: 306,
     minHeight: 470,
 
     main: new layout.Block(
