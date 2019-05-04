@@ -15914,8 +15914,12 @@ class BoxEdit {
                 let pageNode = document.createElement('div')
                 pageNode.className = 'page'
 
-                pageNode.innerHTML = this.pageNodes[i].innerHTML
+                pageNode.style.maxWidth = this._options.print.width + 'mm'
+                pageNode.style.maxHeight = this._options.print.height + 'mm'
+
                 pageNode.style.padding = this._options.margin + 'cm'
+
+                pageNode.innerHTML = this.pageNodes[i].innerHTML
 
                 printElem.appendChild(pageNode)
             }
