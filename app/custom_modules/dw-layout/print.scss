@@ -21,6 +21,10 @@
         vertical-align: top;
 
         box-sizing: border-box;
+
+        :last-child {
+            margin-bottom: 0;
+        }
     }
 
     p,
