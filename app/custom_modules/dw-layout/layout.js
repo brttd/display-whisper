@@ -10695,7 +10695,9 @@ exports.change = addStyles
         margin: (item, value) => {
             value = mapToPx(value)
 
-            item.positionBlock.style.marginRight = value
+            if (item.node.childElementCount > 1) {
+                item.positionBlock.style.marginRight = value
+            }
 
             item.left.node.firstChild.style.marginBottom = item.right.node.firstChild.style.marginBottom = item.top.node.firstChild.style.marginBottom = item.bottom.node.firstChild.style.marginBottom = value
 
