@@ -12918,11 +12918,6 @@ class BoxEdit {
                     this.node.style.height =
                         ~~(currentDisplay.height * this.displayScale + 0.5) +
                         'px'
-                } else {
-                    this.screenOffset.y =
-                        (this.nodeSize.height -
-                            currentDisplay.height * this.displayScale) /
-                        2
                 }
             } else {
                 //scale based on height
