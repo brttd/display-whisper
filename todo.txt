@@ -1,16 +1,23 @@
+
+
 REQUIRED:
     Display window - Fix:
         Occasionally flashes white (Only when looping?).
         When changing screens or opening, it briefly shows at smaller size before resizing to full screen.
     
     Print tool:
-        Output differs to preview (extra blank pages).
         Add user options to filter song searching.
+    
+    Fix:
+        display edit box node changes cursor when mouse is above dropdown element on top of display
+        Play controls, play mode is unspecified by default
 
     Installers - Windows & Mac
 
 REQUIRED - long term:
     Settings "keys": Allow multiple keyboard shortcuts for actions
+
+    Keyboard input item, popup input should have select button to accept new shortcut
 
     Create single source for interface text (file, instead of hard coded strings), allowing for translation + Win/Mac differences
         change keyboard shortcut display based on language, win/mac, keyboard, etc..
