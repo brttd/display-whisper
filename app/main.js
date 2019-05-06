@@ -1407,6 +1407,7 @@ if (process.platform === 'darwin') {
         display.screens[screenIndex].window.setBounds(
             display.screens[screenIndex].bounds
         )
+        display.screens[screenIndex].window.setFullScreen(true)
     }
 }
 
@@ -2704,7 +2705,11 @@ function setupDisplays() {
             }
         }
 
-        sendToAllWindows('display-info', getDisplayInfo())
+        if (display.masterScreen >= oldDisplayIndex) {
+            updateMasterDisplay()
+        } else {
+            sendToAllWindows('display-info', getDisplayInfo())
+        }
     })
 
     screen.on('display-metrics-changed', (event, changedDisplay) => {
@@ -2719,9 +2724,7 @@ function setupDisplays() {
             screenIndex < display.screens.length;
             screenIndex++
         ) {
-            if (display.screens[screenIndex].screen === displayIndex) {
-                updateDisplayScreen(screenIndex)
-            }
+            updateDisplayScreen(screenIndex)
         }
 
         if (display.masterScale !== 'Custom') {
