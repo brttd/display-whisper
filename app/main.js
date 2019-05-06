@@ -2697,7 +2697,7 @@ function setupDisplays() {
         }
 
         for (let i = 0; i < display.screens.length; i++) {
-            if (display.screens[i].screen >= displayIndex) {
+            if (display.screens[i].screen >= oldDisplayIndex) {
                 display.screens[i].screen -= 1
 
                 updateDisplayScreen(i)
