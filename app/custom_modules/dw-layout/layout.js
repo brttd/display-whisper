@@ -12751,6 +12751,14 @@ class BoxEdit {
             })
 
             body.onEvent('mousemove', event => {
+                if (
+                    event.target !== this.node &&
+                    !this.node.contains(event.target) &&
+                    !event.target.contains(this.node)
+                ) {
+                    return false
+                }
+
                 let mouse = this.convertMouse(event)
 
                 for (let i = 0; i < this.nodes.length; i++) {
