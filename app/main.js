@@ -582,6 +582,8 @@ function openDisplayWindow(screenIndex) {
         minimizable: false,
         maximizable: false,
 
+        simpleFullscreen: true,
+
         //focusable: true,
         alwaysOnTop: true,
         frame: false,
@@ -1388,11 +1390,11 @@ if (process.platform === 'darwin') {
             return false
         }
 
-        display.screens[screenIndex].window.setFullScreen(false)
+        display.screens[screenIndex].window.setSimpleFullScreen(false)
         display.screens[screenIndex].window.setBounds(
             display.screens[screenIndex].bounds
         )
-        display.screens[screenIndex].window.setFullScreen(true)
+        display.screens[screenIndex].window.setSimpleFullScreen(true)
     }
 } else {
     updateDisplayPosition = screenIndex => {
