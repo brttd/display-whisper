@@ -12756,6 +12756,20 @@ class BoxEdit {
                     !this.node.contains(event.target) &&
                     !event.target.contains(this.node)
                 ) {
+                    if (body.cursor) {
+                        for (let i = 0; i < this.nodes.length; i++) {
+                            if (
+                                body.cursor ===
+                                cursorNames[this.nodes[i].previewResizing]
+                            ) {
+                                body.setCursor('')
+                                this.nodes[i].previewResizing = ''
+
+                                return false
+                            }
+                        }
+                    }
+
                     return false
                 }
 
