@@ -4249,6 +4249,10 @@ exports.change = addStyles
         set disabled(disabled) {
             if (typeof disabled === 'boolean') {
                 this.inputNode.disabled = disabled
+
+                if (disabled) {
+                    this.blur()
+                }
             }
         }
 
