@@ -423,13 +423,15 @@ window.addEventListener('keydown', event => {
 
     activeShortcut = activeModifierList.concat(activeKeyList).join('+')
 
-    emitEvent('shortcut-change', {
-        shortcut: activeShortcut,
+    if (activeKeyList.length > 0) {
+        emitEvent('shortcut-change', {
+            shortcut: activeShortcut,
 
-        modifiers: activeModifierList.slice(0),
+            modifiers: activeModifierList.slice(0),
 
-        from: exports
-    })
+            from: exports
+        })
+    }
 
     if (listenerShortcutsList.includes(activeShortcut)) {
         for (let i = 0; i < listeners.length; i++) {
@@ -477,7 +479,7 @@ window.addEventListener('keyup', event => {
         })
 
         activeShortcut = ''
-    } else {
+    } else if (activeKeyList.length > 0) {
         emitEvent('shortcut-change', {
             shortcut: activeShortcut,
 
