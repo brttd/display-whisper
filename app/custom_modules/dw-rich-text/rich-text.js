@@ -547,7 +547,7 @@ function dataReplace(text, data) {
 
             if (
                 typeof data[dataName] === 'string' &&
-                data[dataName].trim() !== ''
+                (data[dataName] === '\u00A0' || data[dataName].trim() !== '')
             ) {
                 //if the referenced value exists, and isn't empty, the output it
                 output += data[dataName]
