@@ -727,7 +727,7 @@ module.exports = class Song {
                                       '/' +
                                       sectionTexts.length.toString()
                               )
-                            : '',
+                            : '\u00A0',
 
                     index: richText.format(sectionIndex.toString()),
                     total: richText.format(totalSections.toString())
@@ -815,7 +815,7 @@ module.exports = class Song {
                                       '/' +
                                       parts.length.toString()
                               )
-                            : '',
+                            : '\u00A0',
 
                     //Note: The section overlay is tested once per section, NOT once per play order section
                     //Since the only value which changes inbetween repeats of the same section is {index}, the total count of sections is being used instead.
