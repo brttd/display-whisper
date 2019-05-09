@@ -27,16 +27,74 @@ layout.contextMenu.add(
     true
 )
 
+function checkKeyWarning() {
+    for (let aKey in entryInputs) {
+        if (entryInputs[aKey].type === 'key') {
+            let overlaps = []
+
+            for (let bKey in entryInputs) {
+                if (
+                    entryInputs[bKey].type === 'key' &&
+                    aKey !== bKey &&
+                    entryInputs[aKey].input.value ===
+                        entryInputs[bKey].input.value
+                ) {
+                    overlaps.push(bKey)
+                }
+            }
+
+            if (overlaps.length === 0) {
+                entryInputs[aKey].warning.visible = false
+            } else {
+                let text = 'Warning: '
+                if (overlaps.length === 1) {
+                    text += "'" + entryInputs[overlaps[0]].description + "' has"
+                } else if (overlaps.length === 2) {
+                    text +=
+                        "'" +
+                        entryInputs[overlaps[0]].description +
+                        "' and '" +
+                        entryInputs[overlaps[1]].description +
+                        "' have"
+                } else {
+                    text +=
+                        "'" +
+                        entryInputs[overlaps[0]].description +
+                        "' and " +
+                        (overlaps.length - 1).toString() +
+                        ' other actions have'
+                }
+
+                text += ' the same shortcut!'
+                entryInputs[aKey].warning.text = text
+
+                entryInputs[aKey].warning.visible = true
+            }
+        }
+    }
+}
+
 function onSettingChange(event) {
     if (!event.fromUser) {
         return false
+    }
+
+    if (
+        entryInputs[entryInputs[event.from.key]] &&
+        entryInputs[entryInputs[event.from.key]].type === 'key'
+    ) {
+        checkKeyWarning()
     }
 
     ipcRenderer.send('set-setting', event.from.key, event.value)
 }
 ipcRenderer.on('setting', (event, key, value) => {
     if (entryInputs.hasOwnProperty(key)) {
-        entryInputs[key].value = value
+        entryInputs[key].input.value = value
+
+        if (entryInputs[key].type === 'key') {
+            checkKeyWarning()
+        }
     }
 })
 
@@ -79,11 +137,31 @@ function getEntryBlock(key, data) {
             input = new layout.KeyInput(data)
     }
 
+    let warningElement = null
+    if (data.type === 'key') {
+        warningElement = new layout.Text(
+            {
+                text: 'Warning: ky'
+            },
+            {
+                maxWidth: '70ch',
+
+                margin: 4,
+                padding: 2,
+                paddingLeft: 6,
+                paddingRight: 6,
+
+                background: 'hsl(0, 60%, 75%)'
+            }
+        )
+    }
+
     let block = new layout.Block(
         {
             items: [
                 new layout.Text({ text: data.description }),
                 new layout.Filler(),
+                warningElement,
                 input
             ],
             childSpacing: 6
@@ -112,7 +190,12 @@ function getEntryBlock(key, data) {
 
     input.key = key
 
-    entryInputs[key] = input
+    entryInputs[key] = {
+        input: input,
+        type: data.type,
+        description: data.description,
+        warning: warningElement
+    }
 
     input.onEvent('change', onSettingChange)
 
