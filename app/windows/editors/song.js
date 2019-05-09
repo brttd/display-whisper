@@ -385,18 +385,24 @@ function updateSections() {
 
             displaySections[displayIndex]._sectionName = introName
             displaySections[displayIndex]._sectionSplitIndex = 0
+            displaySections[displayIndex]._sectionSplitCount = 0
+
             displaySections[displayIndex].name = 'Intro'
         } else if (editor.data.playOrder[sectionIndex] === outroName) {
             displaySections.push(editor.util.copyObj(editor.data.outro))
 
             displaySections[displayIndex]._sectionName = outroName
             displaySections[displayIndex]._sectionSplitIndex = 0
+            displaySections[displayIndex]._sectionSplitCount = 0
+
             displaySections[displayIndex].name = 'Outro'
         } else if (editor.data.playOrder[sectionIndex] === blankName) {
             displaySections.push(editor.util.copyObj(editor.data.blank))
 
             displaySections[displayIndex]._sectionName = blankName
             displaySections[displayIndex]._sectionSplitIndex = 0
+            displaySections[displayIndex]._sectionSplitCount = 0
+
             displaySections[displayIndex].name = 'Blank'
         } else if (
             editor.data.sections.hasOwnProperty(
@@ -420,6 +426,7 @@ function updateSections() {
                     displayIndex
                 ].name = section.name
                 displaySections[displayIndex]._sectionSplitIndex = 0
+                displaySections[displayIndex]._sectionSplitCount = 1
             } else {
                 for (
                     let partIndex = 0;
@@ -430,6 +437,8 @@ function updateSections() {
 
                     partSection._sectionIndex = sectionIndex
                     partSection._sectionSplitIndex = partIndex
+                    partSection._sectionSplitCount = sectionParts.length
+
                     partSection._sectionName = section.name
                     partSection.name =
                         section.name +
@@ -451,6 +460,7 @@ function updateSections() {
             ].name = 'Missing Section!'
 
             displaySections[displayIndex]._sectionSplitIndex = 0
+            displaySections[displayIndex]._sectionSplitCount = 0
         }
 
         displaySections[displayIndex]._sectionIndex = sectionIndex
@@ -520,7 +530,31 @@ function isLastSongSection(index) {
     return true
 }
 
-function getTextReplacement(text) {
+function getTextReplacement(text, section) {
+    if (section) {
+        text = richText.dataReplace(text, {
+            section: richText.format(section._sectionName),
+
+            sectionParts: richText.format(
+                section._sectionSplitCount.toString()
+            ),
+            sectionPart: richText.format(
+                (section._sectionSplitIndex + 1).toString()
+            ),
+            sectionSplit:
+                section._sectionSplitCount > 1
+                    ? richText.format(
+                          (section._sectionSplitIndex + 1).toString() +
+                              '/' +
+                              section._sectionSplitCount.toString()
+                      )
+                    : '\u00A0',
+
+            index: richText.format(section._sectionIndex.toString()),
+            total: richText.format(editor.data.playOrder.length.toString())
+        })
+    }
+
     return richText.dataReplace(text, {
         name: richText.format(editor.data.name),
         author: richText.format(editor.data.author),
@@ -577,9 +611,6 @@ function showSection(index) {
         contentTextBox.edit(displaySections[activeIndex])
         contentTextBox.show()
 
-        sectionOverlayTextBox.edit(editor.data.template.sectionOverlay)
-        sectionOverlayTextBox.edit(editor.data.sectionOverlay)
-
         if (editor.data.sectionOverlay.show) {
             sectionOverlayTextBox.show()
         } else {
@@ -597,9 +628,6 @@ function showSection(index) {
 
             showEndOverlay.value = editor.data.endOverlay.show
 
-            endOverlayTextBox.edit(editor.data.template.endOverlay)
-            endOverlayTextBox.edit(editor.data.endOverlay)
-
             if (editor.data.endOverlay.show) {
                 endOverlayTextBox.show()
             }
@@ -607,6 +635,10 @@ function showSection(index) {
             showEndOverlay.visible = false
         }
     }
+
+    updateIntroOutroText()
+    updateSectionOverlayText()
+    updateEndOverlayText()
 }
 
 function changeSection(name, change) {
@@ -647,6 +679,82 @@ function updateSongLibraryButtons() {
         editButton.disabled = true
         saveButton.disabled = true
         reloadButton.disabled = true
+    }
+}
+
+function updateIntroOutroText() {
+    if (activeIndex < 0 || activeIndex >= displaySections.length) {
+        return false
+    }
+
+    if (displaySections[activeIndex]._sectionName === introName) {
+        if (contentTextBox._focused) {
+            contentTextBox.edit({
+                text: editor.data.intro.text
+            })
+        } else {
+            contentTextBox.edit({
+                text: getTextReplacement(editor.data.intro.text)
+            })
+        }
+    } else if (displaySections[activeIndex]._sectionName === outroName) {
+        if (contentTextBox._focused) {
+            contentTextBox.edit({
+                text: editor.data.outro.text
+            })
+        } else {
+            contentTextBox.edit({
+                text: getTextReplacement(editor.data.outro.text)
+            })
+        }
+    }
+}
+function updateSectionOverlayText() {
+    if (activeIndex < 0 || activeIndex >= displaySections.length) {
+        return false
+    }
+
+    if (
+        displaySections[activeIndex]._sectionName === introName ||
+        displaySections[activeIndex]._sectionName === outroName ||
+        displaySections[activeIndex]._sectionName === blankName
+    ) {
+        sectionOverlayTextBox.hide()
+
+        showSectionOverlay.visible = false
+
+        return false
+    }
+
+    if (sectionOverlayTextBox._focused) {
+        sectionOverlayTextBox.edit(editor.data.template.sectionOverlay)
+        sectionOverlayTextBox.edit(editor.data.sectionOverlay)
+    } else {
+        sectionOverlayTextBox.edit(editor.data.template.sectionOverlay)
+        sectionOverlayTextBox.edit(editor.data.sectionOverlay)
+        sectionOverlayTextBox.edit({
+            text: getTextReplacement(
+                editor.data.sectionOverlay.text,
+                displaySections[activeIndex]
+            )
+        })
+    }
+}
+function updateEndOverlayText() {
+    if (isLastSongSection(activeIndex)) {
+        if (endOverlayTextBox._focused) {
+            endOverlayTextBox.edit(editor.data.template.endOverlay)
+            endOverlayTextBox.edit(editor.data.endOverlay)
+        } else {
+            endOverlayTextBox.edit(editor.data.template.endOverlay)
+            endOverlayTextBox.edit(editor.data.endOverlay)
+            endOverlayTextBox.edit({
+                text: getTextReplacement(editor.data.endOverlay.text)
+            })
+        }
+    } else {
+        endOverlayTextBox.hide()
+        showEndOverlay.visible = false
     }
 }
 
@@ -761,7 +869,7 @@ fitTextButton.onEvent('click', () => {
                                   '/' +
                                   parts.length.toString()
                           )
-                        : '',
+                        : '\u00A0',
 
                 //Note: The section overlay is tested once per section, NOT once per play order section
                 //Since the only value which changes inbetween repeats of the same section is {index}, the total count of sections is being used instead.
@@ -897,6 +1005,10 @@ fitTextButton.onEvent('click', () => {
         }
 
         editor.change('name', event.value)
+
+        updateIntroOutroText()
+        updateSectionOverlayText()
+        updateEndOverlayText()
     })
     songAuthorInput.onEvent('change', event => {
         if (!event.fromUser) {
@@ -904,6 +1016,10 @@ fitTextButton.onEvent('click', () => {
         }
 
         editor.change('author', event.value)
+
+        updateIntroOutroText()
+        updateSectionOverlayText()
+        updateEndOverlayText()
     })
     songCopyrightInput.onEvent('change', event => {
         if (!event.fromUser) {
@@ -911,6 +1027,10 @@ fitTextButton.onEvent('click', () => {
         }
 
         editor.change('copyright', event.value)
+
+        updateIntroOutroText()
+        updateSectionOverlayText()
+        updateEndOverlayText()
     })
 
     Songs.onEvent('update', () => {
@@ -1409,6 +1529,15 @@ fitTextButton.onEvent('click', () => {
             playOrderEditor.select(finalIndex)
         }
     })
+
+    contentTextBox.onEvent('focus', updateIntroOutroText)
+    contentTextBox.onEvent('blur', updateIntroOutroText)
+
+    sectionOverlayTextBox.onEvent('focus', updateSectionOverlayText)
+    sectionOverlayTextBox.onEvent('blur', updateSectionOverlayText)
+
+    endOverlayTextBox.onEvent('focus', updateEndOverlayText)
+    endOverlayTextBox.onEvent('blur', updateEndOverlayText)
 }
 
 //Content changes
