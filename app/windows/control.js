@@ -4002,6 +4002,8 @@ const item_control = {
         }
     }
 
+    modeSelect.value = 'Auto'
+
     ipcRenderer.on('display-blank', (event, blank) => {
         blankButton.active = blank
     })
