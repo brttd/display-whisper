@@ -11,8 +11,6 @@ REQUIRED:
 REQUIRED - long term:
     Settings "keys": Allow multiple keyboard shortcuts for actions
 
-    Keyboard input item, popup input should have select button to accept new shortcut
-
     Create single source for interface text (file, instead of hard coded strings), allowing for translation + Win/Mac differences
         change keyboard shortcut display based on language, win/mac, keyboard, etc..
         (Including stuff like ⌘)
@@ -33,9 +31,6 @@ REQUIRED - long term:
 
     Song Library:
         Group input to change group for song.
-
-    Song Editor:
-        For Intro, Outro, Section & End overlay nodes, show the displayed text, and then when user starts editing text switch to actual "{section}" text.
 
     Code signing - Windows & Mac
     Auto update?
