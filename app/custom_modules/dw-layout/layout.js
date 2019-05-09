@@ -5797,6 +5797,102 @@ exports.change = addStyles
     }
     exports.FontInput = items.FontInput = FontInput
 
+    let keyPopup = new InputPopup({ extends: true })
+    {
+        keyPopup.node.classList.add('key')
+
+        let overlayNode = document.createElement('div')
+        overlayNode.className = 'key-overlay'
+        overlayNode.appendChild(keyPopup.node)
+
+        keyPopup.node.appendChild(document.createElement('p'))
+        keyPopup.node.lastChild.textContent = 'Enter new shortcut'
+
+        let cancelButton = document.createElement('button')
+        cancelButton.className = 'cancel'
+        cancelButton.appendChild(getIconSVG('remove'))
+        keyPopup.node.appendChild(cancelButton)
+
+        let keyTextNode = document.createElement('span')
+        keyTextNode.className = 'key'
+        keyTextNode.textContent = ' '
+        keyPopup.node.appendChild(keyTextNode)
+
+        let selectButton = document.createElement('button')
+        selectButton.className = 'select'
+        selectButton.textContent = 'Select'
+        keyPopup.node.appendChild(selectButton)
+
+        let popupVisible = false
+
+        let currentShortcut = null
+
+        keyPopup.show = () => {
+            popupVisible = true
+
+            selectButton.disabled = true
+            keyTextNode.textContent = ' '
+
+            document.body.appendChild(overlayNode)
+        }
+        keyPopup.hide = () => {
+            popupVisible = false
+
+            if (typeof keyPopup.closeListener === 'function') {
+                keyPopup.closeListener()
+            }
+
+            if (overlayNode.parentElement === document.body) {
+                document.body.removeChild(overlayNode)
+            }
+        }
+
+        keyboard.onEvent('shortcut-change', event => {
+            if (!popupVisible) {
+                return false
+            }
+
+            currentShortcut = null
+
+            keyTextNode.textContent = keyboard.getDisplay(event.shortcut) || ' '
+
+            selectButton.disabled = true
+        })
+        keyboard.onEvent('shortcut-finish', event => {
+            if (!popupVisible) {
+                return false
+            }
+
+            currentShortcut = event.shortcut
+
+            keyTextNode.textContent =
+                keyboard.getDisplay(currentShortcut) || ' '
+
+            if (currentShortcut) {
+                selectButton.disabled = false
+            }
+        })
+
+        overlayNode.addEventListener('click', event => {
+            if (event.target === overlayNode) {
+                keyPopup.hide()
+            }
+        })
+        cancelButton.addEventListener('click', keyPopup.hide)
+
+        selectButton.addEventListener('click', () => {
+            if (currentShortcut) {
+                if (typeof keyPopup.changeListener === 'function') {
+                    keyPopup.changeListener(currentShortcut)
+                }
+
+                keyPopup.hide()
+            } else {
+                selectButton.disabled = true
+            }
+        })
+    }
+
     class KeyInput extends focusItem {
         /*
         A input for choosing keyboard shortcuts. Displayed as button, when pressed opens popup for user to input shortcut.
@@ -5816,38 +5912,21 @@ exports.change = addStyles
             super(document.createElement('button'), styles, data.focus)
             this.addClass('input-key')
 
-            {
-                this.overlayNode = document.createElement('div')
-                this.overlayNode.className = 'key-overlay'
-                this.overlayNode.style.display = 'none'
-                body.node.appendChild(this.overlayNode)
+            this.node.id = getUniqueId('key')
 
-                this.popupNode = document.createElement('div')
-                this.popupNode.className = 'popup'
-                this.overlayNode.appendChild(this.popupNode)
-
-                this.popupNode.appendChild(document.createElement('p'))
-                this.popupNode.firstChild.textContent = data.text
-
-                this.keyTextNode = document.createElement('span')
-                this.keyTextNode.className = 'key'
-                this.keyTextNode.textContent = ' '
-                this.popupNode.appendChild(this.keyTextNode)
-
-                this.node.id = getUniqueId('key')
-
-                this.textNode = document.createElement('span')
-                this.textNode.innerText = ' '
-                this.node.appendChild(this.textNode)
-            }
+            this.textNode = document.createElement('span')
+            this.textNode.innerText = ' '
+            this.node.appendChild(this.textNode)
 
             if (data.disabled === true) {
                 this.node.disabled = true
             }
 
+            bindFunctions(this, this.onShortcutChange, this.blur)
+
             this.value = data.value
 
-            this._oldValue = this.shortcut
+            this._oldValue = ''
 
             this.node.addEventListener('click', () => {
                 this.node.blur()
@@ -5855,41 +5934,7 @@ exports.change = addStyles
                 this.focus(true)
             })
 
-            keyboard.onEvent('shortcut-change', event => {
-                if (!this._focused) {
-                    return false
-                }
-
-                this.keyTextNode.textContent =
-                    keyboard.getDisplay(event.shortcut) || ' '
-            })
-            keyboard.onEvent('shortcut-finish', event => {
-                if (!this._focused) {
-                    return false
-                }
-
-                sendEventTo(
-                    {
-                        value: event.shortcut,
-                        oldValue: this._oldValue,
-
-                        fromUser: true,
-                        from: this
-                    },
-                    this.events.change
-                )
-
-                this._oldValue = event.shortcut
-
-                this.textNode.textContent = keyboard.getDisplay(this.shortcut)
-            })
-
-            body.onEvent('blur', this.blur.bind(this))
-            this.overlayNode.addEventListener('click', event => {
-                if (event.target === this.overlayNode) {
-                    this.blur()
-                }
-            })
+            body.onEvent('blur', this.blur)
         }
 
         get disabled() {
@@ -5926,6 +5971,24 @@ exports.change = addStyles
             }
         }
 
+        onShortcutChange(shortcut) {
+            shortcut = keyboard.cleanShortcut(shortcut)
+
+            sendEventTo(
+                {
+                    value: shortcut,
+                    oldValue: this._oldValue,
+
+                    fromUser: true,
+                    from: this
+                },
+                this.events.change
+            )
+            this._oldValue = shortcut
+
+            this.textNode.textContent = keyboard.getDisplay(shortcut)
+        }
+
         focus(fromUser = false) {
             this._focused = true
 
@@ -5941,17 +6004,24 @@ exports.change = addStyles
                 this.events.focus
             )
 
-            this.keyTextNode.textContent = ' '
-
             this.node.classList.add('active')
-            this.overlayNode.style.display = ''
+
+            keyPopup.changeListener = this.onShortcutChange
+            keyPopup.closeListener = this.blur
+            keyPopup.show()
         }
         blur() {
+            if (!this._focused) {
+                return false
+            }
+
             this._focused = false
 
             this.node.classList.remove('active')
 
-            this.overlayNode.style.display = 'none'
+            keyPopup.changeListener = null
+            keyPopup.closeListener = null
+            keyPopup.hide()
         }
     }
     exports.KeyInput = items.KeyInput = KeyInput

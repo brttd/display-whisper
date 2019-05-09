@@ -936,6 +936,7 @@ $slider-padding: 2px;
 
 .key-overlay {
     position: fixed;
+    z-index: 3;
 
     top: 0;
     left: 0;
@@ -951,35 +952,100 @@ $slider-padding: 2px;
 
     .popup {
         @include fonts;
-        @include colors;
-        @include borders(3px);
 
-        display: block;
+        display: flex;
+        flex-flow: column;
 
-        min-width: 30ch;
+        min-width: 33ch;
+        max-width: calc(100vw - 20px);
 
-        padding: 6px;
+        padding: 4px;
+
+        background: $bkg;
+        border-color: $bkg-dark;
+        border-radius: 3px;
 
         p {
             display: block;
 
-            margin: 4px;
-
-            -webkit-margin-collapse: separate;
+            margin: 4px 6px;
         }
 
-        span {
+        button.cancel {
+            position: absolute;
+
+            display: flex;
+
+            top: 0;
+            right: 0;
+
+            width: 1.5em;
+            height: 1.5em;
+
+            margin: 8px;
+
+            justify-content: center;
+
+            background: transparent;
+            border: none;
+            outline: none;
+
+            svg {
+                flex: auto 0 0;
+
+                width: $icon-size;
+                height: $icon-size;
+
+                fill: $text;
+            }
+
+            &:hover,
+            &:focus {
+                svg {
+                    fill: $text-dark;
+                }
+            }
+        }
+
+        .key {
             @include borders(3px);
+            @include colors(active);
 
             display: block;
 
             margin: 4px;
-            padding: 4px 8px;
-
-            background: $bkg-main;
-            border-color: $bkg-main-dark;
+            padding: $input-padding;
 
             word-break: break-all;
+            white-space: pre-wrap;
+        }
+
+        button.select {
+            @extend %all-inputs;
+
+            @extend %button;
+
+            align-self: flex-end;
+
+            margin: 4px;
+            padding: $input-padding;
+
+            border-radius: 2px;
+
+            &[disabled] {
+                @include colors(disabled);
+            }
+
+            &:not([disabled]) {
+                &:hover {
+                    @include colors(hover);
+                }
+
+                &:active,
+                &:focus {
+                    @include colors(active);
+                }
+            }
         }
     }
 }
