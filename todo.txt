@@ -5,9 +5,6 @@ REQUIRED:
     
     Print tool:
         Add user options to filter song searching.
-    
-    Fix:
-        Play controls, play mode is unspecified by default
 
     Installers - Windows & Mac
 
