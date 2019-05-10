@@ -2801,178 +2801,6 @@ exports.change = addStyles
         })
     }
 
-    //TODO: remove this class, only two inputs extend it
-    class InputItem extends focusItem {
-        /*
-        Used as wrapper for input items
-
-        Constructor arguments:
-            type (string): Input node type. A input element is created, assigned the type, and given a new random id.
-            label (string): Text displayed above input, linked to input node. If not given, no label is created.
-            focus (boolean): globalFocus property
-
-        Properties:
-            inputNode (HTML Element): The items input node.
-            autoFocusNext (boolean): If true, when the user presses enter on the input, it will automatically focus the next sibling, if it's a input item.
-            disabled (get/set) (boolean): Retrieve/set the disabled state of the input.
-            label (get) (string)
-        
-        Methods:
-            addInputClass (className: string): Adds class(es) to the inputNode.
-            removeInputClass (className: string): Removes class(es) to the inputNode.
-
-        Events:
-            'focus'
-            'blur'
-        */
-        constructor(type, label, focus = true, styles = {}) {
-            super(document.createElement('div'), {}, focus)
-            this.inputNode = document.createElement('input')
-            this.inputNode.id = getUniqueId(this.inputNode.tagName)
-            this.inputNode.type = type
-
-            if (typeof label === 'string') {
-                this.node.appendChild(document.createElement('label'))
-                this.node.firstChild.textContent = label
-
-                this.node.firstChild.setAttribute('for', this.inputNode.id)
-
-                this.inputNode.title = label
-            } else {
-                this.inputNode.title = ' '
-            }
-
-            this.node.appendChild(this.inputNode)
-
-            addStyles(this, styles)
-
-            this.autoFocusNext = false
-
-            enableOnFocus(this, [
-                ['edit', 'cut'],
-                ['edit', 'copy'],
-                ['edit', 'paste'],
-                ['edit', 'selectAll']
-            ])
-
-            this.inputNode.addEventListener('focus', () => {
-                this._focused = true
-
-                if (this._globalFocus === true) {
-                    body.inputFocused(this, !this._codeFocused)
-                }
-
-                sendEventTo(
-                    {
-                        fromUser: !this._codeFocused,
-                        from: this
-                    },
-                    this.events.focus
-                )
-
-                this._codeFocused = false
-            })
-
-            this.inputNode.addEventListener(
-                'contextmenu',
-                exports.contextMenu.enable.bind(null, 'edit')
-            )
-
-            this.inputNode.addEventListener('blur', () => {
-                this._focused = false
-                sendEventTo(
-                    {
-                        fromUser: true,
-                        from: this
-                    },
-                    this.events.blur
-                )
-            })
-            this.inputNode.addEventListener('keydown', keyEvent => {
-                if (keyEvent.key === 'Enter') {
-                    if (this.autoFocusNext === true && this.parent) {
-                        let index = this.parent.items.indexOf(this)
-
-                        while (index < this.parent.items.length) {
-                            if (
-                                typeof this.parent.items[index + 1].focus ===
-                                'function'
-                            ) {
-                                this.parent.items[index + 1].focus()
-
-                                break
-                            } else {
-                                let exit = true
-
-                                for (
-                                    let i = 0;
-                                    i < inputAutoFocusSkipClasses.length;
-                                    i++
-                                ) {
-                                    if (
-                                        this.parent.items[index + 1] instanceof
-                                        inputAutoFocusSkipClasses[i]
-                                    ) {
-                                        index += 1
-                                        exit = false
-                                    }
-                                }
-                                if (exit) {
-                                    break
-                                }
-                            }
-                        }
-
-                        if (index < this.parent.items.length) {
-                            if (
-                                this.parent.items[index + 1] instanceof
-                                InputItem
-                            )
-                                this.parent.items[index + 1].focus()
-                        }
-                    }
-                }
-            })
-        }
-
-        get disabled() {
-            return this.inputNode.disabled
-        }
-        set disabled(disabled) {
-            if (typeof disabled === 'boolean') {
-                this.inputNode.disabled = disabled
-            }
-        }
-
-        get label() {
-            if (this.node.firstChild.tagName === 'LABEL') {
-                return this.node.firstChild.textContent
-            }
-
-            return ''
-        }
-
-        focus(fromUser = false) {
-            this._codeFocused = !fromUser
-
-            this.inputNode.focus()
-        }
-        blur(fromUser = false) {
-            this.inputNode.blur()
-        }
-    }
-    itemStylesMap.InputItem = {
-        margin: (item, value) => {
-            //Margin should also change spacing between the label and input element
-            if (item.node.firstChild !== item.inputNode) {
-                item.node.firstChild.style.marginBottom = mapToPx(value)
-            }
-
-            return {}
-        }
-    }
-    items.InputItem = InputItem
-
     //Vertical distance between popup origin, and popup box
     let popupArrowHeight = 7
 
@@ -3358,13 +3186,13 @@ exports.change = addStyles
             value (boolean)
             onChange (function)
         
-        Properties (extends InputItem):
+        Properties:
             value (get/set) (boolean): Retrieve the checked state.
         
-        Methods (extends InputItem):
+        Methods:
             N/A
 
-        Events (extends InputItem):
+        Events:
             'change':
                 value (boolean)
                 oldValue (boolean): Checked state before the event was sent
@@ -3474,15 +3302,15 @@ exports.change = addStyles
             tooltip (string)
             value (string)
         
-        Properties (extends InputItem):
+        Properties:
             placeholder (get/set) (string): placeholder text
             tooltip (get/set) (string): tooltip text
             value (get/set) (string): current text in input
         
-        Methods (extends InputItem):
+        Methods:
             N/A
         
-        Events (extends InputItem):
+        Events:
             'change':
                 value (string)
                 oldValue (string): Value of input before change event happened.
@@ -4102,7 +3930,7 @@ exports.change = addStyles
             step (number): Increment amount.
             value (number)
         
-        Properties (extends InputItem):
+        Properties:
             placeholder (get/set) (string)
             tooltip (get/set) (string)
             max (get/set) (number)
@@ -4110,9 +3938,9 @@ exports.change = addStyles
             step (get/set) (number)
             value (get/set) (number)
         
-        Methods (extends InputItem):
+        Methods:
         
-        Events (extends InputItem):
+        Events:
             'change':
                 value (number)
                 oldValue (number): Value before change event happened.
@@ -4363,15 +4191,6 @@ exports.change = addStyles
                                 if (exit) {
                                     break
                                 }
-                            }
-                        }
-
-                        if (index < this.parent.items.length) {
-                            if (
-                                this.parent.items[index + 1] instanceof
-                                InputItem
-                            ) {
-                                this.parent.items[index + 1].focus()
                             }
                         }
                     }
