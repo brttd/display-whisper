@@ -6976,7 +6976,6 @@ exports.change = addStyles
             lineHeight (get/set) (number)
             align (get/set) (string)
             
-            //TODO: move to editTextBox item
             y (get/set) (string)
         
         Methods:
@@ -7708,8 +7707,6 @@ exports.change = addStyles
             this._focused = true
             this._codeFocused = !fromUser
 
-            //TODO: all of this is handled in textnode.onfocus
-
             if (this._globalFocus) {
                 body.inputFocused(this, fromUser)
             }
@@ -7847,7 +7844,7 @@ exports.change = addStyles
             })
 
             let lastEnter = this.textNode.value
-            //TODO: stop emitting 'enter' on blur? (it'll break some things)
+
             this.textNode.addEventListener('blur', () => {
                 //If text is still selected in the input, it needs to be de-selected
                 if (
@@ -7868,6 +7865,7 @@ exports.change = addStyles
                     },
                     this.events.enter
                 )
+
                 lastEnter = this.textNode.value
             })
 
