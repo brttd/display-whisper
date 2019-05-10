@@ -10033,21 +10033,9 @@ exports.change = addStyles
                 )
                 this.inputItems.push(this.alignRight)
 
-                this.verticalAlign = new exports.SelectInput({
-                    focus: false,
-                    disabled: true,
-                    options: ['Top', 'Center', 'Bottom']
-                })
-                this.inputItems.push(this.verticalAlign)
-
                 this.alignBlock.appendChild(this.alignLeft.node)
                 this.alignBlock.appendChild(this.alignCenter.node)
                 this.alignBlock.appendChild(this.alignRight.node)
-
-                //TODO: make this default to being used, instead of defaulting to not
-                if (data.y === true) {
-                    this.alignBlock.appendChild(this.verticalAlign.node)
-                }
 
                 if (data.align !== false) {
                     this.node.appendChild(this.alignBlock)
@@ -10073,16 +10061,6 @@ exports.change = addStyles
                     this.alignRight.active = true
 
                     this.sendEdit('align', 'right', true)
-                })
-
-                this.verticalAlign.onEvent('change', event => {
-                    if (event.fromUser) {
-                        this.sendEdit(
-                            'y',
-                            event.value.toLowerCase(),
-                            event.fromUser
-                        )
-                    }
                 })
             }
 
@@ -10154,14 +10132,6 @@ exports.change = addStyles
                     this.alignRight.active = true
                 }
 
-                if (item.y === 'top') {
-                    this.verticalAlign.value = 'Top'
-                } else if (item.y === 'center') {
-                    this.verticalAlign.value = 'Center'
-                } else if (item.y === 'bottom') {
-                    this.verticalAlign.value = 'Bottom'
-                }
-
                 this.disabled = false
 
                 this.activeItem = item
@@ -10191,14 +10161,6 @@ exports.change = addStyles
                         this.alignCenter.active = true
                     } else if (event.align === 'right') {
                         this.alignRight.active = true
-                    }
-
-                    if (event.y === 'top') {
-                        this.verticalAlign.value = 'Top'
-                    } else if (event.y === 'center') {
-                        this.verticalAlign.value = 'Center'
-                    } else if (event.y === 'bottom') {
-                        this.verticalAlign.value = 'Bottom'
                     }
                 }
             })
@@ -10276,8 +10238,6 @@ exports.change = addStyles
             }
 
             item.font.node.style.marginRight = item.size.node.style.marginRight = value
-
-            item.verticalAlign.node.style.marginLeft = value
 
             item.node.style.margin = value
             item.node.style.marginTop = '0px'
