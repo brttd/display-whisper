@@ -3653,12 +3653,9 @@ exports.change = addStyles
                 this.inputNode.value = data.value
             }
 
-            enableOnFocus(
-                this,
-                ['edit', 'cut'],
-                ['edit', 'copy'],
-                ['edit', 'paste'],
-                ['edit', 'selectAll']
+            this.inputNode.addEventListener(
+                'contextmenu',
+                exports.contextMenu.enable.bind(null, 'edit')
             )
 
             this.inputNode.addEventListener('focus', () => {
@@ -4035,12 +4032,10 @@ exports.change = addStyles
 
             this.value = data.value
 
-            enableOnFocus(this, [
-                ['edit', 'cut'],
-                ['edit', 'copy'],
-                ['edit', 'paste'],
-                ['edit', 'selectAll']
-            ])
+            this.inputNode.addEventListener(
+                'contextmenu',
+                exports.contextMenu.enable.bind(null, 'edit')
+            )
 
             this.inputNode.addEventListener('focus', () => {
                 this._focused = true
