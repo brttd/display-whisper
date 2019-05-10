@@ -13103,28 +13103,6 @@ class BoxEdit {
             return item
         }
 
-        //TODO: remove?
-        replace(itemOrIndex, data) {
-            if (this.nodes.indexOf(itemOrIndex) !== -1)
-                itemOrIndex = this.nodes.indexOf(itemOrIndex)
-
-            if (
-                typeof itemOrIndex === 'number' &&
-                itemOrIndex >= 0 &&
-                itemOrIndex < this.nodes.length
-            ) {
-                let item = this.add(data, itemOrIndex)
-
-                //only remove the item at the original index if a new item was succesfully created
-                if (item) {
-                    this.remove(itemOrIndex + 1)
-                    return item
-                }
-            }
-
-            return null
-        }
-
         remove(itemOrIndex) {
             if (this.nodes.indexOf(itemOrIndex) !== -1) {
                 itemOrIndex = this.nodes.indexOf(itemOrIndex)
