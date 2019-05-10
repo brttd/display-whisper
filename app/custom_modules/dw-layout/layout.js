@@ -6514,12 +6514,33 @@ exports.change = addStyles
             )
         })
 
-        listNode.addEventListener('click', event => {
-            if (event.target === listNode) {
+        listNode.addEventListener('mouseover', event => {
+            if (
+                event.target === listNode ||
+                typeof imagePopup.hoverCallback !== 'function'
+            ) {
                 return false
             }
 
-            if (typeof imagePopup.clickCallback !== 'function') {
+            let img = event.target.getAttribute('file')
+
+            if (event.target.tagName !== 'DIV') {
+                img = event.target.parentNode.getAttribute('file')
+            }
+
+            imagePopup.hoverCallback({
+                value: img,
+                database: true,
+
+                fromUser: true,
+                from: imagePopup
+            })
+        })
+        listNode.addEventListener('click', event => {
+            if (
+                event.target === listNode ||
+                typeof imagePopup.clickCallback !== 'function'
+            ) {
                 return false
             }
 
@@ -6646,7 +6667,6 @@ exports.change = addStyles
                 this._codeFocused = false
             })
 
-            //TODO: make hovering over image in list emit event.
             body.onEvent('mousedown', event => {
                 if (
                     event.target === this.node ||
@@ -6738,10 +6758,10 @@ exports.change = addStyles
         onDropDownHover(event) {
             sendEventTo(
                 {
-                    value: event._database
+                    value: event.database
                         ? path.join(Images.directory, event.value)
                         : event.value,
-                    database: event._database,
+                    database: event.database,
 
                     fromUser: event.fromUser,
                     from: this
@@ -6749,7 +6769,7 @@ exports.change = addStyles
                 this.events.hover
             )
 
-            this._oldValue = event._value
+            this._oldValue = event.value
         }
         onDropDownClick(event) {
             this._value = event.value
@@ -10314,6 +10334,17 @@ exports.change = addStyles
                         )
                     }
                 })
+                this.image.onEvent('hover', event => {
+                    if (event.fromUser) {
+                        this.sendEdit(
+                            {
+                                url: event.value,
+                                database: event.database
+                            },
+                            event.fromUser
+                        )
+                    }
+                })
             }
 
             //scale
@@ -10401,19 +10432,21 @@ exports.change = addStyles
                     })
 
                     item.onEvent('change', event => {
-                        if (
-                            typeof item.url === 'string' &&
-                            this.image.value !== item.url
-                        ) {
-                            this.image.value = item.url
-                        }
+                        if (!event.fromUser) {
+                            if (
+                                typeof item.url === 'string' &&
+                                this.image.value !== item.url
+                            ) {
+                                this.image.value = item.url
+                            }
 
-                        if (event.scale === 'fill') {
-                            this.scale.value = 'Fill'
-                        } else if (event.scale === 'fit') {
-                            this.scale.value = 'Fit'
-                        } else if (event.scale === 'stretch') {
-                            this.scale.value = 'Stretch'
+                            if (event.scale === 'fill') {
+                                this.scale.value = 'Fill'
+                            } else if (event.scale === 'fit') {
+                                this.scale.value = 'Fit'
+                            } else if (event.scale === 'stretch') {
+                                this.scale.value = 'Stretch'
+                            }
                         }
                     })
                 }
