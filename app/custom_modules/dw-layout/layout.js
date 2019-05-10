@@ -5638,8 +5638,6 @@ exports.change = addStyles
                 }
             })
 
-            //TODO: Listen to context menu events
-
             body.onEvent('mousedown', event => {
                 if (
                     !(
