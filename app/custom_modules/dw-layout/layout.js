@@ -7237,28 +7237,10 @@ exports.change = addStyles
             })
 
             this.textNode.addEventListener('focus', () => {
-                if (this._focused) {
-                    return false
-                }
-
-                this._focused = true
-
-                if (this._globalFocus) {
-                    body.inputFocused(this, !this._codeFocused)
-                }
-
                 //This should happen on mouseenter, but just in case it didnt
                 this.iframe.style.pointerEvents = ''
 
-                sendEventTo(
-                    {
-                        fromUser: !this._codeFocused,
-                        from: this
-                    },
-                    this.events.focus
-                )
-
-                this._codeFocused = false
+                this.focus(true)
             })
 
             this.container.addEventListener('contextmenu', () => {
