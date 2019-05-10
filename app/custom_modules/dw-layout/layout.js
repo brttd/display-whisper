@@ -7869,6 +7869,13 @@ exports.change = addStyles
             let lastEnter = this.textNode.value
             //TODO: stop emitting 'enter' on blur? (it'll break some things)
             this.textNode.addEventListener('blur', () => {
+                //If text is still selected in the input, it needs to be de-selected
+                if (
+                    this.textNode.selectionEnd !== this.textNode.selectionStart
+                ) {
+                    window.getSelection().removeAllRanges()
+                }
+
                 this.textNode.disabled = true
 
                 sendEventTo(
