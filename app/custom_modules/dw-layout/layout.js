@@ -3349,7 +3349,7 @@ exports.change = addStyles
     }
     exports.Button = items.Button = Button
 
-    class CheckboxInput extends InputItem {
+    class CheckboxInput extends Item {
         /*
         Standard checkbox input. Label is shown after input.
 
@@ -3370,11 +3370,27 @@ exports.change = addStyles
                 oldValue (boolean): Checked state before the event was sent
         */
         constructor(data = {}, styles = {}) {
-            super('checkbox', data.label, data.focus, styles)
+            super(document.createElement('div'), {})
             this.addClass('input-checkbox')
 
-            //The checkbox needs to be before the label
-            this.node.insertBefore(this.inputNode, this.node.firstChild)
+            this.inputNode = document.createElement('input')
+            this.inputNode.id = getUniqueId(this.inputNode.tagName)
+            this.inputNode.type = 'checkbox'
+
+            this.node.appendChild(this.inputNode)
+
+            if (typeof data.label === 'string') {
+                this.node.appendChild(document.createElement('label'))
+                this.node.lastChild.textContent = data.label
+
+                this.node.lastChild.setAttribute('for', this.inputNode.id)
+
+                this.inputNode.title = data.label
+            } else {
+                this.inputNode.title = ' '
+            }
+
+            addStyles(this, styles)
 
             this.disabled = data.disabled
 
@@ -3385,11 +3401,6 @@ exports.change = addStyles
             if (typeof data.onChange === 'function') {
                 this.onEvent('change', data.onChange)
             }
-
-            this.inputNode.addEventListener(
-                'contextmenu',
-                exports.contextMenu.disable.bind(null, 'edit')
-            )
 
             this._oldValue = this.inputNode.checked
 
@@ -3409,6 +3420,23 @@ exports.change = addStyles
 
                 this._oldValue = this.inputNode.checked
             })
+        }
+
+        get disabled() {
+            return this.inputNode.disabled
+        }
+        set disabled(disabled) {
+            if (typeof disabled === 'boolean') {
+                this.inputNode.disabled = disabled
+            }
+        }
+
+        get label() {
+            if (this.node.firstChild.tagName === 'LABEL') {
+                return this.node.firstChild.textContent
+            }
+
+            return ''
         }
 
         get value() {
@@ -3431,12 +3459,6 @@ exports.change = addStyles
 
                 this._oldValue = this.inputNode.checked
             }
-        }
-    }
-    //inputItem class has style mappings for margin, these need to be reset:
-    itemStylesMap.CheckboxInput = {
-        margin: () => {
-            return {}
         }
     }
     exports.CheckboxInput = items.CheckboxInput = CheckboxInput
