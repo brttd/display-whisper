@@ -7739,9 +7739,6 @@ exports.change = addStyles
     }
     exports.RichTextInput = items.RichTextInput = RichTextInput
 
-    //TODO: Code for textListItem, List, and TableList needs to be reviewed
-
-    //TODO: Make list items show gray when selected and not "active"
     class TextListItem extends Item {
         /*
         Sub item, used inside List item.
