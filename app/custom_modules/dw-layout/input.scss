@@ -1439,8 +1439,8 @@ $img-max-width: 10em;
 
         &.active {
             input:not(:focus) {
-                @include colors(active);
-                border-color: $bkg-active;
+                background-color: $bkg-main;
+                border-color: $bkg-main;
             }
         }
         &.dragging {
@@ -1456,6 +1456,15 @@ $img-max-width: 10em;
 
             &.dragging {
                 background: $bkg-error-dark;
+            }
+        }
+    }
+
+    &.focused {
+        .item.active {
+            input:not(:focus) {
+                @include colors(active);
+                border-color: $bkg-active;
             }
         }
     }

@@ -8147,11 +8147,7 @@ exports.change = addStyles
                         return false
                     }
 
-                    this._focused = true
-
-                    if (this._globalFocus) {
-                        body.inputFocused(this, event.fromUser)
-                    }
+                    this.focus()
 
                     sendEventTo(
                         {
@@ -8533,11 +8529,7 @@ exports.change = addStyles
                         return false
                     }
 
-                    this._focused = true
-
-                    if (this._globalFocus) {
-                        body.inputFocused(this, event.fromUser)
-                    }
+                    this.focus()
 
                     sendEventTo(
                         {
@@ -8549,15 +8541,7 @@ exports.change = addStyles
                 })
 
                 item.onEvent('select', event => {
-                    if (!this._focused) {
-                        if (this._globalFocus) {
-                            body.inputFocused(this, event.fromUser)
-                        }
-
-                        if (event.fromUser) {
-                            this._focused = true
-                        }
-                    }
+                    this.focus()
 
                     this.select(
                         this.items.indexOf(item),
@@ -8838,7 +8822,13 @@ exports.change = addStyles
         }
 
         focus(fromUser = false) {
+            if (this._focused) {
+                return false
+            }
+
             this._focused = true
+
+            this.node.classList.add('focused')
 
             if (this._globalFocus) {
                 body.inputFocused(this, fromUser)
@@ -8850,6 +8840,8 @@ exports.change = addStyles
             }
 
             this._focused = false
+
+            this.node.classList.remove('focused')
 
             this.dragging = null
             this.dropping = false
