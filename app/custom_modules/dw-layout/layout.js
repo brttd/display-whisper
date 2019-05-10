@@ -1831,119 +1831,63 @@ exports.change = addStyles
                 return false
             }
 
-            let newMin = { width: 0, height: 0 }
-            let newMax = { width: 0, height: 0 }
-
-            //TODO: old way of doing it works, check why new one doesn;t
-
             if (this._direction === 'vertical') {
                 this._min.width = this._min.height = 0
-                this._max.width = this._max.height = 0
+                this._max.height = 0
+                this._max.width = Infinity
 
                 for (let i = 0; i < this.items.length; i += 2) {
                     if (this.items[i] instanceof LayoutBlock) {
-                        this.minWidth = Math.max(
-                            this.minWidth,
+                        this._min.width = Math.max(
+                            this._min.width,
                             this.items[i].minWidth
                         )
-                        this.minHeight += this.items[i].minHeight
+                        this._min.height += this.items[i].minHeight
 
-                        newMin.width = Math.max(
-                            newMin.width,
-                            this.items[i].minWidth
-                        )
-                        newMin.height += this.items[i].minHeight
-
-                        this.maxWidth = Math.min(
-                            this.maxWidth,
+                        this._max.width = Math.min(
+                            this._max.width,
                             this.items[i].maxWidth
                         )
-                        this.maxHeight += this.items[i].maxHeight
-
-                        newMax.width = Math.min(
-                            newMax.width,
-                            this.items[i].maxWidth
-                        )
-                        newMax.height += this.items[i].maxHeight
+                        this._max.height += this.items[i].maxHeight
                     }
                 }
 
-                this.minHeight += ~~(this.items.length / 2) * dividerSize
-                this.maxHeight += ~~(this.items.length / 2) * dividerSize
+                this.minWidth = this._min.width
+                this.maxWidth = this._max.width
+
+                this.minHeight =
+                    this._min.height + ~~(this.items.length / 2) * dividerSize
+                this.maxHeight =
+                    this._max.height + ~~(this.items.length / 2) * dividerSize
             } else if (this._direction === 'horizontal') {
                 this._min.width = this._min.height = 0
-                this._max.width = this._max.height = 0
+                this._max.width = 0
+                this._max.height = Infinity
 
                 for (let i = 0; i < this.items.length; i += 2) {
                     if (this.items[i] instanceof LayoutBlock) {
-                        this.minWidth += this.items[i].minWidth
-                        this.minHeight = Math.max(
-                            this.minHeight,
+                        this._min.width += this.items[i].minWidth
+                        this._min.height = Math.max(
+                            this._min.height,
                             this.items[i].minHeight
                         )
 
-                        this.maxWidth += this.items[i].maxWidth
-                        this.maxHeight = Math.min(
-                            this.maxHeight,
+                        this._max.width += this.items[i].maxWidth
+                        this._max.height = Math.min(
+                            this._max.height,
                             this.items[i].maxHeight
                         )
                     }
                 }
 
-                this.minWidth += ~~(this.items.length / 2) * dividerSize
-                this.maxWidth += ~~(this.items.length / 2) * dividerSize
+                this.minHeight = this._min.height
+                this.maxHeight = this._max.height
+
+                this.minWidth =
+                    this._min.width + ~~(this.items.length / 2) * dividerSize
+                this.maxWidth =
+                    this._max.width + ~~(this.items.length / 2) * dividerSize
             }
-
-            /*
-            let newMin = { width: 0, height: 0 }
-            let newMax = { width: 0, height: 0 }
-
-            if (this._direction === 'vertical') {
-                for (let i = 0; i < this.items.length; i += 2) {
-                    if (this.items[i] instanceof LayoutBlock) {
-                        newMin.width = Math.max(
-                            newMin.width,
-                            this.items[i].minWidth
-                        )
-                        newMin.height += this.items[i].minHeight
-
-                        newMax.width = Math.min(
-                            newMax.width,
-                            this.items[i].maxWidth
-                        )
-                        newMax.height += this.items[i].maxHeight
-                    }
-                }
-
-                newMin.height += ~~(this.items.length / 2) * dividerSize
-                newMax.height += ~~(this.items.length / 2) * dividerSize
-            } else if (this._direction === 'horizontal') {
-                for (let i = 0; i < this.items.length; i += 2) {
-                    if (this.items[i] instanceof LayoutBlock) {
-                        newMin.width += this.items[i].minWidth
-                        newMin.height = Math.max(
-                            newMin.height,
-                            this.items[i].minHeight
-                        )
-
-                        newMax.width += this.items[i].maxWidth
-                        newMax.height = Math.min(
-                            newMax.height,
-                            this.items[i].maxHeight
-                        )
-                    }
-                }
-
-                newMin.width += ~~(this.items.length / 2) * dividerSize
-                newMax.width += ~~(this.items.length / 2) * dividerSize
-            }
-
-            this.minWidth = newMin.width
-            this.minWidth = newMin.width
-
-            this.maxWidth = newMax.width
-            this.minHeight = newMax.height
-            */
 
             if (this.parent === body) {
                 exports.window.setMinSize({
