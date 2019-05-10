@@ -13237,6 +13237,7 @@ class BoxEdit {
 //Display methods
 {
     const testContainer = document.createElement('div')
+    testContainer.id = 'display-size-test'
     const testElements = []
 
     const testSize = 100
@@ -13251,21 +13252,9 @@ class BoxEdit {
 
     let running = false
 
-    //TODO: Move this to display stylesheet
-    testContainer.style.position = 'fixed'
-    testContainer.style.top = '5000px'
-    testContainer.style.left = '5000px'
-    testContainer.style.pointerEvents = 'none'
-    testContainer.style.opacity = '0'
-
     for (let i = 0; i < maxConcurrentTests; i++) {
         testElements.push(document.createElement('div'))
-
-        testElements[i].style.position = 'fixed'
-
-        testElements[i].style.display = 'inline-block'
-        testElements[i].style.lineHeight = '1.5'
-        testElements[i].style.whiteSpace = 'pre'
+        testElements[i].className = 'container'
 
         testContainer.appendChild(testElements[i])
     }

@@ -235,3 +235,17 @@ $box-size: $border-size + $box-padding * 2;
         }
     }
 }
+
+#display-size-test {
+    position: fixed;
+    top: 200vh;
+
+    pointer-events: none;
+
+    .container {
+        position: fixed;
+        display: inline-block;
+
+        white-space: pre;
+    }
+}
