@@ -14378,8 +14378,6 @@ class BoxEdit {
             this.title = data.title
             this.content = data.content
 
-            this._display = data.display || {}
-
             this.onResize = this.displayItem.onResize.bind(this.displayItem)
 
             this.parent = null
@@ -14398,12 +14396,10 @@ class BoxEdit {
         }
 
         get display() {
-            //TODO: use proper display class property
-            return this._display
+            return this.displayItem.display
         }
         set display(data) {
-            this._display = data
-            this.displayItem.set(this._display)
+            this.displayItem.set(data)
         }
 
         get active() {
