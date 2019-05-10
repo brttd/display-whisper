@@ -3463,7 +3463,7 @@ exports.change = addStyles
     }
     exports.CheckboxInput = items.CheckboxInput = CheckboxInput
 
-    class TextInput extends InputItem {
+    class TextInput extends focusItem {
         /*
         Standard single line text input.
 
@@ -3490,8 +3490,29 @@ exports.change = addStyles
                 value (string)
         */
         constructor(data = {}, styles = {}) {
-            super('text', data.label, data.focus, styles)
+            super(document.createElement('div'), {}, data.focus)
+            this.inputNode = document.createElement('input')
+            this.inputNode.id = getUniqueId(this.inputNode.tagName)
+            this.inputNode.type = 'text'
+
+            if (typeof data.label === 'string') {
+                this.node.appendChild(document.createElement('label'))
+                this.node.firstChild.textContent = data.label
+
+                this.node.firstChild.setAttribute('for', this.inputNode.id)
+
+                this.inputNode.title = data.label
+            } else {
+                this.inputNode.title = ' '
+            }
+
+            this.node.appendChild(this.inputNode)
+
             this.addClass('input-text')
+
+            addStyles(this, styles)
+
+            this.autoFocusNext = false
 
             if (typeof data.autoFocusNext === 'boolean') {
                 this.autoFocusNext = data.autoFocusNext
@@ -3511,7 +3532,42 @@ exports.change = addStyles
                 this.inputNode.value = data.value
             }
 
+            this.inputNode.addEventListener(
+                'contextmenu',
+                exports.contextMenu.enable.bind(null, 'edit')
+            )
+
+            this.inputNode.addEventListener('focus', () => {
+                this._focused = true
+
+                if (this._globalFocus === true) {
+                    body.inputFocused(this, !this._codeFocused)
+                }
+
+                sendEventTo(
+                    {
+                        fromUser: !this._codeFocused,
+                        from: this
+                    },
+                    this.events.focus
+                )
+
+                this._codeFocused = false
+            })
+            this.inputNode.addEventListener('blur', () => {
+                this._focused = false
+
+                sendEventTo(
+                    {
+                        fromUser: true,
+                        from: this
+                    },
+                    this.events.blur
+                )
+            })
+
             this._oldValue = this.inputNode.value
+
             this.inputNode.addEventListener('input', () => {
                 if (this.inputNode.value.length > this._maxLength) {
                     this.inputNode.value = this.inputNode.value.slice(
@@ -3551,8 +3607,62 @@ exports.change = addStyles
                     )
 
                     this.blur()
+
+                    if (this.autoFocusNext === true && this.parent) {
+                        let index = this.parent.items.indexOf(this)
+
+                        while (index < this.parent.items.length) {
+                            if (
+                                typeof this.parent.items[index + 1].focus ===
+                                'function'
+                            ) {
+                                this.parent.items[index + 1].focus()
+
+                                break
+                            } else {
+                                let exit = true
+
+                                for (
+                                    let i = 0;
+                                    i < inputAutoFocusSkipClasses.length;
+                                    i++
+                                ) {
+                                    if (
+                                        this.parent.items[index + 1] instanceof
+                                        inputAutoFocusSkipClasses[i]
+                                    ) {
+                                        index += 1
+                                        exit = false
+
+                                        continue
+                                    }
+                                }
+
+                                if (exit) {
+                                    break
+                                }
+                            }
+                        }
+                    }
                 }
             })
+        }
+
+        get disabled() {
+            return this.inputNode.disabled
+        }
+        set disabled(disabled) {
+            if (typeof disabled === 'boolean') {
+                this.inputNode.disabled = disabled
+            }
+        }
+
+        get label() {
+            if (this.node.firstChild.tagName === 'LABEL') {
+                return this.node.firstChild.textContent
+            }
+
+            return ''
         }
 
         get placeholder() {
@@ -3612,10 +3722,29 @@ exports.change = addStyles
                 this._oldValue = this.inputNode.value
             }
         }
+
+        focus(fromUser = false) {
+            this._codeFocused = !fromUser
+
+            this.inputNode.focus()
+        }
+        blur() {
+            this.inputNode.blur()
+        }
     }
     exports.TextInput = items.TextInput = TextInput
+
     let inputExtraWidth = '14px'
     itemStylesMap.TextInput = {
+        margin: (item, value) => {
+            //Margin should also change spacing between the label and input element
+            if (item.node.firstChild !== item.inputNode) {
+                item.node.firstChild.style.marginBottom = mapToPx(value)
+            }
+
+            return {}
+        },
+
         width: (item, value) => {
             return {
                 value: 'calc(' + value + ' + ' + inputExtraWidth + ')'
