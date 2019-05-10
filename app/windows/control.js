@@ -2530,9 +2530,9 @@ let displaying = false
 //Add Block
 //======================
 const item_add = {
-    //306x470 fits text without any overflow
-    minWidth: 306,
-    minHeight: 470,
+    //310x465 fits text without any overflow
+    minWidth: 310,
+    minHeight: 465,
 
     main: new layout.Block(
         {},
@@ -3529,16 +3529,14 @@ const item_add = {
     //text add
     {
         const styleEditor = new layout.TextStyleEdit(
-            {
-                y: true
-            },
+            {},
             {
                 align: 'stretch'
             }
         )
         textBlock.add(styleEditor)
 
-        const boxEditor = new layout.BoxStyleEdit({ align: false })
+        const boxEditor = new layout.BoxStyleEdit({})
 
         textBlock.add(boxEditor)
 
