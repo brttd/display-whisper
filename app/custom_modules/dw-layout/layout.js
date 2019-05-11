@@ -1,13 +1,16 @@
 //Check that the module has been used inside a valid document
+//If it hasn't, it needs to exit instantly by throwing an error
 if (typeof document !== 'object' || typeof window !== 'object') {
     throw new Error('Layout module used outside of a valid HTML document!')
 }
+//To stop visual pop, the interface has a fade-in animation
 document.body.style.opacity = 0
 
 const { remote, ipcRenderer } = require('electron')
 const { dialog, Menu, MenuItem } = remote
 
 const path = require('path')
+//fs module is only needed by certain layout items. To save importing without it being used, declare it globally but only import when required by an item
 let fs
 
 const logger = require('dw-log')
@@ -21,7 +24,7 @@ const objUtil = require('dw-editor').util
 //Global variables
 const thisWin = remote.getCurrentWindow()
 
-//Used for quick conversion of number/string to css pixel unit string
+//Quickly converts numbers to px unit CSS strings
 const mapToPx = value => {
     if (typeof value === 'number') {
         return value.toString() + 'px'
@@ -30,7 +33,7 @@ const mapToPx = value => {
     return value
 }
 
-//Mappings between js style names, and CSS style names
+//Mapping between style names, and CSS attribute names
 const stylesMap = {
     overflow: 'overflow',
     overflowX: 'overflowX',
@@ -80,8 +83,8 @@ const stylesMap = {
     minHeight: 'minHeight',
     maxHeight: 'maxHeight'
 }
-//Mappings between js style values, and CSS style values
-//(Either an object with direct mappings, or a function)
+//Mapping between style values, and CSS values
+//Can be a {key: value} object, or function which takes (value)
 const styleValuesMap = {
     border: {
         black: '1px solid black',
@@ -192,14 +195,13 @@ function loadCSS(name) {
     document.head.appendChild(node)
 }
 
-//Private utility functions
+//Rounds the value to a specific amount of decimal places
 function round(value, precision = 0) {
-    //Rounds <value> to the <precision> decimal places
     return Math.round(value * Math.pow(10, precision)) / Math.pow(10, precision)
 }
 
+//Returns true if given object is a DOM node
 function validNode(node = {}) {
-    //Returns true if the given object is a DOM node
     return (
         node !== null &&
         node !== undefined &&
@@ -207,6 +209,7 @@ function validNode(node = {}) {
         node.nodeType === 1
     )
 }
+//Returns true if the given object is a layout item
 function validItem(item = {}) {
     //Returns true if the given object is a layout item.
     //Using "instanceof Item" would be nicer, but there some display items don't extend Item
@@ -250,8 +253,7 @@ function sendEventTo(event, listeners) {
         }
     }
 }
-
-//Can be bound in an .addEventListener call, for a simpler code structure
+//Can be used in .addEventListener calls, binding this function to the listener array is simpler than creating an anonymous array which calls sendEventTo
 function passEventTo(listeners, event) {
     for (let i = 0; i < listeners.length; i++) {
         listeners[i](event)
@@ -267,12 +269,8 @@ function bindFunctions(item) {
     }
 }
 
-//JS style functions
+//Applies the property: value style to the node, using stylesMap for property mapping and stylesValuesMap for value mapping
 function setNodeStyle(node, property, value) {
-    //Sets the given property to the given value on the given node
-    //Uses stylesMap to find full CSS property name
-    //And stylesValuesMap to find full CSS value
-
     if (stylesMap.hasOwnProperty(property)) {
         if (styleValuesMap.hasOwnProperty(property)) {
             if (typeof styleValuesMap[property] === 'function') {
@@ -285,10 +283,8 @@ function setNodeStyle(node, property, value) {
         node.style[stylesMap[property]] = value
     }
 }
-
+//Applies all styles from object to item, using itemStylesMap for item specific styles
 function addStyles(item, styles = {}) {
-    //Adds all valid styles in the given object to the given item
-    //If the item has custom functions for modifiying styles, will call them before applying
     let node
 
     if (validItem(item)) {
@@ -428,8 +424,9 @@ const currentDisplay = {}
 
 const fonts = {}
 {
-    let preloading = false
+    //shouldPreload is set if an item requests fonts to be preloaded (Font list is always loaded, but actual font files are not loaded unless requested)
     let shouldPreload = false
+    let preloading = false
 
     let updateListeners = []
 
@@ -470,6 +467,7 @@ const fonts = {}
             index += 1
 
             if (index < fonts.all.length) {
+                //Wait 100 milliseconds, then wait for an idle frame
                 setTimeout(body.onIdle.bind(null, preloadNext), 100)
             } else {
                 document.body.removeChild(elem)
@@ -539,25 +537,15 @@ Images.onEvent('error', error => {
 
 class Item {
     /*
-    //base class (not publically exposed, used to reduce common code used in items)
+    Base item class
 
-    Constructor arguments:
-        Node (HTML Element): Item .node element.
-        styles (Object): CSS properties, applied to .node.
+    Constructor:
+        node (DOM node): The items root .node element. A DIV by default.
+        styles (Object): CSS properties, applied to the item.
     
     Properties:
-        node (HTMLElement): The main element of the item.
-        events (object): A mapping of event names to arrays of listeners for that event.
-        parent (Item): Item which contains the instance of this item. Only set by parent items (such as blocks).
-        visible (get/set) (Boolean): Whether or not the item is shown.
-    
-    Methods:
-        onEvent(eventName: string, listener: function): Calls listener whenever the event occurs.
-        addClass(className: string): Adds the given class(es) to the main item node.
-        removeClass(className: string): Removes the given class(es) from the main item node.
-    
-    Events:
-        'click': Standard mouse event
+        .node (DOM node): The item root element.
+        .parent (Item): Only set by parent items, allows child items to reference their parents.
     */
     constructor(node = document.createElement('div'), styles = {}) {
         this.node = node
@@ -568,6 +556,7 @@ class Item {
         addStyles(this, styles)
     }
 
+    //Whether or not item is shown
     get visible() {
         return !this.node.classList.contains('hide')
     }
@@ -583,7 +572,7 @@ class Item {
                 this.node.classList.add('hide')
             }
 
-            if (this.parent && this.parent.onResize) {
+            if (this.parent) {
                 if (this.parent.checkResize) {
                     this.parent.checkResize()
                 } else if (this.parent.onResize) {
@@ -593,6 +582,7 @@ class Item {
         }
     }
 
+    //Adds a listener for the event. 'click' and 'contextmenu' are handled automatically
     onEvent(eventName, listener = () => {}) {
         if (!this.events[eventName]) {
             if (eventName === 'click') {
@@ -656,30 +646,23 @@ When an item is focused, it (should) call the body inputFocused method, thus sen
 This happens regardless of whether the focus came from the user or not.
 An item can not emit the 'input-focus' event, if it's ._globalFocus property is false. This should only happen if a parent will emit the event instead.
 
-When an item hears a 'input-focus' event from the body (and itself used to be focused), the following checks should happen:
-If the item is the same as the focused item, stop.
-If the focused item is in the items 'shareFocusWith' list, stop.
-
-If the item was focused, and doesn't have the newly focused item in it's shareFocusWith list, then it should blur (un-focus) itself.
-
+When an item hears a 'input-focus' event from the body, the following checks should happen:
+If the item isn't focused, don't do anything.
+If the item is the same as the focused item, don't do anything.
+If the focused item is in the items 'shareFocusWith' list, don't do anything.
+If the item doesn't have the new focused item in it's shareFocusWith list, then it should blur (un-focus) itself.
 */
 class focusItem extends Item {
     /*
     Constructor arguments:
-        node: Passed to Item.
-        styles: Passed to Item.
-        focus (Boolean): Whether or not this item should emit global focus events.
+        node: Passed down to Item class.
+        styles: Passed down to Item class.
+        focus (Boolean): Whether or not the item should emit global focus events.
     
     Properties:
         _focused (Boolean): If the item is currently focused.
         _globalFocus (Boolean): If the item should emit global (from body) focus events.
-        _shareFocusWith (Array: Item): List of items this Item can "share focus" (Be focused at same time) with
-    
-    Methods:
-        shareFocusWith(item: Item): Makes this Item able to share focus with given item
-        groupShareFocusWith(item: Item): Makes this Item able to share focus with given item, and all items that it can share focus with
-        focus(): Makes the item focused
-        blur(): Makes the item not focused
+        _shareFocusWith (Array: Item): List of items this Item can "share focus" (be focused at same time) with
     */
     constructor(node, styles, focus = true) {
         super(node, styles)
@@ -705,12 +688,14 @@ class focusItem extends Item {
         })
     }
 
+    //Allows this item to be focused at the same time as the given item
     shareFocusWith(item) {
         if (validItem(item) && !this._shareFocusWith.includes(item)) {
             this._shareFocusWith.push(item)
         }
     }
 
+    //Allows this item to be focused at the same time as the given item, and all items that the given item can share with
     groupShareFocusWith(item) {
         if (validItem(item) && !this._shareFocusWith.includes(item)) {
             this._shareFocusWith.push(item)
@@ -744,13 +729,13 @@ class focusItem extends Item {
     }
 }
 
-//Helper function, to make all focus events that come from given item also be sent through second item
-//Used for passing focus from child to parent
+//Makes all focus events that come from the item also get emitted by the second item
 function passFocusThrough(focusItem, item, globalFocus = true) {
     if (!validItem(focusItem) || !validItem(item)) {
         return false
     }
 
+    //Since the second item is emitting a focus event, the first one needs to share its focus with the second
     if (typeof focusItem.shareFocusWith === 'function') {
         focusItem.shareFocusWith(item)
     }
@@ -771,7 +756,6 @@ function passFocusThrough(focusItem, item, globalFocus = true) {
     }
 }
 
-//body
 const body = new Item(document.body)
 {
     body.addClass('block')
