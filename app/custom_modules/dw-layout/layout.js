@@ -6841,6 +6841,9 @@ exports.change = addStyles
 
     let activeRichTextContextMenu = false
 
+    let pasteHtmlStartRegex = new RegExp(/<[\S\s]*tFragment-->/)
+    let pasteHtmlEndRegex = new RegExp(/\s*<!--E[\S\s]*/)
+
     function setupRichTextContextMenu() {
         if (activeRichTextContextMenu !== false) {
             return false
@@ -6942,6 +6945,9 @@ exports.change = addStyles
 
             this.iframe = document.createElement('iframe')
             this.node.appendChild(this.iframe)
+
+            this.docFrag = document.createDocumentFragment()
+            this.docFrag.appendChild(document.createElement('div'))
 
             /*
             If the mouse goes over the iframe, the iframe will mess up mouse events for the rest of the page.
@@ -7137,19 +7143,117 @@ exports.change = addStyles
                 this._onTextNodeChange.bind(this)
             )
 
+            this.textSelection = this.textWindow.getSelection()
+
             this.textNode.addEventListener('paste', event => {
-                let text = event.clipboardData.getData('text/plain')
+                this.docFrag.firstChild.innerHTML = event.clipboardData
+                    .getData('text/html')
+                    .replace(pasteHtmlStartRegex, '')
+                    .replace(pasteHtmlEndRegex, '')
+
                 event.preventDefault()
 
-                this.textDocument.execCommand('insertHTML', false, text)
+                let text = richText.fromNode(this.docFrag.firstChild)
 
-                //TODO: this seems weird?
-                this.textNode.innerHTML = richText
-                    .fromNode(this.textNode)
-                    .trim()
+                if (text.includes('<')) {
+                    //Chrome inserts a newline when insertHTML is run with html tags in the inserted text
 
-                //TODO: is this needed?
-                this._onTextNodeChange()
+                    //Get the text selection range before the text is inserted
+                    let rangeBeforeInsert = this.textSelection.getRangeAt(0)
+
+                    //Find the character which follows the selection
+                    let nextCharBeforeInsert = ''
+                    if (
+                        rangeBeforeInsert.endOffset <
+                        rangeBeforeInsert.endContainer.textContent.length
+                    ) {
+                        //If the selection ends before the text node ends, get the character from that text node
+                        nextCharBeforeInsert =
+                            rangeBeforeInsert.endContainer.textContent[
+                                rangeBeforeInsert.endOffset
+                            ]
+                    } else {
+                        //Try and get the text from a node which follows the endContainer
+                        //Start off with the endContainer
+                        let textNode = rangeBeforeInsert.endContainer
+
+                        //Find the next node which has text content
+                        while (textNode) {
+                            //If there's a sibling, move to it
+                            if (textNode.nextSibling) {
+                                textNode = textNode.nextSibling
+
+                                //If the sibling has text, use it
+                                if (textNode.textContent) {
+                                    nextCharBeforeInsert =
+                                        textNode.textContent[0]
+
+                                    break
+                                }
+                            } else {
+                                //Otherwise move to the parent
+                                textNode = textNode.parentNode
+
+                                if (textNode === this.textNode) {
+                                    break
+                                }
+                            }
+                        }
+                    }
+
+                    this.textDocument.execCommand('insertHTML', false, text)
+
+                    let rangeAfterInsert = this.textSelection.getRangeAt(0)
+
+                    //Find the character which follows the selection
+                    let nextCharAfterInsert = ''
+                    if (
+                        rangeAfterInsert.endOffset <
+                        rangeAfterInsert.endContainer.textContent.length
+                    ) {
+                        //If the selection ends before the text node ends, get the character from that text node
+                        nextCharAfterInsert =
+                            rangeAfterInsert.endContainer.textContent[
+                                rangeAfterInsert.endOffset
+                            ]
+                    } else {
+                        //Try and get the text from a node which follows the endContainer
+                        //Start off with the endContainer
+                        let textNode = rangeAfterInsert.endContainer
+
+                        //Find the next node which has text content
+                        while (textNode) {
+                            //If there's a sibling, move to it
+                            if (textNode.nextSibling) {
+                                textNode = textNode.nextSibling
+
+                                //If the sibling has text, use it
+                                if (textNode.textContent) {
+                                    nextCharAfterInsert =
+                                        textNode.textContent[0]
+
+                                    break
+                                }
+                            } else {
+                                //Otherwise move to the parent
+                                textNode = textNode.parentNode
+
+                                if (textNode === this.textNode) {
+                                    break
+                                }
+                            }
+                        }
+                    }
+
+                    //If the characters before & after inserting the text are not the same
+                    if (nextCharAfterInsert !== nextCharBeforeInsert) {
+                        //Delete the character which follows the selection
+                        this.textDocument.execCommand('forwardDelete', false)
+                    }
+                } else {
+                    //Insert the text without any extra steps
+                    this.textDocument.execCommand('insertHTML', false, text)
+                }
             })
 
             this.textDocument.addEventListener('selectionchange', () => {
@@ -7238,6 +7342,8 @@ exports.change = addStyles
         _onIframeUnload() {
             this.textDocument = null
             this.textWindow = null
+
+            this.textSelection = null
 
             this.container = null
             this.textNode = null
