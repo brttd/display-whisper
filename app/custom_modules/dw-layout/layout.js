@@ -8113,6 +8113,8 @@ exports.change = addStyles
                 this.disabled = data.disabled
             }
 
+            bindFunctions(this, this.onResize, this.readSize)
+
             if (Array.isArray(data.items)) {
                 for (let i = 0; i < data.items.length; i++) {
                     this.add(data.items[i])
@@ -8184,8 +8186,6 @@ exports.change = addStyles
                 height: 0
             }
             this._listOffsetTop = 0
-
-            bindFunctions(this, this.onResize, this.readSize)
 
             this.dragging = null
             this.dropping = false
