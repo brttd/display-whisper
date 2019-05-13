@@ -2390,13 +2390,11 @@ let displaying = false
         //if the amount of screens changes, add/remove buttons
         if (display.screenCount > screenButtons.length) {
             while (screenButtons.length < display.screenCount) {
-                let button = new layout.Button(
-                    {
-                        text: (screenButtons.length + 1).toString(),
-                        size: 'large'
-                    },
-                    { class: 'highlight' }
-                )
+                let button = new layout.Button({
+                    text: (screenButtons.length + 1).toString(),
+                    size: 'large'
+                })
+                button.addClass('highlight')
                 button.onEvent('click', onScreenButtonPress)
 
                 screenButtons.push(button)
