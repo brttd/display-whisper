@@ -436,8 +436,8 @@ const fonts = {}
 
     fonts.isFont = name => fonts.all.includes(name)
 
-    fonts.onEvent = (eventName, listener = () => {}) => {
-        if (eventName === 'update') {
+    fonts.onEvent = (eventName, listener) => {
+        if (eventName === 'update' && typeof listener === 'function') {
             updateListeners.push(listener)
         }
     }
