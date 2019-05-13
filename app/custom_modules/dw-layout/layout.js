@@ -1541,7 +1541,7 @@ exports.change = addStyles
 
     class LayoutBlock extends Item {
         /*
-        Used for responsize, resizable layouts. Adds dividers between child elements so that sections can be resized
+        Used for resizable layouts. Adds dividers between child elements so that sections can be resized
 
         Constructor data:
             direction (string: 'vertical' or 'horizontal'): How to arrange child items.
@@ -1552,21 +1552,6 @@ exports.change = addStyles
             maxHeight (number): Minimum height, in pixels.
             items (array: Items): Children.
             small (boolean): If true, divider lines will be show in thin style.
-        
-        Properties:
-            direction (get/set) (string: 'vertical' or 'horizontal'): How children items are arranged.
-            size (get/set) (number): Percentage size of parent.
-            minWidth (get/set) (number): Minimum width, in pixels.
-            maxWidth (get/set) (number): Maximum width, in pixels.
-            minHeight (get/set) (number): Minimum height, in pixels.
-            maxHeight (get/set) (number): Minimum height, in pixels.
-        
-        Methods:
-            updateMin: Changes min/max Width/Height values to reflect child min/maxes. If item is direct child of body, will change window min/max size
-            add (item: Item): Adds item as child, updating dividers and sizes.
-            remove (item: Item): Removes child, updating dividers and sizes.
-            clear: Removes all children.
-            setDividerPosition (divider: item, position: number): Moves the given child divider to the given position, resizing items as neccesary.
         
         Events:
             sizeChange (size: number): Emitted when the .size property is set.
@@ -1626,6 +1611,7 @@ exports.change = addStyles
             }
         }
 
+        //Used by children layoutBlocks
         get nodeWidth() {
             return this._width
         }
@@ -1633,6 +1619,7 @@ exports.change = addStyles
             return this._height
         }
 
+        //The size basis, percentage of parent size
         get size() {
             return this._size
         }
@@ -1646,6 +1633,7 @@ exports.change = addStyles
             exports.onFrame.end(this.writeStyle)
         }
 
+        //'vertical' or 'horizontal'
         get direction() {
             return this._direction
         }
@@ -1686,6 +1674,7 @@ exports.change = addStyles
             return Infinity
         }
 
+        //Minimum & maximum width in pixels
         get minWidth() {
             return this._min.width
         }
@@ -1827,6 +1816,7 @@ exports.change = addStyles
             this.checkResize()
         }
 
+        //Changes minimum & maximum width/height values based on child minumum & maximum
         updateMin() {
             if (
                 this.items.length === 0 ||
@@ -1893,6 +1883,7 @@ exports.change = addStyles
                     this._max.width + ~~(this.items.length / 2) * dividerSize
             }
 
+            //If this is the direct child of the body, then the actual browser window minimum size should be set
             if (this.parent === body) {
                 exports.window.setMinSize({
                     width: this.minWidth,
@@ -1901,6 +1892,7 @@ exports.change = addStyles
             }
         }
 
+        //Adds item child along with divider as neccesary, and updates size
         add(item) {
             if (!validItem(item)) {
                 return false
@@ -1930,6 +1922,7 @@ exports.change = addStyles
             this.updateMin()
             this.checkResize()
         }
+        //Removes item child and divider, and updates size
         remove(itemOrIndex) {
             let index = -1
 
@@ -1978,6 +1971,7 @@ exports.change = addStyles
             this.checkResize()
         }
 
+        //Removes all children
         clear() {
             for (let i = this.items.length - 1; i >= 0; i--) {
                 this.node.removeChild(this.items[i].node)
@@ -1994,6 +1988,7 @@ exports.change = addStyles
             }
         }
 
+        //Moves the given divider to the given position by resizing children.
         setDividerPosition(divider, position) {
             let index = this.items.indexOf(divider)
 
@@ -2041,13 +2036,7 @@ exports.change = addStyles
         Used for switching between different items, with a tab list at the top for each item.
 
         Constructor data:
-            tabs (Object): mapping of tab names to the items they display.
-        
-        Properties:
-            tab (get/set) (string): The name of the active tab.
-        
-        Methods:
-            set (sections: Object): Removes any currently visible tabs, and adds all from given sections object.
+            tabs (Array): List of tabs
         
         Events:
             'switch' {tab: '...'}
@@ -2197,6 +2186,7 @@ exports.change = addStyles
             )
         }
 
+        //Sets the list of tabs
         set(tabs) {
             if (!Array.isArray(tabs)) {
                 return false
@@ -2262,13 +2252,6 @@ exports.change = addStyles
         Properties:
             items (Array): Children array.
             hovering (boolean): Whether or not to show highlight on dividers on mouse over.
-        
-        Methods:
-            add (item: Item, index: number): Adds item as child, if index is given then it will be inserted at that position, otherwise appended to the end.
-            remove (index: number): Removes the child at the given index.
-            move (index: number, newIndex: number): Moves child from at index to new position.
-            indexOf (item: Item): Returns the index position of the child.
-            clear: Removes all children.
         
         Events:
             drop (index: number): Emitted when user releases mouse after hovering.
@@ -2489,6 +2472,7 @@ exports.change = addStyles
             return -1
         }
 
+        //Adds item as a child, if index is given will be inserted at that position, otherwise added to the end.
         add(item, index = this.items.length) {
             if (validItem(item) && !this.items.includes(item)) {
                 if (index >= 0 && index < this.items.length) {
@@ -2518,7 +2502,7 @@ exports.change = addStyles
                 this.checkResize()
             }
         }
-
+        //Removes the given child, or the child at the given index
         remove(index) {
             if (validItem(index)) {
                 index = this.indexOf(index)
@@ -2551,6 +2535,7 @@ exports.change = addStyles
             }
         }
 
+        //Moves the given child (or the child at the given index) to the new index
         move(index, newIndex, fromUser = false) {
             if (validItem(index)) {
                 index = this.items.indexOf(index)
