@@ -261,11 +261,11 @@ function passEventTo(listeners, event) {
     }
 }
 
-//Make all functions bound to the given context
-function bindFunctions(item) {
+//Binds all object methods to the object, so they will always have the correct context (this = object) even when called from elsewhere
+function bindFunctions(object) {
     for (let i = 1; i < arguments.length; i++) {
         if (typeof arguments[i] === 'function') {
-            item[arguments[i].name] = arguments[i].bind(item)
+            object[arguments[i].name] = arguments[i].bind(object)
         }
     }
 }
