@@ -409,16 +409,15 @@ const currentDisplay = {}
         currentDisplay.width = display.bounds.width
         currentDisplay.height = display.bounds.height
 
-        let allListeners = changeListeners.concat(oneChangeListeners)
-        oneChangeListeners = []
-
         sendEventTo(
             {
                 fromUser: false,
                 from: currentDisplay
             },
-            allListeners
+            changeListeners.concat(oneChangeListeners)
         )
+
+        oneChangeListeners = []
     })
 }
 
