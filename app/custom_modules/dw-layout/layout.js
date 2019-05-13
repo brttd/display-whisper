@@ -1326,17 +1326,17 @@ exports.change = addStyles
             super(document.createElement('div'), {})
             this.addClass('block')
 
-            this.spacing = 0
+            this._spacing = 0
 
             if (typeof (data.childSpacing === 'number')) {
                 if (isFinite(data.childSpacing) && data.childSpacing >= 0) {
-                    this.spacing = data.childSpacing
+                    this._spacing = data.childSpacing
                 }
             }
 
-            if (this.spacing) {
+            if (this._spacing) {
                 addStyles(this, {
-                    padding: this.spacing / 2
+                    padding: this._spacing / 2
                 })
             }
 
@@ -1362,7 +1362,7 @@ exports.change = addStyles
         }
 
         get childSpacing() {
-            return this.spacing
+            return this._spacing
         }
 
         onResize(toParent = false) {
@@ -1406,11 +1406,11 @@ exports.change = addStyles
 
         add(item, index = -1) {
             if (validItem(item) && !this.items.includes(item)) {
-                if (this.spacing) {
+                if (this._spacing) {
                     //All items apart from Blocks should have margin set
                     if (item instanceof Block === false) {
                         addStyles(item, {
-                            margin: this.spacing / 2
+                            margin: this._spacing / 2
                         })
                     }
                 }
