@@ -141,7 +141,7 @@ function getEntryBlock(key, data) {
     if (data.type === 'key') {
         warningElement = new layout.Text(
             {
-                text: 'Warning: ky'
+                text: 'Warning: key'
             },
             {
                 maxWidth: '70ch',
