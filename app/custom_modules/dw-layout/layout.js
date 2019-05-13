@@ -167,31 +167,24 @@ const styleValuesMap = {
     minHeight: mapToPx,
     maxHeight: mapToPx
 }
-//Used for storing unqiue item specific mappings.
-//Each item can add it's own functions, which are called when that property is changed for the item
+//Mapping for style values, scoped to individual items
 const itemStylesMap = {}
 
-const loadedCSS = []
+//All exported items, stored by name
+const items = {}
 
-let idCounter = 0
-
-//Each exported layout item type, stored by name
-let items = {}
-
+const loadedStyleSheets = []
 function loadCSS(name) {
-    if (loadedCSS.includes(name)) {
+    if (loadedStyleSheets.includes(name)) {
         return false
     }
-    loadedCSS.push(name)
-
-    name = __dirname + '/' + name
+    loadedStyleSheets.push(name)
 
     let node = document.createElement('link')
-    node.rel
-
     node.rel = 'stylesheet'
     node.type = 'text/css'
-    node.href = name
+    node.href = __dirname + '/' + name
+
     document.head.appendChild(node)
 }
 
@@ -211,15 +204,17 @@ function validNode(node = {}) {
 }
 //Returns true if the given object is a layout item
 function validItem(item = {}) {
-    //Returns true if the given object is a layout item.
-    //Using "instanceof Item" would be nicer, but there some display items don't extend Item
-    if (typeof item === 'object' && item !== null && item.node) {
-        return validNode(item.node)
-    }
-
-    return false
+    //Using "instanceof Item" would be nicer, but there some display items that don't extend Item
+    return (
+        typeof item === 'object' &&
+        item !== null &&
+        item.node &&
+        validNode(item.node)
+    )
 }
 
+let idCounter = 0
+//Returns a unique string for DOM ids
 function getUniqueId(name) {
     idCounter += 1
 
