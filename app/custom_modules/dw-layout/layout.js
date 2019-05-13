@@ -15238,11 +15238,6 @@ class BoxEdit {
                 this.zoomFull.onEvent('click', event => {
                     this.zoom = 1
                 })
-                this.zoomFull.onEvent('contextmenu', event => {
-                    if (event.ctrlKey && event.shiftKey && event.altKey) {
-                        this.setupTest()
-                    }
-                })
             }
 
             //Page nodes
