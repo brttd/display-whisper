@@ -742,16 +742,12 @@ function passFocusThrough(focusItem, item, globalFocus = true) {
 const body = new Item(document.body)
 {
     body.addClass('block')
+    document.documentElement.style.width = document.documentElement.style.height = body.node.style.width = body.node.style.height =
+        '100%'
 
-    //Style values
-    {
-        document.documentElement.style.width = document.documentElement.style.height = body.node.style.width = body.node.style.height =
-            '100%'
-
-        document.documentElement.style.overflow = body.node.style.overflow =
-            'hidden'
-        body.node.style.margin = '0'
-    }
+    document.documentElement.style.overflow = body.node.style.overflow =
+        'hidden'
+    body.node.style.margin = '0'
 
     let size = {
         width: 0,
@@ -794,12 +790,6 @@ const body = new Item(document.body)
             bodyDirection = direction
 
             exports.onFrame.end(writeBodyDirection)
-        }
-    })
-
-            bodyDirection = direction
-
-            body.onFrame.end(writeBodyDirection)
         }
     })
 
