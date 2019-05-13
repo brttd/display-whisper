@@ -221,6 +221,29 @@ function getUniqueId(name) {
     return name.toLowerCase() + '-' + idCounter.toString(16)
 }
 
+let spareSeparators = []
+//Returns a DIV element with the .separator class
+function getSeparatorNode() {
+    if (spareSeparators.length > 0) {
+        return spareSeparators.pop()
+    }
+
+    let elem = document.createElement('div')
+    elem.className = 'separator'
+
+    return elem
+}
+function recycleSeparator(elem) {
+    if (
+        elem &&
+        elem.childElementCount === 0 &&
+        elem.className === 'separator'
+    ) {
+        spareSeparators.push(elem)
+    }
+}
+
+//Returns the proper app file path for the icon
 function getIconUrl(name) {
     return name
         ? path.join(
@@ -242,6 +265,15 @@ function formatUrl(url) {
     return 'url("' + path.posix.normalize(url) + '")'
 }
 
+//Returns a SVG element with the icon in it
+function getIconSVG(name) {
+    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+    svg.innerHTML = '<use xlink:href="' + getIconUrl(name) + '"></use>'
+
+    return svg
+}
+
+//Calls each function in listeners array with the event
 function sendEventTo(event, listeners) {
     if (Array.isArray(listeners)) {
         for (let i = 0; i < listeners.length; i++) {
@@ -333,42 +365,7 @@ const disableStyle = () => {
     return { value: '' }
 }
 
-//Functions to quickly create nodes with standard attributes
-let spareSeparators = []
-function getSeparatorNode() {
-    if (spareSeparators.length > 0) {
-        let elem = spareSeparators.pop()
-        return elem
-    }
-
-    let elem = document.createElement('div')
-    elem.className = 'separator'
-
-    return elem
-}
-function recycleSeparator(elem) {
-    if (
-        elem &&
-        elem.childElementCount === 0 &&
-        elem.className === 'separator'
-    ) {
-        spareSeparators.push(elem)
-    }
-}
-
-function getIconSVG(name) {
-    /*
-    <svg viewBox="0 0 100 100" class="icon shape-codepen">
-        <use xlink:href="/images/svg-defs.svg#shape-codepen"></use>
-    </svg>
-    */
-    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-    svg.innerHTML = '<use xlink:href="' + getIconUrl(name) + '"></use>'
-
-    return svg
-}
-
-//(Layout) Global objects
+//The current display width, height, and ratio
 const currentDisplay = {}
 {
     let changeListeners = []
