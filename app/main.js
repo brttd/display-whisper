@@ -2734,10 +2734,19 @@ function setupDisplays() {
             updateOutputDisplay(displayIndex)
         }
 
-        if (display.masterScale === 'Custom') {
-            sendToAllWindows('display-info', getDisplayInfo())
-        } else {
+        if (display.masterScreen === oldScreenIndex) {
+            display.masterScreen = -1
             updateMasterDisplay()
+        } else {
+            if (display.masterScreen > oldScreenIndex) {
+                display.masterScreen -= 1
+            }
+
+            if (display.masterScale === 'Custom') {
+                sendToAllWindows('display-info', getDisplayInfo())
+            } else {
+                updateMasterDisplay()
+            }
         }
     })
 
