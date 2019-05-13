@@ -1687,19 +1687,6 @@ exports.change = addStyles
 
             exports.onFrame.end(this.writeStyle)
         }
-        get minHeight() {
-            return this._min.height
-        }
-        set minHeight(height) {
-            if (typeof height !== 'number' || !isFinite(height) || height < 0) {
-                return false
-            }
-
-            this._min.height = height
-
-            exports.onFrame.end(this.writeStyle)
-        }
-
         get maxWidth() {
             return this._max.width === 0 ? Infinity : this._max.width
         }
@@ -1713,6 +1700,19 @@ exports.change = addStyles
             }
 
             this._max.width = width
+
+            exports.onFrame.end(this.writeStyle)
+        }
+        //Minimum & maximum height in pixels
+        get minHeight() {
+            return this._min.height
+        }
+        set minHeight(height) {
+            if (typeof height !== 'number' || !isFinite(height) || height < 0) {
+                return false
+            }
+
+            this._min.height = height
 
             exports.onFrame.end(this.writeStyle)
         }
@@ -2056,9 +2056,7 @@ exports.change = addStyles
             this.node.appendChild(this.contentNode)
 
             this.tabs = []
-            this.activeIndex = -1
-
-            this.lastActiveIndex = -1
+            this._activeTabIndex = -1
 
             this._width = 0
             this._height = 0
@@ -2077,19 +2075,24 @@ exports.change = addStyles
             this.set(data.tabs)
         }
 
+        //The active tab name
         get tab() {
-            if (this.activeIndex < 0 || this.activeIndex >= this.tabs.length) {
+            if (
+                this._activeTabIndex < 0 ||
+                this._activeTabIndex >= this.tabs.length
+            ) {
                 return
             }
 
-            return this.tabs[this.activeIndex].name
+            return this.tabs[this._activeTabIndex].name
         }
         set tab(name) {
             return this.setTab(name, false)
         }
 
+        //The active tab index
         get index() {
-            return this.activeIndex
+            return this._activeTabIndex
         }
         set index(index) {
             if (index >= 0 && index < this.tabs.length) {
@@ -2109,12 +2112,12 @@ exports.change = addStyles
             }
 
             if (
-                this.activeIndex >= 0 &&
-                this.activeIndex < this.tabs.length &&
-                typeof this.tabs[this.activeIndex].content.onResize ===
+                this._activeTabIndex >= 0 &&
+                this._activeTabIndex < this.tabs.length &&
+                typeof this.tabs[this._activeTabIndex].content.onResize ===
                     'function'
             ) {
-                this.tabs[this.activeIndex].content.onResize()
+                this.tabs[this._activeTabIndex].content.onResize()
             }
         }
 
@@ -2159,17 +2162,21 @@ exports.change = addStyles
                 return false
             }
 
-            if (this.activeIndex >= 0 && this.activeIndex < this.tabs.length) {
-                this.tabsNode.children[this.activeIndex].classList.remove(
+            if (
+                this._activeTabIndex >= 0 &&
+                this._activeTabIndex < this.tabs.length
+            ) {
+                this.tabsNode.children[this._activeTabIndex].classList.remove(
                     'active'
                 )
-                this.tabs[this.activeIndex].content.node.style.display = 'none'
+                this.tabs[this._activeTabIndex].content.node.style.display =
+                    'none'
             }
 
-            this.activeIndex = index
+            this._activeTabIndex = index
 
-            this.tabsNode.children[this.activeIndex].classList.add('active')
-            this.tabs[this.activeIndex].content.node.style.display = ''
+            this.tabsNode.children[this._activeTabIndex].classList.add('active')
+            this.tabs[this._activeTabIndex].content.node.style.display = ''
 
             this.checkResize()
 
@@ -2177,7 +2184,7 @@ exports.change = addStyles
 
             sendEventTo(
                 {
-                    tab: this.tabs[this.activeIndex],
+                    tab: this.tabs[this._activeTabIndex],
 
                     fromUser: fromUser,
                     from: this
@@ -2583,10 +2590,7 @@ exports.change = addStyles
             }
         }
 
-        indexOf(item) {
-            return this.items.indexOf(item)
-        }
-
+        //Removes all children
         clear() {
             for (let i = 0; i < this.items.length; i++) {
                 this.items[i].parent = null
@@ -2604,6 +2608,11 @@ exports.change = addStyles
             if (this.parent) {
                 this.parent.checkResize()
             }
+        }
+
+        //Returns the index of the child
+        indexOf(item) {
+            return this.items.indexOf(item)
         }
     }
     exports.ReorderableBlock = items.ReorderableBlock = ReorderableBlock
