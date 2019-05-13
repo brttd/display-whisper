@@ -15750,7 +15750,7 @@ class BoxEdit {
 
                 getTextHeight(text, this._options, (err, height) => {
                     if (err) {
-                        console.error('Could not get text height!', err)
+                        logger.err('Could not get text height!', err)
 
                         renderNext()
                     }
@@ -15833,7 +15833,7 @@ class BoxEdit {
 
             getColumnHeight(optionsCache, (err, height, margin) => {
                 if (err) {
-                    console.error('Could not get height!')
+                    logger.error('Could not get height!')
                     this.render()
 
                     return false
