@@ -712,12 +712,6 @@ class focusItem extends Item {
         }
     }
 
-    blur() {
-        this._focused = false
-
-        this.removeClass('focus')
-    }
-
     focus(fromUser = false) {
         this._focused = true
 
@@ -726,6 +720,11 @@ class focusItem extends Item {
         if (this._globalFocus) {
             body.inputFocused(this, fromUser)
         }
+    }
+    blur() {
+        this._focused = false
+
+        this.removeClass('focus')
     }
 }
 
