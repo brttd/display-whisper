@@ -46,6 +46,8 @@ WANTED:
     FontInput item: Option to choose style (regular/bold/italic), and filter by weight, serif, etc.
 
 CODE CHANGES:
+    Remove stylesMap (Just use flexBasis name directly...)
+    
     Change displayEdit.add to public nodeEdits, with .add the same as block.add
 
     Main process - Re use editing browser windows?
