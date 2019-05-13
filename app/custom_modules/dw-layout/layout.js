@@ -13672,19 +13672,19 @@ class BoxEdit {
                         icon: 'move-y'
                     },
                     {
-                        align: 'stretch',
-                        class: 'highlight'
+                        align: 'stretch'
                     }
                 )
+                this.dragButton.addClass('highlight')
                 this.editButton = new exports.Button(
                     {
                         icon: 'edit'
                     },
                     {
-                        align: 'stretch',
-                        class: 'highlight'
+                        align: 'stretch'
                     }
                 )
+                this.editButton.addClass('highlight')
                 this.toggleButton = new exports.Button({
                     icon: 'expand-y'
                 })
@@ -13699,10 +13699,10 @@ class BoxEdit {
                         icon: 'remove'
                     },
                     {
-                        align: 'stretch',
-                        class: 'highlight'
+                        align: 'stretch'
                     }
                 )
+                this.removeButton.addClass('highlight')
 
                 this.titleNode = document.createElement('div')
                 this.titleNode.className = 'title'
@@ -14336,10 +14336,10 @@ class BoxEdit {
                         icon: 'play'
                     },
                     {
-                        align: 'stretch',
-                        class: 'highlight'
+                        align: 'stretch'
                     }
                 )
+                this.activeButton.addClass('highlight')
 
                 this.titleNode = document.createElement('div')
                 this.titleNode.className = 'title'
