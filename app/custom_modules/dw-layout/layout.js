@@ -3603,11 +3603,6 @@ exports.change = addStyles
                 this._codeFocused = false
             })
 
-            this.inputNode.addEventListener(
-                'contextmenu',
-                exports.contextMenu.enable.bind(null, 'edit')
-            )
-
             this.inputNode.addEventListener('blur', () => {
                 this._focused = false
                 sendEventTo(
@@ -4023,11 +4018,6 @@ exports.change = addStyles
                     this._oldValue = this._value
                 }
             })
-
-            this.inputNode.addEventListener(
-                'contextmenu',
-                exports.contextMenu.enable.bind(null, 'edit')
-            )
 
             this.inputNode.addEventListener('input', () => {
                 if (this.inputNode.value === '') {
