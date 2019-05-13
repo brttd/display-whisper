@@ -332,17 +332,9 @@ function addStyles(item, styles = {}) {
     if (typeof styles.id === 'string') {
         node.id = styles.id
     }
-
-    if (typeof styles.class === 'string') {
-        let classes = styles.class.split(' ')
-        for (let i = 0; i < classes.length; i++) {
-            node.classList.add(classes[i])
-        }
-    }
 }
-
-//Can be used by item custom style mappings to disallow a certain style property
-function disableStyle() {
+//Can be used in item specific style mapping to disallow a certain style property
+const disableStyle = () => {
     return { value: '' }
 }
 
