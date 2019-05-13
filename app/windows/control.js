@@ -1605,7 +1605,7 @@ const presentation = {}
 
             updatePreviews()
         } else if (typeof data.active === 'object') {
-            layout.body.onFrame.end(() => {
+            layout.onFrame.end(() => {
                 //Need to set it to 'manual', so that going to the active item doesn't start the autoplay timer
                 let actualPlayMode = playMode
                 playMode = 'manual'

@@ -452,14 +452,14 @@ const fonts = {}
 
             if (index < fonts.all.length) {
                 //Wait 100 milliseconds, then wait for an idle frame
-                setTimeout(body.onIdle.bind(null, preloadNext), 100)
+                setTimeout(exports.onIdle.bind(null, preloadNext), 100)
             } else {
                 document.body.removeChild(elem)
                 elem = null
             }
         }
 
-        body.onIdle(preloadNext)
+        exports.onIdle(preloadNext)
     }
 
     require('font-list')
@@ -480,7 +480,7 @@ const fonts = {}
             fonts.loaded = true
 
             if (shouldPreload) {
-                body.onIdle(preloadFonts)
+                exports.onIdle(preloadFonts)
             }
 
             sendEventTo(
@@ -497,7 +497,7 @@ const fonts = {}
 
     fonts.preload = () => {
         if (fonts.loaded) {
-            body.onIdle(preloadFonts)
+            exports.onIdle(preloadFonts)
         } else {
             shouldPreload = true
         }
@@ -773,11 +773,8 @@ const body = new Item(document.body)
 
     function onBodyResize() {
         for (let i = 0; i < bodyItemResizeFunctions.length; i++) {
-            body.onFrame.end(bodyItemResizeFunctions[i])
+            exports.onFrame.end(bodyItemResizeFunctions[i])
         }
-    }
-    function checkBodyResize() {
-        onBodyResize()
     }
 
     let writeBodyDirection = () => {
@@ -796,17 +793,9 @@ const body = new Item(document.body)
 
             bodyDirection = direction
 
-            body.onFrame.end(writeBodyDirection)
+            exports.onFrame.end(writeBodyDirection)
         }
     })
-    Object.defineProperty(exports, 'direction', {
-        get: () => {
-            return bodyDirection
-        },
-        set: direction => {
-            if (direction !== 'horizontal' && direction !== 'vertical') {
-                return false
-            }
 
             bodyDirection = direction
 
@@ -827,9 +816,9 @@ const body = new Item(document.body)
     }
 
     body.onResize = onBodyResize
-    body.checkResize = checkBodyResize
+    body.checkResize = onBodyResize
 
-    body.add = exports.add = function(item, index = body.items.length) {
+    body.add = function(item, index = body.items.length) {
         if (validItem(item) && body.items.indexOf(item) === -1) {
             if (index >= 0 && index < body.items.length) {
                 body.items.splice(index, 0, item)
@@ -855,7 +844,7 @@ const body = new Item(document.body)
         }
     }
 
-    body.remove = exports.remove = function(index) {
+    body.remove = function(index) {
         if (validItem(index)) {
             index = body.items.indexOf(index)
         }
@@ -875,7 +864,7 @@ const body = new Item(document.body)
         }
     }
 
-    body.clear = exports.clear = function() {
+    body.clear = function() {
         for (let i = 0; i < body.items.length; i++) {
             body.items[i].parent = null
         }
@@ -938,7 +927,7 @@ const body = new Item(document.body)
             }
         }
 
-        body.onFrame = exports.onFrame = {
+        exports.onFrame = {
             start: func => {
                 if (functions.start.includes(func)) {
                     return false
@@ -968,7 +957,7 @@ const body = new Item(document.body)
             }
         }
 
-        body.onIdle = exports.onIdle = func => {
+        exports.onIdle = func => {
             if (functions.idle.includes(func)) {
                 return false
             }
@@ -981,19 +970,6 @@ const body = new Item(document.body)
                 requestIdleCallback(callIdleFunctions)
             }
         }
-
-        window.addEventListener('load', () => {
-            body.onIdle(() => {
-                document.body.style.transition = 'opacity 0.4s'
-                document.body.style.opacity = 1
-
-                setTimeout(() => {
-                    document.body.style.transition = ''
-                }, 1500)
-
-                body.onResize()
-            })
-        })
     }
 
     //Cursor stuff
@@ -1061,10 +1037,6 @@ const body = new Item(document.body)
             get: () => lastCursor,
             set: setCursor
         })
-        Object.defineProperty(exports, 'cursor', {
-            get: () => lastCursor,
-            set: setCursor
-        })
 
         body.setCursor = exports.setCursor = setCursor
 
@@ -1109,14 +1081,14 @@ const body = new Item(document.body)
         size.width = window.innerWidth
         size.height = window.innerHeight
 
-        body.onFrame.start(body.onResize)
+        exports.onFrame.start(body.onResize)
 
-        body.onFrame.end(sendResizeEvent)
+        exports.onFrame.end(sendResizeEvent)
     })
     document.addEventListener(
         'scroll',
         () => {
-            body.onFrame.end(sendScrollEvent)
+            exports.onFrame.end(sendScrollEvent)
         },
         true
     )
@@ -1168,6 +1140,20 @@ const body = new Item(document.body)
             }
         })
     }
+
+    //When everything has loaded, wait for an idle frame and then fade in the interface
+    window.addEventListener('load', () => {
+        exports.onIdle(() => {
+            document.body.style.transition = 'opacity 0.4s'
+            document.body.style.opacity = 1
+
+            setTimeout(() => {
+                document.body.style.transition = ''
+            }, 1500)
+
+            body.onResize()
+        })
+    })
 
     exports.body = body
 }
@@ -1424,8 +1410,8 @@ exports.change = addStyles
         }
 
         checkResize() {
-            body.onFrame.start(this.readSize)
-            body.onFrame.end(this.checkSize)
+            exports.onFrame.start(this.readSize)
+            exports.onFrame.end(this.checkSize)
         }
 
         add(item, index = -1) {
@@ -1606,7 +1592,7 @@ exports.change = addStyles
 
             this._size = size
 
-            body.onFrame.end(this.writeStyle)
+            exports.onFrame.end(this.writeStyle)
         }
 
         get direction() {
@@ -1619,7 +1605,7 @@ exports.change = addStyles
 
             this._direction = direction
 
-            body.onFrame.end(this.writeStyle)
+            exports.onFrame.end(this.writeStyle)
         }
 
         get minSize() {
@@ -1659,7 +1645,7 @@ exports.change = addStyles
 
             this._min.width = width
 
-            body.onFrame.end(this.writeStyle)
+            exports.onFrame.end(this.writeStyle)
         }
         get minHeight() {
             return this._min.height
@@ -1671,7 +1657,7 @@ exports.change = addStyles
 
             this._min.height = height
 
-            body.onFrame.end(this.writeStyle)
+            exports.onFrame.end(this.writeStyle)
         }
 
         get maxWidth() {
@@ -1688,7 +1674,7 @@ exports.change = addStyles
 
             this._max.width = width
 
-            body.onFrame.end(this.writeStyle)
+            exports.onFrame.end(this.writeStyle)
         }
         get maxHeight() {
             return this._max.height === 0 ? Infinity : this._max.height
@@ -1704,7 +1690,7 @@ exports.change = addStyles
 
             this._max.height = height
 
-            body.onFrame.end(this.writeStyle)
+            exports.onFrame.end(this.writeStyle)
         }
 
         onResize(toParent) {
@@ -1754,8 +1740,8 @@ exports.change = addStyles
                 return false
             }
 
-            body.onFrame.start(this.readSize)
-            body.onFrame.end(this.checkSize)
+            exports.onFrame.start(this.readSize)
+            exports.onFrame.end(this.checkSize)
         }
 
         writeStyle() {
@@ -2075,7 +2061,7 @@ exports.change = addStyles
                 mouse.x = event.pageX - this.parent._left
                 mouse.y = event.pageY - this.parent._top
 
-                body.onFrame.start(updateParent)
+                exports.onFrame.start(updateParent)
             })
 
             body.onEvent('blur', () => {
@@ -2221,8 +2207,8 @@ exports.change = addStyles
         }
 
         checkResize() {
-            body.onFrame.start(this.readSize)
-            body.onFrame.end(this.checkSize)
+            exports.onFrame.start(this.readSize)
+            exports.onFrame.end(this.checkSize)
         }
 
         setTab(index, fromUser = false) {
@@ -2452,7 +2438,7 @@ exports.change = addStyles
             })
 
             this.node.addEventListener('scroll', () => {
-                body.onFrame.start(this.readScroll)
+                exports.onFrame.start(this.readScroll)
             })
 
             body.onEvent('mouseup', () => {
@@ -2526,8 +2512,8 @@ exports.change = addStyles
                 return false
             }
 
-            body.onFrame.start(this.readSize)
-            body.onFrame.end(this.checkSize)
+            exports.onFrame.start(this.readSize)
+            exports.onFrame.end(this.checkSize)
         }
 
         mouseIndex(mouse) {
@@ -2661,7 +2647,7 @@ exports.change = addStyles
 
                 this.items.splice(newIndex, 0, item)
 
-                body.onFrame.start(this.readSize)
+                exports.onFrame.start(this.readSize)
 
                 sendEventTo(event, this.events.reorder)
             }
@@ -4284,7 +4270,7 @@ exports.change = addStyles
         }
 
         openPopup() {
-            body.onFrame.start(this.showPopup)
+            exports.onFrame.start(this.showPopup)
 
             numberPopup.dragCallback = this.onPopupDrag
         }
@@ -4918,7 +4904,7 @@ exports.change = addStyles
         }
 
         openPopup() {
-            body.onFrame.start(this.showPopup)
+            exports.onFrame.start(this.showPopup)
 
             colorPopup.changeCallback = this.onPopupChange
         }
@@ -5261,7 +5247,7 @@ exports.change = addStyles
         }
 
         openPopup() {
-            body.onFrame.start(this.showPopup)
+            exports.onFrame.start(this.showPopup)
 
             selectPopup.selectCallback = this.onPopupSelect
         }
@@ -5619,7 +5605,7 @@ exports.change = addStyles
         }
 
         openDropDown() {
-            body.onFrame.start(this.showDropDown)
+            exports.onFrame.start(this.showDropDown)
 
             fontPopup.hoverCallback = this.onDropDownHover
             fontPopup.clickCallback = this.onDropDownClick
@@ -6307,7 +6293,7 @@ exports.change = addStyles
                 scrollNode.scrollTop = 0
 
                 if (imagePopup.node.parentNode !== document.body) {
-                    body.onFrame.end(scrollList)
+                    exports.onFrame.end(scrollList)
                 }
             }
 
@@ -6674,7 +6660,7 @@ exports.change = addStyles
         }
 
         openDropDown() {
-            body.onFrame.start(this.showDropDown)
+            exports.onFrame.start(this.showDropDown)
 
             imagePopup.hoverCallback = this.onDropDownHover
             imagePopup.clickCallback = this.onDropDownClick
@@ -8372,7 +8358,7 @@ exports.change = addStyles
         }
 
         onResize() {
-            body.onFrame.start(this.readSize)
+            exports.onFrame.start(this.readSize)
         }
         readSize() {
             this.client = this.node.getBoundingClientRect()
@@ -9121,10 +9107,10 @@ exports.change = addStyles
 
                     showPopupData = data
 
-                    body.onFrame.start(setPopupPosition)
+                    exports.onFrame.start(setPopupPosition)
                 }
                 this.movePopup = () => {
-                    body.onFrame.start(setPopupPosition)
+                    exports.onFrame.start(setPopupPosition)
                 }
 
                 this.readSize = () => {
@@ -9132,7 +9118,7 @@ exports.change = addStyles
                     this._nodeOffsetHeight = this.node.offsetHeight
                 }
                 this.onResize = () => {
-                    body.onFrame.start(this.readSize)
+                    exports.onFrame.start(this.readSize)
 
                     if (
                         this._popupIndex < 0 ||
@@ -9419,7 +9405,7 @@ exports.change = addStyles
             this.items.push(data)
             this.listDocumentFragment.appendChild(node)
 
-            body.onFrame.end(this.writeListContent)
+            exports.onFrame.end(this.writeListContent)
         }
 
         set(list) {
@@ -9490,7 +9476,7 @@ exports.change = addStyles
                 }
 
                 this._scrollIndex = this._index
-                body.onFrame.end(this.scrollToElem)
+                exports.onFrame.end(this.scrollToElem)
 
                 if (this.options.popup && this._popupVisible) {
                     listPopup.hide()
@@ -9554,7 +9540,7 @@ exports.change = addStyles
                     }
 
                     this._scrollIndex = this._index
-                    body.onFrame.end(this.scrollToElem)
+                    exports.onFrame.end(this.scrollToElem)
 
                     sendEventTo(
                         {
@@ -11553,7 +11539,7 @@ class BoxEdit {
             )
         }
 
-        body.onFrame.end(this.updatePosition)
+        exports.onFrame.end(this.updatePosition)
 
         sendEventTo(
             {
@@ -11659,7 +11645,7 @@ class BoxEdit {
             event.fromUser = fromUser
             event.from = this
 
-            body.onFrame.end(this.updatePosition)
+            exports.onFrame.end(this.updatePosition)
 
             sendEventTo(event, this.events.change)
         }
@@ -12004,7 +11990,7 @@ class BoxEdit {
                 this.screenNode.style.width = currentDisplay.width + 'px'
                 this.screenNode.style.height = currentDisplay.height + 'px'
 
-                body.onFrame.end(this.writeSize)
+                exports.onFrame.end(this.writeSize)
             })
         }
 
@@ -12054,8 +12040,8 @@ class BoxEdit {
         }
 
         onResize() {
-            body.onFrame.start(this.readSize)
-            body.onFrame.end(this.writeSize)
+            exports.onFrame.start(this.readSize)
+            exports.onFrame.end(this.writeSize)
         }
 
         readSize() {
@@ -12203,7 +12189,7 @@ class BoxEdit {
         add(data) {
             this.data.nodes.push(data)
 
-            body.onFrame.end(this.writeNodes)
+            exports.onFrame.end(this.writeNodes)
         }
 
         set(data = {}) {
@@ -12230,10 +12216,10 @@ class BoxEdit {
                     this.nodes[i].update(this.data.nodes[i])
                 }
 
-                body.onFrame.end(this.writeNodes)
+                exports.onFrame.end(this.writeNodes)
             }
 
-            body.onFrame.end(this.writeContent)
+            exports.onFrame.end(this.writeContent)
         }
 
         update(data = {}) {
@@ -12277,14 +12263,14 @@ class BoxEdit {
                     this.data.nodes.push(data.nodes[i])
                 }
 
-                body.onFrame.end(this.writeNodes)
+                exports.onFrame.end(this.writeNodes)
             }
 
-            body.onFrame.end(this.writeContent)
+            exports.onFrame.end(this.writeContent)
         }
 
         updateDisplay() {
-            body.onFrame.end(this.writeContent)
+            exports.onFrame.end(this.writeContent)
         }
     }
     exports.Display = items.Display = Display
@@ -12757,7 +12743,7 @@ class BoxEdit {
             addStyles(this, styles)
 
             currentDisplay.onEvent('change', () => {
-                body.onFrame.end(this.writeSize)
+                exports.onFrame.end(this.writeSize)
             })
 
             body.onEvent('mousemove', event => {
@@ -12903,8 +12889,8 @@ class BoxEdit {
         }
 
         onResize() {
-            body.onFrame.start(this.readSize)
-            body.onFrame.end(this.writeSize)
+            exports.onFrame.start(this.readSize)
+            exports.onFrame.end(this.writeSize)
         }
 
         readSize() {
@@ -13392,7 +13378,7 @@ class BoxEdit {
                 .join('')
         }
 
-        body.onFrame.start(readTests)
+        exports.onFrame.start(readTests)
     }
 
     function getValidTextNode(textNode) {
@@ -13511,7 +13497,7 @@ class BoxEdit {
                 running = true
                 document.body.appendChild(testContainer)
 
-                body.onFrame.end(writeTests)
+                exports.onFrame.end(writeTests)
             }
         } else {
             textNode = getValidTextNode(textNode)
@@ -13530,7 +13516,7 @@ class BoxEdit {
                 running = true
                 document.body.appendChild(testContainer)
 
-                body.onFrame.end(writeTests)
+                exports.onFrame.end(writeTests)
             }
         }
     }
@@ -13875,7 +13861,7 @@ class BoxEdit {
                 this.properties.title = title
 
                 this.needsChange.title = true
-                body.onFrame.end(this.writeContent)
+                exports.onFrame.end(this.writeContent)
             }
         }
 
@@ -13891,13 +13877,13 @@ class BoxEdit {
             this.properties.editing = active
 
             this.needsChange.editing = true
-            body.onFrame.end(this.writeContent)
+            exports.onFrame.end(this.writeContent)
         }
         set dragActive(active) {
             this.properties.dragging = active
 
             this.needsChange.dragging = true
-            body.onFrame.end(this.writeContent)
+            exports.onFrame.end(this.writeContent)
         }
 
         get active() {
@@ -13916,7 +13902,7 @@ class BoxEdit {
                 }
 
                 this.needsChange.active = true
-                body.onFrame.end(this.writeContent)
+                exports.onFrame.end(this.writeContent)
             }
         }
 
@@ -13934,7 +13920,7 @@ class BoxEdit {
                 }
 
                 this.needsChange.selected = true
-                body.onFrame.end(this.writeContent)
+                exports.onFrame.end(this.writeContent)
             }
         }
 
@@ -13949,7 +13935,7 @@ class BoxEdit {
             this.properties.disabled = disabled
 
             this.needsChange.disabled = true
-            body.onFrame.end(this.writeContent)
+            exports.onFrame.end(this.writeContent)
         }
 
         get errors() {}
@@ -13961,7 +13947,7 @@ class BoxEdit {
             }
 
             this.needsChange.errors = true
-            body.onFrame.end(this.writeContent)
+            exports.onFrame.end(this.writeContent)
         }
 
         get sections() {
@@ -13986,7 +13972,7 @@ class BoxEdit {
                 this.items.splice(sections.length, this.items.length)
 
                 this.needsChange.sectionCount = true
-                body.onFrame.end(this.writeContent)
+                exports.onFrame.end(this.writeContent)
             }
         }
 
@@ -14070,7 +14056,7 @@ class BoxEdit {
                 }
             })
 
-            body.onFrame.end(this.writeContent)
+            exports.onFrame.end(this.writeContent)
         }
 
         indexOf(item) {
@@ -14099,7 +14085,7 @@ class BoxEdit {
 
                 this.needsChange.sectionCount = true
 
-                body.onFrame.end(this.writeContent)
+                exports.onFrame.end(this.writeContent)
             }
         }
 
@@ -14107,13 +14093,13 @@ class BoxEdit {
             this.properties.minimized = false
 
             this.needsChange.minimized = true
-            body.onFrame.end(this.writeContent)
+            exports.onFrame.end(this.writeContent)
         }
         minimize() {
             this.properties.minimized = true
 
             this.needsChange.minimized = true
-            body.onFrame.end(this.writeContent)
+            exports.onFrame.end(this.writeContent)
         }
 
         writeContent() {
@@ -14395,7 +14381,7 @@ class BoxEdit {
                 this.properties.height = height
 
                 this.needsChange.height = true
-                body.onFrame.end(this.writeContent)
+                exports.onFrame.end(this.writeContent)
             }
         }
 
@@ -14415,7 +14401,7 @@ class BoxEdit {
 
                 this.needsChange.active = true
 
-                body.onFrame.end(this.writeContent)
+                exports.onFrame.end(this.writeContent)
             }
         }
 
@@ -14434,7 +14420,7 @@ class BoxEdit {
                 }
 
                 this.needsChange.selected = true
-                body.onFrame.end(this.writeContent)
+                exports.onFrame.end(this.writeContent)
             }
         }
 
@@ -14446,7 +14432,7 @@ class BoxEdit {
                 this.properties.error = error
 
                 this.needsChange.error = true
-                body.onFrame.end(this.writeContent)
+                exports.onFrame.end(this.writeContent)
             }
         }
 
@@ -14458,7 +14444,7 @@ class BoxEdit {
                 this.properties.title = title
 
                 this.needsChange.title = true
-                body.onFrame.end(this.writeContent)
+                exports.onFrame.end(this.writeContent)
             }
         }
 
@@ -14470,7 +14456,7 @@ class BoxEdit {
                 this.properties.content = content
 
                 this.needsChange.content = true
-                body.onFrame.end(this.writeContent)
+                exports.onFrame.end(this.writeContent)
             }
         }
 
@@ -14794,7 +14780,7 @@ class BoxEdit {
 
                 printPageTestElem.firstChild.appendChild(elem)
 
-                body.onFrame.start(() => {
+                exports.onFrame.start(() => {
                     if (text._testCacheOptions !== text._cacheOptions) {
                         if (!testQueue.includes(text)) {
                             testQueue.push(text)
@@ -14802,7 +14788,7 @@ class BoxEdit {
 
                         if (!awaitingTest) {
                             awaitingTest = true
-                            body.onFrame.end(doTest)
+                            exports.onFrame.end(doTest)
                         }
 
                         return false
@@ -14814,7 +14800,7 @@ class BoxEdit {
                         awaitingTest = false
                     } else {
                         awaitingTest = true
-                        body.onFrame.end(doTest)
+                        exports.onFrame.end(doTest)
                     }
                 })
             }
@@ -14834,7 +14820,7 @@ class BoxEdit {
                     }
                 }
 
-                body.onFrame.start(() => {
+                exports.onFrame.start(() => {
                     if (testMargin) {
                         marginSizes[options.font][options.fontSize] =
                             marginTestElem.offsetHeight
@@ -14850,7 +14836,7 @@ class BoxEdit {
                         awaitingTest = false
                     } else {
                         awaitingTest = true
-                        body.onFrame.end(doTest)
+                        exports.onFrame.end(doTest)
                     }
                 })
             }
@@ -14897,7 +14883,7 @@ class BoxEdit {
 
                 if (!awaitingTest) {
                     awaitingTest = true
-                    body.onFrame.end(doTest)
+                    exports.onFrame.end(doTest)
                 }
             }
 
@@ -14920,7 +14906,7 @@ class BoxEdit {
 
                 if (!awaitingTest) {
                     awaitingTest = true
-                    body.onFrame.end(doTest)
+                    exports.onFrame.end(doTest)
                 }
             }
         }
@@ -15333,7 +15319,7 @@ class BoxEdit {
 
                 this.writeSize()
 
-                body.onFrame.end(this.offsetScroll)
+                exports.onFrame.end(this.offsetScroll)
             }
         }
 
@@ -15853,8 +15839,8 @@ class BoxEdit {
         }
 
         onResize() {
-            body.onFrame.start(this.readSize)
-            body.onFrame.end(this.writeSize)
+            exports.onFrame.start(this.readSize)
+            exports.onFrame.end(this.writeSize)
         }
 
         clear() {
