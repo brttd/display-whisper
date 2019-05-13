@@ -235,13 +235,14 @@ function getIconUrl(name) {
           )
         : ''
 }
-
+let pathSepRegex = new RegExp('\\' + path.sep, 'g')
+//Returns the file path formatted for loading by Chromium
 function formatUrl(url) {
     if (!url) {
         return ''
     }
     //Replace all instances of the os path seperator with forward slashes
-    url = url.replace(new RegExp('\\' + path.sep, 'g'), '/')
+    url = url.replace(pathSepRegex, '/')
 
     return 'url("' + path.posix.normalize(url) + '")'
 }
