@@ -435,10 +435,10 @@ const fonts = {}
         let elem = document.createElement('span')
         elem.style.opacity = '0'
         elem.style.position = 'fixed'
-        elem.style.top = '10000px'
+        elem.style.top = '200vh'
         elem.style.userSelect = 'none'
 
-        elem.textContent = 'Hello World'
+        elem.innerHTML = 'a1<b>b2</b><i>c3<b>d4</b></i>'
 
         elem.style.fontFamily = '"' + fonts.all[0] + '"'
 
