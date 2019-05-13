@@ -1160,15 +1160,6 @@ exports.change = addStyles
 
         Constructor data:
             text (string): Text content of item.
-        
-        Properties:
-            text (get/set): Retrieve/update the text content
-        
-        Methods:
-            N/A
-        
-        Events:
-            N/A
         */
         constructor(data = {}, styles = {}) {
             super(document.createElement('p'), styles)
@@ -1182,7 +1173,7 @@ exports.change = addStyles
         }
         set text(text) {
             if (typeof text === 'string') {
-                //Always show at least one character
+                //Always show at least one character so that element does not resize smaller than one line
                 if (text === '') {
                     this.node.textContent = ' '
                 } else {
@@ -1225,16 +1216,6 @@ exports.change = addStyles
         Constructor data:
             url (string): Image url.
             color (string: CSS Color): Background color.
-
-        Properties:
-            color (get/set) (string: CSS Color): Background color.
-            url (get/set) (string): Image url.
-        
-        Methods:
-            N/A
-
-        Events:
-            N/A
         */
         constructor(data = {}, styles = {}) {
             super(document.createElement('div'), styles)
@@ -1245,6 +1226,7 @@ exports.change = addStyles
             this._url = ''
         }
 
+        //Background color
         get color() {
             return this.node.style.backgroundColor
         }
@@ -1268,19 +1250,7 @@ exports.change = addStyles
 
     class Filler extends Item {
         /*
-        Fill up unused space, used for adding spacing between items.
-
-        Constructor data:
-            N/A
-
-        Properties:
-            N/A
-        
-        Methods:
-            N/A
-
-        Events:
-            N/A
+        Fills up unused space, used for adding spacing between items.
         */
         constructor(data = {}, styles = {}) {
             super(document.createElement('div'), styles)
@@ -1313,14 +1283,6 @@ exports.change = addStyles
 
         Properties:
             items (Array: Items): List of items currently in block.
-        
-        Methods:
-            add (item: Item, index(?): number): Adds given item to the block. If index is specified, will be inserted before the item currently in that position. Otherwise appended to the end.
-            remove (item(?): Item || index(?): number): Removes given item from block. If index is given, removes item at that position.
-            move (index: number, newIndex: number): Moves the item at the given index to the new index.
-            clear: Removes all items from block.
-
-        Events:
         */
         constructor(data = {}, styles = {}) {
             super(document.createElement('div'), {})
@@ -1404,6 +1366,7 @@ exports.change = addStyles
             exports.onFrame.end(this.checkSize)
         }
 
+        //Adds given item to the block. If index is specified, will be inserted before the item currently in that position. Otherwise appended to the end.
         add(item, index = -1) {
             if (validItem(item) && !this.items.includes(item)) {
                 if (this._spacing) {
@@ -1433,6 +1396,7 @@ exports.change = addStyles
             }
         }
 
+        //Removes given item from block. If index is given, removes item at that position
         remove(index = -1) {
             //If an item is passed instead of a number, find the index of the item
             if (validItem(index)) {
@@ -1454,6 +1418,7 @@ exports.change = addStyles
             }
         }
 
+        //Removes all items
         clear() {
             for (let i = 0; i < this.items.length; i++) {
                 this.items[i].parent = null
