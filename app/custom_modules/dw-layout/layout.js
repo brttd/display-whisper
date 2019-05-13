@@ -6823,15 +6823,12 @@ exports.change = addStyles
         'removeFormat'
     ]
 
-    let activeRichTextContextMenu = false
-
     let pasteHtmlStartRegex = new RegExp(/<[\S\s]*tFragment-->/)
     let pasteHtmlEndRegex = new RegExp(/\s*<!--E[\S\s]*/)
 
     function setupRichTextContextMenu() {
-        if (activeRichTextContextMenu !== false) {
-            return false
-        }
+        //The function should only be called once, so the first time it's called replace it with an empty function
+        setupRichTextContextMenu = () => {}
 
         activeRichTextContextMenu = null
 
