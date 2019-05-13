@@ -45,7 +45,7 @@ let display = {
         window: BrowserWindow instance
     }
     */
-    screens: [],
+    outputDisplays: [],
 
     //Where to get the master display size from
     //Either "Smallest", "Average", "Largest", or "Custom"
@@ -553,25 +553,24 @@ function onWinNavigate(event, url) {
     event.preventDefault()
 }
 
-function openDisplayWindow(screenIndex) {
-    //screenIndex is the index of the screen in display.screens
+function openDisplayWindow(displayIndex) {
+    //displayIndex is the index of the screen in display.outputDisplays
 
-    if (screenIndex < 0 || screenIndex >= display.screens.length) {
+    if (displayIndex < 0 || displayIndex >= display.outputDisplays.length) {
         return false
     }
 
-    if (display.screens[screenIndex].window) {
-        updateDisplayPosition(screenIndex)
-        display.screens[screenIndex].window.focus()
+    if (display.outputDisplays[displayIndex].window) {
+        updateDisplayPosition(displayIndex)
 
-        return display.screens[screenIndex].window
+        return display.outputDisplays[displayIndex].window
     }
 
     let displayWindow = new BrowserWindow({
-        width: display.screens[screenIndex].bounds.width,
-        height: display.screens[screenIndex].bounds.height,
-        x: display.screens[screenIndex].bounds.x,
-        y: display.screens[screenIndex].bounds.y,
+        width: display.outputDisplays[displayIndex].bounds.width,
+        height: display.outputDisplays[displayIndex].bounds.height,
+        x: display.outputDisplays[displayIndex].bounds.x,
+        y: display.outputDisplays[displayIndex].bounds.y,
 
         icon: path.join(appPath, 'icons/app.ico'),
 
@@ -600,24 +599,24 @@ function openDisplayWindow(screenIndex) {
         }
     })
 
-    display.screens[screenIndex].window = displayWindow
+    display.outputDisplays[displayIndex].window = displayWindow
 
     displayWindow.on('close', () => {
-        let newScreenIndex = display.screens.findIndex(subDisplay => {
-            return subDisplay.window === displayWindow
+        let actualDisplayIndex = display.outputDisplays.findIndex(aDisplay => {
+            return aDisplay.window === displayWindow
         })
 
-        if (newScreenIndex !== -1) {
-            removeDisplayScreen(newScreenIndex)
+        if (actualDisplayIndex !== -1) {
+            removeDisplayOutput(actualDisplayIndex)
         }
     })
     displayWindow.on('closed', () => {
-        let newScreenIndex = display.screens.findIndex(subDisplay => {
-            return subDisplay.window === displayWindow
+        let actualDisplayIndex = display.outputDisplays.findIndex(aDisplay => {
+            return aDisplay.window === displayWindow
         })
 
-        if (newScreenIndex !== -1) {
-            display.screens[newScreenIndex].window = null
+        if (actualDisplayIndex !== -1) {
+            display.outputDisplays[actualDisplayIndex].window = null
         }
 
         displayWindow = undefined
@@ -691,12 +690,12 @@ function openDisplayWindow(screenIndex) {
             displayWindow.webContents.send('display', lastDisplayData)
         }
 
-        let newScreenIndex = display.screens.findIndex(subDisplay => {
-            return subDisplay.window === displayWindow
+        let actualDisplayIndex = display.outputDisplays.findIndex(aDisplay => {
+            return aDisplay.window === displayWindow
         })
 
-        if (newScreenIndex !== -1) {
-            updateDisplayPosition(newScreenIndex)
+        if (actualDisplayIndex !== -1) {
+            updateDisplayPosition(actualDisplayIndex)
             displayWindow.show()
         }
     })
@@ -809,12 +808,12 @@ function openControl() {
         //Control window is fully closed, so program shutdown logic starts
 
         for (
-            let screenIndex = 0;
-            screenIndex < display.screens.length;
-            screenIndex++
+            let displayIndex = 0;
+            displayIndex < display.outputDisplays.length;
+            displayIndex++
         ) {
-            if (display.screens[screenIndex].window) {
-                display.screens[screenIndex].window.destroy()
+            if (display.outputDisplays[displayIndex].window) {
+                display.outputDisplays[displayIndex].window.destroy()
             }
         }
 
@@ -1148,9 +1147,9 @@ function sendToAllWindows() {
         }
     }
 
-    for (let i = 0; i < display.screens.length; i++) {
-        if (display.screens[i].window) {
-            display.screens[i].window.webContents.send(...arguments)
+    for (let i = 0; i < display.outputDisplays.length; i++) {
+        if (display.outputDisplays[i].window) {
+            display.outputDisplays[i].window.webContents.send(...arguments)
         }
     }
 
@@ -1240,7 +1239,7 @@ function getDisplayInfo() {
             height: display.bounds.height
         },
 
-        screens: display.screens.map(subDisplay => subDisplay.screen),
+        screens: display.outputDisplays.map(aDisplay => aDisplay.screen),
         screenCount: displays.length,
 
         masterScreen: display.masterScreen
@@ -1249,7 +1248,7 @@ function getDisplayInfo() {
 
 function updateMasterDisplay() {
     if (display.masterScale !== 'Custom') {
-        if (display.screens.length === 0) {
+        if (display.outputDisplays.length === 0) {
             //The current master display is based on the output displays
             //But there are currently no active output displays
 
@@ -1279,11 +1278,11 @@ function updateMasterDisplay() {
                 display.bounds.height = Infinity
 
                 for (
-                    let screenIndex = 0;
-                    screenIndex < display.screens.length;
-                    screenIndex++
+                    let displayIndex = 0;
+                    displayIndex < display.outputDisplays.length;
+                    displayIndex++
                 ) {
-                    let newBounds = display.screens[screenIndex].bounds
+                    let newBounds = display.outputDisplays[displayIndex].bounds
 
                     //If the pixel count is smaller, or if the pixel count is the same and the aspect ratio smaller
                     //(The aspect ratio check is to ensure that the master display selected is not dependant on the order displays were selected as outputs)
@@ -1299,7 +1298,7 @@ function updateMasterDisplay() {
                         display.bounds.height = newBounds.height
 
                         display.masterScreen =
-                            display.screens[screenIndex].screen
+                            display.outputDisplays[displayIndex].screen
                     }
                 }
             } else if (display.masterScale === 'Largest') {
@@ -1307,11 +1306,11 @@ function updateMasterDisplay() {
                 display.bounds.height = 0
 
                 for (
-                    let screenIndex = 0;
-                    screenIndex < display.screens.length;
-                    screenIndex++
+                    let displayIndex = 0;
+                    displayIndex < display.outputDisplays.length;
+                    displayIndex++
                 ) {
-                    let newBounds = display.screens[screenIndex].bounds
+                    let newBounds = display.outputDisplays[displayIndex].bounds
 
                     //If the pixel count is larger, or if the pixel count is the same and the aspect ratio larger
                     //(The aspect ratio check is to ensure that the master display selected is not dependant on the order displays were selected as outputs)
@@ -1327,7 +1326,7 @@ function updateMasterDisplay() {
                         display.bounds.height = newBounds.height
 
                         display.masterScreen =
-                            display.screens[screenIndex].screen
+                            display.outputDisplays[displayIndex].screen
                     }
                 }
             } else {
@@ -1336,18 +1335,18 @@ function updateMasterDisplay() {
                 display.bounds.height = 0
 
                 for (
-                    let screenIndex = 0;
-                    screenIndex < display.screens.length;
-                    screenIndex++
+                    let displayIndex = 0;
+                    displayIndex < display.outputDisplays.length;
+                    displayIndex++
                 ) {
                     display.bounds.width +=
-                        display.screens[screenIndex].bounds.width
+                        display.outputDisplays[displayIndex].bounds.width
                     display.bounds.height +=
-                        display.screens[screenIndex].bounds.height
+                        display.outputDisplays[displayIndex].bounds.height
                 }
 
-                display.bounds.width /= display.screens.length
-                display.bounds.height /= display.screens.length
+                display.bounds.width /= display.outputDisplays.length
+                display.bounds.height /= display.outputDisplays.length
             }
 
             if (
@@ -1381,81 +1380,77 @@ function updateMasterDisplay() {
 let updateDisplayPosition
 
 if (process.platform === 'darwin') {
-    updateDisplayPosition = screenIndex => {
+    updateDisplayPosition = displayIndex => {
         if (
-            screenIndex < 0 ||
-            screenIndex >= display.screens.length ||
-            !display.screens[screenIndex].window
+            displayIndex < 0 ||
+            displayIndex >= display.outputDisplays.length ||
+            !display.outputDisplays[displayIndex].window
         ) {
             return false
         }
 
-        display.screens[screenIndex].window.setSimpleFullScreen(false)
-        display.screens[screenIndex].window.setBounds(
-            display.screens[screenIndex].bounds
+        display.outputDisplays[displayIndex].window.setSimpleFullScreen(false)
+        display.outputDisplays[displayIndex].window.setBounds(
+            display.outputDisplays[displayIndex].bounds
         )
-        display.screens[screenIndex].window.setSimpleFullScreen(true)
+        display.outputDisplays[displayIndex].window.setSimpleFullScreen(true)
     }
 } else {
-    updateDisplayPosition = screenIndex => {
+    updateDisplayPosition = displayIndex => {
         if (
-            screenIndex < 0 ||
-            screenIndex >= display.screens.length ||
-            !display.screens[screenIndex].window
+            displayIndex < 0 ||
+            displayIndex >= display.outputDisplays.length ||
+            !display.outputDisplays[displayIndex].window
         ) {
             return false
         }
 
-        display.screens[screenIndex].window.setBounds(
-            display.screens[screenIndex].bounds
+        display.outputDisplays[displayIndex].window.setBounds(
+            display.outputDisplays[displayIndex].bounds
         )
-        display.screens[screenIndex].window.setFullScreen(true)
+        display.outputDisplays[displayIndex].window.setFullScreen(true)
     }
 }
 
-function updateDisplayScreen(screenIndex) {
-    if (screenIndex < 0 || screenIndex >= display.screens.length) {
+function updateOutputDisplay(displayIndex) {
+    if (displayIndex < 0 || displayIndex >= display.outputDisplays.length) {
         return false
     }
 
-    display.screens[screenIndex].screen = Math.min(
-        display.screens[screenIndex].screen,
+    display.outputDisplays[displayIndex].screen = Math.min(
+        Math.max(0, display.outputDisplays[displayIndex].screen),
         displays.length - 1
     )
 
-    display.screens[screenIndex].bounds =
-        displays[display.screens[screenIndex].screen].bounds
+    display.outputDisplays[displayIndex].bounds =
+        displays[display.outputDisplays[displayIndex].screen].bounds
 
-    if (display.screens[screenIndex].window) {
-        updateDisplayPosition(screenIndex)
+    if (display.outputDisplays[displayIndex].window) {
+        updateDisplayPosition(displayIndex)
     } else {
-        openDisplayWindow(screenIndex)
+        openDisplayWindow(displayIndex)
     }
 }
 
-function addDisplayScreen(displayIndex) {
-    if (displayIndex < 0 || displayIndex >= displays.length) {
+function addScreenDisplayOutput(screenIndex) {
+    //If the index is out of bounds, or already an output display
+    if (
+        screenIndex < 0 ||
+        screenIndex >= displays.length ||
+        display.outputDisplays.find(aDisplay => aDisplay.screen === screenIndex)
+    ) {
         return false
     }
 
-    let alreadyDisplaying = display.screens.find(
-        subDisplay => subDisplay.screen === displayIndex
-    )
-
-    if (alreadyDisplaying) {
-        return false
-    }
-
-    display.screens.push({
-        bounds: displays[displayIndex].bounds,
-        screen: displayIndex
+    display.outputDisplays.push({
+        screen: screenIndex
     })
 
-    openDisplayWindow(display.screens.length - 1)
+    updateOutputDisplay(display.outputDisplays.length - 1)
 
     settings.set(
         'display.defaultScreens',
-        display.screens.map(subDisplay => subDisplay.screen)
+        display.outputDisplays.map(aDisplay => aDisplay.screen)
     )
 
     if (display.masterScale === 'Custom') {
@@ -1464,12 +1459,12 @@ function addDisplayScreen(displayIndex) {
         updateMasterDisplay()
     }
 }
-function removeDisplayScreen(screenIndex) {
-    if (screenIndex < 0 || screenIndex >= display.screens.length) {
+function removeDisplayOutput(displayIndex) {
+    if (displayIndex < 0 || displayIndex >= display.outputDisplays.length) {
         return false
     }
 
-    let removedDisplay = display.screens.splice(screenIndex, 1)[0]
+    let removedDisplay = display.outputDisplays.splice(displayIndex, 1)[0]
 
     if (removedDisplay.window) {
         removedDisplay.window.destroy()
@@ -1477,7 +1472,7 @@ function removeDisplayScreen(screenIndex) {
 
     settings.set(
         'display.defaultScreens',
-        display.screens.map(subDisplay => subDisplay.screen)
+        display.outputDisplays.map(aDisplay => aDisplay.screen)
     )
 
     if (display.masterScale === 'Custom') {
@@ -1486,15 +1481,15 @@ function removeDisplayScreen(screenIndex) {
         updateMasterDisplay()
     }
 }
-function toggleDisplayScreen(index) {
-    let screenIndex = display.screens.findIndex(
-        subDisplay => subDisplay.screen === index
+function toggleScreenDisplayOutput(screenIndex) {
+    let displayIndex = display.outputDisplays.findIndex(
+        aDisplay => aDisplay.screen === screenIndex
     )
 
-    if (screenIndex === -1) {
-        addDisplayScreen(index)
+    if (displayIndex === -1) {
+        addScreenDisplayOutput(screenIndex)
     } else {
-        removeDisplayScreen(screenIndex)
+        removeDisplayOutput(displayIndex)
     }
 }
 
@@ -2550,12 +2545,12 @@ ipcMain.on('close', event => {
     //Display a slide
     ipcMain.on('display', (event, data) => {
         for (
-            let screenIndex = 0;
-            screenIndex < display.screens.length;
-            screenIndex++
+            let displayIndex = 0;
+            displayIndex < display.outputDisplays.length;
+            displayIndex++
         ) {
-            if (display.screens[screenIndex].window) {
-                display.screens[screenIndex].window.webContents.send(
+            if (display.outputDisplays[displayIndex].window) {
+                display.outputDisplays[displayIndex].window.webContents.send(
                     'display',
                     data
                 )
@@ -2581,15 +2576,14 @@ ipcMain.on('close', event => {
 
         if (event.sender === windows.control.webContents) {
             for (
-                let screenIndex = 0;
-                screenIndex < display.screens.length;
-                screenIndex++
+                let displayIndex = 0;
+                displayIndex < display.outputDisplays.length;
+                displayIndex++
             ) {
-                if (display.screens[screenIndex].window) {
-                    display.screens[screenIndex].window.webContents.send(
-                        'display-blank',
-                        blank
-                    )
+                if (display.outputDisplays[displayIndex].window) {
+                    display.outputDisplays[
+                        displayIndex
+                    ].window.webContents.send('display-blank', blank)
                 }
             }
         } else {
@@ -2599,12 +2593,12 @@ ipcMain.on('close', event => {
 
     //Toggle display output to specific screen
     ipcMain.on('toggle-display-screen', (event, index) => {
-        toggleDisplayScreen(index)
+        toggleScreenDisplayOutput(index)
     })
 
     ipcMain.on('disable-display', () => {
-        for (let i = display.screens.length - 1; i >= 0; i--) {
-            removeDisplayScreen(i)
+        for (let i = display.outputDisplays.length - 1; i >= 0; i--) {
+            removeDisplayOutput(i)
         }
     })
 }
@@ -2657,9 +2651,11 @@ ipcMain.on('close', event => {
 
 //Gets, and listens for information about system displays
 function setupDisplays() {
-    if (!screen) {
-        screen = electron.screen
-    }
+    screen = electron.screen
+
+    //Stop the function from being run again
+    setupDisplays = () => {}
+
     displays = screen.getAllDisplays()
 
     primaryScreen = screen.getPrimaryDisplay()
@@ -2669,11 +2665,9 @@ function setupDisplays() {
         display.masterScale
     )
 
-    //load default screen, and display show/hide from settings
-    //If screen isn't set, use second screen if available, otherwise first
-    let defaultScreens = settings.get('display.screens', [])
+    let defaultScreens = settings.get('display.outputDisplays', [])
     for (let i = 0; i < defaultScreens.length; i++) {
-        addDisplayScreen(defaultScreens[i])
+        addScreenDisplayOutput(defaultScreens[i])
     }
 
     updateMasterDisplay()
@@ -2681,52 +2675,81 @@ function setupDisplays() {
     screen.on('display-added', (event, newDisplay) => {
         displays = screen.getAllDisplays()
 
+        for (
+            let displayIndex = 0;
+            displayIndex < display.outputDisplays.length;
+            displayIndex++
+        ) {
+            updateOutputDisplay(displayIndex)
+        }
+
         sendToAllWindows('display-info', getDisplayInfo())
     })
 
     screen.on('display-removed', (event, oldDisplay) => {
-        let oldDisplayIndex = displays.findIndex(
+        let oldScreenIndex = displays.findIndex(
             display => display.id === oldDisplay.id
         )
 
+        if (oldScreenIndex === -1) {
+            oldScreenIndex = displays.length + 1
+        }
+
         displays = screen.getAllDisplays()
 
-        let screenIndex = display.screens.findIndex(subDisplay => {
-            return subDisplay.screen === oldDisplayIndex
-        })
-
-        if (screenIndex !== -1) {
-            removeDisplayScreen(screenIndex)
-        }
-
-        for (let i = 0; i < display.screens.length; i++) {
-            if (display.screens[i].screen >= oldDisplayIndex) {
-                display.screens[i].screen -= 1
-
-                updateDisplayScreen(i)
+        let removedDisplayScreenIndex = display.outputDisplays.findIndex(
+            aDisplay => {
+                return aDisplay.screen === oldScreenIndex
             }
+        )
+
+        if (removedDisplayScreenIndex !== -1) {
+            removeDisplayOutput(removedDisplayScreenIndex)
         }
 
-        if (display.masterScreen >= oldDisplayIndex) {
-            updateMasterDisplay()
-        } else {
+        //Backwards loop, as displays might be removed
+        for (
+            let displayIndex = display.outputDisplays.length - 1;
+            displayIndex >= 0;
+            displayIndex--
+        ) {
+            if (display.outputDisplays[displayIndex].screen >= oldScreenIndex) {
+                display.outputDisplays[displayIndex].screen -= 1
+            }
+
+            //Check that there aren't two display outputs using the same display screen
+            for (
+                let prevDisplayIndex = displayIndex + 1;
+                prevDisplayIndex < display.outputDisplays.length;
+                prevDisplayIndex++
+            ) {
+                if (
+                    display.outputDisplays[displayIndex].screen ===
+                    display.outputDisplays[prevDisplayIndex].screen
+                ) {
+                    removeDisplayOutput(prevDisplayIndex)
+                }
+            }
+
+            updateOutputDisplay(displayIndex)
+        }
+
+        if (display.masterScale === 'Custom') {
             sendToAllWindows('display-info', getDisplayInfo())
+        } else {
+            updateMasterDisplay()
         }
     })
 
-    screen.on('display-metrics-changed', (event, changedDisplay) => {
-        let displayIndex = displays.findIndex(
-            display => display.id === changedDisplay.id
-        )
-
+    screen.on('display-metrics-changed', () => {
         displays = screen.getAllDisplays()
 
         for (
-            let screenIndex = 0;
-            screenIndex < display.screens.length;
-            screenIndex++
+            let displayIndex = 0;
+            displayIndex < display.outputDisplays.length;
+            displayIndex++
         ) {
-            updateDisplayScreen(screenIndex)
+            updateOutputDisplay(displayIndex)
         }
 
         if (display.masterScale !== 'Custom') {
