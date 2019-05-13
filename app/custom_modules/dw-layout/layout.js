@@ -1221,9 +1221,9 @@ exports.change = addStyles
             super(document.createElement('div'), styles)
             this.addClass('image')
 
+            this._url = ''
             this.color = data.color
             this.url = data.url
-            this._url = ''
         }
 
         //Background color
@@ -1252,9 +1252,8 @@ exports.change = addStyles
         /*
         Fills up unused space, used for adding spacing between items.
         */
-        constructor(data = {}, styles = {}) {
-            super(document.createElement('div'), styles)
-
+        constructor() {
+            super(document.createElement('div'))
             this.addClass('filler')
         }
     }
@@ -1442,6 +1441,103 @@ exports.change = addStyles
     loadCSS('layout.css')
 
     const dividerSize = 5
+
+    class LayoutDivider extends Item {
+        /*
+        Divider lines, used in LayoutBlock to resize sections
+
+        Constructor data:
+            direction (string: 'vertical' or 'horizontal'): Which direction to display as.
+            small (boolean): If true, displayed with thin style.
+        */
+        constructor(data = {}) {
+            super(document.createElement('div'))
+            this.addClass('layout-divider')
+
+            this._direction = 'vertical'
+
+            if (typeof data.direction === 'string') {
+                this.direction = data.direction
+            }
+
+            if (data.small) {
+                this.addClass('small')
+            }
+
+            let mousedown = false
+            this.node.addEventListener('mousedown', event => {
+                if (
+                    this.parent instanceof LayoutBlock === false ||
+                    event.button !== 0
+                ) {
+                    return false
+                }
+
+                mousedown = true
+
+                body.setCursor(
+                    this._direction === 'horizontal'
+                        ? 'col-resize'
+                        : 'row-resize'
+                )
+            })
+
+            let mouse = {
+                x: 0,
+                y: 0
+            }
+
+            let updateParent = function() {
+                if (this.parent instanceof LayoutBlock === false) {
+                    return false
+                }
+
+                let position = 50
+
+                if (this._direction === 'horizontal') {
+                    position = mouse.x / this.parent.nodeWidth
+                } else if (this._direction === 'vertical') {
+                    position = mouse.y / this.parent.nodeHeight
+                }
+
+                this.parent.setDividerPosition(this, position * 100)
+            }.bind(this)
+
+            body.onEvent('mousemove', event => {
+                if (
+                    !mousedown ||
+                    this.parent instanceof LayoutBlock === false
+                ) {
+                    return false
+                }
+
+                mouse.x = event.pageX - this.parent._left
+                mouse.y = event.pageY - this.parent._top
+
+                exports.onFrame.start(updateParent)
+            })
+
+            body.onEvent('blur', () => {
+                mousedown = false
+            })
+
+            body.onEvent('mouseup', () => {
+                mousedown = false
+            })
+        }
+
+        set direction(direction) {
+            if (direction !== 'vertical' && direction !== 'horizontal') {
+                return false
+            }
+
+            this._direction = direction
+
+            this.removeClass('vertical horizontal')
+            this.addClass(this._direction)
+        }
+    }
+    items.LayoutDivider = LayoutDivider
 
     class LayoutBlock extends Item {
         /*
@@ -1934,112 +2030,6 @@ exports.change = addStyles
         }
     }
     exports.LayoutBlock = items.LayoutBlock = LayoutBlock
-
-    class LayoutDivider extends Item {
-        /*
-        Divider lines, used in LayoutBlock to resize sections
-
-        Constructor data:
-            direction (string: 'vertical' or 'horizontal'): Which direction to display as.
-            small (boolean): If true, displayed with thin style.
-        
-        Properties:
-            direction (set) (boolean): Direction.
-        
-        Methods:
-            N/A
-        
-        Events:
-            N/A
-        */
-        constructor(data = {}) {
-            super(document.createElement('div'))
-            this.addClass('layout-divider')
-
-            this._direction = 'vertical'
-
-            if (typeof data.direction === 'string') {
-                this.direction = data.direction
-            }
-
-            if (data.small) {
-                this.addClass('small')
-            }
-
-            let mousedown = false
-            this.node.addEventListener('mousedown', event => {
-                if (
-                    this.parent instanceof LayoutBlock === false ||
-                    event.button !== 0
-                ) {
-                    return false
-                }
-
-                mousedown = true
-
-                body.setCursor(
-                    this._direction === 'horizontal'
-                        ? 'col-resize'
-                        : 'row-resize'
-                )
-            })
-
-            let mouse = {
-                x: 0,
-                y: 0
-            }
-
-            let updateParent = function() {
-                if (this.parent instanceof LayoutBlock === false) {
-                    return false
-                }
-
-                let position = 50
-
-                if (this._direction === 'horizontal') {
-                    position = mouse.x / this.parent.nodeWidth
-                } else if (this._direction === 'vertical') {
-                    position = mouse.y / this.parent.nodeHeight
-                }
-
-                this.parent.setDividerPosition(this, position * 100)
-            }.bind(this)
-
-            body.onEvent('mousemove', event => {
-                if (
-                    !mousedown ||
-                    this.parent instanceof LayoutBlock === false
-                ) {
-                    return false
-                }
-
-                mouse.x = event.pageX - this.parent._left
-                mouse.y = event.pageY - this.parent._top
-
-                exports.onFrame.start(updateParent)
-            })
-
-            body.onEvent('blur', () => {
-                mousedown = false
-            })
-
-            body.onEvent('mouseup', () => {
-                mousedown = false
-            })
-        }
-
-        set direction(direction) {
-            if (direction !== 'vertical' && direction !== 'horizontal') {
-                return false
-            }
-
-            this._direction = direction
-
-            this.removeClass('vertical horizontal')
-            this.addClass(this._direction)
-        }
-    }
-    items.LayoutDivider = LayoutDivider
 }
 
 //Interactive items
