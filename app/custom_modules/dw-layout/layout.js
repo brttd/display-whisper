@@ -6702,7 +6702,7 @@ exports.change = addStyles
         overflow-wrap: break-word;
         word-break: normal;
 
-        hyphens: auto;
+        hyphens: manual;
     }
     `
     let richTextYMap = {

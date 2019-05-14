@@ -7,7 +7,7 @@ overflow: hidden;
 overflow-wrap: break-word;
 word-break: normal;
 
-hyphens: auto;
+hyphens: manual;
 
 
 //Text block user set options are:
@@ -43,4 +43,4 @@ overflow-wrap: break-word; //Any words to long to fit in a single line should be
 word-break: normal; //But words shouldn't normally break
 
 //Not sure if this is needed, but just in case there's &shy; or something?
-hyphens: auto;
+hyphens: manual;
