@@ -1,4 +1,4 @@
-//Current css rules:
+//Current CSS rules:
 line-height: 1.5;
                 
 white-space: pre-wrap;
@@ -30,7 +30,7 @@ line-height: 1.5;
 letter-spacing: normal;
 word-spacing: normal;
 
-//This is the default value, and there's little chance of it being accidentaly changed
+//This is the default value, and there's little chance of it being accidentally changed
 //font-kerning: auto
 
 
