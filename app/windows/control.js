@@ -698,10 +698,11 @@ const presentation = {}
         }
 
         for (let index = itemsBlock.items.length - 2; index >= 0; index--) {
-            of(itemsBlock.items[index].items.length > 0)
-            return {
-                index: index,
-                subIndex: itemsBlock.items[index].items.length - 1
+            if (itemsBlock.items[index].items.length > 0) {
+                return {
+                    index: index,
+                    subIndex: itemsBlock.items[index].items.length - 1
+                }
             }
         }
 
