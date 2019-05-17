@@ -23,9 +23,6 @@ REQUIRED - long term:
         Add Image option
         Options for how columns are laid out. Currently adding extra whitespace is the only way to control where column breaks are. Specific options to move certain items to a new column, etc, are needed.
 
-    Control window song search:
-        Add filter by group option.
-
     Image Library:
         Allow image renaming
 
