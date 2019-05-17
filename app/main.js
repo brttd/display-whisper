@@ -2516,6 +2516,7 @@ ipcMain.on('close', event => {
         for (let i = 0; i < windowNames.length; i++) {
             if (windows[windowNames[i]]) {
                 windows[windowNames[i]].webContents.send(
+                    'database-updated',
                     databaseName,
                     from,
                     changes
@@ -2524,7 +2525,12 @@ ipcMain.on('close', event => {
         }
 
         for (let id in editors) {
-            editors[id].webContents.send(databaseName, from, changes)
+            editors[id].webContents.send(
+                'database-updated',
+                databaseName,
+                from,
+                changes
+            )
         }
     })
 
