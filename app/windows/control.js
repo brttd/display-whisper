@@ -2954,7 +2954,13 @@ const item_add = {
             }),
             author: new layout.CheckboxInput({ label: 'Author' }),
             copyright: new layout.CheckboxInput({ label: 'Copyright' }),
-            content: new layout.CheckboxInput({ label: 'Content' })
+            content: new layout.CheckboxInput({ label: 'Content' }),
+            groups: new layout.TextInput(
+                { placeholder: 'Groups' },
+                {
+                    width: '8ch'
+                }
+            )
         }
 
         let optionsBlock = new layout.Block(
@@ -2964,7 +2970,8 @@ const item_add = {
                     options.name,
                     options.author,
                     options.copyright,
-                    options.content
+                    options.content,
+                    options.groups
                 ]
             },
             {
@@ -3150,6 +3157,26 @@ const item_add = {
                 filterName = filterName.join('_')
 
                 results = Songs.list.filter(filters[filterName], searchTerm)
+            }
+
+            if (options.groups.value) {
+                let groups = options.groups.value
+                    .split(',')
+                    .reduce((newArr, current) => {
+                        current = current.trim().toLowerCase()
+
+                        if (current) {
+                            newArr.push(current)
+                        }
+
+                        return newArr
+                    }, [])
+
+                if (groups.length > 0) {
+                    results = results.filter(song =>
+                        groups.includes(song.group.trim().toLowerCase())
+                    )
+                }
             }
 
             for (let i = 0; i < results.length; i++) {
@@ -3360,6 +3387,7 @@ const item_add = {
         options.author.onEvent('change', onSearchOptionChange)
         options.copyright.onEvent('change', onSearchOptionChange)
         options.content.onEvent('change', onSearchOptionChange)
+        options.groups.onEvent('change', onSearchOptionChange)
 
         resultsBox.onEvent('select', event => {
             song = results.find(item => {
