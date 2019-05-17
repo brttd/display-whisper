@@ -3411,6 +3411,7 @@ exports.change = addStyles
 
         width: (item, value) => {
             return {
+                node: item.inputNode,
                 value: 'calc(' + value + ' + ' + inputExtraWidth + ')'
             }
         },
