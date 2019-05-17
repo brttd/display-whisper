@@ -1,6 +1,8 @@
 const electron = require('electron')
 const { ipcRenderer } = electron
 
+const app = electron.remote.app
+
 const fs = require('fs')
 const path = require('path')
 
@@ -1769,6 +1771,8 @@ const presentation = {}
 
     //File functions
     function loadFile(file) {
+        app.addRecentDocument(file)
+
         fs.readFile(file, (error, data) => {
             if (error) {
                 if (error.code === 'ENOENT') {
