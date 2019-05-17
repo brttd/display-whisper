@@ -1822,6 +1822,8 @@ editor.onEvent('change', from => {
 
 editor.onEvent('output', data => {
     ipcRenderer.send('edit', data)
+
+    layout.window.setTitle('Song Editor - ' + editor.data.name)
 })
 
 let gotData = false
@@ -1865,6 +1867,8 @@ ipcRenderer.on('edit-data', (event, data) => {
     editor.set(data)
 
     maxLines.value = editor.data.maxLines
+
+    layout.window.setTitle('Song Editor - ' + editor.data.name)
 
     updateSections()
     playOrderEditor.select(0)

@@ -769,6 +769,12 @@ fitTextButton.onEvent('click', () => {
 
 editor.onEvent('output', data => {
     ipcRenderer.send('edit', data)
+
+    if (editor.data.sections.length > 0) {
+        layout.window.setTitle('Text Editor - ' + editor.data.sections[0].name)
+    } else {
+        layout.window.setTitle('Text Editor')
+    }
 })
 
 editor.onEvent('history', () => {
@@ -874,6 +880,12 @@ ipcRenderer.on('edit-data', (event, data) => {
     sectionEditor.select(0)
 
     maxLinesEditor.value = data.maxLines
+
+    if (editor.data.sections.length > 0) {
+        layout.window.setTitle('Text Editor - ' + editor.data.sections[0].name)
+    } else {
+        layout.window.setTitle('Text Editor')
+    }
 })
 
 ipcRenderer.on('setting', (event, key, value) => {

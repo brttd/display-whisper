@@ -280,6 +280,12 @@ playControl.onEvent('change', onChange)
 
 editor.onEvent('output', data => {
     ipcRenderer.send('edit', data)
+
+    if (editor.data.url) {
+        layout.window.setTitle('Image Editor - ' + editor.data.url)
+    } else {
+        layout.window.setTitle('Image Editor')
+    }
 })
 
 editor.onEvent('history', () => {
@@ -364,6 +370,12 @@ ipcRenderer.on('edit-data', (event, data) => {
 
     imageBox.focus()
     update()
+
+    if (editor.data.url) {
+        layout.window.setTitle('Image Editor - ' + editor.data.url)
+    } else {
+        layout.window.setTitle('Image Editor')
+    }
 })
 
 layout.window.onEvent('close', event => {
