@@ -293,6 +293,12 @@
 
                     "default": false
                 },
+                "simpleFullscreen": {
+                    "description": "Use MacOS simple (Pre-Lion) fullscreen display mode",
+                    "type": "boolean",
+
+                    "default": true
+                },
                 "masterScale": {
                     "description": "Master display size",
                     "type": "select",
