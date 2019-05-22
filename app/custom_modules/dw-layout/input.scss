@@ -851,7 +851,6 @@ $slider-padding: 2px;
 
         &:hover {
             @include colors(active);
-            opacity: 1 !important;
         }
     }
 }
