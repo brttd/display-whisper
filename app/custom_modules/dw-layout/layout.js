@@ -5264,14 +5264,41 @@ exports.change = addStyles
     {
         fontPopup.node.classList.add('font')
 
-        fontPopup.show = function(position, data) {
+        fontPopup.show = function(position, fontName) {
             fontPopup.move(position)
+
+            let activeElem = fontPopup.node.querySelector('.active')
+            if (activeElem) {
+                activeElem.className = ''
+                activeElem = null
+            }
 
             for (let i = 0; i < fontPopup.node.childElementCount; i++) {
                 fontPopup.node.children[i].style.display = ''
+
+                if (fontPopup.node.children[i].textContent === fontName) {
+                    fontPopup.node.children[i].className = 'active'
+
+                    activeElem = fontPopup.node.children[i]
+                }
             }
 
             document.body.appendChild(fontPopup.node)
+
+            if (activeElem) {
+                //Only show the popup after scrolling has happened
+                fontPopup.node.style.opacity = '0'
+
+                exports.onFrame.start(() => {
+                    let scrollPosition = activeElem.offsetTop - (fontPopup.node.offsetHeight / 2)
+
+                    exports.onFrame.end(() => {
+                        fontPopup.node.scrollTop = scrollPosition
+
+                        fontPopup.node.style.opacity = ''
+                    })
+                })
+            }
         }
         fontPopup.move = fontPopup._move
         fontPopup.hide = function() {
@@ -5534,7 +5561,7 @@ exports.change = addStyles
         }
 
         showDropDown() {
-            fontPopup.show(this.inputNode.getBoundingClientRect())
+            fontPopup.show(this.inputNode.getBoundingClientRect(), this._value)
         }
         moveDropDown() {
             if (!this._focused) {
@@ -16043,6 +16070,13 @@ class BoxEdit {
         if (typeof title === 'string') {
             thisWin.setTitle(title)
         }
+    }
+
+    exports.window.setFile = function(filePath) {
+        thisWin.setRepresentedFilename(filePath)
+    }
+    exports.window.setFileEdited = function(edited) {
+        thisWin.setDocumentEdited(edited)
     }
 
     exports.window.close = function() {
