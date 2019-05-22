@@ -15991,6 +15991,12 @@ class BoxEdit {
     let events = {}
     exports.window = {}
 
+    let title = {
+        base: thisWin.getTitle(),
+        document: '',
+        edited: false
+    }
+
     exports.window.onEvent = function(eventName, listener) {
         if (typeof eventName !== 'string' || typeof listener !== 'function') {
             return false
@@ -16066,17 +16072,61 @@ class BoxEdit {
         exports.window.setMaxSize(size.max)
     }
 
-    exports.window.setTitle = function(title) {
-        if (typeof title === 'string') {
-            thisWin.setTitle(title)
+    exports.window.setTitle = function(newTitle) {
+        if (typeof newTitle !== 'string') {
+            return false
+        }
+
+        title.base = newTitle
+
+        if (process.platform === 'darwin') {
+            thisWin.setTitle(title.base)
+        } else {
+            if (title.document) {
+                thisWin.setTitle(title.base + ' | ' + title.document + (title.edited ? '*' : ''))
+            } else {
+                thisWin.setTitle(title.base)
+            }
         }
     }
 
-    exports.window.setFile = function(filePath) {
-        thisWin.setRepresentedFilename(filePath)
+    exports.window.setDocument = function(document) {
+        if (typeof document !== 'string') {
+            return false
+        }
+
+        title.document = document
+
+        if (process.platform === 'darwin') {
+            thisWin.setRepresentedFilename(document)    
+        } else {
+            if (title.document) {
+                thisWin.setTitle(title.base + ' | ' + title.document + (title.edited ? '*' : ''))
+            } else {
+                thisWin.setTitle(title.base)
+            }
+        }
     }
-    exports.window.setFileEdited = function(edited) {
-        thisWin.setDocumentEdited(edited)
+    exports.window.setDocumentEdited = function(edited) {
+        if (typeof edited !== 'boolean') {
+            if (edited === 'autosaved' && process.platform !== 'darwin' && title.document) {
+                thisWin.setTitle(title.base + ' | ' + title.document + '^')
+            }
+
+            return false
+        }
+
+        title.edited = edited
+
+        if (process.platform === 'darwin') {
+            thisWin.setDocumentEdited(title.edited)    
+        } else {
+            if (title.document) {
+                thisWin.setTitle(title.base + ' | ' + title.document + (title.edited ? '*' : ''))
+            } else {
+                thisWin.setTitle(title.base)
+            }
+        }
     }
 
     exports.window.close = function() {
