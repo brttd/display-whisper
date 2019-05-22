@@ -261,8 +261,12 @@ function save(callback) {
                 }
 
                 return false
-            } else if (typeof callback === 'function') {
-                callback()
+            } else {
+                layout.window.setDocumentEdited(false)
+
+                if (typeof callback === 'function') {
+                    callback()
+                }
             }
         }
     )
@@ -569,6 +573,9 @@ function showTemplate(index) {
     selectedIndex = index
 
     editor.set(editor.util.copyObj(Templates.list[selectedIndex]))
+
+    layout.window.setDocument(editor.data.name)
+    layout.window.setDocumentEdited(false)
 
     if (itemFormat.name) {
         switchFormat(itemFormat.name)
@@ -899,6 +906,8 @@ editor.onEvent('change', from => {
     if (from === 'undo' || from === 'redo') {
         updateAll()
     }
+
+    layout.window.setDocumentEdited(editor.hasChanges)
 })
 
 displayEditor.onEvent('change', slideChange)

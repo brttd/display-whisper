@@ -1818,12 +1818,15 @@ editor.onEvent('change', from => {
     if (from === 'undo' || from === 'redo') {
         updateSectionsAndSelect()
     }
+
+    layout.window.setDocumentEdited(editor.hasChanges)
 })
 
 editor.onEvent('output', data => {
     ipcRenderer.send('edit', data)
 
-    layout.window.setTitle('Song Editor - ' + editor.data.name)
+    layout.window.setDocument(editor.data.name)
+    layout.window.setDocumentEdited(false)
 })
 
 let gotData = false
@@ -1868,7 +1871,7 @@ ipcRenderer.on('edit-data', (event, data) => {
 
     maxLines.value = editor.data.maxLines
 
-    layout.window.setTitle('Song Editor - ' + editor.data.name)
+    layout.window.setDocument(editor.data.name)
 
     updateSections()
     playOrderEditor.select(0)
