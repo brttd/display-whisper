@@ -6,8 +6,6 @@ const layout = require('dw-layout')
 const logger = require('dw-log')
 const Database = require('dw-database')
 
-layout.window.setTitle('Song Library Check')
-
 const Songs = new Database.Group('songs', {
     load: true,
     parse: true,
