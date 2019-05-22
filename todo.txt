@@ -15,10 +15,6 @@ REQUIRED - long term:
         change keyboard shortcut display based on language, win/mac, keyboard, etc..
         (Including stuff like ⌘)
 
-    Control window taskbar:
-        Use "Jumplist" (addRecentDocument) to show presentation files opened by user.
-        (Mac) Use '.setRepresentedFilename(filename)', 'setDocumentEdited(edited)' to show state of active presentation file.
-
     Print tool:
         Add Image option
         Options for how columns are laid out. Currently adding extra whitespace is the only way to control where column breaks are. Specific options to move certain items to a new column, etc, are needed.
