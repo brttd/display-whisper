@@ -5264,14 +5264,41 @@ exports.change = addStyles
     {
         fontPopup.node.classList.add('font')
 
-        fontPopup.show = function(position, data) {
+        fontPopup.show = function(position, fontName) {
             fontPopup.move(position)
+
+            let activeElem = fontPopup.node.querySelector('.active')
+            if (activeElem) {
+                activeElem.className = ''
+                activeElem = null
+            }
 
             for (let i = 0; i < fontPopup.node.childElementCount; i++) {
                 fontPopup.node.children[i].style.display = ''
+
+                if (fontPopup.node.children[i].textContent === fontName) {
+                    fontPopup.node.children[i].className = 'active'
+
+                    activeElem = fontPopup.node.children[i]
+                }
             }
 
             document.body.appendChild(fontPopup.node)
+
+            if (activeElem) {
+                //Only show the popup after scrolling has happened
+                fontPopup.node.style.opacity = '0'
+
+                exports.onFrame.start(() => {
+                    let scrollPosition = activeElem.offsetTop - (fontPopup.node.offsetHeight / 2)
+
+                    exports.onFrame.end(() => {
+                        fontPopup.node.scrollTop = scrollPosition
+
+                        fontPopup.node.style.opacity = ''
+                    })
+                })
+            }
         }
         fontPopup.move = fontPopup._move
         fontPopup.hide = function() {
@@ -5534,7 +5561,7 @@ exports.change = addStyles
         }
 
         showDropDown() {
-            fontPopup.show(this.inputNode.getBoundingClientRect())
+            fontPopup.show(this.inputNode.getBoundingClientRect(), this._value)
         }
         moveDropDown() {
             if (!this._focused) {
@@ -15964,6 +15991,12 @@ class BoxEdit {
     let events = {}
     exports.window = {}
 
+    let title = {
+        base: thisWin.getTitle(),
+        document: '',
+        edited: false
+    }
+
     exports.window.onEvent = function(eventName, listener) {
         if (typeof eventName !== 'string' || typeof listener !== 'function') {
             return false
@@ -16039,9 +16072,60 @@ class BoxEdit {
         exports.window.setMaxSize(size.max)
     }
 
-    exports.window.setTitle = function(title) {
-        if (typeof title === 'string') {
-            thisWin.setTitle(title)
+    exports.window.setTitle = function(newTitle) {
+        if (typeof newTitle !== 'string') {
+            return false
+        }
+
+        title.base = newTitle
+
+        if (process.platform === 'darwin') {
+            thisWin.setTitle(title.base)
+        } else {
+            if (title.document) {
+                thisWin.setTitle(title.base + ' | ' + title.document + (title.edited ? '*' : ''))
+            } else {
+                thisWin.setTitle(title.base)
+            }
+        }
+    }
+
+    exports.window.setDocument = function(document) {
+        if (typeof document !== 'string') {
+            return false
+        }
+
+        title.document = document
+
+        if (process.platform === 'darwin') {
+            thisWin.setRepresentedFilename(document)    
+        } else {
+            if (title.document) {
+                thisWin.setTitle(title.base + ' | ' + title.document + (title.edited ? '*' : ''))
+            } else {
+                thisWin.setTitle(title.base)
+            }
+        }
+    }
+    exports.window.setDocumentEdited = function(edited) {
+        if (typeof edited !== 'boolean') {
+            if (edited === 'autosaved' && process.platform !== 'darwin' && title.document) {
+                thisWin.setTitle(title.base + ' | ' + title.document + '^')
+            }
+
+            return false
+        }
+
+        title.edited = edited
+
+        if (process.platform === 'darwin') {
+            thisWin.setDocumentEdited(title.edited)    
+        } else {
+            if (title.document) {
+                thisWin.setTitle(title.base + ' | ' + title.document + (title.edited ? '*' : ''))
+            } else {
+                thisWin.setTitle(title.base)
+            }
         }
     }
 

@@ -771,10 +771,12 @@ editor.onEvent('output', data => {
     ipcRenderer.send('edit', data)
 
     if (editor.data.sections.length > 0) {
-        layout.window.setTitle('Text Editor - ' + editor.data.sections[0].name)
+        layout.window.setDocument(editor.data.sections[0].name)
     } else {
-        layout.window.setTitle('Text Editor')
+        layout.window.setDocument('')
     }
+
+    layout.window.setDocumentEdited(false)
 })
 
 editor.onEvent('history', () => {
@@ -798,6 +800,8 @@ editor.onEvent('change', from => {
     if (from === 'undo' || from === 'redo') {
         updateSectionsAndSelect()
     }
+
+    layout.window.setDocumentEdited(editor.hasChanges)
 })
 
 displayButton.onEvent('click', () => {
@@ -882,9 +886,9 @@ ipcRenderer.on('edit-data', (event, data) => {
     maxLinesEditor.value = data.maxLines
 
     if (editor.data.sections.length > 0) {
-        layout.window.setTitle('Text Editor - ' + editor.data.sections[0].name)
+        layout.window.setDocument(editor.data.sections[0].name)
     } else {
-        layout.window.setTitle('Text Editor')
+        layout.window.setDocument('')
     }
 })
 

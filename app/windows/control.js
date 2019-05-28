@@ -216,25 +216,19 @@ const presentation = {}
                 if (value === true) {
                     lastSaveTime = Date.now()
 
-                    layout.window.setTitle(
-                        'Display Whisper | ' + displayFilename(file)
-                    )
+                    layout.window.setDocumentEdited(false)
+                } else {
+                    layout.window.setDocumentEdited(true)
                 }
             }
         }
     })
 
-    displayFilename = filename => {
-        return path.basename(filename, '.dpl')
-    }
-
     //save functions
     function editHasOccured() {
         lastEditTime = Date.now()
 
-        layout.window.setTitle(
-            'Display Whisper | ' + displayFilename(file) + '*'
-        )
+        layout.window.setDocumentEdited(true)
     }
 
     function addRemoveHistory(obj) {
@@ -1624,6 +1618,8 @@ const presentation = {}
 
         lastEditTime = 0
 
+        layout.window.setDocument(file)
+
         presentation.saved = true
     }
     presentation.load = load
@@ -1709,9 +1705,7 @@ const presentation = {}
 
                     lastAutoSaveTime = Date.now()
 
-                    layout.window.setTitle(
-                        'Display Whisper | ' + displayFilename(file) + '^'
-                    )
+                    layout.window.setDocumentEdited('autosaved')
                 }
             )
         }

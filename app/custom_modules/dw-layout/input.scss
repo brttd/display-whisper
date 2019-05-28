@@ -851,7 +851,6 @@ $slider-padding: 2px;
 
         &:hover {
             @include colors(active);
-            opacity: 1 !important;
         }
     }
 }
@@ -903,7 +902,9 @@ $slider-padding: 2px;
     }
 }
 .popup.font {
-    @extend %scrollbars-main;
+    @extend %scrollbars;
+
+    background: $bkg;
 
     overflow: auto;
     overflow-x: hidden;
@@ -921,6 +922,10 @@ $slider-padding: 2px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+
+        &.active {
+            @include colors(hover);
+        }
 
         &:hover {
             @include colors(active);
