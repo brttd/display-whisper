@@ -13611,6 +13611,13 @@ class BoxEdit {
                 this.toggleButton = new exports.Button({
                     icon: 'expand-y'
                 })
+
+                this.activeButton = new exports.Button({
+                    icon: 'play'
+                })
+                this.activeButton.addClass('highlight')
+                this.activeButton.node.style.display = 'none'
+
                 this.itemsBlock = new exports.Block(
                     {},
                     {
@@ -13635,10 +13642,11 @@ class BoxEdit {
                 {
                     let block = document.createElement('div')
                     block.className = 'content'
-
+                    
                     let topBlock = document.createElement('div')
                     topBlock.className = 'bar'
                     topBlock.appendChild(this.toggleButton.node)
+                    topBlock.appendChild(this.activeButton.node)
                     topBlock.appendChild(this.titleNode)
 
                     block.appendChild(topBlock)
@@ -13651,6 +13659,7 @@ class BoxEdit {
                 this.events['drag-click'] = []
                 this.events['edit-click'] = []
                 this.events['remove-click'] = []
+                this.events['active-click'] = []
 
                 this.dragButton.node.addEventListener('mousedown', event => {
                     if (event.button === 0) {
@@ -13673,6 +13682,14 @@ class BoxEdit {
                 this.removeButton.onEvent(
                     'click',
                     passEventTo.bind(this, this.events['remove-click'], {
+                        fromUser: true,
+                        from: this
+                    })
+                )
+                this.activeButton.onEvent(
+                    'click',
+                    passEventTo.bind(this, this.events['active-click'], {
+                        index: 0,
                         fromUser: true,
                         from: this
                     })
@@ -14089,6 +14106,7 @@ class BoxEdit {
 
             if (this.needsChange.active) {
                 this.toggleButton.active = this.properties.active
+                this.activeButton.active = this.properties.active
 
                 if (this.properties.active) {
                     this.node.classList.add('active')
@@ -14146,11 +14164,15 @@ class BoxEdit {
                             this.properties.previewHeight.toString() + 'px'
 
                         this.toggleButton.icon = 'expand-x'
+
+                        this.activeButton.node.style.display = 'none'
                     } else if (this.items.length > 1) {
                         //Minimized, not showing first section
                         this.itemsBlock.node.style.height = '0px'
 
                         this.toggleButton.icon = 'expand-x'
+
+                        this.activeButton.node.style.display = ''
                     } else {
                         //Not minimized
                         this.itemsBlock.node.style.height = ''
@@ -14158,12 +14180,16 @@ class BoxEdit {
                         this.toggleButton.icon = 'expand-y'
 
                         this.properties.minimized = false
+
+                        this.activeButton.node.style.display = 'none'
                     }
                 } else {
                     //Not minimized
                     this.itemsBlock.node.style.height = ''
 
                     this.toggleButton.icon = 'expand-y'
+
+                    this.activeButton.node.style.display = 'none'
                 }
 
                 this.needsChange.minimized = false
@@ -14194,8 +14220,14 @@ class BoxEdit {
 
                 if (this.items.length > 1) {
                     this.toggleButton.node.style.display = ''
+
+                    if (this.properties.minimized) {
+                        this.activeButton.node.style.display = ''
+                    }
                 } else {
                     this.toggleButton.node.style.display = 'none'
+
+                    this.activeButton.node.style.display = 'none'
 
                     if (this.properties.minimized) {
                         this.itemsBlock.node.style.height = ''
