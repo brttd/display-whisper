@@ -194,6 +194,8 @@ function showImage(image) {
 
         removeButton.disabled = true
 
+        layout.window.setDocument('')
+
         return false
     }
 
@@ -201,6 +203,8 @@ function showImage(image) {
     imagePreview.url = path.join(Images.directory, image)
 
     removeButton.disabled = false
+
+    layout.window.setDocument(image)
 }
 
 imageList.onEvent('select', event => {

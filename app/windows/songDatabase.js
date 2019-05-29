@@ -759,6 +759,8 @@ function resetSong() {
     playOrderEditor.addInput = []
 
     setDisabled(true)
+
+    layout.window.setDocument('')
 }
 
 //Changes the song to the given ID, and updates all editing items
@@ -852,6 +854,9 @@ function loadSong(group, groupID, force = false) {
             })
 
             resultsBox.select(searchResultsIndex)
+
+            layout.window.setDocument(editor.data.name)
+            layout.window.setDocumentEdited(false)
         }
     })
 }
@@ -1383,6 +1388,8 @@ editor.onEvent('change', (from, changes) => {
 
     //The save button should only be enabled if there are changes
     saveButton.disabled = !editor.hasChanges
+
+    layout.window.setDocumentEdited(editor.hasChanges)
 })
 
 //When editor.apply() is callled
