@@ -14362,6 +14362,8 @@ class BoxEdit {
                 error: false
             }
 
+            this._display = {}
+
             bindFunctions(this, this.writeContent)
 
             this.title = data.title
@@ -14385,9 +14387,10 @@ class BoxEdit {
         }
 
         get display() {
-            return this.displayItem.display
+            return this._display
         }
         set display(data) {
+            this._display = data
             this.displayItem.set(data)
         }
 
