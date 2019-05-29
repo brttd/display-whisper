@@ -16114,14 +16114,14 @@ class BoxEdit {
 
         title.base = newTitle
 
-        if (process.platform === 'darwin') {
-            thisWin.setTitle(title.base)
-        } else {
-            if (title.document) {
-                thisWin.setTitle(title.base + ' | ' + title.document + (title.edited ? '*' : ''))
-            } else {
+        if (title.document) {
+            if (process.platform === 'darwin' && path.isAbsolute(title.document)) {
                 thisWin.setTitle(title.base)
+            } else {
+                thisWin.setTitle(title.base + ' | ' + title.document + (title.edited ? '*' : ''))
             }
+        } else {
+            thisWin.setTitle(title.base)
         }
     }
 
@@ -16132,14 +16132,19 @@ class BoxEdit {
 
         title.document = document
 
-        if (process.platform === 'darwin') {
-            thisWin.setRepresentedFilename(document)    
-        } else {
-            if (title.document) {
-                thisWin.setTitle(title.base + ' | ' + title.document + (title.edited ? '*' : ''))
+        if (title.document) {
+            if (process.platform === 'darwin' && path.isAbsolute(title.document)) {
+                thisWin.setRepresentedFilename(title.document)
             } else {
-                thisWin.setTitle(title.base)
+                thisWin.setTitle(title.base + ' | ' + title.document + (title.edited ? '*' : ''))                
             }
+        } else {
+            thisWin.setTitle(title.base)
+            
+            title.edited = false
+
+            thisWin.setRepresentedFilename('')
+            thisWin.setDocumentEdited(title.edited)
         }
     }
     exports.window.setDocumentEdited = function(edited) {
@@ -16153,14 +16158,14 @@ class BoxEdit {
 
         title.edited = edited
 
-        if (process.platform === 'darwin') {
-            thisWin.setDocumentEdited(title.edited)    
-        } else {
-            if (title.document) {
-                thisWin.setTitle(title.base + ' | ' + title.document + (title.edited ? '*' : ''))
+        if (title.document) {
+            if (process.platform === 'darwin' && path.isAbsolute(title.document)) {
+                thisWin.setDocumentEdited(title.edited)
             } else {
-                thisWin.setTitle(title.base)
+                thisWin.setTitle(title.base + ' | ' + title.document + (title.edited ? '*' : ''))
             }
+        } else {
+            thisWin.setTitle(title.base)
         }
     }
 
