@@ -12006,9 +12006,6 @@ class BoxEdit {
             bindFunctions(
                 this,
                 this.onResize,
-                this.repaint,
-                this.repaint2,
-                this.repaint3,
                 this.readSize,
                 this.writeSize,
 
