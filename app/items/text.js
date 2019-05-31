@@ -74,6 +74,10 @@ function applySectionData(target, source = {}) {
         target.y = source.y
     }
 
+    if (typeof source.opacity === 'number' && isFinite(source.opacity)) {
+        target.opacity = source.opacity
+    }
+
     if (typeof source.top === 'number' && isFinite(source.top)) {
         target.top = source.top
     }
@@ -153,6 +157,8 @@ module.exports = class Text {
 
                 align: 'center',
                 y: 'top',
+
+                opacity: 100,
 
                 top: 10,
                 left: 10,
@@ -264,6 +270,8 @@ module.exports = class Text {
                                 align: section.align,
                                 y: section.y,
 
+                                opacity: section.opacity,
+
                                 top: section.top,
                                 left: section.left,
                                 right: section.right,
@@ -316,6 +324,8 @@ module.exports = class Text {
                                     align: section.align,
                                     y: section.y,
 
+                                    opacity: section.opacity,
+
                                     top: section.top,
                                     left: section.left,
                                     right: section.right,
@@ -360,6 +370,8 @@ module.exports = class Text {
                     size: this.data.sections[sectionIndex].size,
 
                     lineHeight: this.data.sections[sectionIndex].lineHeight,
+
+                    opacity: this.data.sections[sectionIndex].opacity,
 
                     top: this.data.sections[sectionIndex].top,
                     left: this.data.sections[sectionIndex].left,
@@ -495,6 +507,8 @@ module.exports.template = {
                 align: true,
 
                 y: true,
+
+                opacity: true,
 
                 top: true,
                 left: true,

@@ -45,6 +45,8 @@ let defaults = {
 
     scale: 'contain',
 
+    opacity: 100,
+
     top: 20,
     left: 20,
     right: 80,
@@ -212,6 +214,10 @@ function addNode(data = {}, parentNode = displayNode.lastChild) {
         node.style.bottom = 100 - data.bottom + '%'
     } else {
         node.style.bottom = 100 - defaults.bottom + '%'
+    }
+
+    if (typeof data.opacity === 'number' && isFinite(data.opacity)) {
+        node.style.opacity = Math.max(0, Math.min(1, data.opacity / 100))
     }
 
     parentNode.appendChild(node)

@@ -17,6 +17,8 @@ const defaultTemplate = {
     y: 'center',
     x: 'fill',
 
+    opacity: 100,
+
     top: 12,
     left: 10,
     right: 90,
@@ -50,6 +52,8 @@ const defaultTemplate = {
         y: 'top',
         x: 'fill',
 
+        opacity: 100,
+
         top: 1,
         left: 65,
         right: 96,
@@ -73,6 +77,8 @@ const defaultTemplate = {
         y: 'center',
         x: 'fill',
 
+        opacity: 100,
+
         top: 89,
         left: 4,
         right: 50,
@@ -85,6 +91,8 @@ const defaultTemplate = {
         align: 'center',
         y: 'bottom',
 
+        opacity: 100,
+
         top: 30,
         left: 30,
         right: 70,
@@ -95,6 +103,8 @@ const defaultTemplate = {
 
         align: 'center',
         y: 'bottom',
+
+        opacity: 100,
 
         top: 30,
         left: 30,
@@ -222,6 +232,10 @@ function applyStyleData(target, source = {}) {
 
     if (source.y === 'top' || source.y === 'center' || source.y === 'bottom') {
         target.y = source.y
+    }
+
+    if (typeof source.opacity === 'number' && isFinite(source.opacity)) {
+        target.opacity = source.opacity
     }
 
     if (typeof source.top === 'number' && isFinite(source.top)) {
@@ -793,6 +807,8 @@ module.exports = class Song {
 
                     lineHeight: this.data.sections[section].lineHeight,
 
+                    opacity: this.data.sections[section].opacity,
+
                     top: this.data.sections[section].top,
                     left: this.data.sections[section].left,
                     right: this.data.sections[section].right,
@@ -832,6 +848,8 @@ module.exports = class Song {
 
                     lineHeight: this.data.sectionOverlay.lineHeight,
 
+                    opacity: this.data.sectionOverlay.opacity,
+
                     top: this.data.sectionOverlay.top,
                     left: this.data.sectionOverlay.left,
                     right: this.data.sectionOverlay.right,
@@ -848,6 +866,8 @@ module.exports = class Song {
 
             lineHeight: this.data.endOverlay.lineHeight,
 
+            opacity: this.data.endOverlay.opacity,
+
             top: this.data.endOverlay.top,
             left: this.data.endOverlay.left,
             right: this.data.endOverlay.right,
@@ -862,6 +882,8 @@ module.exports = class Song {
 
             lineHeight: this.data.intro.lineHeight,
 
+            opacity: this.data.intro.opacity,
+
             top: this.data.intro.top,
             left: this.data.intro.left,
             right: this.data.intro.right,
@@ -874,6 +896,8 @@ module.exports = class Song {
             size: this.data.outro.size,
 
             lineHeight: this.data.outro.lineHeight,
+
+            opacity: this.data.outro.opacity,
 
             top: this.data.outro.top,
             left: this.data.outro.left,
@@ -1074,6 +1098,8 @@ module.exports.template = {
 
                 y: true,
 
+                opacity: true,
+
                 top: true,
                 left: true,
                 right: true,
@@ -1098,6 +1124,8 @@ module.exports.template = {
 
                 y: true,
 
+                opacity: true,
+
                 top: true,
                 left: true,
                 right: true,
@@ -1121,6 +1149,8 @@ module.exports.template = {
                 align: true,
 
                 y: true,
+
+                opacity: true,
 
                 top: true,
                 left: true,

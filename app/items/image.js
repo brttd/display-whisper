@@ -29,6 +29,10 @@ function applyData(target, source = {}) {
         target.backgroundScale = source.backgroundScale
     }
 
+    if (typeof source.opacity === 'number' && isFinite(source.opacity)) {
+        target.opacity = source.opacity
+    }
+
     if (typeof source.top === 'number' && isFinite(source.top)) {
         target.top = source.top
     }
@@ -107,6 +111,8 @@ module.exports = class Image {
             backgroundImage: '',
             backgroundScale: 'fill',
 
+            opacity: 100,
+
             top: 0,
             left: 0,
             right: 100,
@@ -159,6 +165,8 @@ module.exports = class Image {
 
                             scale: this.data.scale,
 
+                            opacity: this.data.opacity,
+
                             top: this.data.top,
                             left: this.data.left,
                             right: this.data.right,
@@ -209,6 +217,8 @@ module.exports = class Image {
 
             scale: this.data.scale,
 
+            opacity: this.data.opacity,
+
             top: this.data.top,
             left: this.data.left,
             right: this.data.right,
@@ -237,6 +247,9 @@ module.exports.template = {
             name: 'Main',
             properties: {
                 scale: true,
+
+                opacity: true,
+
                 top: true,
                 left: true,
                 right: true,

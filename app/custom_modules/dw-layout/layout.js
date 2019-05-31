@@ -10367,6 +10367,44 @@ exports.change = addStyles
         constructor(data = {}, styles = {}) {
             super(document.createElement('div'), styles)
 
+            //opacity
+            {
+                this.opacityBlock = document.createElement('div')
+                this.opacityBlock.className = 'section'
+
+                this.opacity = new exports.NumberInput(
+                    {
+                        focus: false,
+                        disabled: true,
+                        label: 'Opacity',
+                        unit: '%',
+
+                        min: 0,
+                        max: 100,
+                        precision: 1,
+                    },
+                    {
+                        width: '5.5ch',
+                        grow: false,
+                    }
+                )
+                this.inputItems.push(this.opacity)
+
+                this.opacityBlock.appendChild(this.opacity.node)
+
+                if (
+                    data.opacity !== false
+                ) {
+                    this.node.appendChild(this.opacityBlock)
+                }
+
+                this.opacity.onEvent('change', event => {
+                    if (event.fromUser) {
+                        this.sendEdit({ opacity: event.value }, event.fromUser)
+                    }
+                })
+            }
+
             //position
             {
                 this.positionBlock = document.createElement('div')
@@ -10581,6 +10619,8 @@ exports.change = addStyles
                     this.groupShareFocusWith(item)
 
                     item.onEvent('focus', () => {
+                        this.opacity.value = item.opacity
+
                         this.top.value = item.top
                         this.left.value = item.left
                         this.right.value = item.right
@@ -10608,6 +10648,8 @@ exports.change = addStyles
 
                     item.onEvent('change', event => {
                         if (event.fromUser) {
+                            this.opacity.value = event.opacity
+
                             this.top.value = event.top
                             this.left.value = event.left
                             this.right.value = event.right
@@ -10639,7 +10681,11 @@ exports.change = addStyles
         margin: (item, value) => {
             value = mapToPx(value)
 
-            if (item.node.childElementCount > 1) {
+            item.opacityBlock.style.marginRight = value
+
+            item.opacity.node.firstChild.style.marginBottom = value
+
+            if (item.node.childElementCount > 2) {
                 item.positionBlock.style.marginRight = value
             }
 
@@ -11209,6 +11255,7 @@ class BoxEdit {
         handleColor (color: CSS color)
         visible (get/set) (boolean)
         focused (get) (boolean)
+        opacity (get/set) (number)
         top (get/set) (number)
         left (get/set) (number)
         right (get/set) (number)
@@ -11223,7 +11270,7 @@ class BoxEdit {
         getData
 
     Events:
-        change (top: number, left: number, right: number, bottom: number)
+        change (opacity: number, top: number, left: number, right: number, bottom: number)
         focus
         blur
     */
@@ -11261,6 +11308,8 @@ class BoxEdit {
         this.events = {}
 
         this.values = {
+            opacity: 100,
+
             top: 10,
             left: 10,
             right: 90,
@@ -11338,6 +11387,10 @@ class BoxEdit {
 
     get focused() {
         return this.node.classList.contains('focus')
+    }
+
+    get opacity() {
+        return this.values.opacity
     }
 
     get top() {
@@ -11421,6 +11474,8 @@ class BoxEdit {
     }
 
     updatePosition() {
+        this.node.lastChild.style.opacity = this.values.opacity / 100
+
         this.node.style.top = this.values.top + '%'
         this.node.style.left = this.values.left + '%'
         this.node.style.right = (100 - this.values.right).toString() + '%'
@@ -11570,6 +11625,12 @@ class BoxEdit {
     edit(data = {}, fromUser = false) {
         let event = {}
 
+        if (typeof data.opacity === 'number' && isFinite(data.opacity)) {
+            this.values.opacity = Math.max(0, Math.min(100, data.opacity))
+
+            event.opacity = this.values.opacity
+        }
+
         if (typeof data.top === 'number' && isFinite(data.top)) {
             this.values.top = round(data.top, positionPrecision)
 
@@ -11636,6 +11697,7 @@ class BoxEdit {
         Wrapper item for display items (does not extend base item class).
 
         Constructor data:
+            opacity (number)
             top (number)
             left (number)
             right (number)
@@ -11650,13 +11712,16 @@ class BoxEdit {
             this.node = document.createElement('div')
             this.node.className = 'display-node'
 
+            this.node.style.opacity = '1'
+
             this.node.style.top = '0%'
             this.node.style.left = '0%'
             this.node.style.right = '0%'
             this.node.style.bottom = '0%'
 
-            //Used in Display.display getter
             this.values = {
+                opacity: 100,
+
                 top: 0,
                 left: 0,
                 right: 0,
@@ -11667,6 +11732,10 @@ class BoxEdit {
         }
 
         update(data = {}) {
+            if (typeof data.opacity === 'number') {
+                this.node.style.opacity = data.opacity / 100
+            }
+
             if (typeof data.top === 'number') {
                 this.node.style.top = data.top + '%'
             }

@@ -781,6 +781,8 @@ fitTextButton.onEvent('click', () => {
 
                 lineHeight: editor.data.intro.lineHeight,
 
+                opacity: editor.data.intro.opacity,
+
                 top: editor.data.intro.top,
                 left: editor.data.intro.left,
                 right: editor.data.intro.right,
@@ -795,6 +797,8 @@ fitTextButton.onEvent('click', () => {
                 size: editor.data.outro.size,
 
                 lineHeight: editor.data.outro.lineHeight,
+
+                opacity: editor.data.outro.opacity,
 
                 top: editor.data.outro.top,
                 left: editor.data.outro.left,
@@ -811,6 +815,8 @@ fitTextButton.onEvent('click', () => {
                 size: editor.data.endOverlay.size,
 
                 lineHeight: editor.data.endOverlay.lineHeight,
+
+                opacity: editor.data.endOverlay.opacity,
 
                 top: editor.data.endOverlay.top,
                 left: editor.data.endOverlay.left,
@@ -846,6 +852,8 @@ fitTextButton.onEvent('click', () => {
                 size: editor.data.sections[section].size,
 
                 lineHeight: editor.data.sections[section].lineHeight,
+
+                opacity: editor.data.sections[section].opacity,
 
                 top: editor.data.sections[section].top,
                 left: editor.data.sections[section].left,
@@ -885,6 +893,8 @@ fitTextButton.onEvent('click', () => {
                 size: editor.data.sectionOverlay.size,
 
                 lineHeight: editor.data.sectionOverlay.lineHeight,
+
+                opacity: editor.data.sectionOverlay.opacity,
 
                 top: editor.data.sectionOverlay.top,
                 left: editor.data.sectionOverlay.left,
@@ -1198,6 +1208,8 @@ fitTextButton.onEvent('click', () => {
 
                             align: true,
                             y: true,
+
+                            opacity: true,
 
                             top: true,
                             left: true,
