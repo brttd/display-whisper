@@ -1390,11 +1390,15 @@ if (process.platform === 'darwin') {
         }
 
         if (settings.get('display.simpleFullscreen', true)) {
-        display.outputDisplays[displayIndex].window.setSimpleFullScreen(false)
-        display.outputDisplays[displayIndex].window.setBounds(
-            display.outputDisplays[displayIndex].bounds
-        )
-        display.outputDisplays[displayIndex].window.setSimpleFullScreen(true)
+            display.outputDisplays[displayIndex].window.setSimpleFullScreen(
+                false
+            )
+            display.outputDisplays[displayIndex].window.setBounds(
+                display.outputDisplays[displayIndex].bounds
+            )
+            display.outputDisplays[displayIndex].window.setSimpleFullScreen(
+                true
+            )
         } else {
             display.outputDisplays[displayIndex].window.setFullScreen(false)
             display.outputDisplays[displayIndex].window.setBounds(
