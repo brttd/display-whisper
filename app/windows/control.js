@@ -286,7 +286,7 @@ const presentation = {}
             'start-edit',
             event.from._itemType,
             event.from._data.id,
-            event.from._data.getEditData()
+            event.from._data.getData()
         )
 
         activeEditors.push(event.from._data.id)
@@ -1186,7 +1186,7 @@ const presentation = {}
                     ipcRenderer.send(
                         'edit-data',
                         list[index].id,
-                        list[index].getEditData()
+                        list[index].getData()
                     )
                 }
             }
@@ -1641,7 +1641,7 @@ const presentation = {}
         }
 
         for (let i = 0; i < list.length; i++) {
-            data.list.push(list[i].getAllSaveData())
+            data.list.push(list[i].getData())
         }
 
         return data

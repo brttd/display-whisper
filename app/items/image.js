@@ -195,16 +195,7 @@ module.exports = class Image {
         applyData(this.data, data)
     }
 
-    getSaveData() {
-        return {
-            itemType: 'image',
-
-            url: this.data.url,
-            database: this.data.database
-        }
-    }
-
-    getAllSaveData() {
+    getData() {
         return {
             itemType: 'image',
 
@@ -232,10 +223,6 @@ module.exports = class Image {
                 time: this.data.transition.time
             }
         }
-    }
-
-    getEditData() {
-        return this.getAllSaveData()
     }
 }
 

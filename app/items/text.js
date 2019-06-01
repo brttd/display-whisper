@@ -456,22 +456,7 @@ module.exports = class Text {
         }
     }
 
-    getSaveData() {
-        return {
-            itemType: 'text',
-
-            sections: this.data.sections.map(section => {
-                return {
-                    name: section.name,
-
-                    text: richText.clean(section.text),
-                    plainText: section.plainText
-                }
-            })
-        }
-    }
-
-    getAllSaveData() {
+    getData() {
         return {
             itemType: 'text',
 
@@ -484,10 +469,6 @@ module.exports = class Text {
             }),
             template: this.data.template
         }
-    }
-
-    getEditData() {
-        return this.getAllSaveData()
     }
 }
 

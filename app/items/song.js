@@ -1023,32 +1023,7 @@ module.exports = class Song {
         }
     }
 
-    getSaveData() {
-        let sections = {}
-        for (let section in this.data.sections) {
-            sections[section] = {
-                text: richText.clean(this.data.sections[section].text),
-                plainText: this.data.sections[section].plainText
-            }
-        }
-
-        return {
-            itemType: 'song',
-
-            group: this.data.group,
-            groupID: this.data.groupID,
-
-            name: this.data.name,
-            author: this.data.author,
-            copyright: this.data.copyright,
-
-            sections: sections,
-
-            playOrder: this.data.playOrder
-        }
-    }
-
-    getAllSaveData() {
+    getData() {
         return {
             itemType: 'song',
 
@@ -1074,10 +1049,6 @@ module.exports = class Song {
 
             playOrder: this.data.playOrder
         }
-    }
-
-    getEditData() {
-        return this.getAllSaveData()
     }
 }
 
