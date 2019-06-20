@@ -5906,6 +5906,7 @@ exports.change = addStyles
 
             this.options = {
                 save: false,
+                read: true,
 
                 multi: false,
                 folder: false,
@@ -5928,6 +5929,9 @@ exports.change = addStyles
                 this.options.save = data.save
             } else if (typeof data.open === 'boolean') {
                 this.options.save = !data.open
+            }
+            if (typeof data.read === 'boolean') {
+                this.options.read = data.read
             }
             if (typeof data.multi === 'boolean') {
                 this.options.multi = data.multi
@@ -6030,7 +6034,7 @@ exports.change = addStyles
                         },
                         this.events.open
                     )
-                } else {
+                } else if (this.options.read) {
                     fs.readFile(value, 'utf8', (error, content) => {
                         if (error) {
                             logger.error('File open error:', error)
@@ -6047,6 +6051,16 @@ exports.change = addStyles
                             )
                         }
                     })
+                } else {
+                    sendEventTo(
+                        {
+                            filename: value,
+
+                            fromUser: true,
+                            from: this
+                        },
+                        this.events.open
+                    )
                 }
             }
         }
