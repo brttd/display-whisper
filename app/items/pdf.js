@@ -153,11 +153,20 @@ module.exports = class PDF {
         if (!this.data.file) {
             this.document = null
             this.metadata = null
+            this.loadedFile = null
+
+            this._emitChange()
 
             return false
         }
 
+        if (this.loadedFile === this.data.file) {
+            return false
+        }
+
         this.loading = true
+
+        let file = this.data.file
 
         pdfjs
             .getDocument({
@@ -169,6 +178,7 @@ module.exports = class PDF {
                 pdf => {
                     this.loading = false
 
+                    this.loadedFile = file
                     this.document = pdf
                     this.metadata = null
 
@@ -187,10 +197,13 @@ module.exports = class PDF {
                 error => {
                     this.loading = false
 
+                    this.loadedFile = null
                     this.document = null
                     this.metadata = null
 
                     console.error(error)
+
+                    this._emitChange()
                 }
             )
     }
@@ -212,13 +225,9 @@ module.exports = class PDF {
     unifyTextSections() {}
 
     edit(data = {}) {
-        if (this.data.file !== data.file) {
-            applyData(this.data, data)
+        applyData(this.data, data)
 
-            this.loadDocument()
-        } else {
-            applyData(this.data, data)
-        }
+        this.loadDocument()
     }
 
     getData() {
