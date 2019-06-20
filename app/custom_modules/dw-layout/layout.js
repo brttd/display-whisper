@@ -12129,6 +12129,8 @@ class BoxEdit {
 
         onPdfPageLoad(page) {
             if (!page) {
+                this._rendering = false
+
                 return false
             }
 
@@ -12148,6 +12150,12 @@ class BoxEdit {
             page.render({
                 canvasContext: this.canvasContext,
                 viewport: page.getViewport(scale)
+            }).then(() => {
+                this._rendering = false
+
+                if (this._needsRender) {
+                    pdf.getPage(this.values.file, this.values.page, this.onPdfPageLoad)
+                }
             })
         }
 
@@ -12175,7 +12183,14 @@ class BoxEdit {
             }
 
             if (needsChange) {
-                pdf.getPage(this.values.file, this.values.page, this.onPdfPageLoad)
+                if (this._rendering) {
+                    this._needsRender = true
+                } else {
+                    this._rendering = true
+                    this._needsRender = false
+
+                    pdf.getPage(this.values.file, this.values.page, this.onPdfPageLoad)
+                }
             }
         }
     }
