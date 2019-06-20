@@ -119,9 +119,6 @@ module.exports = class PDF {
                 display: {
                     background: this.data.background,
 
-                    pdfDocument: this.data.file,
-                    pdfDocumentPage: i + 1,
-
                     nodes: [
                         {
                             type: 'pdf',
