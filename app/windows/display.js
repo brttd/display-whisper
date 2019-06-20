@@ -120,17 +120,10 @@ function onPdfDocumentLoad(pdf) {
 
     this.pages = []
 
-    let toFinish = this.document.numPages
-
     for (let i = 0; i < this.document.numPages; i++) {
         this.pages.push()
 
         this.document.getPage(i + 1).then(page => {
-            toFinish -= 1
-            if (toFinish === 0) {
-                console.timeEnd('pdf-load')
-            }
-
             this.pages[i] = page
             this.pages[i]._viewport = page.getViewport(1)
         })
@@ -138,8 +131,6 @@ function onPdfDocumentLoad(pdf) {
 }
 function onPdfDocumentError(error) {
     this.error = error
-
-    console.error(error)
 }
 
 function addNode(data = {}, parentNode = displayNode.lastChild) {
