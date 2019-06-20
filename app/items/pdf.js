@@ -235,13 +235,6 @@ module.exports = class PDF {
 }
 
 module.exports.template = {
-    nodes: [
-        {
-            type: 'pdf',
-            map: '',
-            name: 'Main',
-            properties: {}
-        }
-    ],
+    nodes: [],
     options: []
 }
