@@ -15,6 +15,8 @@ document.body.style.background = 'black'
 
 const pdfDocumentCache = []
 
+const imageLoadNodes = []
+
 const canvasNodes = []
 const textNodes = []
 const imageNodes = []
@@ -219,6 +221,18 @@ function addNode(data = {}, parentNode = displayNode.lastChild) {
         } else {
             node.style.backgroundSize = defaults.scale
         }
+
+        let loader = imageLoadNodes.pop() || document.createElement('img')
+        loader.onload = finishDisplay.bind(
+            null,
+            parentNode,
+            parentNode._data,
+            loader
+        )
+
+        loader.src = data.url
+
+        parentNode._delay = true
     } else if (data.type === 'pdf') {
         let doc = pdfDocumentCache.find(document => document.file === data.file)
 
@@ -325,9 +339,13 @@ function renderPdfPage(parentNode, page) {
     parentNode.appendChild(canvas)
 }
 
-function finishDisplay(newDisplay, data) {
+function finishDisplay(newDisplay, data, imageLoader) {
     if (!delayedDisplay) {
         return false
+    }
+
+    if (imageLoader) {
+        imageLoadNodes.push(imageLoader)
     }
 
     delayedDisplay = false
