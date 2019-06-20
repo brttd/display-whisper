@@ -12080,6 +12080,86 @@ class BoxEdit {
         }
     }
 
+    class PdfNode extends Node {
+        /*
+        PDF node for display item (extends Node item).
+
+        Constructor data:
+            url (string)
+            scale (number)
+        
+        Properties:
+            N/A
+        
+        Methods:
+            update (data: object)
+        */
+        constructor(data = {}) {
+            super()
+
+            this.canvasNode = document.createElement('canvas')
+            this.node.appendChild(this.canvasNode)
+
+            this.canvasContext = this.canvasNode.getContext('2d')
+
+            this.displayScale = 1
+
+            this.values.type = 'pdf'
+
+            this.values.file = ''
+            this.values.page = 1
+
+            bindFunctions(this, this.onPdfPageLoad)
+
+            this.update(data)
+        }
+
+        onPdfPageLoad(page) {
+            if (!page) {
+                return false
+            }
+
+            let viewport = page.getViewport(1)
+
+            let scale = Math.min(
+                currentDisplay.width / viewport.width,
+                currentDisplay.height / viewport.height
+            )
+
+            this.canvasNode.width = Math.round(viewport.width * scale)
+            this.canvasNode.height = Math.round(viewport.height * scale)
+
+            this.canvasNode.style.width = this.canvasNode.width + 'px'
+            this.canvasNode.style.height = this.canvasNode.height + 'px'
+
+            page.render({
+                canvasContext: this.canvasContext,
+                viewport: page.getViewport(scale)
+            })
+        }
+
+        update(data = {}) {
+            super.update(data)
+
+            if (
+                typeof data.page === 'number' &&
+                data.page !== this.values.page &&
+                data.page > 0 &&
+                isFinite(data.page)
+            ) {
+                this.values.page = data.page
+            }
+
+            if (
+                typeof data.file === 'string' &&
+                data.file !== this.values.file
+            ) {
+                this.values.file = data.file
+            }
+            pdf.getPage(this.values.file, this.values.page, this.onPdfPageLoad)
+        }
+    }
+
     class Display extends Item {
         /*
         For previewing what will be displayed.
@@ -12301,7 +12381,9 @@ class BoxEdit {
 
             //Add any new children
             for (let i = this.nodes.length; i < this.data.nodes.length; i++) {
-                if (this.data.nodes[i].type === 'image') {
+                if (this.data.nodes[i].type === 'pdf') {
+                    this.nodes.push(new PdfNode(this.data.nodes[i]))
+                } else if (this.data.nodes[i].type === 'image') {
                     this.nodes.push(new ImageNode(this.data.nodes[i]))
                 } else {
                     this.nodes.push(new TextNode(this.data.nodes[i]))
@@ -12314,7 +12396,9 @@ class BoxEdit {
                 if (this.nodes[i].values.type !== this.data.nodes[i].type) {
                     let oldNodeElement = this.screenNode.childNodes[i]
 
-                    if (this.data.nodes[i].type === 'image') {
+                    if (this.data.nodes[i].type === 'pdf') {
+                        this.nodes[i] = new PdfNode(this.data.nodes[i])
+                    } else if (this.data.nodes[i].type === 'image') {
                         this.nodes[i] = new ImageNode(this.data.nodes[i])
                     } else {
                         this.nodes[i] = new TextNode(this.data.nodes[i])
