@@ -106,10 +106,12 @@ function removeOldDisplayNode() {
         displayNode.removeChild(node)
 
         for (let i = 0; i < node.childElementCount; i++) {
-            if (node.children[i].childElementCount === 1) {
+            if (node.children[i].tagName === 'P') {
                 textNodes.push(node.children[i])
-            } else {
+            } else if (node.children[i].tagName === 'DIV') {
                 imageNodes.push(node.children[i])
+            } else if (node.children[i].tagName === 'CANVAS') {
+                canvasNodes.push(node.children[i])
             }
         }
     }
