@@ -1,5 +1,8 @@
 const ipcRenderer = require('electron').ipcRenderer
 
+const pdfjs = require('../../pdfjs/pdf')
+pdfjs.GlobalWorkerOptions.workerSrc = '../pdfjs/pdf.worker.js'
+
 const layout = require('dw-layout')
 
 const Database = require('dw-database')
@@ -24,6 +27,19 @@ const displayPreview = new layout.Display(
 
         background: true,
         border: true
+    }
+)
+
+const pageList = new layout.List(
+    {
+        editButton: false,
+        removeButton: false
+    },
+    {
+        width: '15ch',
+
+        grow: false,
+        shrink: false
     }
 )
 
@@ -118,7 +134,18 @@ layout.body.add(
                                 ),
 
                                 playControl,
-                                displayPreview
+
+                                new layout.Block(
+                                    {
+                                        items: [displayPreview, pageList],
+                                        childSpacing: 8
+                                    },
+                                    {
+                                        direction: 'horizontal',
+
+                                        padding: 0
+                                    }
+                                )
                             ],
 
                             childSpacing: 8
@@ -263,6 +290,35 @@ layout.body.add(
     ipcRenderer.send('get-setting', 'general.defaultTemplate')
 }
 
+let loadedFile = ''
+
+function loadPDF() {
+    if (loadedFile === editor.data.file) {
+        return false
+    }
+
+    pageList.disabled = true
+
+    loadedFile = editor.data.file
+
+    pdfjs.getDocument('file://' + loadedFile).then(
+        pdf => {
+            pageList.clear()
+
+            for (let i = 0; i < pdf.numPages; i++) {
+                pageList.add('Page ' + (i + 1).toString())
+            }
+
+            pageList.select(0)
+
+            pageList.disabled = false
+        },
+        error => {
+            console.error(error)
+        }
+    )
+}
+
 function update() {
     displayPreview.update({
         background: editor.data.background,
@@ -271,7 +327,7 @@ function update() {
             {
                 type: 'pdf',
                 file: editor.data.file,
-                page: 1,
+                page: pageList.index + 1,
 
                 top: 0,
                 left: 0,
@@ -282,6 +338,8 @@ function update() {
     })
 
     playControl.set(editor.data)
+
+    loadPDF()
 }
 
 let onChange = event => {
@@ -295,6 +353,17 @@ let onChange = event => {
 
     update()
 }
+
+pageList.onEvent('select', event => {
+    displayPreview.update({
+        nodes: [
+            {
+                type: 'pdf',
+                page: pageList.index + 1
+            }
+        ]
+    })
+})
 
 backgroundControl.onEvent('change', event => {
     onChange({
@@ -357,7 +426,7 @@ displayButton.onEvent('click', () => {
                 {
                     type: 'pdf',
                     file: editor.data.file,
-                    page: 1,
+                    page: pageList.index + 1,
 
                     top: 0,
                     left: 0,
