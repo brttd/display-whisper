@@ -212,7 +212,13 @@ module.exports = class PDF {
     unifyTextSections() {}
 
     edit(data = {}) {
-        applyData(this.data, data)
+        if (this.data.file !== data.file) {
+            applyData(this.data, data)
+
+            this.loadDocument()
+        } else {
+            applyData(this.data, data)
+        }
     }
 
     getData() {
