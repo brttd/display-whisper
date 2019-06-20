@@ -230,8 +230,6 @@ function addNode(data = {}, parentNode = displayNode.lastChild) {
         let doc = pdfDocumentCache.find(document => document.file === data.file)
 
         if (!doc) {
-            console.time('pdf-load')
-
             doc = {
                 documentLoader: pdfjs.getDocument({
                     url: 'file://' + data.file,
@@ -274,6 +272,7 @@ function addNode(data = {}, parentNode = displayNode.lastChild) {
             })
         }
 
+        parentNode._delay = true
         return
     }
 
@@ -309,7 +308,6 @@ function addNode(data = {}, parentNode = displayNode.lastChild) {
 }
 
 function renderPdfPage(parentNode, page) {
-    console.time('pdf-render')
     let viewport = page._viewport || page.getViewport(1)
 
     let canvas = canvasNodes.pop() || document.createElement('canvas')
@@ -329,8 +327,8 @@ function renderPdfPage(parentNode, page) {
     page.render({
         canvasContext: canvas._context,
         viewport: page.getViewport(scale)
-    }).promise.then(function() {
-        console.timeEnd('pdf-render')
+    }).promise.then(() => {
+        delayedDisplay === parentNode ? finishDisplay() : null
     })
 
     parentNode.appendChild(canvas)
