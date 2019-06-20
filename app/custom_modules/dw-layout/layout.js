@@ -5290,7 +5290,8 @@ exports.change = addStyles
                 fontPopup.node.style.opacity = '0'
 
                 exports.onFrame.start(() => {
-                    let scrollPosition = activeElem.offsetTop - (fontPopup.node.offsetHeight / 2)
+                    let scrollPosition =
+                        activeElem.offsetTop - fontPopup.node.offsetHeight / 2
 
                     exports.onFrame.end(() => {
                         fontPopup.node.scrollTop = scrollPosition
@@ -10381,20 +10382,18 @@ exports.change = addStyles
 
                         min: 0,
                         max: 100,
-                        precision: 1,
+                        precision: 1
                     },
                     {
                         width: '5.5ch',
-                        grow: false,
+                        grow: false
                     }
                 )
                 this.inputItems.push(this.opacity)
 
                 this.opacityBlock.appendChild(this.opacity.node)
 
-                if (
-                    data.opacity !== false
-                ) {
+                if (data.opacity !== false) {
                     this.node.appendChild(this.opacityBlock)
                 }
 
@@ -13926,7 +13925,7 @@ class BoxEdit {
                 {
                     let block = document.createElement('div')
                     block.className = 'content'
-                    
+
                     let topBlock = document.createElement('div')
                     topBlock.className = 'bar'
                     topBlock.appendChild(this.toggleButton.node)
@@ -16399,10 +16398,18 @@ class BoxEdit {
         title.base = newTitle
 
         if (title.document) {
-            if (process.platform === 'darwin' && path.isAbsolute(title.document)) {
+            if (
+                process.platform === 'darwin' &&
+                path.isAbsolute(title.document)
+            ) {
                 thisWin.setTitle(title.base)
             } else {
-                thisWin.setTitle(title.base + ' | ' + title.document + (title.edited ? '*' : ''))
+                thisWin.setTitle(
+                    title.base +
+                        ' | ' +
+                        title.document +
+                        (title.edited ? '*' : '')
+                )
             }
         } else {
             thisWin.setTitle(title.base)
@@ -16417,14 +16424,22 @@ class BoxEdit {
         title.document = document
 
         if (title.document) {
-            if (process.platform === 'darwin' && path.isAbsolute(title.document)) {
+            if (
+                process.platform === 'darwin' &&
+                path.isAbsolute(title.document)
+            ) {
                 thisWin.setRepresentedFilename(title.document)
             } else {
-                thisWin.setTitle(title.base + ' | ' + title.document + (title.edited ? '*' : ''))                
+                thisWin.setTitle(
+                    title.base +
+                        ' | ' +
+                        title.document +
+                        (title.edited ? '*' : '')
+                )
             }
         } else {
             thisWin.setTitle(title.base)
-            
+
             title.edited = false
 
             thisWin.setRepresentedFilename('')
@@ -16433,7 +16448,11 @@ class BoxEdit {
     }
     exports.window.setDocumentEdited = function(edited) {
         if (typeof edited !== 'boolean') {
-            if (edited === 'autosaved' && process.platform !== 'darwin' && title.document) {
+            if (
+                edited === 'autosaved' &&
+                process.platform !== 'darwin' &&
+                title.document
+            ) {
                 thisWin.setTitle(title.base + ' | ' + title.document + '^')
             }
 
@@ -16443,10 +16462,18 @@ class BoxEdit {
         title.edited = edited
 
         if (title.document) {
-            if (process.platform === 'darwin' && path.isAbsolute(title.document)) {
+            if (
+                process.platform === 'darwin' &&
+                path.isAbsolute(title.document)
+            ) {
                 thisWin.setDocumentEdited(title.edited)
             } else {
-                thisWin.setTitle(title.base + ' | ' + title.document + (title.edited ? '*' : ''))
+                thisWin.setTitle(
+                    title.base +
+                        ' | ' +
+                        title.document +
+                        (title.edited ? '*' : '')
+                )
             }
         } else {
             thisWin.setTitle(title.base)
