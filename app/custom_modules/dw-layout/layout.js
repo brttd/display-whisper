@@ -8713,6 +8713,9 @@ exports.change = addStyles
                         this.events.select
                     )
                 } else {
+
+                    this.items[indexOrList].node.scrollIntoViewIfNeeded()
+
                     sendEventTo(
                         {
                             index: indexOrList,
