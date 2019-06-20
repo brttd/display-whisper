@@ -2579,6 +2579,15 @@ const item_add = {
             paddingBottom: 0
         }
     )
+    let pdfBlock = new layout.Block(
+        {
+            childSpacing: 8
+        },
+        {
+            direction: 'vertical',
+            paddingBottom: 0
+        }
+    )
 
     let tabBlock = new layout.TabBlock({
         tabs: [
@@ -2593,6 +2602,10 @@ const item_add = {
             {
                 name: 'Image',
                 content: imageBlock
+            },
+            {
+                name: 'PDF',
+                content: pdfBlock
             }
         ]
     })
@@ -3769,6 +3782,7 @@ const item_add = {
             if (item_add.options.tab !== 'Image') {
                 return false
             }
+
             let imageData = image.getData()
             imageData.itemType = 'image'
             if (
@@ -3842,6 +3856,151 @@ const item_add = {
                 image.focus()
 
                 addButton.disabled = false
+            }
+        })
+    }
+    //pdf add
+    {
+        let file = null
+
+        let fileSelect = new layout.FileInput({
+            text: 'Select PDF',
+
+            filters: [{ name: 'PDF', extensions: ['pdf'] }],
+
+            read: false
+        })
+        let backgroundEditor = new layout.ColorInput({
+            label: 'Background'
+        })
+
+        pdfBlock.add(fileSelect)
+        pdfBlock.add(backgroundEditor)
+
+        let preview = new layout.Display(
+            {},
+            {
+                shrink: true,
+                grow: true,
+
+                border: true,
+                background: true
+            }
+        )
+        preview.set({
+            nodes: [
+                {
+                    type: 'pdf',
+
+                    top: 0,
+                    left: 0,
+                    right: 100,
+                    bottom: 100
+                }
+            ]
+        })
+
+        pdfBlock.add(preview)
+
+        templateSelect.onEvent('change', () => {
+            preview.update(selectedTemplate)
+
+            backgroundEditor.value = preview.display.background
+        })
+
+        backgroundEditor.onEvent('change', event => {
+            preview.update({
+                background: event.value
+            })
+        })
+
+        fileSelect.onEvent('open', event => {
+            if (event.filename) {
+                file = event.filename
+
+                preview.update({
+                    nodes: [
+                        {
+                            type: 'pdf',
+
+                            file: file,
+                            page: 1,
+
+                            top: 0,
+                            left: 0,
+                            right: 100,
+                            bottom: 100
+                        }
+                    ]
+                })
+
+                addButton.disabled = false
+            }
+        })
+
+        preview.onEvent('drag', () => {
+            presentation.addDrop(
+                {
+                    itemType: 'pdf',
+
+                    file: file,
+
+                    background: preview.display.background
+                },
+                selectedTemplate
+            )
+        })
+
+        addButton.onEvent('drag', () => {
+            if (item_add.options.tab !== 'PDF') {
+                return false
+            }
+
+            if (!file) {
+                addButton.disabled = true
+                return false
+            }
+
+            presentation.addDrop(
+                {
+                    itemType: 'pdf',
+
+                    file: file,
+
+                    background: preview.display.background
+                },
+                selectedTemplate
+            )
+        })
+        addButton.onEvent('click', () => {
+            if (item_add.options.tab !== 'Image') {
+                return false
+            }
+
+            if (!file) {
+                addButton.disabled = true
+                return false
+            }
+
+            presentation.add(
+                {
+                    itemType: 'pdf',
+
+                    file: file,
+
+                    background: preview.display.background
+                },
+                selectedTemplate
+            )
+        })
+
+        tabBlock.onEvent('switch', event => {
+            if (event.tab.name === 'PDF' && event.fromUser) {
+                if (file) {
+                    addButton.disabled = false
+                } else {
+                    addButton.disabled = true
+                }
             }
         })
     }
