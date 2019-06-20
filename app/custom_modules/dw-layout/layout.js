@@ -11692,6 +11692,140 @@ class BoxEdit {
 {
     loadCSS('display.css')
 
+    let pdf = {}
+    {
+        let pdfjs
+
+        let pdfDocumentCache = []
+        let maxCachedDocuments = 50
+
+        let loadPdfjs = () => {
+            pdfjs = require('../../pdfjs/pdf')
+
+            pdfjs.GlobalWorkerOptions.workerSrc = '../pdfjs/pdf.worker.js'
+
+            loadPdfjs = () => {}
+        }
+
+        function callCallbacks(pdfDoc) {
+            while (pdfDoc.callbacks.length > 0) {
+                if (
+                    pdfDoc.callbacks[0].page > 0 &&
+                    pdfDoc.callbacks[0].page <= pdfDoc.pages.length
+                ) {
+                    pdfDoc.callbacks[0].func(
+                        pdfDoc.pages[pdfDoc.callbacks[0].page - 1]
+                    )
+                } else {
+                    pdfDoc.callbacks[0].func(null)
+                }
+
+                pdfDoc.callbacks.shift()
+            }
+        }
+
+        function onPdfLoad(result) {
+            this.loader = null
+            this.document = result
+
+            this.pages = []
+
+            let toLoad = this.document.numPages
+
+            for (let i = 0; i < this.document.numPages; i++) {
+                this.pages.push()
+
+                this.document.getPage(i + 1).then(
+                    page => {
+                        toLoad -= 1
+
+                        this.pages[i] = page
+
+                        if (toLoad === 0) {
+                            callCallbacks(this)
+                        }
+                    },
+                    error => {
+                        console.error(error)
+
+                        toLoad -= 1
+
+                        if (toLoad === 0) {
+                            callCallbacks(this)
+                        }
+                    }
+                )
+            }
+        }
+        function onPdfError(error) {
+            this.loader = null
+            this.error = error
+
+            console.error(error)
+
+            callCallbacks(this)
+        }
+
+        pdf.getPage = (file, page, callback) => {
+            loadPdfjs()
+
+            if (typeof callback !== 'function') {
+                return false
+            }
+
+            if (typeof file !== 'string' || typeof page !== 'number') {
+                callback(null)
+
+                return false
+            }
+
+            let pdfDoc = pdfDocumentCache.find(doc => doc.file === file)
+
+            if (!pdfDoc) {
+                pdfDoc = {
+                    loader: pdfjs.getDocument({
+                        url: 'file://' + file,
+
+                        disableFontFace: false
+                    }).promise,
+
+                    callbacks: [],
+
+                    file: file
+                }
+
+                pdfDocumentCache.push(pdfDoc)
+
+                if (pdfDocumentCache.length > maxCachedDocuments) {
+                    pdfDocumentCache.splice(
+                        0,
+                        pdfDocumentCache.length - maxCachedDocuments
+                    )
+                }
+
+                pdfDoc.loader.then(
+                    onPdfLoad.bind(pdfDoc),
+                    onPdfError.bind(pdfDoc)
+                )
+            }
+
+            if (pdfDoc.loader) {
+                pdfDoc.callbacks.push({
+                    page: page,
+                    func: callback
+                })
+            } else if (pdfDoc.error) {
+                callback(null)
+            } else {
+                if (page > 0 && page <= pdfDoc.pages.length) {
+                    callback(pdfDoc.pages[page - 1])
+                } else {
+                    callback(null)
+                }
+            }
+        }
+    }
+
     class Node {
         /*
         Wrapper item for display items (does not extend base item class).
