@@ -297,6 +297,10 @@ const presentation = {}
         remove(itemsBlock.indexOf(event.from))
     }
 
+    function onDataChange(changedItem) {
+        updateItem(list.findIndex(item => item.id === changedItem.id))
+    }
+
     //presentation functions
     function ensureImageExists(image) {
         return false
@@ -1081,6 +1085,10 @@ const presentation = {}
         }
 
         updateItem(Math.max(0, Math.min(list.length - 1, index)))
+
+        if (typeof data.onChange === 'function') {
+            data.onChange(onDataChange.bind(null, data))
+        }
 
         if (options.autoMinimize) {
             item.minimize()
