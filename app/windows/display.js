@@ -4,12 +4,18 @@ const path = require('path')
 
 const { isColor } = require('dw-color')
 
+const pdfjs = require('../pdfjs/pdf')
+pdfjs.GlobalWorkerOptions.workerSrc = '../pdfjs/pdf.worker.js'
+
 const displayNode = document.createElement('div')
 displayNode.id = 'display'
 document.body.appendChild(displayNode)
 
 document.body.style.background = 'black'
 
+const pdfDocumentCache = []
+
+const canvasNodes = []
 const textNodes = []
 const imageNodes = []
 
@@ -106,6 +112,33 @@ function removeOldDisplayNode() {
     }
 }
 
+function onPdfDocumentLoad(pdf) {
+    this.document = pdf
+
+    this.pages = []
+
+    let toFinish = this.document.numPages
+
+    for (let i = 0; i < this.document.numPages; i++) {
+        this.pages.push()
+
+        this.document.getPage(i + 1).then(page => {
+            toFinish -= 1
+            if (toFinish === 0) {
+                console.timeEnd('pdf-load')
+            }
+
+            this.pages[i] = page
+            this.pages[i]._viewport = page.getViewport(1)
+        })
+    }
+}
+function onPdfDocumentError(error) {
+    this.error = error
+
+    console.error(error)
+}
+
 function addNode(data = {}, parentNode = displayNode.lastChild) {
     let node
 
@@ -190,6 +223,55 @@ function addNode(data = {}, parentNode = displayNode.lastChild) {
         } else {
             node.style.backgroundSize = defaults.scale
         }
+    } else if (data.type === 'pdf') {
+        let doc = pdfDocumentCache.find(document => document.file === data.file)
+
+        if (!doc) {
+            console.time('pdf-load')
+
+            doc = {
+                documentLoader: pdfjs.getDocument({
+                    url: 'file://' + data.file,
+
+                    disableFontFace: false
+                }).promise,
+
+                file: data.file
+            }
+
+            pdfDocumentCache.push(doc)
+
+            doc.documentLoader.then(
+                onPdfDocumentLoad.bind(doc),
+                onPdfDocumentError.bind(doc)
+            )
+        }
+
+        if (doc.error) {
+        } else if (doc.document) {
+            let pageNumber = Math.max(
+                1,
+                Math.min(data.page, doc.document.numPages)
+            )
+
+            if (doc.pages[pageNumber - 1]) {
+                renderPdfPage(parentNode, doc.pages[pageNumber - 1])
+            } else {
+                doc.document.getPage(pageNumber).then(page => {
+                    renderPdfPage(parentNode, page)
+                })
+            }
+        } else {
+            doc.documentLoader.then(pdf => {
+                pdf.getPage(
+                    Math.max(1, Math.min(data.page, pdf.numPages))
+                ).then(page => {
+                    renderPdfPage(parentNode, page)
+                })
+            })
+        }
+
+        return
     }
 
     if (typeof data.top === 'number' && isFinite(data.top)) {
@@ -221,6 +303,34 @@ function addNode(data = {}, parentNode = displayNode.lastChild) {
     }
 
     parentNode.appendChild(node)
+}
+
+function renderPdfPage(parentNode, page) {
+    console.time('pdf-render')
+    let viewport = page._viewport || page.getViewport(1)
+
+    let canvas = canvasNodes.pop() || document.createElement('canvas')
+    canvas._context = canvas._context || canvas.getContext('2d')
+
+    let scale = Math.min(
+        masterDisplay.width / viewport.width,
+        masterDisplay.height / viewport.height
+    )
+
+    canvas.width = viewport.width * scale
+    canvas.height = viewport.height * scale
+
+    canvas.style.width = canvas.width + 'px'
+    canvas.style.height = canvas.height + 'px'
+
+    page.render({
+        canvasContext: canvas._context,
+        viewport: page.getViewport(scale)
+    }).promise.then(function() {
+        console.timeEnd('pdf-render')
+    })
+
+    parentNode.appendChild(canvas)
 }
 
 function display(data = {}) {
