@@ -3973,7 +3973,7 @@ const item_add = {
             )
         })
         addButton.onEvent('click', () => {
-            if (item_add.options.tab !== 'Image') {
+            if (item_add.options.tab !== 'PDF') {
                 return false
             }
 
