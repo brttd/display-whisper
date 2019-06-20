@@ -19,6 +19,9 @@ const canvasNodes = []
 const textNodes = []
 const imageNodes = []
 
+const displayQueue = []
+let delayedDisplay = null
+
 const masterDisplay = {
     width: 0,
     height: 0,
@@ -333,8 +336,149 @@ function renderPdfPage(parentNode, page) {
     parentNode.appendChild(canvas)
 }
 
+function finishDisplay() {
+    if (!delayedDisplay) {
+        return false
+    }
+
+    let newDisplay = delayedDisplay
+    let data = newDisplay._data
+
+    delayedDisplay = null
+
+    if (blanked) {
+        displayNode.insertBefore(newDisplay, blankNode)
+    } else {
+        displayNode.appendChild(newDisplay)
+    }
+
+    if (typeof data.transition === 'object' && data.transition.time >= 0) {
+        if (
+            typeof data.transition.time !== 'number' ||
+            !isFinite(data.transition.time)
+        ) {
+            data.transition.time = defaults.transition.time
+        }
+
+        if (!validTransitionTypes.includes(data.transition.type)) {
+            data.transition.type = defaults.transition.type
+        }
+
+        switch (data.transition.type) {
+            case 'fade':
+                newDisplay.style.opacity = '0'
+
+                newDisplay.style.transition =
+                    'opacity ' + data.transition.time + 'ms'
+
+                //The opacity: 0 rule needs to be applied (and painted),
+                //then on the next frame the opacity: 1 rule needs to be set for the transition animation to happen
+                requestAnimationFrame(() => {
+                    newDisplay.style.opacity = '1'
+                })
+
+                break
+            case 'zoom':
+                newDisplay.style.transform = 'scale(0)'
+
+                if (validTransitionOrigins.includes(data.transition.origin)) {
+                    newDisplay.style.transformOrigin = data.transition.origin
+                } else {
+                    newDisplay.style.transformOrigin =
+                        defaults.transition.zoom.origin
+                }
+
+                newDisplay.style.transition =
+                    'transform ' + data.transition.time + 'ms'
+
+                requestAnimationFrame(() => {
+                    newDisplay.style.transform = 'scale(1)'
+                })
+
+                break
+            case 'slide':
+                if (
+                    !validTransitionOrigins.includes(data.transition.origin) ||
+                    data.transition.origin === 'center'
+                ) {
+                    data.transition.origin = defaults.transition.slide.origin
+                }
+
+                switch (data.transition.origin) {
+                    case 'top right':
+                        newDisplay.style.transform = 'translate(100%, -100%)'
+                        break
+                    case 'right':
+                        newDisplay.style.transform = 'translate(100%, 0)'
+                        break
+                    case 'bottom right':
+                        newDisplay.style.transform = 'translate(100%, 100%)'
+                        break
+                    case 'bottom':
+                        newDisplay.style.transform = 'translate(0, 100%)'
+                        break
+                    case 'bottom left':
+                        newDisplay.style.transform = 'translate(-100%, 100%)'
+                        break
+                    case 'top left':
+                        newDisplay.style.transform = 'translate(-100%, -100%)'
+                        break
+                    case 'top':
+                    default:
+                        newDisplay.style.transform = 'translate(0, -100%)'
+                        break
+                }
+
+                newDisplay.style.transition =
+                    'transform ' + data.transition.time + 'ms'
+
+                requestAnimationFrame(() => {
+                    newDisplay.style.transform = 'translate(0, 0)'
+                })
+        }
+
+        setTimeout(() => {
+            requestAnimationFrame(removeOldDisplayNode)
+        }, data.transition.time)
+    } else {
+        requestAnimationFrame(removeOldDisplayNode)
+    }
+
+    if (!masterDisplay.letterbox) {
+        if (data.transition.time > 0 && data.transition.type === 'fade') {
+            document.body.style.transition =
+                'background ' + data.transition.time + 'ms'
+
+            requestAnimationFrame(() => {
+                document.body.style.background =
+                    newDisplay.style.backgroundColor
+            })
+        } else {
+            document.body.style.transition = ''
+
+            document.body.style.background = newDisplay.style.backgroundColor
+        }
+    }
+
+    let queued = displayQueue.splice(0, displayQueue.length)
+
+    for (let i = 0; i < queued.length; i++) {
+        display(queued[i])
+    }
+}
+
 function display(data = {}) {
+    if (delayedDisplay) {
+        displayQueue.push(data)
+        return
+    }
+
     requestAnimationFrame(() => {
+        if (delayedDisplay) {
+            displayQueue.push(data)
+            return
+        }
+
         let newDisplay = document.createElement('div')
 
         if (isColor(data.background)) {
@@ -365,6 +509,17 @@ function display(data = {}) {
             for (let i = 0; i < data.nodes.length; i++) {
                 addNode(data.nodes[i], newDisplay)
             }
+        }
+
+        if (newDisplay._delay) {
+            delayedDisplay = newDisplay
+            newDisplay._data = data
+
+            setTimeout(() => {
+                delayedDisplay === newDisplay ? finishDisplay() : null
+            }, 300)
+
+            return
         }
 
         if (blanked) {
