@@ -320,22 +320,17 @@ function renderPdfPage(parentNode, page) {
     page.render({
         canvasContext: canvas._context,
         viewport: page.getViewport(scale)
-    }).promise.then(() => {
-        delayedDisplay === parentNode ? finishDisplay() : null
-    })
+    }).promise.then(finishDisplay.bind(null, parentNode, parentNode._data))
 
     parentNode.appendChild(canvas)
 }
 
-function finishDisplay() {
+function finishDisplay(newDisplay, data) {
     if (!delayedDisplay) {
         return false
     }
 
-    let newDisplay = delayedDisplay
-    let data = newDisplay._data
-
-    delayedDisplay = null
+    delayedDisplay = false
 
     if (blanked) {
         displayNode.insertBefore(newDisplay, blankNode)
@@ -496,6 +491,8 @@ function display(data = {}) {
             newDisplay.style.backgroundSize = defaults.backgroundSize
         }
 
+        newDisplay._data = data
+
         if (Array.isArray(data.nodes)) {
             for (let i = 0; i < data.nodes.length; i++) {
                 addNode(data.nodes[i], newDisplay)
@@ -503,14 +500,11 @@ function display(data = {}) {
         }
 
         if (newDisplay._delay) {
-            delayedDisplay = newDisplay
-            newDisplay._data = data
+            delayedDisplay = true
 
-            setTimeout(() => {
-                delayedDisplay === newDisplay ? finishDisplay() : null
-            }, 300)
+            setTimeout(finishDisplay.bind(null, newDisplay, data), 300)
 
-            return
+            return false
         }
 
         if (blanked) {
