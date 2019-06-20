@@ -12151,10 +12151,13 @@ class BoxEdit {
                 canvasContext: this.canvasContext,
                 viewport: page.getViewport(scale)
             }).then(() => {
-                this._rendering = false
-
                 if (this._needsRender) {
+                    this._rendering = true
+                    this._needsRender = false
+
                     pdf.getPage(this.values.file, this.values.page, this.onPdfPageLoad)
+                } else {
+                    this._rendering = false
                 }
             })
         }
