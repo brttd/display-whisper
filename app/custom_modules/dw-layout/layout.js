@@ -11759,7 +11759,7 @@ class BoxEdit {
                         }
                     },
                     error => {
-                        console.error(error)
+                        logger.error('PDF page error:', error)
 
                         toLoad -= 1
 
@@ -11774,7 +11774,7 @@ class BoxEdit {
             this.loader = null
             this.error = error
 
-            console.error(error)
+            logger.error('PDF document error:', error)
 
             callCallbacks(this)
         }
