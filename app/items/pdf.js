@@ -93,7 +93,7 @@ module.exports = class PDF {
     }
 
     get title() {
-        if (this.metadata) {
+        if (this.metadata && this.metadata.info && this.metadata.info.Title) {
             return (
                 this.metadata.info.Title +
                 (this.metadata.info.Author
