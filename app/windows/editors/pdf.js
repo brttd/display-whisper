@@ -99,8 +99,24 @@ layout.body.add(
                     new layout.Block(
                         {
                             items: [
-                                fileSelector,
-                                backgroundControl,
+                                new layout.Block(
+                                    {
+                                        items: [
+                                            fileSelector,
+                                            backgroundControl
+                                        ],
+
+                                        childSpacing: 8
+                                    },
+                                    {
+                                        direction: 'horizontal',
+
+                                        padding: 0,
+                                        grow: false,
+                                        shrink: false
+                                    }
+                                ),
+
                                 playControl,
                                 displayPreview
                             ],
