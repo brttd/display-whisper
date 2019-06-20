@@ -12154,6 +12154,8 @@ class BoxEdit {
         update(data = {}) {
             super.update(data)
 
+            let needsChange = false
+
             if (
                 typeof data.page === 'number' &&
                 data.page !== this.values.page &&
@@ -12161,6 +12163,7 @@ class BoxEdit {
                 isFinite(data.page)
             ) {
                 this.values.page = data.page
+                needsChange = true
             }
 
             if (
@@ -12168,8 +12171,12 @@ class BoxEdit {
                 data.file !== this.values.file
             ) {
                 this.values.file = data.file
+                needsChange = true
             }
-            pdf.getPage(this.values.file, this.values.page, this.onPdfPageLoad)
+
+            if (needsChange) {
+                pdf.getPage(this.values.file, this.values.page, this.onPdfPageLoad)
+            }
         }
     }
 
