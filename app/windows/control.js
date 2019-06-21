@@ -4276,20 +4276,25 @@ const item_control = {
 let activePreviewContextMenu = -1
 layout.contextMenu.add('preview-display', [
     {
-        label: 'Active',
-        type: 'checkbox'
-    },
-    {
-        label: 'Preview',
-        type: 'checkbox'
-    },
-    {
-        label: 'Previous',
-        type: 'checkbox'
-    },
-    {
-        label: 'Next',
-        type: 'checkbox'
+        label: 'Show',
+        submenu: [
+            {
+                label: 'Active',
+                type: 'checkbox'
+            },
+            {
+                label: 'Preview',
+                type: 'checkbox'
+            },
+            {
+                label: 'Previous',
+                type: 'checkbox'
+            },
+            {
+                label: 'Next',
+                type: 'checkbox'
+            }
+        ]
     }
 ])
 
@@ -4399,16 +4404,20 @@ const item_display1 = {
 
         layout.contextMenu.change('preview-display', [
             {
-                checked: item_display1.options.type === 'active'
-            },
-            {
-                checked: item_display1.options.type === 'preview'
-            },
-            {
-                checked: item_display1.options.type === 'previous'
-            },
-            {
-                checked: item_display1.options.type === 'next'
+                submenu: [
+                    {
+                        checked: item_display1.options.type === 'active'
+                    },
+                    {
+                        checked: item_display1.options.type === 'preview'
+                    },
+                    {
+                        checked: item_display1.options.type === 'previous'
+                    },
+                    {
+                        checked: item_display1.options.type === 'next'
+                    }
+                ]
             }
         ])
 
@@ -4535,16 +4544,20 @@ const item_display2 = {
 
         layout.contextMenu.change('preview-display', [
             {
-                checked: item_display2.options.type === 'active'
-            },
-            {
-                checked: item_display2.options.type === 'preview'
-            },
-            {
-                checked: item_display2.options.type === 'previous'
-            },
-            {
-                checked: item_display2.options.type === 'next'
+                submenu: [
+                    {
+                        checked: item_display2.options.type === 'active'
+                    },
+                    {
+                        checked: item_display2.options.type === 'preview'
+                    },
+                    {
+                        checked: item_display2.options.type === 'previous'
+                    },
+                    {
+                        checked: item_display2.options.type === 'next'
+                    }
+                ]
             }
         ])
 
@@ -4672,16 +4685,20 @@ const item_display3 = {
 
         layout.contextMenu.change('preview-display', [
             {
-                checked: item_display3.options.type === 'active'
-            },
-            {
-                checked: item_display3.options.type === 'preview'
-            },
-            {
-                checked: item_display3.options.type === 'previous'
-            },
-            {
-                checked: item_display3.options.type === 'next'
+                submenu: [
+                    {
+                        checked: item_display3.options.type === 'active'
+                    },
+                    {
+                        checked: item_display3.options.type === 'preview'
+                    },
+                    {
+                        checked: item_display3.options.type === 'previous'
+                    },
+                    {
+                        checked: item_display3.options.type === 'next'
+                    }
+                ]
             }
         ])
 
@@ -4808,16 +4825,20 @@ const item_display4 = {
 
         layout.contextMenu.change('preview-display', [
             {
-                checked: item_display4.options.type === 'active'
-            },
-            {
-                checked: item_display4.options.type === 'preview'
-            },
-            {
-                checked: item_display4.options.type === 'previous'
-            },
-            {
-                checked: item_display4.options.type === 'next'
+                submenu: [
+                    {
+                        checked: item_display4.options.type === 'active'
+                    },
+                    {
+                        checked: item_display4.options.type === 'preview'
+                    },
+                    {
+                        checked: item_display4.options.type === 'previous'
+                    },
+                    {
+                        checked: item_display4.options.type === 'next'
+                    }
+                ]
             }
         ])
 
