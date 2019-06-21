@@ -11239,6 +11239,12 @@ function setupBoxEditContextMenu() {
     exports.contextMenu.add('box-edit', [
         {
             label: 'Center'
+        },
+        {
+            label: 'Resize Fill'
+        },
+        {
+            label: 'Resize 2/3'
         }
     ])
 
@@ -11246,10 +11252,10 @@ function setupBoxEditContextMenu() {
         if (activeBoxEditContextMenu) {
             if (event.label === 'Center') {
                 let width =
-                    activeBoxEditContextMenu.values.right -
+                    activeBoxEditContextMenu.right -
                     activeBoxEditContextMenu.left
                 let height =
-                    activeBoxEditContextMenu.values.bottom -
+                    activeBoxEditContextMenu.bottom -
                     activeBoxEditContextMenu.top
 
                 activeBoxEditContextMenu.edit(
@@ -11258,6 +11264,50 @@ function setupBoxEditContextMenu() {
                         left: 50 - width / 2,
                         right: 50 + width / 2,
                         bottom: 50 + height / 2
+                    },
+                    true
+                )
+            } else if (event.label === 'Resize Fill') {
+                activeBoxEditContextMenu.edit(
+                    {
+                        top: 0,
+                        left: 0,
+                        right: 100,
+                        bottom: 100
+                    },
+                    true
+                )
+            } else if (event.label === 'Resize 2/3') {
+                let width = 66
+                let height = 66
+
+                let left = Math.max(
+                    0,
+                    Math.min(
+                        100 - width,
+                        (activeBoxEditContextMenu.left +
+                            activeBoxEditContextMenu.right) /
+                            2 -
+                            width / 2
+                    )
+                )
+                let top = Math.max(
+                    0,
+                    Math.min(
+                        100 - height,
+                        (activeBoxEditContextMenu.top +
+                            activeBoxEditContextMenu.bottom) /
+                            2 -
+                            height / 2
+                    )
+                )
+
+                activeBoxEditContextMenu.edit(
+                    {
+                        top: top,
+                        left: left,
+                        right: left + width,
+                        bottom: top + height
                     },
                     true
                 )
