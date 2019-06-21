@@ -3338,7 +3338,7 @@ const item_add = {
             },
             {
                 label: 'Add to Presentation (Start)',
-                value: 'add-end'
+                value: 'add-start'
             },
             {
                 label: 'Edit in Library...',
