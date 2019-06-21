@@ -7068,7 +7068,9 @@ exports.change = addStyles
             this.textSelection = this.textWindow.getSelection()
 
             this.textNode.addEventListener('paste', event => {
-                let text = richText.format(event.clipboardData.getData('text/plain'))
+                let text = richText.format(
+                    event.clipboardData.getData('text/plain')
+                )
 
                 if (
                     event.clipboardData.getData('text/html').length >
