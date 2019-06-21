@@ -17116,13 +17116,13 @@ class BoxEdit {
                 listeners[item.context][i](item)
             }
         }
-        function cleanItem(item) {
+        function cleanItem(item, parent = {}) {
             if (typeof item !== 'object' || item === null) {
                 return {}
             }
 
-            return {
-                context: item.context || '',
+            let safeItem = {
+                context: item.context || parent.context || '',
                 value: item.value || item.label,
                 window: item.window || null,
 
@@ -17136,6 +17136,46 @@ class BoxEdit {
                 enabled: item.enabled,
 
                 registerAccelerator: item.role === undefined ? false : true
+            }
+
+            if (Array.isArray(item.submenu)) {
+                submenu = []
+
+                for (let i = 0; i < item.submenu.length; i++) {
+                    let submenuItem = cleanItem(item.submenu[i], item)
+
+                    if (Object.keys(submenuItem).length > 0) {
+                        submenu.push(submenuItem)
+                    }
+                }
+
+                if (submenu.length > 0) {
+                    safeItem.submenu = submenu
+                }
+            }
+
+            return safeItem
+        }
+
+        function updateItem(item, changes) {
+            if (typeof changes.checked === 'boolean') {
+                item.checked = changes.checked
+            }
+            if (typeof changes.enabled === 'boolean') {
+                item.enabled = changes.enabled
+            }
+            if (typeof changes.visible === 'boolean') {
+                item.visible = changes.visible
+            }
+
+            if (Array.isArray(changes.submenu) && item.submenu) {
+                for (
+                    let i = 0;
+                    i < item.submenu.items.length && i < changes.submenu.length;
+                    i++
+                ) {
+                    updateItem(item.submenu.items[i], changes.submenu[i])
+                }
             }
         }
 
@@ -17222,15 +17262,7 @@ class BoxEdit {
                 i < menuItems[context].length && i < changes.length;
                 i++
             ) {
-                if (typeof changes[i].checked === 'boolean') {
-                    menuItems[context][i].checked = changes[i].checked
-                }
-                if (typeof changes[i].enabled === 'boolean') {
-                    menuItems[context][i].enabled = changes[i].enabled
-                }
-                if (typeof changes[i].visible === 'boolean') {
-                    menuItems[context][i].visible = changes[i].visible
-                }
+                updateItem(menuItems[context][i], changes[i])
             }
         }
         exports.contextMenu.enable = context => {
