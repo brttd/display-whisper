@@ -2354,20 +2354,25 @@ let displaying = false
         'display-menu',
         [
             {
-                label: 'Screen 1',
-                type: 'checkbox'
-            },
-            {
-                label: 'Screen 2',
-                type: 'checkbox'
-            },
-            {
-                label: 'Screen 3',
-                type: 'checkbox'
-            },
-            {
-                label: 'Screen 4',
-                type: 'checkbox'
+                label: 'Active Displays',
+                submenu: [
+                    {
+                        label: 'Screen 1',
+                        type: 'checkbox'
+                    },
+                    {
+                        label: 'Screen 2',
+                        type: 'checkbox'
+                    },
+                    {
+                        label: 'Screen 3',
+                        type: 'checkbox'
+                    },
+                    {
+                        label: 'Screen 4',
+                        type: 'checkbox'
+                    }
+                ]
             }
         ],
         true
@@ -2427,20 +2432,24 @@ let displaying = false
 
         layout.contextMenu.change('display-menu', [
             {
-                checked: activeScreenList.includes(0),
-                visible: display.screenCount >= 1
-            },
-            {
-                checked: activeScreenList.includes(1),
-                visible: display.screenCount >= 2
-            },
-            {
-                checked: activeScreenList.includes(2),
-                visible: display.screenCount >= 3
-            },
-            {
-                checked: activeScreenList.includes(3),
-                visible: display.screenCount >= 4
+                submenu: [
+                    {
+                        checked: activeScreenList.includes(0),
+                        visible: display.screenCount >= 1
+                    },
+                    {
+                        checked: activeScreenList.includes(1),
+                        visible: display.screenCount >= 2
+                    },
+                    {
+                        checked: activeScreenList.includes(2),
+                        visible: display.screenCount >= 3
+                    },
+                    {
+                        checked: activeScreenList.includes(3),
+                        visible: display.screenCount >= 4
+                    }
+                ]
             }
         ])
 
