@@ -7068,14 +7068,21 @@ exports.change = addStyles
             this.textSelection = this.textWindow.getSelection()
 
             this.textNode.addEventListener('paste', event => {
-                this.docFrag.firstChild.innerHTML = event.clipboardData
-                    .getData('text/html')
-                    .replace(pasteHtmlStartRegex, '')
-                    .replace(pasteHtmlEndRegex, '')
+                let text = richText.format(event.clipboardData.getData('text/plain'))
+
+                if (
+                    event.clipboardData.getData('text/html').length >
+                    text.length
+                ) {
+                    this.docFrag.firstChild.innerHTML = event.clipboardData
+                        .getData('text/html')
+                        .replace(pasteHtmlStartRegex, '')
+                        .replace(pasteHtmlEndRegex, '')
+
+                    text = richText.fromNode(this.docFrag.firstChild)
+                }
 
                 event.preventDefault()
-
-                let text = richText.fromNode(this.docFrag.firstChild)
 
                 if (text.includes('<')) {
                     //Chrome inserts a newline when insertHTML is run with html tags in the inserted text
