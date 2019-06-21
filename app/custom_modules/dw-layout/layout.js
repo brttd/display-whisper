@@ -14560,7 +14560,10 @@ class BoxEdit {
                 if (this.items.length > 1) {
                     this.toggleButton.node.style.display = ''
 
-                    if (this.properties.minimized) {
+                    if (
+                        this.properties.minimized &&
+                        !this._showSectionWhenMinimized
+                    ) {
                         this.activeButton.node.style.display = ''
                     }
                 } else {
