@@ -8720,7 +8720,6 @@ exports.change = addStyles
                         this.events.select
                     )
                 } else {
-
                     this.items[indexOrList].node.scrollIntoViewIfNeeded()
 
                     sendEventTo(
@@ -12165,7 +12164,11 @@ class BoxEdit {
                     this._rendering = true
                     this._needsRender = false
 
-                    pdf.getPage(this.values.file, this.values.page, this.onPdfPageLoad)
+                    pdf.getPage(
+                        this.values.file,
+                        this.values.page,
+                        this.onPdfPageLoad
+                    )
                 } else {
                     this._rendering = false
                 }
@@ -12202,7 +12205,11 @@ class BoxEdit {
                     this._rendering = true
                     this._needsRender = false
 
-                    pdf.getPage(this.values.file, this.values.page, this.onPdfPageLoad)
+                    pdf.getPage(
+                        this.values.file,
+                        this.values.page,
+                        this.onPdfPageLoad
+                    )
                 }
             }
         }
