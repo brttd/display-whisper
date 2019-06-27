@@ -18,92 +18,33 @@ const items = require('dw-items')
 
 const appDataPath = electron.remote.app.getPath('userData')
 
-//**********************
-//Timer
-//(Because the timer needs to be used by both presentation (code), and item_control (interface), it needs to be declared globally)
-//**********************
-const timer = new layout.Timer({}, {})
+const lists = []
 
 //**********************
 //Previews
 //**********************
-const displays = {
-    active: [],
-    previous: [],
-    next: [],
-    preview: []
-}
-const output = {
-    active: {},
-    previous: {},
-    next: {},
-    preview: {}
-}
+const displayPreviews = []
 
-function changeDisplay(display, type) {
-    if (output[type]) {
-        display.set(output[type])
-    } else {
-        display.set({})
-    }
-}
+const validPreviews = ['active', 'selected', 'previous', 'next']
 
-function updateDisplays() {
-    for (let i = 0; i < displays.active.length; i++) {
-        displays.active[i].set(output.active)
-    }
-
-    for (let i = 0; i < displays.previous.length; i++) {
-        displays.previous[i].set(output.previous)
-    }
-
-    for (let i = 0; i < displays.next.length; i++) {
-        displays.next[i].set(output.next)
-    }
-
-    for (let i = 0; i < displays.preview.length; i++) {
-        displays.preview[i].set(output.preview)
-    }
-}
-
-function changeDisplay(display, type) {
-    if (!output.hasOwnProperty(type)) {
+function updateDisplayPreviews(index) {
+    if (index < 0 || index >= lists.length) {
         return false
     }
 
-    if (displays.active.includes(display)) {
-        displays.active.splice(displays.active.indexOf(display), 1)
+    for (let i = 0; i < displayPreviews.length; i++) {
+        if (displayPreviews[i].index === index) {
+            displayPreviews[i].display.set(
+                lists[index].output[displayPreviews[i].preview]
+            )
+        }
     }
-
-    if (displays.previous.includes(display)) {
-        displays.previous.splice(displays.previous.indexOf(display), 1)
-    }
-
-    if (displays.next.includes(display)) {
-        displays.next.splice(displays.next.indexOf(display), 1)
-    }
-
-    if (displays.preview.includes(display)) {
-        displays.preview.splice(displays.preview.indexOf(display), 1)
-    }
-
-    displays[type].push(display)
-
-    display.set(output[type])
 }
+let onDisplayOutputsChange
 
-//interface items
-
-//These two buttons need to be globally accesible
-const blankButton = new layout.Button(
-    {
-        text: 'Blank',
-        toggle: true
-    },
-    {
-        margin: 4
-    }
-)
+//**********************
+//Menu Buttons
+//**********************
 const undoRemoveButton = new layout.Button({
     text: 'Undo Remove (0)',
 
@@ -111,49 +52,99 @@ const undoRemoveButton = new layout.Button({
 
     disabled: true
 })
+const blankButton = new layout.Button({
+    text: 'Blank',
+    toggle: true,
 
-//**********************
-//Presentation
-//**********************
-let itemIdCounter = 0
-const itemsBlock = new layout.ReorderableBlock(
-    {},
-    {
-        direction: 'vertical',
-        align: 'stretch',
-        size: '100%',
+    size: 'large',
 
-        overflow: 'scroll',
-        overflowX: 'hidden'
-    }
-)
+    disabled: true
+})
+const fitTextAllButton = new layout.Button({
+    text: 'Scale Text & Unify - All',
+
+    size: 'large'
+})
+const addListButton = new layout.Button({
+    icon: 'add'
+})
 
 const presentation = {}
+
+//======================
+//Presentation Block
+//======================
+const item_presentation = {
+    minWidth: 350,
+    minHeight: 250,
+
+    main: new layout.Block(
+        {},
+        {
+            direction: 'vertical',
+            align: 'stretch',
+            size: '100%',
+
+            overflow: 'auto'
+        }
+    )
+}
 {
+    let itemsBlock = new layout.LayoutBlock(
+        {},
+        {
+            direction: 'vertical',
+            align: 'stretch',
+            size: '100%',
+
+            overflow: 'auto'
+        }
+    )
+    item_presentation.main.add(itemsBlock)
+
     let lastSaveTime = 0
     let lastAutoSaveTime = 0
+    let autoSaveTimer
 
     let lastEditTime = 0
 
     let file = ''
 
-    let list = []
+    let display = {
+        activeScreens: [],
+
+        screenCount: 0,
+        masterScreen: -1
+    }
+
+    /*
+    {
+        screens: [],
+
+        list: [],
+        itemsBlock: {},
+
+        active: {},
+        selected: {},
+
+        output: {}
+
+        timeout: ...,
+
+        timer: {},
+
+        scrollPosition: {}
+    }
+    */
+    let focusedListIndex = -1
 
     let removeHistory = []
 
     let loadingPresentation = false
 
+    let itemIdCounter = 0
+
     let activeEditors = []
-
-    let active = {
-        index: 0,
-        subIndex: 0
-    }
-
-    let selected = {
-        index: 0,
-        subIndex: 0
-    }
 
     let defaultDisplay = {
         background: 'black',
@@ -187,13 +178,13 @@ const presentation = {}
     let dropping = false
     let dragging = false
 
-    let timeout = false
-
     let playMode = 'auto'
     let playOptions = {
         loop: false,
         shuffle: false
     }
+
+    let outputsChangeListeners = []
 
     Object.defineProperties(presentation, {
         file: {
@@ -224,6 +215,18 @@ const presentation = {}
         }
     })
 
+    //display outputs
+    onDisplayOutputsChange = listener => {
+        if (typeof listener === 'function') {
+            outputsChangeListeners.push(listener)
+        }
+    }
+    function outputsChanged() {
+        for (let i = 0; i < outputsChangeListeners.length; i++) {
+            outputsChangeListeners[i]()
+        }
+    }
+
     //save functions
     function editHasOccured() {
         lastEditTime = Date.now()
@@ -231,6 +234,7 @@ const presentation = {}
         layout.window.setDocumentEdited(true)
     }
 
+    //history
     function addRemoveHistory(obj) {
         if (options.removeHistoryCount === 0) {
             return false
@@ -259,25 +263,56 @@ const presentation = {}
         })
     }
 
-    //event functions
-    let lastClicked = null
+    //Item event functions
     function onItemActive(event) {
-        setActive({
-            index: itemsBlock.indexOf(event.from),
-            subIndex: event.index
-        })
+        let listIndex = lists.findIndex(
+            list => list.id === event.from._data.listId
+        )
+
+        if (listIndex !== -1) {
+            setActive(listIndex, {
+                index: lists[listIndex].itemsBlock.indexOf(event.from),
+                subIndex: event.index
+            })
+
+            focusList(listIndex)
+        }
     }
     function onItemSelect(event) {
-        setSelected({
-            index: itemsBlock.indexOf(event.from),
-            subIndex: event.index
-        })
+        let listIndex = lists.findIndex(
+            list => list.id === event.from._data.listId
+        )
+
+        if (listIndex !== -1) {
+            setSelected(listIndex, {
+                index: lists[listIndex].itemsBlock.indexOf(event.from),
+                subIndex: event.index
+            })
+
+            focusList(listIndex)
+        }
     }
     function onItemDrag(event) {
-        event.from.dragActive = true
-        dragging = itemsBlock.indexOf(event.from)
+        let listIndex = lists.findIndex(
+            list => list.id === event.from._data.listId
+        )
 
-        itemsBlock.hovering = true
+        if (listIndex === -1) {
+            return false
+        }
+
+        event.from.dragActive = true
+
+        dragging = {
+            listId: event.from._data.listId,
+            listIndex: listIndex,
+
+            index: lists[listIndex].itemsBlock.indexOf(event.from)
+        }
+
+        for (let i = 0; i < lists.length; i++) {
+            lists[i].itemsBlock.hovering = true
+        }
 
         layout.setCursor('grabbing')
     }
@@ -292,27 +327,57 @@ const presentation = {}
         activeEditors.push(event.from._data.id)
 
         event.from.editActive = true
+
+        let listIndex = lists.findIndex(
+            list => list.id === event.from._data.listId
+        )
+        if (listIndex !== -1) {
+            focusList(listIndex)
+        }
     }
     function onItemRemove(event) {
-        remove(itemsBlock.indexOf(event.from))
+        let listIndex = lists.findIndex(
+            list => list.id === event.from._data.listId
+        )
+
+        if (listIndex !== -1) {
+            remove(listIndex, lists[listIndex].itemsBlock.indexOf(event.from))
+
+            focusList(listIndex)
+        }
     }
 
     function onDataChange(changedItem) {
-        updateItem(list.findIndex(item => item.id === changedItem.id))
+        let listIndex = lists.findIndex(list => list.id === changedItem.listId)
+
+        if (listIndex !== -1) {
+            updateItem(
+                listIndex,
+                lists[listIndex].list.findIndex(
+                    item => item.id === changedItem.id
+                )
+            )
+        }
     }
 
-    //presentation functions
+    //presentation item functions
     function ensureImageExists(image) {
         return false
     }
 
-    function reduceItemTextSize(index, sections) {
-        if (sections.length === 0) {
+    function reduceItemTextSize(listIndex, index, sections) {
+        if (
+            listIndex < 0 ||
+            listIndex >= lists.length ||
+            sections.length === 0
+        ) {
             return false
         }
 
+        let listId = lists[listIndex].id
+
         //Keep a copy of the item, in case it's moved whilst the check is going on
-        let item = list[index]
+        let item = lists[listIndex].list[index]
 
         //If any nodes have their text scaled down, this will be set to true
         let changed = false
@@ -320,13 +385,19 @@ const presentation = {}
         //Whenever a node gets a new text size, this is run:
         let onResult = (sectionIndex, nodeIndex, size) => {
             //Update the index, in case the item has been moved
-            index = list.indexOf(item)
+            listIndex = lists.findIndex(list => list.id === listId)
+            if (listIndex === -1) {
+                return false
+            }
+
+            index = lists[listIndex].list.indexOf(item)
 
             if (
                 //If the item has been removed
                 index === -1 ||
                 //Or if the amount of sections has been changed
-                sections.length !== itemsBlock.items[index].items.length
+                sections.length !==
+                    lists[listIndex].itemsBlock.items[index].items.length
             ) {
                 //Completely stop checking
                 //Because the item has been changed, that means updateItem will have been called again
@@ -338,7 +409,8 @@ const presentation = {}
             if (size < sections[sectionIndex].display.nodes[nodeIndex].size) {
                 //Get the current actual display values
                 let display =
-                    itemsBlock.items[index].items[sectionIndex].display
+                    lists[listIndex].itemsBlock.items[index].items[sectionIndex]
+                        .display
 
                 //Check if the amount of nodes has changed
                 if (
@@ -363,7 +435,7 @@ const presentation = {}
                     //(Without actually changing the item values)
                     display.nodes[nodeIndex].size = size
 
-                    itemsBlock.items[index].items[
+                    lists[listIndex].itemsBlock.items[index].items[
                         sectionIndex
                     ].display = display
                 }
@@ -412,11 +484,11 @@ const presentation = {}
             //So check if any changes have been made
             if (changed) {
                 //If there have been changes, update the item error highlighting
-                updateItemErrorHighlight(index)
+                updateItemErrorHighlight(listIndex, index)
 
                 //And if the item is in the display, update it
-                if (itemInOutput(index)) {
-                    updateOutput()
+                if (itemInOutput(listIndex, index)) {
+                    updateOutput(listIndex)
                 }
             }
         }
@@ -451,26 +523,37 @@ const presentation = {}
         }
     }
 
-    function updateItemErrorHighlight(index) {
-        if (index < 0 || index >= itemsBlock.items.length) {
+    function updateItemErrorHighlight(listIndex, index) {
+        if (
+            listIndex < 0 ||
+            listIndex >= lists.length ||
+            index < 0 ||
+            index >= lists[listIndex].itemsBlock.items.length
+        ) {
             return false
         }
 
         let problems = []
 
-        for (let i = 0; i < itemsBlock.items[index].items.length; i++) {
+        for (
+            let i = 0;
+            i < lists[listIndex].itemsBlock.items[index].items.length;
+            i++
+        ) {
             for (
                 let j = 0;
-                j < itemsBlock.items[index].items[i].display.nodes.length;
+                j <
+                lists[listIndex].itemsBlock.items[index].items[i].display.nodes
+                    .length;
                 j++
             ) {
                 if (
-                    itemsBlock.items[index].items[i].display.nodes[j].type ===
-                    'text'
+                    lists[listIndex].itemsBlock.items[index].items[i].display
+                        .nodes[j].type === 'text'
                 ) {
                     if (
-                        itemsBlock.items[index].items[i].display.nodes[j].size <
-                        options.minTextSize
+                        lists[listIndex].itemsBlock.items[index].items[i]
+                            .display.nodes[j].size < options.minTextSize
                     ) {
                         problems.push(i)
                     }
@@ -478,660 +561,54 @@ const presentation = {}
             }
         }
 
-        itemsBlock.items[index].errors = problems
+        lists[listIndex].itemsBlock.items[index].errors = problems
     }
-    function updateAllItemErrorHighlights() {
-        for (let i = 0; i < itemsBlock.items.length; i++) {
-            updateItemErrorHighlight(i)
+    function updateAllItemErrorHighlights(listIndex) {
+        if (listIndex >= 0 && listIndex < lists.length) {
+            for (let i = 0; i < lists[listIndex].itemsBlock.items.length; i++) {
+                updateItemErrorHighlight(listIndex, i)
+            }
         }
     }
 
-    function updateItem(index = -1) {
-        if (index < 0 || index >= list.length) {
+    function updateItem(listIndex, index = -1) {
+        if (
+            listIndex < 0 ||
+            listIndex >= lists.length ||
+            index < 0 ||
+            index >= lists[listIndex].list.length
+        ) {
             return false
         }
-        let sections = list[index].sections
+        let sections = lists[listIndex].list[index].sections
 
-        itemsBlock.items[index].sections = sections
-        itemsBlock.items[index].title = list[index].title
+        lists[listIndex].itemsBlock.items[index].sections = sections
+        lists[listIndex].itemsBlock.items[index].title =
+            lists[listIndex].list[index].title
 
         if (options.reduceTextSize) {
-            reduceItemTextSize(index, sections)
+            reduceItemTextSize(listIndex, index, sections)
         }
 
-        updateItemErrorHighlight(index)
+        updateItemErrorHighlight(listIndex, index)
 
-        if (itemInOutput(index)) {
-            updatePreviews()
+        if (itemInOutput(listIndex, index)) {
+            updatePreviews(listIndex)
         }
     }
-    function updateAllItems() {
-        for (let i = 0; i < list.length; i++) {
-            updateItem(i)
-        }
 
-        updateOutput()
-    }
-
-    let scrollPosition = { index: 0, subIndex: 0 }
-
-    function updateScroll() {
+    function fitText(listIndex, index) {
         if (
-            options.autoScroll === false ||
-            scrollPosition.index < 0 ||
-            scrollPosition.index >= itemsBlock.items.length ||
-            scrollPosition.subIndex < 0 ||
-            scrollPosition.subIndex >=
-                itemsBlock.items[scrollPosition.index].items.length
+            listIndex < 0 ||
+            listIndex >= lists.length ||
+            index < 0 ||
+            index >= lists[listIndex].list.length
         ) {
             return false
         }
+        let data = lists[listIndex].list[index]
 
-        let node =
-            itemsBlock.items[scrollPosition.index].items[
-                scrollPosition.subIndex
-            ].node
-
-        let listHeight = itemsBlock.node.offsetHeight
-        let listScroll = itemsBlock.node.scrollTop
-
-        let itemCenter =
-            node.offsetTop + node.offsetHeight / 2 - itemsBlock.node.offsetTop
-
-        let listPadding = Math.min(node.offsetHeight * 2.6, listHeight / 2)
-
-        if (itemCenter - listPadding < listScroll) {
-            itemsBlock.node.scrollTo({
-                top: itemCenter - listPadding,
-                left: 0,
-                behavior: options.scrollSmooth ? 'smooth' : 'auto'
-            })
-        } else if (itemCenter + listPadding > listScroll + listHeight) {
-            itemsBlock.node.scrollTo({
-                top: itemCenter - (listHeight - listPadding),
-                left: 0,
-                behavior: options.scrollSmooth ? 'smooth' : 'auto'
-            })
-        }
-    }
-
-    function scrollTo(position) {
-        if (
-            options.autoScroll === false ||
-            position.index < 0 ||
-            position.index >= list.length ||
-            position.subIndex < 0 ||
-            position.subIndex >= itemsBlock.items[position.index].items.length
-        ) {
-            return false
-        }
-
-        scrollPosition.index = position.index
-        scrollPosition.subIndex = position.subIndex
-
-        //The scrollTo function waits for the end of an animation frame to actually update
-        //This is because items may get maximized/minimized when going through the presentation
-        //And their height only updates on an animation frame, so by waiting for the end of one, all items should be at the correct height when scrolling
-        layout.onFrame.end(updateScroll)
-    }
-
-    //Updates previews and sends display message
-    function updateOutput() {
-        output.active = getDisplay(active, 0)
-        output.previous = getDisplay(active, -1)
-        output.next = getDisplay(active, 1)
-        output.preview = getDisplay(selected, 0)
-
-        updateDisplays()
-
-        ipcRenderer.send('display', output.active)
-    }
-
-    //Only updates previews, does not change "active" display
-    function updatePreviews() {
-        output.previous = getDisplay(active, -1)
-        output.next = getDisplay(active, 1)
-        output.preview = getDisplay(selected, 0)
-
-        updateDisplays()
-    }
-
-    function itemInOutput(index) {
-        return (
-            //If the item is active
-            active.index === index ||
-            //If the item is selected
-            selected.index === index ||
-            //If the item is after the active item, and the active section is the first of the item
-            (active.index === index - 1 && active.subIndex === 0) ||
-            //If the item is before the active item, and the active section is the last of the item
-            (active.index === index + 1 &&
-                active.subIndex ===
-                    itemsBlock.items[active.index].items.length - 1)
-        )
-    }
-
-    function isFirstPosition(position) {
-        if (position.index === 0 && position.subIndex === 0) {
-            return true
-        }
-
-        //if it's not the first section in its item, always return false (regardless of item position)
-        if (position.subIndex > 0) {
-            return false
-        }
-
-        //check each item before the given position, if any of them have 1 or more sections, return false
-        for (
-            let index = 0;
-            index < position.index && index < itemsBlock.items.length;
-            index++
-        ) {
-            if (itemsBlock.items[index].items.length > 0) {
-                return false
-            }
-        }
-
-        return true
-    }
-
-    function isLastPosition(position) {
-        if (
-            position.index === itemsBlock.items.length - 1 &&
-            position.subIndex >=
-                itemsBlock.items[position.index].items.length - 1
-        ) {
-            return true
-        }
-
-        if (position.index >= 0 && position.index < itemsBlock.items.length) {
-            //if it's not the last section in its item, always return false (regardless of the item position)
-            if (
-                position.subIndex <
-                itemsBlock.items[position.index].items.length - 1
-            ) {
-                return false
-            }
-        }
-
-        //check each item after the given position, if any of them have 1 or more sections, return false
-        for (
-            let index = itemsBlock.items.length - 1;
-            index > position.index && index >= 0;
-            index--
-        ) {
-            if (itemsBlock.items[index].items.length > 0) {
-                return false
-            }
-        }
-
-        return true
-    }
-
-    function getFirstPosition() {
-        if (
-            itemsBlock.items.length === 0 ||
-            itemsBlock.items[0].items.length > 0
-        ) {
-            return { index: 0, subIndex: 0 }
-        }
-
-        for (let index = 1; index < itemsBlock.items.length; index++) {
-            if (itemsBlock.items[index].items.length > 0) {
-                return { index: index, subIndex: 0 }
-            }
-        }
-
-        return { index: 0, subIndex: 0 }
-    }
-
-    function getLastPosition() {
-        if (itemsBlock.items.length === 0) return { index: 0, subIndex: 0 }
-
-        if (itemsBlock.items[itemsBlock.items.length - 1].items.length > 0) {
-            return {
-                index: itemsBlock.items.length - 1,
-                subIndex:
-                    itemsBlock.items[itemsBlock.items.length - 1].items.length -
-                    1
-            }
-        }
-
-        for (let index = itemsBlock.items.length - 2; index >= 0; index--) {
-            if (itemsBlock.items[index].items.length > 0) {
-                return {
-                    index: index,
-                    subIndex: itemsBlock.items[index].items.length - 1
-                }
-            }
-        }
-
-        return { index: 0, subIndex: 0 }
-    }
-
-    function getNewPosition(position = { index: 0, subIndex: 0 }, offset = 0) {
-        if (list.length === 0) {
-            return {
-                index: 0,
-                subIndex: 0
-            }
-        } else if (list.length === 1) {
-            return {
-                index: 0,
-                subIndex: Math.max(
-                    0,
-                    Math.min(
-                        list[0].sections.length - 1,
-                        position.subIndex + offset
-                    )
-                )
-            }
-        }
-
-        if (position.index < 0) {
-            position.index = 0
-        }
-
-        if (position.index >= list.length) {
-            position.index = list.length - 1
-        }
-
-        if (offset < 0) {
-            if (itemsBlock.items[position.index].sections.length > 0) {
-                if (position.subIndex > 0) {
-                    return {
-                        index: position.index,
-                        subIndex: Math.min(
-                            position.subIndex - 1,
-                            itemsBlock.items[position.index].sections.length - 1
-                        )
-                    }
-                }
-            }
-
-            //go backwards, and use the first item which has multiple sections
-            let index = position.index - 1
-            while (index >= 0) {
-                if (itemsBlock.items[index].sections.length > 0) {
-                    return {
-                        index: index,
-                        subIndex: itemsBlock.items[index].sections.length - 1
-                    }
-                }
-                index -= 1
-            }
-
-            //if no items backwards, then get the first item with multiple sections after
-            index = position.index
-            while (index < list.length) {
-                if (itemsBlock.items[index].sections.length > 0) {
-                    return {
-                        index: index,
-                        subIndex: 0
-                    }
-                }
-                index -= 1
-            }
-
-            //if no items have sections, return 0, 0
-            return {
-                index: 0,
-                subIndex: 0
-            }
-        } else if (offset > 0) {
-            if (itemsBlock.items[position.index].sections.length > 0) {
-                if (
-                    position.subIndex <
-                    itemsBlock.items[position.index].sections.length - 1
-                ) {
-                    return {
-                        index: position.index,
-                        subIndex: Math.max(0, position.subIndex + 1)
-                    }
-                }
-            }
-
-            //go forward, and use the first item with 1 or more sections
-            let index = position.index + 1
-            while (index < list.length) {
-                if (itemsBlock.items[index].sections.length > 0) {
-                    return {
-                        index: index,
-                        subIndex: 0
-                    }
-                }
-                index += 1
-            }
-
-            index = position.index
-            while (index >= 0) {
-                if (itemsBlock.items[index].sections.length > 0) {
-                    return {
-                        index: index,
-                        subIndex: itemsBlock.items[index].sections.length - 1
-                    }
-                }
-                index -= 1
-            }
-
-            return {
-                index: 0,
-                subIndex: 0
-            }
-        } else {
-            if (itemsBlock.items[position.index].sections.length > 0) {
-                return {
-                    index: position.index,
-                    subIndex: Math.max(
-                        0,
-                        Math.min(
-                            itemsBlock.items[position.index].sections.length -
-                                1,
-                            position.subIndex
-                        )
-                    )
-                }
-            }
-
-            //go forward, and use the first item with 1 or more sections
-            let index = position.index + 1
-            while (index < list.length) {
-                if (itemsBlock.items[index].sections.length > 0) {
-                    return {
-                        index: index,
-                        subIndex: 0
-                    }
-                }
-                index += 1
-            }
-
-            index = position.index - 1
-            while (index >= 0) {
-                if (itemsBlock.items[index].sections.length > 0) {
-                    return {
-                        index: index,
-                        subIndex: itemsBlock.items[index].sections.length - 1
-                    }
-                }
-                index -= 1
-            }
-
-            return {
-                index: 0,
-                subIndex: 0
-            }
-        }
-    }
-    function getDisplay(position, offset = 0) {
-        if (typeof offset !== 'number' || !isFinite(offset)) {
-            offset = 0
-        }
-
-        if (offset === -1 && isFirstPosition(position)) {
-            if (playOptions.loop) {
-                position = getLastPosition()
-            } else {
-                position = { index: -1, subIndex: -1 }
-            }
-        } else if (offset === 1 && isLastPosition(position)) {
-            if (playOptions.loop) {
-                position = getFirstPosition()
-            } else {
-                position = { index: -1, subIndex: -1 }
-            }
-        } else {
-            position = getNewPosition(position, offset)
-        }
-
-        if (position.index < 0 || position.index >= itemsBlock.items.length) {
-            return defaultDisplay
-        }
-
-        if (
-            position.subIndex < 0 ||
-            position.subIndex >= itemsBlock.items[position.index].items.length
-        ) {
-            return defaultDisplay
-        }
-
-        return itemsBlock.items[position.index].items[position.subIndex].display
-    }
-
-    //public presentation functions
-    function setActive(position, updateScroll = true) {
-        if (timeout) {
-            clearTimeout(timeout)
-        }
-
-        if (typeof position.index !== 'number') {
-            position.index = 0
-        }
-
-        if (typeof position.subIndex !== 'number') {
-            position.subIndex = 0
-        }
-
-        if (active.index >= 0 && active.index < itemsBlock.items.length) {
-            itemsBlock.items[active.index].active = false
-
-            if (options.autoMinimize) {
-                itemsBlock.items[active.index].minimize()
-            }
-        }
-
-        active = getNewPosition(position, 0)
-
-        if (active.index < itemsBlock.items.length) {
-            itemsBlock.items[active.index].active = true
-
-            if (active.subIndex < itemsBlock.items[active.index].items.length) {
-                itemsBlock.items[active.index].items[
-                    active.subIndex
-                ].active = true
-            }
-        }
-
-        //The setSelected function calls updateOutput, so setActive doesn't need to call it
-        setSelected(active, updateScroll)
-
-        if (output.active.autoPlay === true && playMode !== 'manual') {
-            let time = output.active.playTime + output.active.transition.time
-
-            //if the transition is 10% or more of the playTime, show the extra time in brackets
-            if (
-                output.active.transition.time / output.active.playTime >= 0.1 &&
-                output.active.transition.time > 0.5
-            ) {
-                timer.text =
-                    output.active.playTime / 1000 +
-                    's ( + ' +
-                    output.active.transition.time / 1000 +
-                    's)'
-            } else {
-                timer.text = output.active.playTime / 1000 + 's'
-            }
-
-            if (playOptions.loop) {
-                timer.disabled = false
-            } else {
-                timer.disabled = isLastPosition(active)
-            }
-
-            timer.animate(time)
-
-            timeout = setTimeout(() => {
-                forward()
-            }, time)
-        } else {
-            timer.text = ''
-            timer.value = 0
-        }
-    }
-    presentation.setActive = setActive
-
-    function setSelected(position, updateScroll = true) {
-        if (typeof position.index !== 'number') {
-            position.index = 0
-        }
-
-        if (typeof position.subIndex !== 'number') {
-            position.subIndex = 0
-        }
-
-        if (selected.index >= 0 && selected.index < itemsBlock.items.length) {
-            itemsBlock.items[selected.index].selected = false
-        }
-
-        let lastSelectedItem = selected.index
-
-        selected = getNewPosition(position, 0)
-
-        if (
-            options.autoMinimize &&
-            lastSelectedItem !== active.index &&
-            lastSelectedItem !== selected.index &&
-            lastSelectedItem >= 0 &&
-            lastSelectedItem < itemsBlock.items.length
-        ) {
-            itemsBlock.items[lastSelectedItem].minimize()
-        }
-
-        if (selected.index < itemsBlock.items.length) {
-            itemsBlock.items[selected.index].selected = true
-
-            if (
-                selected.subIndex <
-                itemsBlock.items[selected.index].items.length
-            ) {
-                itemsBlock.items[selected.index].items[
-                    selected.subIndex
-                ].selected = true
-            }
-        }
-
-        if (updateScroll) {
-            scrollTo(selected)
-        }
-
-        updateOutput()
-    }
-
-    function add(input, template = {}, index = -1) {
-        if (!items.list.includes(input.itemType)) {
-            return false
-        }
-
-        let data = new items[input.itemType](input, template)
-
-        let item = new layout.PresentationItem({
-            title: data.title,
-
-            showSectionWhenMinimized: options.showSectionWhenMinimized
-        })
-
-        item._data = data
-        item._itemType = input.itemType
-
-        data.id =
-            itemIdCounter.toString(16) +
-            '-' +
-            data.constructor.name.toLowerCase()
-        itemIdCounter += 1
-
-        if (index >= 0 && index < list.length) {
-            let lastSelected = {
-                index: selected.index,
-                subIndex: selected.subIndex
-            }
-
-            if (index <= selected.index) {
-                if (selected.index < itemsBlock.items.length) {
-                    itemsBlock.items[selected.index].selected = false
-                }
-            }
-            if (index <= active.index) {
-                if (active.index < itemsBlock.items.length) {
-                    itemsBlock.items[active.index].active = false
-                }
-            }
-
-            list.splice(index, 0, data)
-            itemsBlock.add(item, index)
-
-            if (index <= active.index) {
-                setActive(
-                    {
-                        index: active.index + 1,
-                        subIndex: active.subIndex
-                    },
-                    false
-                )
-            }
-
-            if (index <= lastSelected.index) {
-                setSelected(
-                    {
-                        index: lastSelected.index + 1,
-                        subIndex: lastSelected.subIndex
-                    },
-                    false
-                )
-            }
-        } else {
-            list.push(data)
-            itemsBlock.add(item)
-
-            index = list.length - 1
-        }
-
-        updateItem(Math.max(0, Math.min(list.length - 1, index)))
-
-        if (typeof data.onChange === 'function') {
-            data.onChange(onDataChange.bind(null, data))
-        }
-
-        if (options.autoMinimize) {
-            item.minimize()
-        }
-
-        if (
-            //Autofit when not loading a presentation an auto fit setting is true
-            //Or autofit when loading a presentation and auto fit on open is true
-            (options.autoFitText && !loadingPresentation) ||
-            (options.autoFitTextOpen && loadingPresentation)
-        ) {
-            fitText(list.indexOf(data))
-        }
-
-        editHasOccured()
-
-        item.onEvent('active-click', onItemActive)
-        item.onEvent('select-click', onItemSelect)
-        item.onEvent('edit-click', onItemEdit)
-        item.onEvent('drag-click', onItemDrag)
-        item.onEvent('remove-click', onItemRemove)
-    }
-    presentation.add = add
-
-    function addDrop(input, template = {}) {
-        if (!items.list.includes(input.itemType)) {
-            return false
-        }
-
-        dropping = {
-            input: input,
-            template: template
-        }
-
-        itemsBlock.hovering = true
-    }
-    presentation.addDrop = addDrop
-
-    function fitText(index) {
-        if (index < 0 || index >= list.length) {
-            return false
-        }
-        let data = list[index]
+        let listId = lists[listIndex].id
 
         let sectionCollections = data.getTextUnifySections()
 
@@ -1140,9 +617,9 @@ const presentation = {}
         }
 
         //Visually disable the item
-        itemsBlock.items[index].disabled = true
+        lists[listIndex].itemsBlock.items[index].disabled = true
         //And if an editor window is open for it, lock it
-        ipcRenderer.send('lock-edit', list[index].id)
+        ipcRenderer.send('lock-edit', lists[listIndex].list[index].id)
 
         let collectionSizes = []
 
@@ -1183,18 +660,27 @@ const presentation = {}
             } else {
                 data.unifyTextSections(collectionSizes)
 
+                listIndex = lists.findIndex(list => list.id === listId)
+
+                if (listIndex === -1) {
+                    return false
+                }
+
                 //The item may have been moved, or removed whilst the text was being fitted, so get the current index of the item
-                index = list.indexOf(data)
+                index = lists[listIndex].list.indexOf(data)
 
-                if (index >= 0 && index < list.length) {
-                    updateItem(index)
+                if (index >= 0 && index < lists[listIndex].list.length) {
+                    updateItem(listIndex, index)
 
-                    itemsBlock.items[index].disabled = false
-                    ipcRenderer.send('unlock-edit', list[index].id)
+                    lists[listIndex].itemsBlock.items[index].disabled = false
+                    ipcRenderer.send(
+                        'unlock-edit',
+                        lists[listIndex].list[index].id
+                    )
                     ipcRenderer.send(
                         'edit-data',
-                        list[index].id,
-                        list[index].getData()
+                        lists[listIndex].list[index].id,
+                        lists[listIndex].list[index].getData()
                     )
                 }
             }
@@ -1205,56 +691,1167 @@ const presentation = {}
             onResult
         )
     }
-    presentation.fitText = fitText
 
-    presentation.fitTextAll = () => {
-        for (let i = 0; i < list.length; i++) {
-            fitText(i)
+    //presentation list functions
+    function focusList(listIndex) {
+        if (listIndex >= 0 && listIndex < lists.length) {
+            if (focusedListIndex >= 0 && focusedListIndex < lists.length) {
+                lists[focusedListIndex].itemsBlock.node.style.borderColor =
+                    'hsl(0, 0%, 70%)'
+
+                lists[focusedListIndex].mainBlock.node.style.background =
+                    'white'
+            }
+
+            focusedListIndex = listIndex
+
+            lists[focusedListIndex].itemsBlock.node.style.borderColor =
+                'hsl(200, 66%, 60%)'
+
+            lists[focusedListIndex].mainBlock.node.style.background =
+                'hsl(200, 60%, 90%)'
         }
     }
 
-    function remove(index) {
-        if (index < 0 || index >= list.length) {
+    function updateAllItems(listIndex) {
+        if (listIndex >= 0 && listIndex < lists.length) {
+            for (let i = 0; i < lists[listIndex].list.length; i++) {
+                updateItem(listIndex, i)
+            }
+
+            updateOutput(listIndex)
+        }
+    }
+
+    function updateScroll(listIndex) {
+        if (
+            options.autoScroll === false ||
+            listIndex < 0 ||
+            listIndex >= lists.length ||
+            lists[listIndex].scrollPosition.index < 0 ||
+            lists[listIndex].scrollPosition.index >=
+                lists[listIndex].itemsBlock.items.length ||
+            lists[listIndex].scrollPosition.subIndex < 0 ||
+            lists[listIndex].scrollPosition.subIndex >=
+                lists[listIndex].itemsBlock.items[
+                    lists[listIndex].scrollPosition.index
+                ].items.length
+        ) {
             return false
         }
 
-        ipcRenderer.send('stop-edit', list[index].id)
+        let node =
+            lists[listIndex].itemsBlock.items[
+                lists[listIndex].scrollPosition.index
+            ].items[lists[listIndex].scrollPosition.subIndex].node
+
+        let listHeight = lists[listIndex].itemsBlock.node.offsetHeight
+        let listScroll = lists[listIndex].itemsBlock.node.scrollTop
+
+        let itemCenter =
+            node.offsetTop +
+            node.offsetHeight / 2 -
+            lists[listIndex].itemsBlock.node.offsetTop
+
+        let listPadding = Math.min(node.offsetHeight * 2.6, listHeight / 2)
+
+        if (itemCenter - listPadding < listScroll) {
+            lists[listIndex].itemsBlock.node.scrollTo({
+                top: itemCenter - listPadding,
+                left: 0,
+                behavior: options.scrollSmooth ? 'smooth' : 'auto'
+            })
+        } else if (itemCenter + listPadding > listScroll + listHeight) {
+            lists[listIndex].itemsBlock.node.scrollTo({
+                top: itemCenter - (listHeight - listPadding),
+                left: 0,
+                behavior: options.scrollSmooth ? 'smooth' : 'auto'
+            })
+        }
+    }
+    function updateScrollByListId(listId) {
+        updateScroll(lists.findIndex(list => list.id === listId))
+    }
+    function scrollTo(listIndex, position) {
+        if (
+            options.autoScroll === false ||
+            listIndex < 0 ||
+            listIndex >= lists.length ||
+            position.index < 0 ||
+            position.index >= lists[listIndex].list.length ||
+            position.subIndex < 0 ||
+            position.subIndex >=
+                lists[listIndex].itemsBlock.items[position.index].items.length
+        ) {
+            return false
+        }
+
+        lists[listIndex].scrollPosition.index = position.index
+        lists[listIndex].scrollPosition.subIndex = position.subIndex
+
+        //The scrollTo function waits for the end of an animation frame to actually update
+        //This is because items may get maximized/minimized when going through the presentation
+        //And their height only updates on an animation frame, so by waiting for the end of one, all items should be at the correct height when scrolling
+        layout.onFrame.end(updateScrollByListId.bind(lists[listIndex].id))
+    }
+
+    function itemInOutput(listIndex, index) {
+        if (listIndex < 0 || listIndex >= lists.length) {
+            return false
+        }
+
+        return (
+            //If the item is active
+            lists[listIndex].active.index === index ||
+            //If the item is selected
+            lists[listIndex].selected.index === index ||
+            //If the item is after the active item, and the active section is the first of the item
+            (lists[listIndex].active.index === index - 1 &&
+                lists[listIndex].active.subIndex === 0) ||
+            //If the item is before the active item, and the active section is the last of the item
+            (lists[listIndex].active.index === index + 1 &&
+                lists[listIndex].active.subIndex ===
+                    lists[listIndex].itemsBlock.items[
+                        lists[listIndex].active.index
+                    ].items.length -
+                        1)
+        )
+    }
+
+    function isFirstPosition(listIndex, position) {
+        if (listIndex < 0 || listIndex >= lists.length) {
+            return false
+        }
+
+        if (position.index === 0 && position.subIndex === 0) {
+            return true
+        }
+
+        //if it's not the first section in its item, always return false (regardless of item position)
+        if (position.subIndex > 0) {
+            return false
+        }
+
+        //check each item before the given position, if any of them have 1 or more sections, return false
+        for (
+            let index = 0;
+            index < position.index &&
+            index < lists[listIndex].itemsBlock.items.length;
+            index++
+        ) {
+            if (lists[listIndex].itemsBlock.items[index].items.length > 0) {
+                return false
+            }
+        }
+
+        return true
+    }
+    function isLastPosition(listIndex, position) {
+        if (listIndex < 0 || listIndex >= lists.length) {
+            return false
+        }
+
+        if (
+            position.index === lists[listIndex].itemsBlock.items.length - 1 &&
+            position.subIndex >=
+                lists[listIndex].itemsBlock.items[position.index].items.length -
+                    1
+        ) {
+            return true
+        }
+
+        if (
+            position.index >= 0 &&
+            position.index < lists[listIndex].itemsBlock.items.length
+        ) {
+            //if it's not the last section in its item, always return false (regardless of the item position)
+            if (
+                position.subIndex <
+                lists[listIndex].itemsBlock.items[position.index].items.length -
+                    1
+            ) {
+                return false
+            }
+        }
+
+        //check each item after the given position, if any of them have 1 or more sections, return false
+        for (
+            let index = lists[listIndex].itemsBlock.items.length - 1;
+            index > position.index && index >= 0;
+            index--
+        ) {
+            if (lists[listIndex].itemsBlock.items[index].items.length > 0) {
+                return false
+            }
+        }
+
+        return true
+    }
+
+    function getFirstPosition(listIndex) {
+        if (
+            listIndex < 0 ||
+            listIndex >= lists.length ||
+            lists[listIndex].itemsBlock.items.length === 0 ||
+            lists[listIndex].itemsBlock.items[0].items.length > 0
+        ) {
+            return { index: 0, subIndex: 0 }
+        }
+
+        for (
+            let index = 1;
+            index < lists[listIndex].itemsBlock.items.length;
+            index++
+        ) {
+            if (lists[listIndex].itemsBlock.items[index].items.length > 0) {
+                return { index: index, subIndex: 0 }
+            }
+        }
+
+        return { index: 0, subIndex: 0 }
+    }
+    function getLastPosition(listIndex) {
+        if (listIndex < 0 || listIndex >= lists.length) {
+            return false
+        }
+
+        if (lists[listIndex].itemsBlock.items.length === 0) {
+            return { index: 0, subIndex: 0 }
+        }
+
+        if (
+            lists[listIndex].itemsBlock.items[
+                lists[listIndex].itemsBlock.items.length - 1
+            ].items.length > 0
+        ) {
+            return {
+                index: lists[listIndex].itemsBlock.items.length - 1,
+                subIndex:
+                    lists[listIndex].itemsBlock.items[
+                        lists[listIndex].itemsBlock.items.length - 1
+                    ].items.length - 1
+            }
+        }
+
+        for (
+            let index = lists[listIndex].itemsBlock.items.length - 2;
+            index >= 0;
+            index--
+        ) {
+            if (lists[listIndex].itemsBlock.items[index].items.length > 0) {
+                return {
+                    index: index,
+                    subIndex:
+                        lists[listIndex].itemsBlock.items[index].items.length -
+                        1
+                }
+            }
+        }
+
+        return { index: 0, subIndex: 0 }
+    }
+
+    function getNewPosition(
+        listIndex,
+        position = { index: 0, subIndex: 0 },
+        offset = 0
+    ) {
+        if (
+            listIndex < 0 ||
+            listIndex >= lists.length ||
+            lists[listIndex].list.length === 0
+        ) {
+            return {
+                index: 0,
+                subIndex: 0
+            }
+        } else if (lists[listIndex].list.length === 1) {
+            return {
+                index: 0,
+                subIndex: Math.max(
+                    0,
+                    Math.min(
+                        lists[listIndex].list[0].sections.length - 1,
+                        position.subIndex + offset
+                    )
+                )
+            }
+        }
+
+        if (position.index < 0) {
+            position.index = 0
+        }
+
+        if (position.index >= lists[listIndex].list.length) {
+            position.index = lists[listIndex].list.length - 1
+        }
+
+        if (offset < 0) {
+            if (
+                lists[listIndex].itemsBlock.items[position.index].sections
+                    .length > 0
+            ) {
+                if (position.subIndex > 0) {
+                    return {
+                        index: position.index,
+                        subIndex: Math.min(
+                            position.subIndex - 1,
+                            lists[listIndex].itemsBlock.items[position.index]
+                                .sections.length - 1
+                        )
+                    }
+                }
+            }
+
+            //go backwards, and use the first item which has multiple sections
+            let index = position.index - 1
+            while (index >= 0) {
+                if (
+                    lists[listIndex].itemsBlock.items[index].sections.length > 0
+                ) {
+                    return {
+                        index: index,
+                        subIndex:
+                            lists[listIndex].itemsBlock.items[index].sections
+                                .length - 1
+                    }
+                }
+                index -= 1
+            }
+
+            //if no items backwards, then get the first item with multiple sections after
+            index = position.index
+            while (index < lists[listIndex].list.length) {
+                if (
+                    lists[listIndex].itemsBlock.items[index].sections.length > 0
+                ) {
+                    return {
+                        index: index,
+                        subIndex: 0
+                    }
+                }
+                //TODO: this should be += 1 ?
+                index += 1
+            }
+
+            //if no items have sections, return 0, 0
+            return {
+                index: 0,
+                subIndex: 0
+            }
+        } else if (offset > 0) {
+            if (
+                lists[listIndex].itemsBlock.items[position.index].sections
+                    .length > 0
+            ) {
+                if (
+                    position.subIndex <
+                    lists[listIndex].itemsBlock.items[position.index].sections
+                        .length -
+                        1
+                ) {
+                    return {
+                        index: position.index,
+                        subIndex: Math.max(0, position.subIndex + 1)
+                    }
+                }
+            }
+
+            //go forward, and use the first item with 1 or more sections
+            let index = position.index + 1
+            while (index < lists[listIndex].list.length) {
+                if (
+                    lists[listIndex].itemsBlock.items[index].sections.length > 0
+                ) {
+                    return {
+                        index: index,
+                        subIndex: 0
+                    }
+                }
+                index += 1
+            }
+
+            index = position.index
+            while (index >= 0) {
+                if (
+                    lists[listIndex].itemsBlock.items[index].sections.length > 0
+                ) {
+                    return {
+                        index: index,
+                        subIndex:
+                            lists[listIndex].itemsBlock.items[index].sections
+                                .length - 1
+                    }
+                }
+                index -= 1
+            }
+
+            return {
+                index: 0,
+                subIndex: 0
+            }
+        } else {
+            if (
+                lists[listIndex].itemsBlock.items[position.index].sections
+                    .length > 0
+            ) {
+                return {
+                    index: position.index,
+                    subIndex: Math.max(
+                        0,
+                        Math.min(
+                            lists[listIndex].itemsBlock.items[position.index]
+                                .sections.length - 1,
+                            position.subIndex
+                        )
+                    )
+                }
+            }
+
+            //go forward, and use the first item with 1 or more sections
+            let index = position.index + 1
+            while (index < lists[listIndex].list.length) {
+                if (
+                    lists[listIndex].itemsBlock.items[index].sections.length > 0
+                ) {
+                    return {
+                        index: index,
+                        subIndex: 0
+                    }
+                }
+                index += 1
+            }
+
+            index = position.index - 1
+            while (index >= 0) {
+                if (
+                    lists[listIndex].itemsBlock.items[index].sections.length > 0
+                ) {
+                    return {
+                        index: index,
+                        subIndex:
+                            lists[listIndex].itemsBlock.items[index].sections
+                                .length - 1
+                    }
+                }
+                index -= 1
+            }
+
+            return {
+                index: 0,
+                subIndex: 0
+            }
+        }
+    }
+
+    function getDisplay(listIndex, position, offset = 0) {
+        if (listIndex < 0 || listIndex >= lists.length) {
+            return defaultDisplay
+        }
+
+        if (typeof offset !== 'number' || !isFinite(offset)) {
+            offset = 0
+        }
+
+        if (offset === -1 && isFirstPosition(listIndex, position)) {
+            if (playOptions.loop) {
+                position = getLastPosition(listIndex)
+            } else {
+                position = { index: -1, subIndex: -1 }
+            }
+        } else if (offset === 1 && isLastPosition(listIndex, position)) {
+            if (playOptions.loop) {
+                position = getFirstPosition(listIndex)
+            } else {
+                position = { index: -1, subIndex: -1 }
+            }
+        } else {
+            position = getNewPosition(listIndex, position, offset)
+        }
+
+        if (
+            position.index < 0 ||
+            position.index >= lists[listIndex].itemsBlock.items.length
+        ) {
+            return defaultDisplay
+        }
+
+        if (
+            position.subIndex < 0 ||
+            position.subIndex >=
+                lists[listIndex].itemsBlock.items[position.index].items.length
+        ) {
+            return defaultDisplay
+        }
+
+        return lists[listIndex].itemsBlock.items[position.index].items[
+            position.subIndex
+        ].display
+    }
+    //Updates previews and sends display message
+    function updateOutput(listIndex) {
+        if (listIndex < 0 || listIndex >= lists.length) {
+            return false
+        }
+
+        lists[listIndex].output.active = getDisplay(
+            listIndex,
+            lists[listIndex].active,
+            0
+        )
+        lists[listIndex].output.previous = getDisplay(
+            listIndex,
+            lists[listIndex].active,
+            -1
+        )
+        lists[listIndex].output.next = getDisplay(
+            listIndex,
+            lists[listIndex].active,
+            1
+        )
+        lists[listIndex].output.selected = getDisplay(
+            listIndex,
+            lists[listIndex].selected,
+            0
+        )
+
+        updateDisplayPreviews(listIndex)
+
+        ipcRenderer.send(
+            'display',
+            lists[listIndex].output.active,
+            lists[listIndex].screens
+        )
+    }
+    //Only updates previews, does not change "active" display
+    function updatePreviews(listIndex) {
+        if (listIndex < 0 || listIndex >= lists.length) {
+            return false
+        }
+
+        lists[listIndex].output.previous = getDisplay(
+            listIndex,
+            lists[listIndex].active,
+            -1
+        )
+        lists[listIndex].output.next = getDisplay(
+            listIndex,
+            lists[listIndex].active,
+            1
+        )
+        lists[listIndex].output.selected = getDisplay(
+            listIndex,
+            lists[listIndex].selected,
+            0
+        )
+
+        updateDisplayPreviews(listIndex)
+    }
+
+    function setActive(listIndex, position, updateScroll = true) {
+        if (listIndex < 0 || listIndex >= lists.length) {
+            return false
+        }
+
+        if (lists[listIndex].timeout) {
+            clearTimeout(lists[listIndex].timeout)
+        }
+
+        if (typeof position.index !== 'number') {
+            position.index = 0
+        }
+
+        if (typeof position.subIndex !== 'number') {
+            position.subIndex = 0
+        }
+
+        if (
+            lists[listIndex].active.index >= 0 &&
+            lists[listIndex].active.index <
+                lists[listIndex].itemsBlock.items.length
+        ) {
+            lists[listIndex].itemsBlock.items[
+                lists[listIndex].active.index
+            ].active = false
+
+            if (options.autoMinimize) {
+                lists[listIndex].itemsBlock.items[
+                    lists[listIndex].active.index
+                ].minimize()
+            }
+        }
+
+        lists[listIndex].active = getNewPosition(listIndex, position, 0)
+
+        if (
+            lists[listIndex].active.index <
+            lists[listIndex].itemsBlock.items.length
+        ) {
+            lists[listIndex].itemsBlock.items[
+                lists[listIndex].active.index
+            ].active = true
+
+            if (
+                lists[listIndex].active.subIndex <
+                lists[listIndex].itemsBlock.items[lists[listIndex].active.index]
+                    .items.length
+            ) {
+                lists[listIndex].itemsBlock.items[
+                    lists[listIndex].active.index
+                ].items[lists[listIndex].active.subIndex].active = true
+            }
+        }
+
+        //The setSelected function calls updateOutput, so setActive doesn't need to call it
+        setSelected(listIndex, lists[listIndex].active, updateScroll)
+
+        if (
+            lists[listIndex].output.active.autoPlay === true &&
+            playMode !== 'manual' &&
+            !loadingPresentation
+        ) {
+            let time =
+                lists[listIndex].output.active.playTime +
+                lists[listIndex].output.active.transition.time
+
+            //if the transition is 10% or more of the playTime, show the extra time in brackets
+            if (
+                lists[listIndex].output.active.transition.time /
+                    lists[listIndex].output.active.playTime >=
+                    0.1 &&
+                lists[listIndex].output.active.transition.time > 0.5
+            ) {
+                lists[listIndex].timer.text =
+                    lists[listIndex].output.active.playTime / 1000 +
+                    's ( + ' +
+                    lists[listIndex].output.active.transition.time / 1000 +
+                    's)'
+            } else {
+                lists[listIndex].timer.text =
+                    lists[listIndex].output.active.playTime / 1000 + 's'
+            }
+
+            if (playOptions.loop) {
+                lists[listIndex].timer.disabled = false
+            } else {
+                lists[listIndex].timer.disabled = isLastPosition(
+                    listIndex,
+                    lists[listIndex].active
+                )
+            }
+
+            lists[listIndex].timer.animate(time)
+
+            let listId = lists[listIndex].id
+
+            lists[listIndex].timeout = setTimeout(() => {
+                forward(lists.findIndex(list => list.id === listId))
+            }, time)
+        } else {
+            lists[listIndex].timer.text = ''
+            lists[listIndex].timer.value = 0
+        }
+    }
+    function setSelected(listIndex, position, updateScroll = true) {
+        if (listIndex < 0 || listIndex >= lists.length) {
+            return false
+        }
+
+        if (typeof position.index !== 'number') {
+            position.index = 0
+        }
+
+        if (typeof position.subIndex !== 'number') {
+            position.subIndex = 0
+        }
+
+        if (
+            lists[listIndex].selected.index >= 0 &&
+            lists[listIndex].selected.index <
+                lists[listIndex].itemsBlock.items.length
+        ) {
+            lists[listIndex].itemsBlock.items[
+                lists[listIndex].selected.index
+            ].selected = false
+        }
+
+        let lastSelectedItem = lists[listIndex].selected.index
+
+        lists[listIndex].selected = getNewPosition(listIndex, position, 0)
+
+        if (
+            options.autoMinimize &&
+            lastSelectedItem !== lists[listIndex].active.index &&
+            lastSelectedItem !== lists[listIndex].selected.index &&
+            lastSelectedItem >= 0 &&
+            lastSelectedItem < lists[listIndex].itemsBlock.items.length
+        ) {
+            lists[listIndex].itemsBlock.items[lastSelectedItem].minimize()
+        }
+
+        if (
+            lists[listIndex].selected.index <
+            lists[listIndex].itemsBlock.items.length
+        ) {
+            lists[listIndex].itemsBlock.items[
+                lists[listIndex].selected.index
+            ].selected = true
+
+            if (
+                lists[listIndex].selected.subIndex <
+                lists[listIndex].itemsBlock.items[
+                    lists[listIndex].selected.index
+                ].items.length
+            ) {
+                lists[listIndex].itemsBlock.items[
+                    lists[listIndex].selected.index
+                ].items[lists[listIndex].selected.subIndex].selected = true
+            }
+        }
+
+        if (updateScroll) {
+            scrollTo(listIndex, lists[listIndex].selected)
+        }
+
+        updateOutput(listIndex)
+    }
+
+    //list content functions
+    function add(listIndex, input, template = {}, index = -1) {
+        if (
+            !items.list.includes(input.itemType) ||
+            listIndex < 0 ||
+            listIndex >= lists.length
+        ) {
+            return false
+        }
+
+        let data = new items[input.itemType](input, template)
+
+        let item = new layout.PresentationItem({
+            title: data.title,
+
+            showSectionWhenMinimized: options.showSectionWhenMinimized
+        })
+
+        item._data = data
+        item._itemType = input.itemType
+
+        data.id =
+            itemIdCounter.toString(16) +
+            '-' +
+            data.constructor.name.toLowerCase()
+        itemIdCounter += 1
+
+        data.listId = lists[listIndex].id
+
+        if (index >= 0 && index < lists[listIndex].list.length) {
+            let lastSelected = {
+                index: lists[listIndex].selected.index,
+                subIndex: lists[listIndex].selected.subIndex
+            }
+
+            if (index <= lists[listIndex].selected.index) {
+                if (
+                    lists[listIndex].selected.index <
+                    lists[listIndex].itemsBlock.items.length
+                ) {
+                    lists[listIndex].itemsBlock.items[
+                        lists[listIndex].selected.index
+                    ].selected = false
+                }
+            }
+            if (index <= lists[listIndex].active.index) {
+                if (
+                    lists[listIndex].active.index <
+                    lists[listIndex].itemsBlock.items.length
+                ) {
+                    lists[listIndex].itemsBlock.items[
+                        lists[listIndex].active.index
+                    ].active = false
+                }
+            }
+
+            lists[listIndex].list.splice(index, 0, data)
+            lists[listIndex].itemsBlock.add(item, index)
+
+            if (index <= lists[listIndex].active.index) {
+                setActive(
+                    listIndex,
+                    {
+                        index: lists[listIndex].active.index + 1,
+                        subIndex: lists[listIndex].active.subIndex
+                    },
+                    false
+                )
+            }
+
+            if (index <= lastSelected.index) {
+                setSelected(
+                    listIndex,
+                    {
+                        index: lastSelected.index + 1,
+                        subIndex: lastSelected.subIndex
+                    },
+                    false
+                )
+            }
+        } else {
+            lists[listIndex].list.push(data)
+            lists[listIndex].itemsBlock.add(item)
+
+            index = lists[listIndex].list.length - 1
+        }
+
+        updateItem(
+            listIndex,
+            Math.max(0, Math.min(lists[listIndex].list.length - 1, index))
+        )
+
+        if (typeof data.onChange === 'function') {
+            data.onChange(onDataChange.bind(null, data))
+        }
+
+        if (options.autoMinimize) {
+            item.minimize()
+        }
+
+        if (
+            //Autofit when not loading a presentation an auto fit setting is true
+            //Or autofit when loading a presentation and auto fit on open is true
+            (options.autoFitText && !loadingPresentation) ||
+            (options.autoFitTextOpen && loadingPresentation)
+        ) {
+            fitText(listIndex, lists[listIndex].list.indexOf(data))
+        }
+
+        editHasOccured()
+
+        item.onEvent('active-click', onItemActive)
+        item.onEvent('select-click', onItemSelect)
+        item.onEvent('edit-click', onItemEdit)
+        item.onEvent('drag-click', onItemDrag)
+        item.onEvent('remove-click', onItemRemove)
+    }
+    presentation.add = (input, template) => {
+        if (focusedListIndex !== -1) {
+            add(focusedListIndex, input, template)
+        } else {
+            logger.error(
+                'presentation.add was called when there was no focused list!'
+            )
+        }
+    }
+    presentation.addDrop = (input, template = {}) => {
+        if (!items.list.includes(input.itemType)) {
+            return false
+        }
+
+        dropping = {
+            input: input,
+            template: template
+        }
+
+        for (let i = 0; i < lists.length; i++) {
+            lists[i].itemsBlock.hovering = true
+        }
+    }
+
+    function remove(listIndex, index) {
+        if (
+            listIndex < 0 ||
+            listIndex >= lists.length ||
+            index < 0 ||
+            index >= lists[listIndex].list.length
+        ) {
+            return false
+        }
+
+        ipcRenderer.send('stop-edit', lists[listIndex].list[index].id)
 
         addRemoveHistory({
-            item: itemsBlock.items[index],
-            data: list[index],
+            listId: lists[listIndex].id,
+
+            item: lists[listIndex].itemsBlock.items[index],
+            data: lists[listIndex].list[index],
             index: index
         })
 
-        itemsBlock.items[index].selected = false
-        itemsBlock.items[index].active = false
-        itemsBlock.items[index].editActive = false
+        lists[listIndex].itemsBlock.items[index].selected = false
+        lists[listIndex].itemsBlock.items[index].active = false
+        lists[listIndex].itemsBlock.items[index].editActive = false
 
-        list.splice(index, 1)
-        itemsBlock.remove(index)
+        lists[listIndex].list.splice(index, 1)
+        lists[listIndex].itemsBlock.remove(index)
 
         let lastSelected = {
-            index: selected.index,
-            subIndex: selected.subIndex
+            index: lists[listIndex].selected.index,
+            subIndex: lists[listIndex].selected.subIndex
         }
 
-        if (index <= active.index) {
-            setActive({ index: active.index - 1, subIndex: 0 }, false)
+        if (index <= lists[listIndex].active.index) {
+            setActive(
+                listIndex,
+                { index: lists[listIndex].active.index - 1, subIndex: 0 },
+                false
+            )
         }
 
         if (index <= lastSelected.index) {
-            setSelected({ index: lastSelected.index - 1, subIndex: 0 }, false)
+            setSelected(
+                listIndex,
+                { index: lastSelected.index - 1, subIndex: 0 },
+                false
+            )
         }
 
-        if (list.length === 0) {
-            active.index = active.subIndex = selected.index = selected.subIndex = 0
+        if (lists[listIndex].list.length === 0) {
+            lists[listIndex].active.index = lists[
+                listIndex
+            ].active.subIndex = lists[listIndex].selected.index = lists[
+                listIndex
+            ].selected.subIndex = 0
 
-            updatePreviews()
+            updatePreviews(listIndex)
         }
 
         editHasOccured()
     }
-    presentation.remove = remove
+
+    function move(listIndex, index, newIndex) {
+        if (listIndex < 0 || listIndex >= lists.length) {
+            return false
+        }
+
+        if (typeof index !== 'number') {
+            index = lists[listIndex].list.indexOf(index)
+        }
+
+        if (
+            lists[listIndex].list.length <= 1 ||
+            index < 0 ||
+            index >= lists[listIndex].list.length ||
+            newIndex < 0 ||
+            newIndex > lists[listIndex].list.length ||
+            index === newIndex
+        ) {
+            return false
+        }
+
+        if (
+            lists[listIndex].active.index < 0 ||
+            lists[listIndex].active.index >= items.length
+        ) {
+            lists[listIndex].active = getNewPosition(
+                listIndex,
+                lists[listIndex].active
+            )
+        }
+        let currentActiveId =
+            lists[listIndex].list[lists[listIndex].active.index].id
+
+        if (
+            lists[listIndex].selected.index < 0 ||
+            lists[listIndex].selected.index >= items.length
+        ) {
+            lists[listIndex].selected = getNewPosition(
+                listIndex,
+                lists[listIndex].selected
+            )
+        }
+        let currentSelectedId =
+            lists[listIndex].list[lists[listIndex].selected.index].id
+
+        if (
+            lists[listIndex].selected.index >= 0 &&
+            lists[listIndex].selected.index <
+                lists[listIndex].itemsBlock.items.length
+        ) {
+            lists[listIndex].itemsBlock.items[
+                lists[listIndex].selected.index
+            ].selected = false
+        }
+
+        lists[listIndex].itemsBlock.move(index, newIndex)
+
+        let data = lists[listIndex].list.splice(index, 1)[0]
+
+        if (newIndex > index) {
+            newIndex -= 1
+        }
+
+        lists[listIndex].list.splice(newIndex, 0, data)
+
+        for (let i = 0; i < lists[listIndex].list.length; i++) {
+            if (lists[listIndex].list[i].id === currentActiveId) {
+                lists[listIndex].active.index = i
+            }
+            if (lists[listIndex].list[i].id === currentSelectedId) {
+                lists[listIndex].selected.index = i
+            }
+        }
+
+        if (
+            lists[listIndex].selected.index <
+            lists[listIndex].itemsBlock.items.length
+        ) {
+            lists[listIndex].itemsBlock.items[
+                lists[listIndex].selected.index
+            ].selected = true
+
+            if (
+                lists[listIndex].selected.subIndex <
+                lists[listIndex].itemsBlock.items[
+                    lists[listIndex].selected.index
+                ].items.length
+            ) {
+                lists[listIndex].itemsBlock.items[
+                    lists[listIndex].selected.index
+                ].items[lists[listIndex].selected.subIndex].selected = true
+            }
+        }
+
+        if (lists[listIndex].active.index === newIndex) {
+            scrollTo(listIndex, lists[listIndex].active)
+        } else if (lists[listIndex].selected.index === newIndex) {
+            scrollTo(listIndex, lists[listIndex].selected)
+        }
+
+        updateOutput(listIndex)
+
+        editHasOccured()
+    }
+
+    function moveList(
+        sourceListIndex,
+        sourceIndex,
+        targetListIndex,
+        targetIndex
+    ) {
+        if (
+            sourceListIndex < 0 ||
+            sourceListIndex >= lists.length ||
+            targetListIndex < 0 ||
+            targetListIndex >= lists.length ||
+            sourceIndex < 0 ||
+            sourceIndex >= lists[sourceListIndex].list.length
+        ) {
+            return false
+        }
+
+        if (
+            lists[targetListIndex].selected.index >= 0 &&
+            lists[targetListIndex].selected.index <
+                lists[targetListIndex].itemsBlock.items.length
+        ) {
+            lists[targetListIndex].itemsBlock.items[
+                lists[targetListIndex].selected.index
+            ].selected = false
+        }
+
+        let data = lists[sourceListIndex].list[sourceIndex]
+        let item = lists[sourceListIndex].itemsBlock.items[sourceIndex]
+
+        lists[sourceListIndex].list.splice(sourceIndex, 1)
+        lists[sourceListIndex].itemsBlock.remove(item)
+
+        if (targetIndex <= 0) {
+            //start of list
+            lists[targetListIndex].list.splice(0, 0, data)
+            lists[targetListIndex].itemsBlock.add(item, 0)
+        } else if (targetIndex >= lists[targetListIndex].list.length) {
+            //end of list
+            lists[targetListIndex].list.push(data)
+            lists[targetListIndex].itemsBlock.add(item)
+        } else {
+            //middle of list
+            lists[targetListIndex].list.splice(targetIndex, 0, data)
+            lists[targetListIndex].itemsBlock.add(item, targetIndex)
+        }
+
+        item.selected = false
+        item.active = false
+
+        data.listId = lists[targetListIndex].id
+
+        //update active + selected
+        let sourceSelected = {
+            index: lists[sourceListIndex].selected.index,
+            subIndex: lists[sourceListIndex].selected.subIndex
+        }
+
+        if (lists[sourceListIndex].active.index >= sourceIndex) {
+            if (
+                lists[sourceListIndex].active.index >= 0 &&
+                lists[sourceListIndex].active.index <
+                    lists[sourceListIndex].itemsBlock.items.length
+            ) {
+                lists[sourceListIndex].itemsBlock.items[
+                    lists[sourceListIndex].active.index
+                ].active = false
+            }
+
+            if (
+                lists[sourceListIndex].selected.index >= 0 &&
+                lists[sourceListIndex].selected.index <
+                    lists[sourceListIndex].itemsBlock.items.length
+            ) {
+                lists[sourceListIndex].itemsBlock.items[
+                    lists[sourceListIndex].selected.index
+                ].selected = false
+            }
+
+            setActive(sourceListIndex, {
+                index: lists[sourceListIndex].active.index - 1,
+                subIndex: lists[sourceListIndex].active.subIndex
+            })
+
+            if (sourceSelected.index >= sourceIndex) {
+                setSelected(sourceListIndex, {
+                    index: sourceSelected.index - 1,
+                    subIndex: sourceSelected.subIndex
+                })
+            } else {
+                setSelected(sourceListIndex, sourceSelected)
+            }
+        } else if (sourceSelected.index >= sourceIndex) {
+            setSelected(sourceListIndex, {
+                index: sourceSelected.index - 1,
+                subIndex: sourceSelected.subIndex
+            })
+        }
+
+        let targetSelected = {
+            index: lists[targetListIndex].selected.index,
+            subIndex: lists[targetListIndex].selected.subIndex
+        }
+
+        if (targetIndex <= lists[targetListIndex].active.index) {
+            if (
+                lists[targetListIndex].active.index + 1 >= 0 &&
+                lists[targetListIndex].active.index + 1 <
+                    lists[targetListIndex].itemsBlock.items.length
+            ) {
+                lists[targetListIndex].itemsBlock.items[
+                    lists[targetListIndex].active.index + 1
+                ].active = false
+            }
+
+            setActive(targetListIndex, {
+                index: lists[targetListIndex].active.index + 1,
+                subIndex: lists[targetListIndex].active.subIndex
+            })
+        }
+
+        if (targetSelected.index >= targetIndex) {
+            setSelected(targetListIndex, {
+                index: targetSelected.index + 1,
+                subIndex: targetSelected.subIndex
+            })
+        } else {
+            setSelected(targetListIndex, targetSelected)
+        }
+    }
 
     function undoRemove() {
         if (removeHistory.length === 0) {
@@ -1265,37 +1862,58 @@ const presentation = {}
 
         updateRemoveButton()
 
-        if (history.index >= 0 && history.index < list.length) {
+        let listIndex = lists.findIndex(list => list.id === history.id)
+
+        if (listIndex < 0 || listIndex >= lists.length) {
+            return false
+        }
+
+        if (
+            history.index >= 0 &&
+            history.index < lists[listIndex].list.length
+        ) {
             let lastSelected = {
-                index: selected.index,
-                subIndex: selected.subIndex
+                index: lists[listIndex].selected.index,
+                subIndex: lists[listIndex].selected.subIndex
             }
 
-            if (history.index <= selected.index) {
-                if (selected.index < itemsBlock.items.length) {
-                    itemsBlock.items[selected.index].selected = false
+            if (history.index <= lists[listIndex].selected.index) {
+                if (
+                    lists[listIndex].selected.index <
+                    lists[listIndex].itemsBlock.items.length
+                ) {
+                    lists[listIndex].itemsBlock.items[
+                        lists[listIndex].selected.index
+                    ].selected = false
                 }
             }
-            if (history.index <= active.index) {
-                if (active.index < itemsBlock.items.length) {
-                    itemsBlock.items[active.index].active = false
+            if (history.index <= lists[listIndex].active.index) {
+                if (
+                    lists[listIndex].active.index <
+                    lists[listIndex].itemsBlock.items.length
+                ) {
+                    lists[listIndex].itemsBlock.items[
+                        lists[listIndex].active.index
+                    ].active = false
                 }
             }
 
-            list.splice(history.index, 0, history.data)
-            itemsBlock.add(history.item, history.index)
+            lists[listIndex].list.splice(history.index, 0, history.data)
+            lists[listIndex].itemsBlock.add(history.item, history.index)
 
-            if (history.index <= active.index) {
+            if (history.index <= lists[listIndex].active.index) {
                 setActive(
+                    listIndex,
                     {
-                        index: active.index + 1,
-                        subIndex: active.subIndex
+                        index: lists[listIndex].active.index + 1,
+                        subIndex: lists[listIndex].active.subIndex
                     },
                     false
                 )
             }
             if (history.index <= lastSelected.index) {
                 setSelected(
+                    listIndex,
                     {
                         index: lastSelected.index + 1,
                         subIndex: lastSelected.subIndex
@@ -1304,359 +1922,367 @@ const presentation = {}
                 )
             }
         } else {
-            list.push(history.data)
-            itemsBlock.add(history.item)
+            lists[listIndex].list.push(history.data)
+            lists[listIndex].itemsBlock.add(history.item)
 
-            history.index = list.length - 1
+            history.index = lists[listIndex].list.length - 1
         }
 
-        updateItem(Math.max(0, Math.min(list.length - 1, history.index)))
+        updateItem(
+            Math.max(
+                0,
+                Math.min(lists[listIndex].list.length - 1, history.index)
+            )
+        )
 
         if (options.autoMinimize) {
             history.item.minimize()
         }
 
         if (options.autoFitText) {
-            fitText(list.indexOf(history.data))
+            fitText(listIndex, lists[listIndex].list.indexOf(history.data))
         }
 
         editHasOccured()
     }
     presentation.undoRemove = undoRemove
 
-    function move(index, newIndex) {
-        if (typeof index !== 'number') {
-            index = list.indexOf(index)
-        }
-
+    function beginFirst(listIndex) {
         if (
-            list.length <= 1 ||
-            index < 0 ||
-            index >= list.length ||
-            newIndex < 0 ||
-            newIndex > list.length ||
-            index === newIndex
+            listIndex < 0 ||
+            listIndex >= lists.length ||
+            lists[listIndex].list.length === 0
         ) {
             return false
         }
 
-        if (active.index < 0 || active.index >= items.length) {
-            active = getNewPosition(active)
-        }
-        let currentActiveId = list[active.index].id
-
-        if (selected.index < 0 || selected.index >= items.length) {
-            selected = getNewPosition(selected)
-        }
-        let currentSelectedId = list[selected.index].id
-
-        if (selected.index >= 0 && selected.index < itemsBlock.items.length) {
-            itemsBlock.items[selected.index].selected = false
-        }
-
-        itemsBlock.move(index, newIndex)
-
-        let data = list.splice(index, 1)[0]
-
-        if (newIndex > index) {
-            newIndex -= 1
-        }
-
-        list.splice(newIndex, 0, data)
-
-        for (let i = 0; i < list.length; i++) {
-            if (list[i].id === currentActiveId) {
-                active.index = i
-            }
-            if (list[i].id === currentSelectedId) {
-                selected.index = i
-            }
-        }
-
-        if (selected.index < itemsBlock.items.length) {
-            itemsBlock.items[selected.index].selected = true
-
-            if (
-                selected.subIndex <
-                itemsBlock.items[selected.index].items.length
-            ) {
-                itemsBlock.items[selected.index].items[
-                    selected.subIndex
-                ].selected = true
-            }
-        }
-
-        if (active.index === newIndex) {
-            scrollTo(active)
-        } else if (selected.index === newIndex) {
-            scrollTo(selected)
-        }
-
-        updateOutput()
-
-        editHasOccured()
+        setActive(listIndex, { index: 0, subIndex: 0 })
     }
-    presentation.move = move
 
-    function beginFirst() {
-        if (list.length === 0) {
-            return false
-        }
-
-        setActive({ index: 0, subIndex: 0 })
-    }
-    presentation.beginFirst = beginFirst
-
-    function beginLast() {
-        if (list.length === 0) {
-            return false
-        }
-
-        let subIndex = itemsBlock.items[list.length - 1].items.length - 1
-
-        setActive({ index: list.length, subIndex: subIndex })
-    }
-    presentation.beginLast = beginLast
-
-    function forward() {
-        if (list.length === 0) {
+    function forward(listIndex) {
+        if (
+            listIndex < 0 ||
+            listIndex >= lists.length ||
+            lists[listIndex].list.length === 0
+        ) {
             return false
         }
 
         if (
             playOptions.shuffle &&
-            list.length !== 1 &&
-            active.index < itemsBlock.items.length &&
-            active.index >= 0 &&
-            active.subIndex === itemsBlock.items[active.index].items.length - 1
+            lists[listIndex].list.length !== 1 &&
+            lists[listIndex].active.index <
+                lists[listIndex].itemsBlock.items.length &&
+            lists[listIndex].active.index >= 0 &&
+            lists[listIndex].active.subIndex ===
+                lists[listIndex].itemsBlock.items[lists[listIndex].active.index]
+                    .items.length -
+                    1
         ) {
             //At the end of an item, and shuffle is enabled
 
-            if (list.length === 2) {
+            if (lists[listIndex].list.length === 2) {
                 //If there are only two items, go to the other item
-                setActive({
-                    index: active.index === 0 ? 1 : 0,
+                setActive(listIndex, {
+                    index: lists[listIndex].active.index === 0 ? 1 : 0,
                     subIndex: 0
                 })
             } else {
                 //Get a random index, excluding the last item
-                let randomIndex = ~~(Math.random() * (list.length - 1))
+                let randomIndex = ~~(
+                    Math.random() *
+                    (lists[listIndex].list.length - 1)
+                )
                 //Then add one if the index is at, or above the current index
                 //This ensure all indexs are evenly chosen, and the current index is never chosen.
-                if (randomIndex >= active.index) {
+                if (randomIndex >= lists[listIndex].active.index) {
                     randomIndex += 1
                 }
 
-                setActive({
+                setActive(listIndex, {
                     index: randomIndex,
                     subIndex: 0
                 })
             }
-        } else if (isLastPosition(active)) {
+        } else if (isLastPosition(listIndex, lists[listIndex].active)) {
             if (playOptions.loop) {
-                setActive(getFirstPosition())
+                setActive(listIndex, getFirstPosition(listIndex))
             } else {
-                timer.value = 0
-                timer.text = ''
-                timer.disabled = true
+                lists[listIndex].timer.value = 0
+                lists[listIndex].timer.text = ''
+                lists[listIndex].timer.disabled = true
             }
         } else {
-            setActive(getNewPosition(active, 1))
+            setActive(
+                listIndex,
+                getNewPosition(listIndex, lists[listIndex].active, 1)
+            )
         }
     }
-    presentation.forward = forward
+    presentation.forward = () => {
+        if (focusedListIndex !== -1) {
+            forward(focusedListIndex)
+        } else {
+            logger.error(
+                'presentation.forward was called when there was no focused list!'
+            )
+        }
+    }
 
-    function back() {
-        if (list.length === 0) {
+    function back(listIndex) {
+        if (
+            listIndex < 0 ||
+            listIndex >= lists.length ||
+            lists[listIndex].list.length === 0
+        ) {
             return false
         }
 
         if (
             playOptions.shuffle &&
-            list.length !== 1 &&
-            active.index < itemsBlock.items.length &&
-            active.index >= 0 &&
-            active.subIndex === 0
+            lists[listIndex].list.length !== 1 &&
+            lists[listIndex].active.index <
+                lists[listIndex].itemsBlock.items.length &&
+            lists[listIndex].active.index >= 0 &&
+            lists[listIndex].active.subIndex === 0
         ) {
             //At the start of an item, and shuffle is enabled
-            if (list.length === 2) {
+            if (lists[listIndex].list.length === 2) {
                 //If there are only two items, go to the other item
-                setActive({
-                    index: active.index === 0 ? 1 : 0,
+                setActive(listIndex, {
+                    index: lists[listIndex].active.index === 0 ? 1 : 0,
                     subIndex: 0
                 })
             } else {
                 //Get a random index, excluding the last item
-                let randomIndex = ~~(Math.random() * (list.length - 1))
+                let randomIndex = ~~(
+                    Math.random() *
+                    (lists[listIndex].list.length - 1)
+                )
                 //Then add one if the index is at, or above the current index
                 //This ensure all indexs are evenly chosen, and the current index is never chosen.
-                if (randomIndex >= active.index) {
+                if (randomIndex >= lists[listIndex].active.index) {
                     randomIndex += 1
                 }
 
-                setActive({
+                setActive(listIndex, {
                     index: randomIndex,
                     subIndex: 0
                 })
             }
-        } else if (isFirstPosition(active)) {
+        } else if (isFirstPosition(listIndex, lists[listIndex].active)) {
             if (playOptions.loop) {
-                setActive(getLastPosition())
+                setActive(listIndex, getLastPosition(listIndex))
             } else {
-                timer.value = 0
-                timer.text = ''
-                timer.disabled = true
+                lists[listIndex].timer.value = 0
+                lists[listIndex].timer.text = ''
+                lists[listIndex].timer.disabled = true
             }
         } else {
-            setActive(getNewPosition(active, -1))
+            setActive(
+                listIndex,
+                getNewPosition(listIndex, lists[listIndex].active, -1)
+            )
         }
     }
-    presentation.back = back
+    presentation.back = () => {
+        if (focusedListIndex !== -1) {
+            back(focusedListIndex)
+        } else {
+            logger.error(
+                'presentation.back was called when there was no focused list!'
+            )
+        }
+    }
 
-    function selectForward() {
-        if (list.length === 0) {
+    function selectForward(listIndex) {
+        if (
+            listIndex < 0 ||
+            listIndex >= lists.length ||
+            lists[listIndex].list.length === 0
+        ) {
             return false
         }
 
-        setSelected(getNewPosition(selected, 1))
+        setSelected(
+            listIndex,
+            getNewPosition(listIndex, lists[listIndex].selected, 1)
+        )
     }
-    presentation.selectForward = selectForward
+    presentation.selectForward = () => {
+        if (focusedListIndex !== -1) {
+            selectForward(focusedListIndex)
+        } else {
+            logger.error(
+                'presentation.selectForward was called when there was no focused list!'
+            )
+        }
+    }
 
-    function selectBack() {
-        if (list.length === 0) {
+    function selectBack(listIndex) {
+        if (
+            listIndex < 0 ||
+            listIndex >= lists.length ||
+            lists[listIndex].list.length === 0
+        ) {
             return false
         }
 
-        setSelected(getNewPosition(selected, -1))
+        setSelected(
+            listIndex,
+            getNewPosition(listIndex, lists[listIndex].selected, -1)
+        )
     }
-    presentation.selectBack = selectBack
+    presentation.selectBack = () => {
+        if (focusedListIndex !== -1) {
+            selectBack(focusedListIndex)
+        } else {
+            logger.error(
+                'presentation.selectBack was called when there was no focused list!'
+            )
+        }
+    }
 
-    function selectItemForward() {
-        if (list.length === 0) {
+    function selectItemForward(listIndex) {
+        if (
+            listIndex < 0 ||
+            listIndex >= lists.length ||
+            lists[listIndex].list.length === 0
+        ) {
             return false
         }
 
-        if (selected.index < list.length - 1) {
-            setSelected({ index: selected.index + 1, subIndex: 0 })
-        }
-    }
-    presentation.selectItemForward = selectItemForward
-    function selectItemBackward() {
-        if (list.length === 0) {
-            return false
-        }
-
-        if (selected.index > 0) {
-            setSelected({ index: selected.index - 1, subIndex: 0 })
-        }
-    }
-    presentation.selectItemBackward = selectItemBackward
-
-    function playSelected() {
-        setActive(selected)
-    }
-    presentation.playSelected = playSelected
-
-    function moveSelectedUp() {
-        move(selected.index, selected.index - 1)
-    }
-    presentation.moveSelectedUp = moveSelectedUp
-    function moveSelectedDown() {
-        move(selected.index, selected.index + 2)
-    }
-    presentation.moveSelectedDown = moveSelectedDown
-    function moveSelectedTop() {
-        move(selected.index, 0)
-    }
-    presentation.moveSelectedTop = moveSelectedTop
-    function moveSelectedBottom() {
-        move(selected.index, list.length)
-    }
-    presentation.moveSelectedBottom = moveSelectedBottom
-
-    function load(data = {}) {
-        file = ''
-        list = []
-        removeHistory = []
-        active.index = 0
-        active.subIndex = 0
-
-        updateRemoveButton()
-
-        itemsBlock.clear()
-
-        for (let i = 0; i < activeEditors.length; i++) {
-            ipcRenderer.send('stop-edit', activeEditors[i])
-        }
-
-        activeEditors = []
-
-        if (typeof data.file === 'string') {
-            file = data.file
-        }
-
-        loadingPresentation = true
-
-        if (Array.isArray(data.list)) {
-            for (let i = 0; i < data.list.length; i++) {
-                add(data.list[i])
-            }
-        }
-
-        loadingPresentation = false
-
-        if (list.length === 0) {
-            active.index = active.subIndex = selected.index = selected.subIndex = 0
-
-            updatePreviews()
-        } else if (typeof data.active === 'object') {
-            layout.onFrame.end(() => {
-                //Need to set it to 'manual', so that going to the active item doesn't start the autoplay timer
-                let actualPlayMode = playMode
-                playMode = 'manual'
-
-                setActive({
-                    index: data.active.index || 0,
-                    subIndex: data.active.subIndex || 0
-                })
-
-                playMode = actualPlayMode
+        if (
+            lists[listIndex].selected.index <
+            lists[listIndex].list.length - 1
+        ) {
+            setSelected(listIndex, {
+                index: lists[listIndex].selected.index + 1,
+                subIndex: 0
             })
         }
-
-        lastEditTime = 0
-
-        layout.window.setDocument(file)
-
-        presentation.saved = true
     }
-    presentation.load = load
-
-    function reset() {
-        load({})
+    presentation.selectItemForward = () => {
+        if (focusedListIndex !== -1) {
+            selectItemForward(focusedListIndex)
+        } else {
+            logger.error(
+                'presentation.selectItemForward was called when there was no focused list!'
+            )
+        }
     }
-    presentation.reset = reset
-
-    function getSaveData() {
-        let data = {
-            file: file,
-            list: [],
-
-            active: {
-                index: active.index,
-                subIndex: active.subIndex
-            }
+    function selectItemBackward(listIndex) {
+        if (
+            listIndex < 0 ||
+            listIndex >= lists.length ||
+            lists[listIndex].list.length === 0
+        ) {
+            return false
         }
 
-        for (let i = 0; i < list.length; i++) {
-            data.list.push(list[i].getData())
+        if (lists[listIndex].selected.index > 0) {
+            setSelected(listIndex, {
+                index: lists[listIndex].selected.index - 1,
+                subIndex: 0
+            })
         }
-
-        return data
     }
-    presentation.getSaveData = getSaveData
+    presentation.selectItemBackward = () => {
+        if (focusedListIndex !== -1) {
+            selectItemBackward(focusedListIndex)
+        } else {
+            logger.error(
+                'presentation.selectItemBackward was called when there was no focused list!'
+            )
+        }
+    }
 
-    function setPlayMode(mode, options) {
+    function playSelected(listIndex) {
+        if (listIndex >= 0 && listIndex < lists.length) {
+            setActive(listIndex, lists[listIndex].selected)
+        }
+    }
+    presentation.playSelected = () => {
+        if (focusedListIndex !== -1) {
+            playSelected(focusedListIndex)
+        } else {
+            logger.error(
+                'presentation.playSelected was called when there was no focused list!'
+            )
+        }
+    }
+
+    function moveSelectedUp(listIndex) {
+        if (listIndex >= 0 && listIndex < lists.length) {
+            move(
+                listIndex,
+                lists[listIndex].selected.index,
+                lists[listIndex].selected.index - 1
+            )
+        }
+    }
+    presentation.moveSelectedUp = () => {
+        if (focusedListIndex !== -1) {
+            moveSelectedUp(focusedListIndex)
+        } else {
+            logger.error(
+                'presentation.moveSelectedUp was called when there was no focused list!'
+            )
+        }
+    }
+    function moveSelectedDown(listIndex) {
+        if (listIndex >= 0 && listIndex < lists.length) {
+            move(
+                listIndex,
+                lists[listIndex].selected.index,
+                lists[listIndex].selected.index + 2
+            )
+        }
+    }
+    presentation.moveSelectedDown = () => {
+        if (focusedListIndex !== -1) {
+            moveSelectedDown(focusedListIndex)
+        } else {
+            logger.error(
+                'presentation.moveSelectedDown was called when there was no focused list!'
+            )
+        }
+    }
+
+    function moveSelectedTop(listIndex) {
+        if (listIndex >= 0 && listIndex < lists.length) {
+            move(listIndex, lists[listIndex].selected.index, 0)
+        }
+    }
+    presentation.moveSelectedTop = () => {
+        if (focusedListIndex !== -1) {
+            moveSelectedTop(focusedListIndex)
+        } else {
+            logger.error(
+                'presentation.moveSelectedTop was called when there was no focused list!'
+            )
+        }
+    }
+    function moveSelectedBottom(listIndex) {
+        if (listIndex >= 0 && listIndex < lists.length) {
+            move(
+                listIndex,
+                lists[listIndex].selected.index,
+                lists[listIndex].list.length
+            )
+        }
+    }
+    presentation.moveSelectedBottom = () => {
+        if (focusedListIndex !== -1) {
+            moveSelectedBottom(focusedListIndex)
+        } else {
+            logger.error(
+                'presentation.moveSelectedBottom was called when there was no focused list!'
+            )
+        }
+    }
+
+    presentation.setPlayMode = function(mode, options) {
         if (mode === 'manual' || mode === 'auto') {
             playMode = mode
         }
@@ -1665,9 +2291,11 @@ const presentation = {}
             if (typeof options.loop === 'boolean') {
                 playOptions.loop = options.loop
 
-                //if at last item, disable timer if loop is false, otherwise enable it
-                if (isLastPosition(active)) {
-                    timer.disabled = !playOptions.loop
+                for (let i = 0; i < lists.length; i++) {
+                    if (isLastPosition(i, lists[i].active)) {
+                        //if at last item, disable timer if loop is false, otherwise enable it
+                        lists[i].timer.disabled = !playOptions.loop
+                    }
                 }
             }
 
@@ -1677,17 +2305,530 @@ const presentation = {}
         }
 
         if (playMode === 'manual') {
-            if (timeout) {
-                clearTimeout(timeout)
-            }
+            for (let i = 0; i < lists.length; i++) {
+                if (lists[i].timeout) {
+                    clearTimeout(lists[i].timeout)
+                }
 
-            timer.text = ''
-            timer.value = 0
+                lists[i].timer.text = ''
+                lists[i].timer.value = 0
+            }
         }
 
-        updatePreviews()
+        for (let i = 0; i < lists.length; i++) {
+            updatePreviews(i)
+        }
     }
-    presentation.setPlayMode = setPlayMode
+
+    //List events
+    function onListDrop(event) {
+        let listIndex = lists.findIndex(list => list.itemsBlock === event.from)
+
+        if (listIndex === -1) {
+            dropping = false
+            dragging = false
+
+            return false
+        }
+
+        if (typeof dropping === 'object') {
+            add(listIndex, dropping.input, dropping.template, event.index)
+
+            dropping = false
+        }
+
+        if (typeof dragging === 'object') {
+            if (
+                dragging.index <
+                lists[dragging.listIndex].itemsBlock.items.length
+            ) {
+                lists[dragging.listIndex].itemsBlock.items[
+                    dragging.index
+                ].dragActive = false
+            }
+
+            if (dragging.listIndex === listIndex) {
+                move(listIndex, dragging.index, event.index)
+            } else {
+                moveList(
+                    dragging.listIndex,
+                    dragging.index,
+                    listIndex,
+                    event.index
+                )
+            }
+
+            dragging = false
+        }
+    }
+    function onListDropCancel() {
+        if (typeof dropping === 'object') {
+            dropping = false
+        }
+
+        if (typeof dragging === 'object') {
+            lists[dragging.listIndex].itemsBlock.items[
+                dragging.index
+            ].dragActive = false
+
+            dragging = false
+        }
+    }
+    function onListButtonFirst(event) {
+        let listIndex = lists.findIndex(
+            list => list.controlBlock === event.from.parent
+        )
+
+        beginFirst(listIndex)
+
+        focusList(listIndex)
+    }
+    function onListButtonPrevious(event) {
+        let listIndex = lists.findIndex(
+            list => list.controlBlock === event.from.parent
+        )
+
+        back(listIndex)
+
+        focusList(listIndex)
+    }
+    function onListButtonNext(event) {
+        let listIndex = lists.findIndex(
+            list => list.controlBlock === event.from.parent
+        )
+
+        forward(listIndex)
+
+        focusList(listIndex)
+    }
+    function onListScreenButton(event) {
+        let listIndex = lists.findIndex(
+            list => list.screenBlock === event.from.parent
+        )
+
+        if (listIndex !== -1) {
+            event.from.active !== event.from.active
+
+            if (event.from.active) {
+                ipcRenderer.send(
+                    'enable-display-screen',
+                    event.from.screenIndex
+                )
+
+                ipcRenderer.send('display', lists[listIndex].output.active, [
+                    event.from.screenIndex
+                ])
+
+                if (
+                    !lists[listIndex].screens.includes(event.from.screenIndex)
+                ) {
+                    lists[listIndex].screens.push(event.from.screenIndex)
+                }
+
+                for (let i = 0; i < lists.length; i++) {
+                    if (
+                        i !== listIndex &&
+                        lists[i].screens.includes(event.from.screenIndex)
+                    ) {
+                        lists[i].screens.splice(
+                            lists[i].screens.indexOf(event.screenIndex),
+                            1
+                        )
+
+                        updateListScreenButtons(i)
+                    }
+                }
+            } else {
+                ipcRenderer.send(
+                    'disable-display-screen',
+                    event.from.screenIndex
+                )
+
+                let index = lists[listIndex].screens.indexOf(
+                    event.from.screenIndex
+                )
+
+                if (index !== -1) {
+                    lists[listIndex].screens.splice(index, 1)
+                }
+            }
+
+            focusList(listIndex)
+        }
+    }
+
+    function onListRemoveButton(event) {
+        let listIndex = lists.findIndex(
+            list => list.topBlock === event.from.parent
+        )
+
+        if (listIndex >= 0 && listIndex < lists.length) {
+            removeList(listIndex)
+        }
+    }
+
+    function updateListScreenButtons(listIndex) {
+        if (listIndex < 0 || listIndex >= lists.length) {
+            return false
+        }
+
+        while (lists[listIndex].screenButtons.length <= display.screenCount) {
+            lists[listIndex].screenButtons.push(
+                new layout.Button({
+                    text: lists[listIndex].screenButtons.length.toString(),
+                    toggle: true,
+
+                    onClick: onListScreenButton,
+
+                    size: 'large'
+                })
+            )
+
+            lists[listIndex].screenButtons[
+                lists[listIndex].screenButtons.length - 1
+            ].screenIndex = lists[listIndex].screenButtons.length - 1
+
+            lists[listIndex].screenButtons[
+                lists[listIndex].screenButtons.length - 1
+            ].addClass('highlight')
+        }
+
+        for (
+            let i = lists[listIndex].screenBlock.items.length;
+            i < display.screenCount;
+            i++
+        ) {
+            lists[listIndex].screenBlock.add(lists[listIndex].screenButtons[i])
+        }
+
+        while (
+            lists[listIndex].screenBlock.items.length > display.screenCount
+        ) {
+            lists[listIndex].screenBlock.remove(
+                lists[listIndex].screenBlock.items[
+                    lists[listIndex].screenBlock.items.length - 1
+                ]
+            )
+        }
+
+        for (let i = 0; i < display.screenCount; i++) {
+            if (display.masterScreen === i) {
+                lists[listIndex].screenButtons[i].text =
+                    '[' + (i + 1).toString() + ']'
+            } else {
+                lists[listIndex].screenButtons[i].text = (i + 1).toString()
+            }
+
+            if (
+                lists[listIndex].screens.includes(i) &&
+                !display.activeScreens.includes(i)
+            ) {
+                lists[listIndex].screens.splice(
+                    lists[listIndex].screens.indexOf(i),
+                    1
+                )
+            }
+
+            lists[listIndex].screenButtons[i].active = lists[
+                listIndex
+            ].screens.includes(i)
+        }
+    }
+
+    //List functions
+    function addList() {
+        if (lists.length >= options.maxLists) {
+            return false
+        }
+
+        let newList = {
+            mainBlock: new layout.Block(
+                {},
+                {
+                    direction: 'vertical'
+                }
+            ),
+
+            //top bar + remove button
+            topBlock: new layout.Block(
+                {
+                    items: [new layout.Filler()],
+                    childSpacing: 8
+                },
+                {
+                    direction: 'horizontal',
+                    padding: 2,
+
+                    shrink: false,
+                    grow: false
+                }
+            ),
+            removeButton: new layout.Button({
+                icon: 'remove',
+
+                onClick: onListRemoveButton,
+
+                size: 'large'
+            }),
+
+            //screen properties + interface
+            screens: [],
+
+            screenButtons: [],
+            screenBlock: new layout.Block(
+                {
+                    childSpacing: 8
+                },
+                {
+                    direction: 'horizontal',
+                    padding: 0,
+
+                    shrink: false,
+                    grow: false
+                }
+            ),
+
+            //list properties + interface
+            list: [],
+            itemsBlock: new layout.ReorderableBlock(
+                {},
+                {
+                    direction: 'vertical',
+
+                    overflow: 'scroll',
+                    overflowX: 'hidden',
+
+                    background: 'white',
+
+                    borderTop: '2px solid hsl(0, 0%, 70%)',
+                    borderBottom: '2px solid hsl(0, 0%, 70%)'
+                }
+            ),
+
+            active: {
+                index: 0,
+                subIndex: 0
+            },
+            selected: {
+                index: 0,
+                subIndex: 0
+            },
+
+            scrollPosition: {},
+
+            output: {
+                active: {},
+                selected: {},
+                next: {},
+                previous: {}
+            },
+
+            //control properties + interface
+            timeout: null,
+
+            controlBlock: new layout.Block(
+                {
+                    items: [
+                        new layout.Button({
+                            icon: 'play-first',
+
+                            onClick: onListButtonFirst
+                        }),
+                        new layout.Button({
+                            icon: 'play-previous',
+
+                            onClick: onListButtonPrevious
+                        }),
+                        new layout.Button({
+                            icon: 'play-next',
+
+                            onClick: onListButtonNext
+                        })
+                    ],
+                    childSpacing: 8
+                },
+                {
+                    direction: 'horizontal',
+                    padding: 2,
+
+                    shrink: false,
+                    grow: false
+                }
+            ),
+
+            timer: new layout.Timer({}, {})
+        }
+
+        newList.id = itemIdCounter.toString(16) + '-list'
+        itemIdCounter += 1
+
+        newList.mainBlock.add(newList.topBlock)
+        newList.topBlock.add(newList.screenBlock, 0)
+        newList.topBlock.add(newList.removeButton)
+
+        newList.mainBlock.add(newList.itemsBlock)
+        newList.mainBlock.add(newList.controlBlock)
+
+        newList.controlBlock.add(newList.timer)
+
+        newList.itemsBlock.onEvent('cancel-drop', onListDropCancel)
+        newList.itemsBlock.onEvent('drop', onListDrop)
+
+        let newSize = 100 / (lists.length + 1)
+
+        for (let i = 0; i < lists.length; i++) {
+            itemsBlock.items[i].size -= newSize / lists.length
+        }
+
+        lists.push(newList)
+        itemsBlock.add(
+            new layout.LayoutBlock({
+                items: [newList.mainBlock],
+
+                size: newSize,
+
+                minHeight: 200
+            })
+        )
+
+        updateListScreenButtons(lists.length - 1)
+        focusList(lists.length - 1)
+
+        outputsChanged()
+
+        addListButton.disabled = lists.length >= options.maxLists
+
+        if (lists.length === 1) {
+            newList.removeButton.disabled = true
+        } else {
+            for (let i = 0; i < lists.length; i++) {
+                lists[i].removeButton.disabled = false
+            }
+        }
+    }
+    function removeList(listIndex) {
+        if (listIndex < 0 || listIndex >= lists.length) {
+            return false
+        }
+
+        let removedList = lists.splice(listIndex, 1)[0]
+
+        for (let i = 0; i < removedList.list.length; i++) {
+            if (activeEditors.includes(removedList.list[i].id)) {
+                ipcRenderer.send('stop-edit', removedList.list[i].id)
+            }
+        }
+
+        let extraSpace = removedList.mainBlock.parent.size
+
+        itemsBlock.remove(removedList.mainBlock.parent)
+
+        for (let i = 0; i < lists.length; i++) {
+            itemsBlock.items[i].size += extraSpace / lists.length
+        }
+
+        if (focusedListIndex >= listIndex) {
+            if (focusedListIndex > listIndex) {
+                focusedListIndex -= 1
+                focusList(focusedListIndex)
+            } else {
+                focusList(focusedListIndex - 1)
+            }
+        }
+
+        outputsChanged()
+
+        addListButton.disabled = lists.length >= options.maxLists
+
+        if (lists.length === 1) {
+            lists[0].removeButton.disabled = true
+        }
+    }
+
+    function getListSaveData(listIndex) {
+        if (listIndex < 0 || listIndex >= lists.length) {
+            return {}
+        }
+
+        let data = {
+            list: [],
+
+            active: {
+                index: lists[listIndex].active.index,
+                subIndex: lists[listIndex].active.subIndex
+            }
+        }
+
+        for (let i = 0; i < lists[listIndex].list.length; i++) {
+            data.list.push(lists[listIndex].list[i].getData())
+        }
+
+        return data
+    }
+
+    presentation.load = function(data = {}) {
+        file = ''
+
+        while (lists.length > 0) {
+            removeList(lists.length - 1)
+        }
+
+        removeHistory = []
+        updateRemoveButton()
+
+        if (typeof data.file === 'string') {
+            file = data.file
+        }
+
+        loadingPresentation = true
+
+        if (Array.isArray(data.lists)) {
+            for (let i = 0; i < data.lists.length; i++) {
+                addList()
+
+                for (let j = 0; j < data.lists[i].list.length; j++) {
+                    add(i, data.lists[i].list[j])
+                }
+
+                setActive(i, data.lists[i].active)
+            }
+        } else {
+            addList()
+
+            if (Array.isArray(data.list)) {
+                for (let i = 0; i < data.list.length; i++) {
+                    add(0, data.list[i])
+                }
+            }
+
+            setActive(0, data.active)
+        }
+
+        loadingPresentation = false
+
+        lastEditTime = 0
+
+        layout.window.setDocument(file)
+
+        presentation.saved = true
+    }
+    presentation.reset = function() {
+        presentation.load({})
+    }
+
+    presentation.getSaveData = function() {
+        let data = {
+            file: file,
+
+            lists: []
+        }
+
+        for (let i = 0; i < lists.length; i++) {
+            data.lists.push(getListSaveData(i))
+        }
+
+        return data
+    }
 
     function autoSaveCheck() {
         if (
@@ -1696,7 +2837,7 @@ const presentation = {}
         ) {
             fs.writeFile(
                 path.join(appDataPath, 'autosave.dpl'),
-                JSON.stringify(getSaveData()),
+                JSON.stringify(presentation.getSaveData()),
                 error => {
                     if (error) {
                         layout.dialog.showNotification({
@@ -1718,11 +2859,6 @@ const presentation = {}
             )
         }
     }
-
-    let autoSaveTimer = setInterval(
-        autoSaveCheck,
-        options.autoSaveInterval * 1000
-    )
 
     //Checks if the presentation has been saved, callback(error, canContinue)
     //If not, asks the user if they want to: Save, Discard, or Cancel
@@ -1930,149 +3066,37 @@ const presentation = {}
         })
     }
 
-    //Settings, and keyboard shortcuts
-    {
-        ipcRenderer.on('setting', (event, key, value) => {
-            if (key.startsWith('defaults.')) {
-                defaultDisplay[key.slice(9)] = value
+    //User list events
+    undoRemoveButton.onEvent('click', presentation.undoRemove)
 
-                return
+    layout.menu.onEvent('edit', item => {
+        if (item.value === 'undo') {
+            presentation.undoRemove()
+        }
+    })
+
+    blankButton.onEvent('click', event => {
+        if (!event.fromUser) {
+            blankButton.active = !blankButton.active
+        }
+
+        ipcRenderer.send('display-blank', blankButton.active)
+    })
+    ipcRenderer.on('display-blank', (event, blank) => {
+        blankButton.active = blank
+    })
+
+    fitTextAllButton.onEvent('click', () => {
+        for (let i = 0; i < lists.length; i++) {
+            for (let j = 0; j < lists[i].list.length; j++) {
+                fitText(i, j)
             }
+        }
+    })
 
-            switch (key) {
-                case 'display.autoFitText':
-                    options.autoFitText = value
+    addListButton.onEvent('click', addList)
 
-                    break
-                case 'display.autoFitTextOpen':
-                    options.autoFitTextOpen = value
-
-                    break
-                case 'display.increaseSizeOnFit':
-                    options.increaseSizeOnFit = value
-
-                    break
-                case 'display.reduceTextSize':
-                    if (
-                        options.reduceTextSize !== value &&
-                        typeof value === 'boolean'
-                    ) {
-                        options.reduceTextSize = value
-
-                        //When changing the option to reduce all text to fit, every item needs to be re-calculated
-                        updateAllItems()
-                    }
-
-                    break
-                case 'display.minTextSize':
-                    if (
-                        options.minTextSize !== value &&
-                        typeof value === 'number' &&
-                        isFinite(value) &&
-                        value > 0
-                    ) {
-                        options.minTextSize = value
-
-                        //When changing the minimum text size, all items need to have their error highlighting updated
-                        updateAllItemErrorHighlights()
-                    }
-
-                    break
-                case 'general.autoMinimize':
-                    options.autoMinimize = value
-
-                    if (value) {
-                        for (let i = 0; i < itemsBlock.items.length; i++) {
-                            if (i !== active.index && i !== selected.index) {
-                                itemsBlock.items[i].minimize()
-                            }
-                        }
-                    }
-
-                    break
-                case 'general.showSectionWhenMinimized':
-                    options.showSectionWhenMinimized = value
-
-                    for (let i = 0; i < itemsBlock.items.length; i++) {
-                        itemsBlock.items[i].showSectionWhenMinimized = value
-                    }
-
-                    break
-                case 'general.autoSaveInterval':
-                    if (
-                        typeof value !== 'number' ||
-                        value < 3 ||
-                        !isFinite(value)
-                    ) {
-                        return false
-                    }
-
-                    clearInterval(autoSaveTimer)
-
-                    options.autoSaveInterval = value
-
-                    autoSaveTimer = setInterval(
-                        autoSaveCheck,
-                        options.autoSaveInterval * 1000
-                    )
-
-                    break
-                case 'general.removeHistoryCount':
-                    if (
-                        typeof value !== 'number' ||
-                        value < 0 ||
-                        !isFinite(value)
-                    ) {
-                        return false
-                    }
-
-                    options.removeHistoryCount = value
-
-                    if (removeHistory.length > options.removeHistoryCount) {
-                        removeHistory.splice(
-                            0,
-                            removeHistory.length - options.removeHistoryCount
-                        )
-
-                        updateRemoveButton()
-                    }
-                    break
-                case 'general.autoScroll':
-                    options.autoScroll = value
-
-                    if (value) {
-                        scrollTo(selected)
-                    }
-                    break
-                case 'general.scrollSmooth':
-                    options.scrollSmooth = value
-                    break
-            }
-        })
-
-        ipcRenderer.send('get-settings', [
-            ['defaults.background', 'black'],
-            ['defaults.backgroundScale', 'fill'],
-
-            ['display.autoFitText', true],
-            ['display.autoFitTextOpen', true],
-            ['display.increaseSizeOnFit', true],
-
-            ['display.reduceTextSize', true],
-            ['display.minTextSize', 10],
-
-            ['general.autoMinimize', true],
-            ['general.showSectionWhenMinimized', true],
-
-            ['general.autoScroll', true],
-            ['general.scrollSmooth', true],
-
-            ['general.autoSaveInterval', 30],
-
-            ['general.removeHistoryCount', 3]
-        ])
-    }
-
+    //User file events
     layout.menu.onEvent('file', item => {
         if (item.value === 'new') {
             fileNewPresentation()
@@ -2085,6 +3109,15 @@ const presentation = {}
         }
     })
 
+    ipcRenderer.on('open-file', (e, file) => {
+        checkSave((error, canContinue) => {
+            if (!canContinue) {
+                return false
+            }
+
+            loadFile(file)
+        })
+    })
     layout.onEvent('file-drop', event => {
         if (event.files.length > 1) {
             layout.dialog.showNotification({
@@ -2102,114 +3135,327 @@ const presentation = {}
         }
     })
 
-    let closing = false
-    let canClose = false
+    //Window closing save confirmation
+    {
+        let closing = false
+        let canClose = false
 
-    function finishClose() {
-        if (lastEditTime >= lastAutoSaveTime) {
-            layout.showLoader(layout.body, 'Auto-Saving')
+        function finishClose() {
+            if (lastEditTime >= lastAutoSaveTime) {
+                layout.showLoader(layout.body, 'Auto-Saving')
 
-            fs.writeFile(
-                path.join(appDataPath, 'autosave.dpl'),
-                JSON.stringify(getSaveData()),
-                error => {
-                    if (error) {
-                        logger.error('Unable to autosave on close:', error)
+                fs.writeFile(
+                    path.join(appDataPath, 'autosave.dpl'),
+                    JSON.stringify(presentation.getSaveData()),
+                    error => {
+                        if (error) {
+                            logger.error('Unable to autosave on close:', error)
+                        }
+
+                        layout.window.close()
                     }
-
-                    layout.window.close()
-                }
-            )
-        } else {
-            layout.window.close()
+                )
+            } else {
+                layout.window.close()
+            }
         }
+
+        layout.window.onEvent('close', event => {
+            if (closing & canClose) {
+                return
+            }
+
+            closing = true
+            canClose = false
+
+            event.cancel()
+
+            ipcRenderer.send('close')
+        })
+        ipcRenderer.on('cancel-close', () => {
+            closing = false
+            canClose = false
+        })
+        ipcRenderer.on('can-close', () => {
+            if (!closing) {
+                return
+            }
+
+            canClose = true
+
+            checkSave((error, canContinue) => {
+                if (!canContinue) {
+                    closing = false
+                    canClose = false
+
+                    return false
+                }
+
+                finishClose()
+            })
+        })
     }
 
-    layout.window.onEvent('close', event => {
-        if (closing & canClose) {
-            return
+    //Settings, and keyboard shortcuts
+    {
+        const shortcutFunctions = {
+            'control.keyboard.disableDisplay': () => {
+                ipcRenderer.send('disable-display')
+            },
+
+            'control.keyboard.toggleBlank': blankButton.click,
+
+            'control.keyboard.playNext': presentation.forward,
+            'control.keyboard.playPrevious': presentation.back,
+
+            'control.keyboard.selectNext': presentation.selectForward,
+            'control.keyboard.selectPrevious': presentation.selectBack,
+            'control.keyboard.selectNextItem': presentation.selectItemForward,
+            'control.keyboard.selectPreviousItem':
+                presentation.selectItemBackward,
+
+            'control.keyboard.playSelected': presentation.playSelected,
+
+            'control.keyboard.moveSelectedUp': presentation.moveSelectedUp,
+            'control.keyboard.moveSelectedDown': presentation.moveSelectedDown,
+            'control.keyboard.moveSelectedTop': presentation.moveSelectedTop,
+            'control.keyboard.moveSelectedBottom':
+                presentation.moveSelectedBottom,
+
+            'control.keyboard.focusListUp': () => {
+                focusList(focusedListIndex - 1)
+            },
+            'control.keyboard.focusListDown': () => {
+                focusList(focusedListIndex + 1)
+            },
+
+            'control.keyboard.focusList1': focusList.bind(null, 0),
+            'control.keyboard.focusList2': focusList.bind(null, 1),
+            'control.keyboard.focusList3': focusList.bind(null, 2)
         }
 
-        closing = true
-        canClose = false
+        const keyboardListeners = {}
 
-        event.cancel()
+        let repeatShortcuts = false
 
-        ipcRenderer.send('close')
-    })
-    ipcRenderer.on('cancel-close', () => {
-        closing = false
-        canClose = false
-    })
-    ipcRenderer.on('can-close', () => {
-        if (!closing) {
-            return
-        }
-
-        canClose = true
-
-        checkSave((error, canContinue) => {
-            if (!canContinue) {
-                closing = false
-                canClose = false
+        ipcRenderer.on('setting', (e, key, value) => {
+            if (key === 'defaults.background') {
+                defaultDisplay.background = value
 
                 return false
-            }
+            } else if (key === 'control.keyboard.repeat') {
+                repeatShortcuts = value
 
-            finishClose()
+                ipcRenderer.send('get-settings', Object.keys(shortcutFunctions))
+
+                return false
+            } else if (shortcutFunctions.hasOwnProperty(key)) {
+                keyboard.unregister(keyboardListeners[key])
+
+                keyboardListeners[key] = keyboard.register(
+                    value,
+                    shortcutFunctions[key],
+                    {
+                        repeat: repeatShortcuts
+                    }
+                )
+
+                return false
+            } else if (key.startsWith('presentation.')) {
+                options[key.slice(13)] = value
+
+                switch (key) {
+                    case 'presentation.reduceTextSize':
+                        for (let i = 0; i < lists.length; i++) {
+                            updateAllItems(i)
+                        }
+                        break
+                    case 'presentation.minTextSize':
+                        if (
+                            typeof value !== 'number' ||
+                            !isFinite(value) ||
+                            value < 0
+                        ) {
+                            options.minTextSize = 10
+                        }
+
+                        for (let i = 0; i < lists.length; i++) {
+                            updateAllItemErrorHighlights(i)
+                        }
+                        break
+                    case 'presentation.autoMinimize':
+                        if (value) {
+                            for (let i = 0; i < lists.length; i++) {
+                                for (
+                                    let j = 0;
+                                    j < lists[i].itemsBlock.items.length;
+                                    j++
+                                ) {
+                                    if (
+                                        j !== lists[i].active.index &&
+                                        j !== lists[i].selected.index
+                                    ) {
+                                        lists[i].itemsBlock.items[j].minimize()
+                                    }
+                                }
+                            }
+                        }
+
+                        break
+                    case 'presentation.showSectionWhenMinimized':
+                        for (let i = 0; i < lists.length; i++) {
+                            for (
+                                let j = 0;
+                                j < lists[i].itemsBlock.items.length;
+                                j++
+                            ) {
+                                lists[i].itemsBlock.items[
+                                    j
+                                ].showSectionWhenMinimized = value
+                            }
+                        }
+
+                        break
+                    case 'presentation.autoScroll':
+                        if (value) {
+                            for (let i = 0; i < lists.length; i++) {
+                                scrollTo(i, lists[i].selected)
+                            }
+                        }
+                        break
+                    case 'presentation.autoSaveInterval':
+                        if (
+                            typeof value !== 'number' ||
+                            value < 3 ||
+                            !isFinite(value)
+                        ) {
+                            options.autoSaveInterval = 30
+                        }
+
+                        clearInterval(autoSaveTimer)
+
+                        autoSaveTimer = setInterval(
+                            autoSaveCheck,
+                            options.autoSaveInterval * 1000
+                        )
+
+                        break
+                    case 'presentation.removeHistoryCount':
+                        if (
+                            typeof value !== 'number' ||
+                            value < 0 ||
+                            !isFinite(value)
+                        ) {
+                            options.removeHistoryCount = 5
+                        }
+
+                        options.removeHistoryCount = value
+
+                        if (removeHistory.length > options.removeHistoryCount) {
+                            removeHistory.splice(
+                                0,
+                                removeHistory.length -
+                                    options.removeHistoryCount
+                            )
+
+                            updateRemoveButton()
+                        }
+                        break
+                }
+            }
         })
-    })
 
-    itemsBlock.onEvent('cancel-drop', () => {
-        if (typeof dropping === 'object') {
-            dropping = false
-        }
+        ipcRenderer.send('get-settings', [
+            ['defaults.background', 'black'],
 
-        if (typeof dragging === 'number') {
-            dragging = false
-        }
-    })
-    itemsBlock.onEvent('drop', event => {
-        if (typeof dropping === 'object') {
-            add(dropping.input, dropping.template, event.index)
+            ['presentation.maxLists', 3],
 
-            dropping = false
-        }
+            ['presentation.autoFitText', true],
+            ['presentation.autoFitTextOpen', true],
+            ['presentation.increaseSizeOnFit', true],
 
-        if (
-            typeof dragging === 'number' &&
-            dragging >= 0 &&
-            dragging < list.length
-        ) {
-            if (itemsBlock.items.length > dragging) {
-                itemsBlock.items[dragging].dragActive = false
-            }
+            ['presentation.reduceTextSize', true],
+            ['presentation.minTextSize', 10],
 
-            move(dragging, event.index)
+            ['presentation.autoMinimize', true],
+            ['presentation.showSectionWhenMinimized', true],
 
-            dragging = false
-        }
-    })
+            ['presentation.autoScroll', true],
+            ['presentation.scrollSmooth', true],
+
+            ['presentation.autoSaveInterval', 30],
+
+            ['presentation.removeHistoryCount', 5],
+
+            ['control.keyboard.repeat', false],
+
+            ['control.keyboard.disableDisplay', 'Escape'],
+
+            ['control.keyboard.toggleBlank', 'Period'],
+
+            ['control.keyboard.playNext', 'Space'],
+            ['control.keyboard.playPrevious', 'Control+Space'],
+
+            ['control.keyboard.selectNext', 'ArrowDown'],
+            ['control.keyboard.selectPrevious', 'ArrowUp'],
+            ['control.keyboard.selectNextItem', 'Control+ArrowDown'],
+            ['control.keyboard.selectPreviousItem', 'Control+ArrowUp'],
+
+            ['control.keyboard.playSelected', 'Enter'],
+
+            ['control.keyboard.moveSelectedUp', 'PageUp'],
+            ['control.keyboard.moveSelectedDown', 'PageDown'],
+            ['control.keyboard.moveSelectedTop', 'Control+PageUp'],
+            ['control.keyboard.moveSelectedBottom', 'Control+PageDown'],
+
+            ['control.keyboard.focusListUp', 'Control+Shift+ArrowUp'],
+            ['control.keyboard.focusListDown', 'Control+Shift+ArrowDown'],
+
+            ['control.keyboard.focusList1', 'Control+Shift+Digit1'],
+            ['control.keyboard.focusList2', 'Control+Shift+Digit2'],
+            ['control.keyboard.focusList3', 'Control+Shift+Digit3']
+        ])
+    }
 
     //Commands from other windows
     {
-        ipcRenderer.on('edit', (event, id, data) => {
-            let index = list.findIndex(item => item.id === id)
+        ipcRenderer.on('edit', (e, id, data) => {
+            let listIndex = -1
+            let index = -1
+
+            for (let i = 0; i < lists.length; i++) {
+                index = lists[i].list.findIndex(item => item.id === id)
+
+                if (index !== -1) {
+                    listIndex = i
+                    break
+                }
+            }
 
             if (index !== -1) {
-                list[index].edit(data)
+                lists[listIndex].list[index].edit(data)
 
-                updateItem(index)
+                updateItem(listIndex, index)
 
                 editHasOccured()
             }
         })
 
-        ipcRenderer.on('edit-close', (event, id) => {
-            let index = list.findIndex(item => item.id === id)
+        ipcRenderer.on('edit-close', (e, id) => {
+            let listIndex = -1
+            let index = -1
+
+            for (let i = 0; i < lists.length; i++) {
+                index = lists[i].list.findIndex(item => item.id === id)
+
+                if (index !== -1) {
+                    listIndex = i
+                    break
+                }
+            }
 
             if (index !== -1) {
-                itemsBlock.items[index].editActive = false
+                lists[listIndex].itemsBlock.items[index].editActive = false
             }
 
             index = activeEditors.indexOf(id)
@@ -2219,88 +3465,76 @@ const presentation = {}
             }
         })
 
-        ipcRenderer.on('presentation', (event, argument) => {
-            switch (argument) {
-                case 'play-next':
-                    presentation.forward()
-                    break
-                case 'play-previous':
-                    presentation.back()
-                    break
-                case 'select-next':
-                    presentation.selectForward()
-                    break
-                case 'select-previous':
-                    presentation.selectBack()
-                    break
-                case 'select-next-item':
-                    presentation.selectItemForward()
-                    break
-                case 'select-previous-item':
-                    presentation.selectItemBackward()
-                    break
-                case 'play-selected':
-                    presentation.playSelected()
+        let presentationFunctions = {
+            'play-next': presentation.forward,
+            'play-previous': presentation.back,
+
+            'select-next': presentation.selectForward,
+            'select-previous': presentation.selectBack,
+            'select-next-item': presentation.selectItemForward,
+            'select-previous-item': presentation.selectItemBackward,
+
+            'play-selected': presentation.playSelected
+        }
+
+        ipcRenderer.on('presentation', (e, argument) => {
+            if (presentationFunctions.hasOwnProperty(argument)) {
+                presentationFunctions[argument]()
             }
         })
     }
 
+    //Display data
     let lastDisplay = { bounds: {} }
-    ipcRenderer.on('display-info', (event, display) => {
+    ipcRenderer.on('display-info', (e, newDisplay) => {
+        display.activeScreens = newDisplay.screens
+        display.screenCount = newDisplay.screenCount
+        display.masterScreen = newDisplay.masterScreen
+
+        for (let i = 0; i < lists.length; i++) {
+            updateListScreenButtons(i)
+        }
+
+        //Enable/disable blank button
+        if (display.activeScreens.length > 0) {
+            blankButton.disabled = false
+        } else {
+            blankButton.active = false
+            blankButton.disabled = true
+        }
+
+        //Check if display size has changed, if so update presentation items
         if (
-            lastDisplay.bounds.width === display.bounds.width &&
-            lastDisplay.bounds.height === display.bounds.height
+            lastDisplay.bounds.width !== newDisplay.bounds.width ||
+            lastDisplay.bounds.height !== newDisplay.bounds.height
         ) {
+            lastDisplay = newDisplay
+
+            for (let i = 0; i < lists.length; i++) {
+                updateAllItems(i)
+            }
+        }
+    })
+
+    //Autosave
+    fs.readFile(path.join(appDataPath, 'autosave.dpl'), (error, data) => {
+        if (error) {
+            logger.error('Unable to load autosave:', error)
+
             return false
         }
 
-        lastDisplay = display
+        try {
+            data = JSON.parse(data)
+        } catch (error) {
+            logger.error('Unable to parse autosave:', error)
 
-        updateAllItems()
+            return false
+        }
+
+        presentation.load(data)
     })
-
-    //Loading autosave
-    {
-        fs.readFile(path.join(appDataPath, 'autosave.dpl'), (error, data) => {
-            if (error) {
-                logger.error('Unable to load autosave:', error)
-
-                return false
-            }
-
-            try {
-                data = JSON.parse(data)
-            } catch (error) {
-                logger.error('Unable to parse autosave:', error)
-
-                return false
-            }
-
-            load(data)
-        })
-    }
-
-    ipcRenderer.on('open-file', (event, file) => {
-        checkSave((error, canContinue) => {
-            if (!canContinue) {
-                return false
-            }
-
-            loadFile(file)
-        })
-    })
-}
-
-//======================
-//Presentation Block
-//======================
-const item_presentation = {
-    minWidth: 350,
-    minHeight: 250,
-
-    main: itemsBlock
-}
-{
+    autoSaveTimer = setInterval(autoSaveCheck, options.autoSaveInterval * 1000)
 }
 
 //======================
@@ -2320,224 +3554,105 @@ const item_menu = {
         }
     )
 }
-//This variable needs to be accesible globally, so that blank button logic can use it
-let displaying = false
 {
-    let activeScreenList = []
-
-    const screenButtons = []
-    const screenButtonList = new layout.Block(
-        {
-            direction: 'horizontal',
-            childSpacing: item_menu.main.childSpacing
-        },
-        {
-            grow: false,
-            shrink: false,
-
-            padding: 0
-        }
-    )
-
-    const fitTextAllButton = new layout.Button({
-        text: 'Scale Text & Unify - All',
-        size: 'large'
-    })
-
-    item_menu.main.add(screenButtonList)
-    item_menu.main.add(new layout.Filler())
     item_menu.main.add(undoRemoveButton)
     item_menu.main.add(new layout.Filler())
+    item_menu.main.add(blankButton)
+    item_menu.main.add(new layout.Filler())
     item_menu.main.add(fitTextAllButton)
+}
 
-    layout.contextMenu.add(
-        'display-menu',
-        [
-            {
-                label: 'Active Displays',
-                submenu: [
-                    {
-                        label: 'Screen 1',
-                        type: 'checkbox'
-                    },
-                    {
-                        label: 'Screen 2',
-                        type: 'checkbox'
-                    },
-                    {
-                        label: 'Screen 3',
-                        type: 'checkbox'
-                    },
-                    {
-                        label: 'Screen 4',
-                        type: 'checkbox'
-                    }
-                ]
-            }
-        ],
-        true
+//======================
+//Control Block
+//======================
+const item_control = {
+    minWidth: 410,
+    minHeight: 40,
+    maxHeight: 40,
+
+    main: new layout.Block(
+        {
+            childSpacing: 8
+        },
+        {
+            direction: 'horizontal'
+        }
+    ),
+
+    options: {
+        playMode: 'Auto',
+        playLoop: false,
+        playShuffle: false
+    }
+}
+{
+    let loopInput = new layout.CheckboxInput(
+        {
+            tooltip: 'Loop',
+            label: 'Loop'
+        },
+        {}
+    )
+    let shuffleInput = new layout.CheckboxInput(
+        {
+            tooltip: 'Shuffle',
+            label: 'Shuffle'
+        },
+        {}
+    )
+    let modeSelect = new layout.SelectInput(
+        {
+            tooltip: 'Mode',
+            options: ['Auto', 'Manual']
+        },
+        {
+            width: 52
+        }
     )
 
-    function onScreenButtonPress(event) {
-        let index = screenButtons.findIndex(btn => btn === event.from)
+    item_control.main.add(addListButton)
+    item_control.main.add(new layout.Filler())
+    item_control.main.add(shuffleInput)
+    item_control.main.add(loopInput)
+    item_control.main.add(modeSelect)
 
-        ipcRenderer.send('toggle-display-screen', index)
-    }
-
-    fitTextAllButton.onEvent('click', presentation.fitTextAll)
-
-    layout.contextMenu.onEvent('display-menu', event => {
-        if (event.label === 'Screen 1') {
-            ipcRenderer.send('toggle-display-screen', 0)
-        } else if (event.label === 'Screen 2') {
-            ipcRenderer.send('toggle-display-screen', 1)
-        } else if (event.label === 'Screen 3') {
-            ipcRenderer.send('toggle-display-screen', 2)
-        } else if (event.label === 'Screen 4') {
-            ipcRenderer.send('toggle-display-screen', 3)
-        }
-    })
-
-    ipcRenderer.on('display-info', (event, display) => {
-        //if the amount of screens changes, add/remove buttons
-        if (display.screenCount > screenButtons.length) {
-            while (screenButtons.length < display.screenCount) {
-                let button = new layout.Button({
-                    text: (screenButtons.length + 1).toString(),
-                    size: 'large'
-                })
-                button.addClass('highlight')
-                button.onEvent('click', onScreenButtonPress)
-
-                screenButtons.push(button)
-                screenButtonList.add(button)
-            }
-        } else if (display.screenCount < screenButtons.length) {
-            while (screenButtons.length > display.screenCount) {
-                screenButtonList.remove(screenButtons.pop())
-            }
-        }
-
-        activeScreenList = display.screens
-
-        for (let i = 0; i < display.screenCount; i++) {
-            screenButtons[i].active = activeScreenList.includes(i)
-
-            if (display.masterScreen === i) {
-                screenButtons[i].text = '[' + (i + 1).toString() + ']'
-            } else {
-                screenButtons[i].text = (i + 1).toString()
-            }
-        }
-
-        layout.contextMenu.change('display-menu', [
-            {
-                submenu: [
-                    {
-                        checked: activeScreenList.includes(0),
-                        visible: display.screenCount >= 1
-                    },
-                    {
-                        checked: activeScreenList.includes(1),
-                        visible: display.screenCount >= 2
-                    },
-                    {
-                        checked: activeScreenList.includes(2),
-                        visible: display.screenCount >= 3
-                    },
-                    {
-                        checked: activeScreenList.includes(3),
-                        visible: display.screenCount >= 4
-                    }
-                ]
-            }
-        ])
-
-        if (activeScreenList.length > 0) {
-            blankButton.disabled = false
-
-            displaying = true
-        } else {
-            blankButton.active = false
-            blankButton.disabled = true
-
-            displaying = false
-        }
-    })
-
-    //Keyboard shortcuts
-    {
-        const keyboardListeners = {}
-
-        ipcRenderer.on('setting', (event, key, value) => {
-            switch (key) {
-                case 'control.keyboard.disableDisplay':
-                    keyboard.unregister(keyboardListeners['dd'])
-
-                    keyboardListeners['dd'] = keyboard.register(
-                        value,
-                        () => {
-                            ipcRenderer.send('disable-display')
-                        },
-                        { repeat: false }
-                    )
-                    break
-                case 'control.keyboard.toggleDisplayScreen1':
-                    keyboard.unregister(keyboardListeners['s1'])
-
-                    keyboardListeners['s1'] = keyboard.register(
-                        value,
-                        () => {
-                            ipcRenderer.send('toggle-display-screen', 0)
-                        },
-                        { repeat: false }
-                    )
-                    break
-                case 'control.keyboard.toggleDisplayScreen2':
-                    keyboard.unregister(keyboardListeners['s2'])
-
-                    keyboardListeners['s2'] = keyboard.register(
-                        value,
-                        () => {
-                            ipcRenderer.send('toggle-display-screen', 1)
-                        },
-                        { repeat: false }
-                    )
-                    break
-                case 'control.keyboard.toggleDisplayScreen3':
-                    keyboard.unregister(keyboardListeners['s3'])
-
-                    keyboardListeners['s3'] = keyboard.register(
-                        value,
-                        () => {
-                            ipcRenderer.send('toggle-display-screen', 2)
-                        },
-                        { repeat: false }
-                    )
-                    break
-                case 'control.keyboard.toggleDisplayScreen4':
-                    keyboard.unregister(keyboardListeners['s4'])
-
-                    keyboardListeners['s4'] = keyboard.register(
-                        value,
-                        () => {
-                            ipcRenderer.send('toggle-display-screen', 3)
-                        },
-                        { repeat: false }
-                    )
-                    break
-            }
+    loopInput.onEvent('change', event => {
+        presentation.setPlayMode(modeSelect.value.toLowerCase(), {
+            loop: event.value
         })
 
-        ipcRenderer.send('get-settings', [
-            ['control.keyboard.disableDisplay', 'Escape'],
+        if (typeof item_control.onOption === 'function') {
+            item_control.onOption.call(null, 'playLoop', event.value)
+        }
+    })
+    shuffleInput.onEvent('change', event => {
+        presentation.setPlayMode(modeSelect.value.toLowerCase, {
+            shuffle: event.value
+        })
 
-            ['control.keyboard.toggleDisplayScreen1', 'Alt+Shift+Digit1'],
-            ['control.keyboard.toggleDisplayScreen2', 'Alt+Shift+Digit2'],
-            ['control.keyboard.toggleDisplayScreen3', 'Alt+Shift+Digit3'],
-            ['control.keyboard.toggleDisplayScreen4', 'Alt+Shift+Digit4']
-        ])
+        if (typeof item_control.onOption === 'function') {
+            item_control.onOption.call(null, 'playShuffle', event.value)
+        }
+    })
+    modeSelect.onEvent('change', event => {
+        presentation.setPlayMode(event.value.toLowerCase())
+
+        if (typeof item_control.onOption === 'function') {
+            item_control.onOption.call(null, 'playMode', event.value)
+        }
+    })
+
+    item_control.setOption = (name, value) => {
+        if (name === 'playMode') {
+            modeSelect.value = item_control.options.playMode = value
+        } else if (name === 'playLoop') {
+            loopInput.value = item_control.options.playLoop = value
+        } else if (name === 'playShuffle') {
+            shuffleInput.value = item_control.options.playShuffle = value
+        }
     }
+
+    modeSelect.value = 'Auto'
 }
 
 //======================
@@ -4016,849 +5131,142 @@ const item_add = {
 }
 
 //======================
-//Control Block
+//Previews Block
 //======================
-const item_control = {
-    minWidth: 410,
-    minHeight: 72,
-    maxHeight: 72,
-
-    main: new layout.Block(
-        {},
-        {
-            padding: 4,
-            direction: 'vertical'
-        }
-    ),
-
-    options: {
-        playMode: 'Auto',
-        playLoop: false,
-        playShuffle: false
-    }
-}
-{
-    layout.change(timer, { margin: 4 })
-
-    let loopInput = new layout.CheckboxInput(
-        {
-            tooltip: 'Loop',
-            label: 'Loop'
-        },
-        {
-            margin: 4
-        }
-    )
-    let shuffleInput = new layout.CheckboxInput(
-        {
-            tooltip: 'Shuffle',
-            label: 'Shuffle'
-        },
-        {
-            margin: 4
-        }
-    )
-    let modeSelect = new layout.SelectInput(
-        {
-            tooltip: 'Mode',
-            options: ['Auto', 'Manual']
-        },
-        {
-            width: 52,
-            margin: 4
-        }
-    )
-
-    let firstButton = new layout.Button(
-        {
-            icon: 'play-first'
-        },
-        {
-            margin: 4
-        }
-    )
-    let prevButton = new layout.Button(
-        {
-            icon: 'play-previous'
-        },
-        {
-            margin: 4,
-            marginLeft: 0,
-            marginRight: 0
-        }
-    )
-    let nextButton = new layout.Button(
-        {
-            icon: 'play-next'
-        },
-        {
-            margin: 4,
-            marginLeft: 0,
-            marginRight: 0
-        }
-    )
-    let lastButton = new layout.Button(
-        {
-            icon: 'play-last'
-        },
-        {
-            margin: 4
-        }
-    )
-
-    item_control.main.add(timer)
-    item_control.main.add(
-        new layout.Block(
+class DisplayPreview {
+    constructor() {
+        this.minWidth = 100
+        this.minHeight = 100
+        this.main = new layout.Block(
             {
                 items: [
-                    firstButton,
-                    prevButton,
-                    nextButton,
-                    lastButton,
-                    new layout.Filler(),
-                    blankButton,
-                    new layout.Filler(),
-                    shuffleInput,
-                    loopInput,
-                    modeSelect
+                    new layout.Block(
+                        {
+                            childSpacing: 4
+                        },
+                        {
+                            direction: 'horizontal',
+                            justify: 'end',
+                            grow: false,
+                            shrink: false
+                        }
+                    )
                 ]
             },
             {
-                direction: 'horizontal',
-                grow: false,
-                shrink: false
+                direction: 'vertical',
+                overflow: 'hidden'
             }
         )
-    )
 
-    loopInput.onEvent('change', event => {
-        presentation.setPlayMode(modeSelect.value.toLowerCase(), {
-            loop: event.value
+        this.display = new layout.Display(
+            {},
+            {
+                grow: true,
+                align: 'stretch',
+
+                background: true,
+                border: true
+            }
+        )
+        this.main.add(this.display)
+
+        this.input = new layout.SelectInput(
+            {},
+            {
+                width: 63
+            }
+        )
+        this.main.items[0].add(this.input)
+
+        this.index = 0
+        this.preview = validPreviews[0]
+
+        this.options = {
+            index: this.index,
+            preview: this.preview
+        }
+
+        onDisplayOutputsChange(() => {
+            this.updateOptions()
         })
 
-        if (typeof item_control.onOption === 'function') {
-            item_control.onOption.call(null, 'playLoop', event.value)
-        }
-    })
-    shuffleInput.onEvent('change', event => {
-        presentation.setPlayMode(modeSelect.value.toLowerCase, {
-            shuffle: event.value
-        })
+        this.input.onEvent('change', event => {
+            let parts = event.value.split(' ')
+            let index = parseInt(parts[0]) - 1
 
-        if (typeof item_control.onOption === 'function') {
-            item_control.onOption.call(null, 'playShuffle', event.value)
-        }
-    })
-    modeSelect.onEvent('change', event => {
-        presentation.setPlayMode(event.value.toLowerCase())
+            if (
+                index < 0 ||
+                index >= lists.length ||
+                !validPreviews.includes(parts[1])
+            ) {
+                this.updateOptions()
 
-        if (typeof item_control.onOption === 'function') {
-            item_control.onOption.call(null, 'playMode', event.value)
-        }
-    })
+                return false
+            }
 
-    firstButton.onEvent('click', () => {
-        presentation.beginFirst()
-    })
-    prevButton.onEvent('click', () => {
-        presentation.back()
-    })
-    nextButton.onEvent('click', () => {
-        presentation.forward()
-    })
-    lastButton.onEvent('click', () => {
-        presentation.beginLast()
-    })
+            if (this.index !== index || this.preview !== parts[1]) {
+                this.index = index
+                this.preview = parts[1]
 
-    blankButton.onEvent('click', event => {
-        if (!displaying) {
-            blankButton.active = false
-            blankButton.disabled = true
+                this.input.value =
+                    (this.index + 1).toString() + ' ' + this.preview
 
-            return false
-        }
+                this.display.set(lists[this.index].output[this.preview])
 
-        if (!event.fromUser) {
-            blankButton.active = !blankButton.active
-        }
-
-        ipcRenderer.send('display-blank', blankButton.active)
-    })
-    undoRemoveButton.onEvent('click', presentation.undoRemove)
-    layout.menu.onEvent('edit', item => {
-        if (item.value === 'undo') {
-            presentation.undoRemove()
-        }
-    })
-
-    item_control.setOption = (name, value) => {
-        if (name === 'playMode') {
-            modeSelect.value = item_control.options.playMode = value
-        } else if (name === 'playLoop') {
-            loopInput.value = item_control.options.playLoop = value
-        } else if (name === 'playShuffle') {
-            shuffleInput.value = item_control.options.playShuffle = value
-        }
-    }
-
-    modeSelect.value = 'Auto'
-
-    ipcRenderer.on('display-blank', (event, blank) => {
-        blankButton.active = blank
-    })
-
-    //keyboard shortcuts
-    {
-        let repeatShortcuts = false
-
-        const shortcutFunctions = {
-            'control.keyboard.toggleBlank': blankButton.click,
-
-            'control.keyboard.playNext': presentation.forward,
-            'control.keyboard.playPrevious': presentation.back,
-
-            'control.keyboard.selectNext': presentation.selectForward,
-            'control.keyboard.selectPrevious': presentation.selectBack,
-            'control.keyboard.selectNextItem': presentation.selectItemForward,
-            'control.keyboard.selectPreviousItem':
-                presentation.selectItemBackward,
-
-            'control.keyboard.playSelected': presentation.playSelected,
-
-            'control.keyboard.moveSelectedUp': presentation.moveSelectedUp,
-            'control.keyboard.moveSelectedDown': presentation.moveSelectedDown,
-            'control.keyboard.moveSelectedTop': presentation.moveSelectedTop,
-            'control.keyboard.moveSelectedBottom':
-                presentation.moveSelectedBottom
-        }
-
-        const keyboardListeners = {}
-
-        ipcRenderer.on('setting', (event, key, value) => {
-            if (key === 'control.keyboard.repeat') {
-                repeatShortcuts = value
-
-                ipcRenderer.send('get-settings', Object.keys(shortcutFunctions))
-            } else if (shortcutFunctions.hasOwnProperty(key)) {
-                keyboard.unregister(keyboardListeners[key])
-
-                keyboardListeners[key] = keyboard.register(
-                    value,
-                    shortcutFunctions[key],
-                    {
-                        repeat: repeatShortcuts
-                    }
-                )
+                this.saveOptions()
             }
         })
 
-        ipcRenderer.send('get-settings', [
-            ['control.keyboard.repeat', false],
+        this.updateOptions()
 
-            ['control.keyboard.toggleBlank', 'Period'],
-            ['control.keyboard.playNext', 'Space'],
-            ['control.keyboard.playPrevious', 'Control+Space'],
-            ['control.keyboard.selectNext', 'ArrowDown'],
-            ['control.keyboard.selectPrevious', 'ArrowUp'],
-            ['control.keyboard.selectNextItem', 'Control+ArrowDown'],
-            ['control.keyboard.selectPreviousItem', 'Control+ArrowUp'],
-            ['control.keyboard.playSelected', 'Enter'],
+        this.setOption = this.setOption.bind(this)
 
-            ['control.keyboard.moveSelectedUp', 'PageUp'],
-            ['control.keyboard.moveSelectedDown', 'PageDown'],
-            ['control.keyboard.moveSelectedTop', 'Control+PageUp'],
-            ['control.keyboard.moveSelectedBottom', 'Control+PageDown']
-        ])
+        displayPreviews.push(this)
+    }
+
+    updateOptions() {
+        let allOptions = []
+
+        for (let i = 0; i < lists.length; i++) {
+            for (let j = 0; j < validPreviews.length; j++) {
+                allOptions.push((i + 1).toString() + ' ' + validPreviews[j])
+            }
+        }
+
+        this.input.options = allOptions
+
+        let value = (this.index + 1).toString() + ' ' + this.preview
+
+        this.input.value = value
+
+        if (!allOptions.includes(value)) {
+            this.display.set({
+                background: 'grey',
+                nodes: []
+            })
+        }
+
+        this.saveOptions()
+    }
+
+    saveOptions() {
+        if (typeof this.onOption === 'function') {
+            this.onOption('index', this.index)
+            this.onOption('preview', this.preview)
+        }
+    }
+
+    setOption(name, value) {
+        if (name === 'index' && isFinite(value) && value >= 0) {
+            this.index = value
+        } else if (name === 'preview' && validPreviews.includes(value)) {
+            this.preview = value
+        }
+
+        this.input.value = (this.index + 1).toString() + ' ' + this.preview
     }
 }
-
-//Preview context menu:
-let activePreviewContextMenu = -1
-layout.contextMenu.add('preview-display', [
-    {
-        label: 'Show',
-        submenu: [
-            {
-                label: 'Active',
-                type: 'checkbox'
-            },
-            {
-                label: 'Preview',
-                type: 'checkbox'
-            },
-            {
-                label: 'Previous',
-                type: 'checkbox'
-            },
-            {
-                label: 'Next',
-                type: 'checkbox'
-            }
-        ]
-    }
-])
-
-//======================
-//Preview (1) Block
-//======================
-const item_display1 = {
-    //242 fits the four option buttons
-    minWidth: 242,
-    minHeight: 100,
-
-    main: new layout.Block(
-        {},
-        {
-            direction: 'vertical',
-            overflow: 'hidden'
-        }
-    ),
-
-    options: { type: 'active' }
-}
-{
-    let display = new layout.Display(
-        {},
-        {
-            grow: true,
-            align: 'stretch',
-
-            background: true,
-            border: true
-        }
-    )
-
-    let showButtons = {
-        active: new layout.Button(
-            {
-                text: 'Active'
-            },
-            {}
-        ),
-        previous: new layout.Button(
-            {
-                text: 'Previous'
-            },
-            {}
-        ),
-        next: new layout.Button(
-            {
-                text: 'Next'
-            },
-            {}
-        ),
-        preview: new layout.Button(
-            {
-                text: 'Preview'
-            },
-            {}
-        )
-    }
-
-    showButtons[item_display1.options.type].active = true
-
-    item_display1.main.add(display)
-    item_display1.main.add(
-        new layout.Block(
-            {
-                items: [
-                    showButtons.active,
-                    showButtons.preview,
-                    showButtons.previous,
-                    showButtons.next
-                ],
-                childSpacing: 4
-            },
-            {
-                shrink: false,
-                grow: false
-            }
-        )
-    )
-
-    changeDisplay(display, item_display1.options.type)
-
-    item_display1.setOption = (name, value) => {
-        if (name === 'type') {
-            if (showButtons[value]) {
-                showButtons[value].click()
-            }
-        }
-    }
-
-    function setType(type) {
-        showButtons[item_display1.options.type].active = false
-        item_display1.options.type = type
-
-        changeDisplay(display, type)
-
-        showButtons[type].active = true
-
-        if (typeof item_display1.onOption === 'function') {
-            item_display1.onOption.call(null, 'type', type)
-        }
-    }
-
-    display.onEvent('contextmenu', () => {
-        activePreviewContextMenu = 1
-
-        layout.contextMenu.change('preview-display', [
-            {
-                submenu: [
-                    {
-                        checked: item_display1.options.type === 'active'
-                    },
-                    {
-                        checked: item_display1.options.type === 'preview'
-                    },
-                    {
-                        checked: item_display1.options.type === 'previous'
-                    },
-                    {
-                        checked: item_display1.options.type === 'next'
-                    }
-                ]
-            }
-        ])
-
-        layout.contextMenu.enable('preview-display')
-    })
-
-    layout.contextMenu.onEvent('preview-display', event => {
-        if (activePreviewContextMenu !== 1) {
-            return false
-        }
-
-        setType(event.label.toLowerCase())
-    })
-
-    showButtons.active.onEvent('click', setType.bind(null, 'active'))
-    showButtons.previous.onEvent('click', setType.bind(null, 'previous'))
-    showButtons.next.onEvent('click', setType.bind(null, 'next'))
-    showButtons.preview.onEvent('click', setType.bind(null, 'preview'))
-}
-
-//======================
-//Preview (2) Block
-//======================
-const item_display2 = {
-    //242 fits the four option buttons
-    minWidth: 242,
-    minHeight: 100,
-
-    main: new layout.Block(
-        {},
-        {
-            direction: 'vertical',
-            overflow: 'hidden'
-        }
-    ),
-
-    options: { type: 'next' }
-}
-{
-    let display = new layout.Display(
-        {},
-        {
-            grow: true,
-            align: 'stretch',
-
-            background: true,
-            border: true
-        }
-    )
-
-    let showButtons = {
-        active: new layout.Button(
-            {
-                text: 'Active'
-            },
-            {}
-        ),
-        previous: new layout.Button(
-            {
-                text: 'Previous'
-            },
-            {}
-        ),
-        next: new layout.Button(
-            {
-                text: 'Next'
-            },
-            {}
-        ),
-        preview: new layout.Button(
-            {
-                text: 'Preview'
-            },
-            {}
-        )
-    }
-
-    showButtons[item_display2.options.type].active = true
-
-    item_display2.main.add(display)
-    item_display2.main.add(
-        new layout.Block(
-            {
-                items: [
-                    showButtons.active,
-                    showButtons.preview,
-                    showButtons.previous,
-                    showButtons.next
-                ],
-                childSpacing: 4
-            },
-            {
-                shrink: false,
-                grow: false
-            }
-        )
-    )
-
-    changeDisplay(display, item_display2.options.type)
-
-    item_display2.setOption = (name, value) => {
-        if (name === 'type') {
-            if (showButtons[value]) {
-                showButtons[value].click()
-            }
-        }
-    }
-
-    function setType(type) {
-        showButtons[item_display2.options.type].active = false
-        item_display2.options.type = type
-
-        changeDisplay(display, type)
-
-        showButtons[type].active = true
-
-        if (typeof item_display2.onOption === 'function') {
-            item_display2.onOption.call(null, 'type', type)
-        }
-    }
-
-    display.onEvent('contextmenu', () => {
-        activePreviewContextMenu = 2
-
-        layout.contextMenu.change('preview-display', [
-            {
-                submenu: [
-                    {
-                        checked: item_display2.options.type === 'active'
-                    },
-                    {
-                        checked: item_display2.options.type === 'preview'
-                    },
-                    {
-                        checked: item_display2.options.type === 'previous'
-                    },
-                    {
-                        checked: item_display2.options.type === 'next'
-                    }
-                ]
-            }
-        ])
-
-        layout.contextMenu.enable('preview-display')
-    })
-
-    layout.contextMenu.onEvent('preview-display', event => {
-        if (activePreviewContextMenu !== 2) {
-            return false
-        }
-
-        setType(event.label.toLowerCase())
-    })
-
-    showButtons.active.onEvent('click', setType.bind(null, 'active'))
-    showButtons.previous.onEvent('click', setType.bind(null, 'previous'))
-    showButtons.next.onEvent('click', setType.bind(null, 'next'))
-    showButtons.preview.onEvent('click', setType.bind(null, 'preview'))
-}
-
-/*
-//======================
-//Preview (3) Block
-//======================
-const item_display3 = {
-    //242 fits the four option buttons
-    minWidth: 242,
-    minHeight: 100,
-
-    main: new layout.Block(
-        {},
-        {
-            direction: 'vertical',
-            overflow: 'hidden'
-        }
-    ),
-
-    options: { type: 'preview' }
-}
-{
-    let display = new layout.Display(
-        {},
-        {
-            grow: true,
-            align: 'stretch',
-
-            background: true,
-            border: true
-        }
-    )
-
-    let showButtons = {
-        active: new layout.Button(
-            {
-                text: 'Active'
-            },
-            {}
-        ),
-        previous: new layout.Button(
-            {
-                text: 'Previous'
-            },
-            {}
-        ),
-        next: new layout.Button(
-            {
-                text: 'Next'
-            },
-            {}
-        ),
-        preview: new layout.Button(
-            {
-                text: 'Preview'
-            },
-            {}
-        )
-    }
-
-    showButtons[item_display3.options.type].active = true
-
-    item_display3.main.add(display)
-    item_display3.main.add(
-        new layout.Block(
-            {
-                items: [
-                    showButtons.active,
-                    showButtons.preview,
-                    showButtons.previous,
-                    showButtons.next
-                ],
-                childSpacing: 4
-            },
-            {
-                shrink: false,
-                grow: false
-            }
-        )
-    )
-
-    changeDisplay(display, item_display3.options.type)
-
-    item_display3.setOption = (name, value) => {
-        if (name === 'type') {
-            if (showButtons[value]) {
-                showButtons[value].click()
-            }
-        }
-    }
-
-    function setType(type) {
-        showButtons[item_display3.options.type].active = false
-        item_display3.options.type = type
-
-        changeDisplay(display, type)
-
-        showButtons[type].active = true
-
-        if (typeof item_display3.onOption === 'function') {
-            item_display3.onOption.call(null, 'type', type)
-        }
-    }
-
-    display.onEvent('contextmenu', () => {
-        activePreviewContextMenu = 3
-
-        layout.contextMenu.change('preview-display', [
-            {
-                submenu: [
-                    {
-                        checked: item_display3.options.type === 'active'
-                    },
-                    {
-                        checked: item_display3.options.type === 'preview'
-                    },
-                    {
-                        checked: item_display3.options.type === 'previous'
-                    },
-                    {
-                        checked: item_display3.options.type === 'next'
-                    }
-                ]
-            }
-        ])
-
-        layout.contextMenu.enable('preview-display')
-    })
-
-    layout.contextMenu.onEvent('preview-display', event => {
-        if (activePreviewContextMenu !== 3) {
-            return false
-        }
-
-        setType(event.label.toLowerCase())
-    })
-
-    showButtons.active.onEvent('click', setType.bind(null, 'active'))
-    showButtons.previous.onEvent('click', setType.bind(null, 'previous'))
-    showButtons.next.onEvent('click', setType.bind(null, 'next'))
-    showButtons.preview.onEvent('click', setType.bind(null, 'preview'))
-}
-
-//======================
-//Preview (4) Block
-//======================
-const item_display4 = {
-    //242 fits the four option buttons
-    minWidth: 242,
-    minHeight: 100,
-
-    main: new layout.Block(
-        {},
-        {
-            direction: 'vertical',
-            overflow: 'hidden'
-        }
-    ),
-
-    options: { type: 'previous' }
-}
-{
-    let display = new layout.Display(
-        {},
-        {
-            grow: true,
-            align: 'stretch',
-
-            background: true,
-            border: true
-        }
-    )
-
-    let showButtons = {
-        active: new layout.Button(
-            {
-                text: 'Active'
-            },
-            {}
-        ),
-        previous: new layout.Button(
-            {
-                text: 'Previous'
-            },
-            {}
-        ),
-        next: new layout.Button(
-            {
-                text: 'Next'
-            },
-            {}
-        ),
-        preview: new layout.Button(
-            {
-                text: 'Preview'
-            },
-            {}
-        )
-    }
-
-    showButtons[item_display4.options.type].active = true
-
-    item_display4.main.add(display)
-    item_display4.main.add(
-        new layout.Block(
-            {
-                items: [
-                    showButtons.active,
-                    showButtons.preview,
-                    showButtons.previous,
-                    showButtons.next
-                ],
-                childSpacing: 4
-            },
-            {
-                shrink: false,
-                grow: false
-            }
-        )
-    )
-
-    changeDisplay(display, item_display4.options.type)
-
-    item_display4.setOption = (name, value) => {
-        if (name === 'type') {
-            if (showButtons[value]) {
-                showButtons[value].click()
-            }
-        }
-    }
-
-    function setType(type) {
-        showButtons[item_display4.options.type].active = false
-        item_display4.options.type = type
-
-        changeDisplay(display, type)
-
-        showButtons[type].active = true
-
-        if (typeof item_display4.onOption === 'function') {
-            item_display4.onOption.call(null, 'type', type)
-        }
-    }
-
-    display.onEvent('contextmenu', () => {
-        activePreviewContextMenu = 4
-
-        layout.contextMenu.change('preview-display', [
-            {
-                submenu: [
-                    {
-                        checked: item_display4.options.type === 'active'
-                    },
-                    {
-                        checked: item_display4.options.type === 'preview'
-                    },
-                    {
-                        checked: item_display4.options.type === 'previous'
-                    },
-                    {
-                        checked: item_display4.options.type === 'next'
-                    }
-                ]
-            }
-        ])
-
-        layout.contextMenu.enable('preview-display')
-    })
-
-    layout.contextMenu.onEvent('preview-display', event => {
-        if (activePreviewContextMenu !== 4) {
-            return false
-        }
-
-        setType(event.label.toLowerCase())
-    })
-
-    showButtons.active.onEvent('click', setType.bind(null, 'active'))
-    showButtons.previous.onEvent('click', setType.bind(null, 'previous'))
-    showButtons.next.onEvent('click', setType.bind(null, 'next'))
-    showButtons.preview.onEvent('click', setType.bind(null, 'preview'))
-}
-*/
 
 layout.contextMenu.add(
     'library',
@@ -4885,16 +5293,12 @@ layout.contextMenu.add(
 
 //Name to element mappings:
 const interfaceItems = {
-    menu: item_menu,
     add: item_add,
+    menu: item_menu,
     playlist: item_presentation,
     control: item_control,
-    'preview 1': item_display1,
-    'preview 2': item_display2
-    /*
-    'preview 3': item_display3,
-    'preview 4': item_display4
-    */
+    'preview 1': new DisplayPreview(),
+    'preview 2': new DisplayPreview()
 }
 
 //Loading, displaying, & updating layout:

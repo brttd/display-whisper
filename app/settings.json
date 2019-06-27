@@ -4,7 +4,7 @@
 
         "control": {
             "description": "Main",
-            "map": "general",
+            "map": "presentation",
 
             "entries": {
                 "autoSaveInterval": {
@@ -20,20 +20,9 @@
                     "popupMin": 10,
                     "popupMax": 600,
 
-                    "default": 20
+                    "default": 30
                 },
-                "removeHistoryCount": {
-                    "description": "Maximum item remove history size",
-                    "type": "number",
 
-                    "min": 0,
-                    "max": 100,
-                    "precision": 0,
-
-                    "popupMax": 50,
-
-                    "default": 3
-                },
                 "autoUpdateSongs": {
                     "description": "Automatically update song search results when song library is modified",
                     "type": "boolean",
@@ -45,7 +34,40 @@
 
         "presentation": {
             "description": "Presentation",
-            "map": "general",
+            "map": "presentation",
+
+            "entries": {
+                "maxLists": {
+                    "description": "Maximum amount of lists",
+                    "type": "number",
+
+                    "min": 1,
+                    "max": 10,
+
+                    "precision": 0,
+                    "popupMax": 5,
+
+                    "default": 3
+                },
+
+                "removeHistoryCount": {
+                    "description": "Maximum remove history size",
+                    "type": "number",
+
+                    "min": 0,
+                    "max": 100,
+                    "precision": 0,
+
+                    "popupMax": 50,
+
+                    "default": 5
+                }
+            }
+        },
+
+        "presentationItems": {
+            "description": "Presentation List",
+            "map": "presentation",
 
             "entries": {
                 "autoMinimize": {
@@ -60,6 +82,7 @@
 
                     "default": true
                 },
+
                 "autoScroll": {
                     "description": "Automatically scroll selected section into view",
                     "type": "boolean",
@@ -67,7 +90,7 @@
                     "default": true
                 },
                 "scrollSmooth": {
-                    "description": "Animate automatic scrolling",
+                    "description": "Animate scrolling",
                     "type": "boolean",
 
                     "default": true
@@ -153,7 +176,7 @@
             }
         }
     },
-    "control": {
+    "shortcuts": {
         "name": "Shortcuts",
 
         "presentation": {
@@ -167,6 +190,7 @@
 
                     "default": false
                 },
+
                 "selectNext": {
                     "description": "Select next section",
                     "type": "key",
@@ -191,12 +215,14 @@
 
                     "default": "Control+ArrowUp"
                 },
+
                 "playSelected": {
                     "description": "Play selected section",
                     "type": "key",
 
                     "default": "Enter"
                 },
+
                 "playNext": {
                     "description": "Play (and select) next section",
                     "type": "key",
@@ -209,6 +235,7 @@
 
                     "default": "Control+Space"
                 },
+
                 "moveSelectedDown": {
                     "description": "Move selected item down in presentation",
                     "type": "key",
@@ -235,46 +262,60 @@
                 }
             }
         },
+        "lists": {
+            "description": "Presentation Lists",
+            "map": "control.keyboard",
+
+            "entries": {
+                "focusListUp": {
+                    "description": "Focus List Above",
+                    "type": "key",
+
+                    "default": "Control+Shift+ArrowUp"
+                },
+                "focusListDown": {
+                    "description": "Focus List Below",
+                    "type": "key",
+
+                    "default": "Control+Shift+ArrowDown"
+                },
+                "focusList1": {
+                    "description": "Focus List 1",
+                    "type": "key",
+
+                    "default": "Control+Shift+Digit1"
+                },
+                "focusList2": {
+                    "description": "Focus List 2",
+                    "type": "key",
+
+                    "default": "Control+Shift+Digit2"
+                },
+                "focusList3": {
+                    "description": "Focus List 3",
+                    "type": "key",
+
+                    "default": "Control+Shift+Digit3"
+                }
+            }
+        },
         "display": {
             "description": "Display Keyboard Shortcuts",
             "map": "control.keyboard",
 
             "entries": {
-                "toggleBlank": {
-                    "description": "Toggle display blanked",
-                    "type": "key",
-
-                    "default": "Period"
-                },
                 "disableDisplay": {
                     "description": "Turn all displays off",
                     "type": "key",
 
                     "default": "Escape"
                 },
-                "toggleDisplayScreen1": {
-                    "description": "Toggle display for screen 1",
+
+                "toggleBlank": {
+                    "description": "Toggle display blanked",
                     "type": "key",
 
-                    "default": "Alt+Shift+Digit1"
-                },
-                "toggleDisplayScreen2": {
-                    "description": "Toggle display for screen 2 (if available)",
-                    "type": "key",
-
-                    "default": "Alt+Shift+Digit2"
-                },
-                "toggleDisplayScreen3": {
-                    "description": "Toggle display for screen 3 (if available)",
-                    "type": "key",
-
-                    "default": "Alt+Shift+Digit3"
-                },
-                "toggleDisplayScreen4": {
-                    "description": "Toggle display for screen 4 (if available)",
-                    "type": "key",
-
-                    "default": "Alt+Shift+Digit4"
+                    "default": "Period"
                 }
             }
         }
@@ -350,7 +391,7 @@
 
         "display": {
             "description": "Text Scaling",
-            "map": "display",
+            "map": "presentation",
 
             "entries": {
                 "autoFitText": {

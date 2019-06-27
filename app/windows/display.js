@@ -705,12 +705,17 @@ function toggleBlank() {
     let repeat = false
 
     let keyboardFunctions = {
+        'control.keyboard.toggleBlank': () => {
+            toggleBlank()
+        },
+
         'control.keyboard.playNext': () => {
             ipcRenderer.send('presentation-command', 'play-next')
         },
         'control.keyboard.playPrevious': () => {
             ipcRenderer.send('presentation-command', 'play-previous')
         },
+
         'control.keyboard.selectNext': () => {
             ipcRenderer.send('presentation-command', 'select-next')
         },
@@ -723,30 +728,13 @@ function toggleBlank() {
         'control.keyboard.selectPreviousItem': () => {
             ipcRenderer.send('presentation-command', 'select-previous-item')
         },
+
         'control.keyboard.playSelected': () => {
             ipcRenderer.send('presentation-command', 'play-selected')
         },
 
-        'control.keyboard.toggleBlank': () => {
-            toggleBlank()
-        },
-
         'control.keyboard.disableDisplay': () => {
             ipcRenderer.send('disable-display')
-            ipcRenderer.send('display-blank', false)
-        },
-
-        'control.keyboard.toggleDisplayScreen1': () => {
-            ipcRenderer.send('toggle-display-screen', 0)
-        },
-        'control.keyboard.toggleDisplayScreen2': () => {
-            ipcRenderer.send('toggle-display-screen', 1)
-        },
-        'control.keyboard.toggleDisplayScreen3': () => {
-            ipcRenderer.send('toggle-display-screen', 2)
-        },
-        'control.keyboard.toggleDisplayScreen4': () => {
-            ipcRenderer.send('toggle-display-screen', 3)
         }
     }
 

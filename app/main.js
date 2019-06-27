@@ -53,9 +53,6 @@ let display = {
     masterScreen: -1
 }
 
-//Used when display is re-opened, so that it correctly shows the current section
-let lastDisplayData = null
-
 //User settings
 //All logic is done inside the main JS script, so that there's a simple system for requesting & setting values, and sending updates to windows which requested values
 const settings = {}
@@ -683,12 +680,6 @@ function openDisplayWindow(displayIndex) {
 
     displayWindow.webContents.on('did-finish-load', () => {
         displayWindow.webContents.send('display-info', getDisplayInfo())
-
-        //when reopening the display window,
-        //re-display whatever was last displayed
-        if (lastDisplayData !== null) {
-            displayWindow.webContents.send('display', lastDisplayData)
-        }
 
         let actualDisplayIndex = display.outputDisplays.findIndex(aDisplay => {
             return aDisplay.window === displayWindow
@@ -2561,22 +2552,26 @@ ipcMain.on('close', event => {
 //============================================
 {
     //Display a slide
-    ipcMain.on('display', (event, data) => {
-        for (
-            let displayIndex = 0;
-            displayIndex < display.outputDisplays.length;
-            displayIndex++
-        ) {
-            if (display.outputDisplays[displayIndex].window) {
-                display.outputDisplays[displayIndex].window.webContents.send(
-                    'display',
-                    data
-                )
+    ipcMain.on('display', (event, data, screens) => {
+        if (Array.isArray(screens)) {
+            for (
+                let displayIndex = 0;
+                displayIndex < display.outputDisplays.length;
+                displayIndex++
+            ) {
+                if (
+                    screens.includes(
+                        display.outputDisplays[displayIndex].screen
+                    )
+                ) {
+                    if (display.outputDisplays[displayIndex].window) {
+                        display.outputDisplays[
+                            displayIndex
+                        ].window.webContents.send('display', data)
+                    }
+                }
             }
         }
-
-        lastDisplayData = data
-        lastDisplayData.transition = {}
     })
 
     //Presentation control command, sent from a window other than the control window
@@ -2609,9 +2604,17 @@ ipcMain.on('close', event => {
         }
     })
 
-    //Toggle display output to specific screen
-    ipcMain.on('toggle-display-screen', (event, index) => {
-        toggleScreenDisplayOutput(index)
+    ipcMain.on('enable-display-screen', (event, screenIndex) => {
+        addScreenDisplayOutput(screenIndex)
+    })
+    ipcMain.on('disable-display-screen', (event, screenIndex) => {
+        let displayIndex = display.outputDisplays.findIndex(
+            aDisplay => aDisplay.screen === screenIndex
+        )
+
+        if (displayIndex !== -1) {
+            removeDisplayOutput(displayIndex)
+        }
     })
 
     ipcMain.on('disable-display', () => {
