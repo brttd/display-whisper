@@ -2860,7 +2860,7 @@ exports.change = addStyles
             this.events.click = []
 
             if (typeof data.onClick === 'function') {
-                this.node.addEventListener('click', data.onClick)
+                this.onEvent('click', data.onClick)
             }
 
             if (data.active === true) {
