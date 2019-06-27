@@ -2385,6 +2385,16 @@ exports.change = addStyles
                     ].classList.remove('active')
                 }
 
+                if (this.hovering) {
+                    sendEventTo(
+                        {
+                            fromUser: true,
+                            from: this
+                        },
+                        this.events['cancel-drop']
+                    )
+                }
+
                 this.hovering = false
 
                 this.lastIndexHover = -1
