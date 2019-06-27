@@ -1933,7 +1933,7 @@ exports.change = addStyles
                 index = this.items.indexOf(itemOrIndex)
             }
 
-            if (!isFinite(index) || index <= 0) {
+            if (!isFinite(index) || index < 0) {
                 return false
             }
 
@@ -1959,6 +1959,8 @@ exports.change = addStyles
             }
 
             this.node.removeChild(item.node)
+
+            this.items.splice(index, 1)
 
             item.parent = null
 
