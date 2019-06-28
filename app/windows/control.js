@@ -2406,46 +2406,36 @@ const item_presentation = {
         )
 
         if (listIndex !== -1) {
+            let screenIndex = event.from.screenIndex
+
+            //Regardless of whether or not this list is going to enable/disable the screen, any other lists need to have the screen removed
+            for (let i = 0; i < lists.length; i++) {
+                if (i !== listIndex && lists[i].screens.includes(screenIndex)) {
+                    lists[i].screens.splice(
+                        lists[i].screens.indexOf(screenIndex),
+                        1
+                    )
+
+                    updateListScreenButtons(i)
+                }
+            }
+
             event.from.active !== event.from.active
 
             if (event.from.active) {
-                ipcRenderer.send(
-                    'enable-display-screen',
-                    event.from.screenIndex
-                )
+                ipcRenderer.send('enable-display-screen', screenIndex)
 
                 ipcRenderer.send('display', lists[listIndex].output.active, [
-                    event.from.screenIndex
+                    screenIndex
                 ])
 
-                if (
-                    !lists[listIndex].screens.includes(event.from.screenIndex)
-                ) {
-                    lists[listIndex].screens.push(event.from.screenIndex)
-                }
-
-                for (let i = 0; i < lists.length; i++) {
-                    if (
-                        i !== listIndex &&
-                        lists[i].screens.includes(event.from.screenIndex)
-                    ) {
-                        lists[i].screens.splice(
-                            lists[i].screens.indexOf(event.screenIndex),
-                            1
-                        )
-
-                        updateListScreenButtons(i)
-                    }
+                if (!lists[listIndex].screens.includes(screenIndex)) {
+                    lists[listIndex].screens.push(screenIndex)
                 }
             } else {
-                ipcRenderer.send(
-                    'disable-display-screen',
-                    event.from.screenIndex
-                )
+                ipcRenderer.send('disable-display-screen', screenIndex)
 
-                let index = lists[listIndex].screens.indexOf(
-                    event.from.screenIndex
-                )
+                let index = lists[listIndex].screens.indexOf(screenIndex)
 
                 if (index !== -1) {
                     lists[listIndex].screens.splice(index, 1)
@@ -2471,6 +2461,7 @@ const item_presentation = {
             return false
         }
 
+        //Add extra buttons
         while (lists[listIndex].screenButtons.length <= display.screenCount) {
             lists[listIndex].screenButtons.push(
                 new layout.Button({
@@ -2492,6 +2483,7 @@ const item_presentation = {
             ].addClass('highlight')
         }
 
+        //Show more buttons in interface
         for (
             let i = lists[listIndex].screenBlock.items.length;
             i < display.screenCount;
@@ -2500,6 +2492,7 @@ const item_presentation = {
             lists[listIndex].screenBlock.add(lists[listIndex].screenButtons[i])
         }
 
+        //Show less buttons in interface
         while (
             lists[listIndex].screenBlock.items.length > display.screenCount
         ) {
@@ -2518,6 +2511,7 @@ const item_presentation = {
                 lists[listIndex].screenButtons[i].text = (i + 1).toString()
             }
 
+            //If the main process says this screen isn't active, remove it from the list
             if (
                 lists[listIndex].screens.includes(i) &&
                 !display.activeScreens.includes(i)
