@@ -694,6 +694,14 @@ function openDisplayWindow(displayIndex) {
 
         if (actualDisplayIndex !== -1) {
             updateDisplayPosition(actualDisplayIndex)
+
+            if (display.outputDisplays[actualDisplayIndex].defaultDisplay) {
+                displayWindow.webContents.send(
+                    'display',
+                    display.outputDisplays[actualDisplayIndex].defaultDisplay
+                )
+            }
+
             displayWindow.show()
         }
     })
