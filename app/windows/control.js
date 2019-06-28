@@ -5314,59 +5314,46 @@ const interfaceItems = {
 //Loading, displaying, & updating layout:
 {
     const defaultLayout = {
-        direction: 'vertical',
-        size: 100,
-
+        direction: 'horizontal',
+        size: 90,
         items: [
             {
-                item: 'menu',
-                size: 10
+                item: 'add',
+                size: 30
             },
             {
-                direction: 'horizontal',
-                size: 90,
+                direction: 'vertical',
+                size: 50,
                 items: [
                     {
-                        item: 'add',
-                        size: 30
+                        item: 'menu',
+                        size: 10
                     },
                     {
-                        direction: 'vertical',
-                        size: 50,
-                        items: [
-                            {
-                                item: 'playlist',
-                                size: 50
-                            },
-                            {
-                                item: 'control',
-                                size: 50
-                            }
-                        ]
+                        item: 'playlist',
+                        size: 80
                     },
                     {
-                        direction: 'vertical',
-                        size: 20,
-                        items: [
-                            {
-                                item: 'preview 1',
-                                size: 50
-                            },
-                            {
-                                item: 'preview 2',
-                                size: 50
-                            }
-                        ]
+                        item: 'control',
+                        size: 10
+                    }
+                ]
+            },
+            {
+                direction: 'vertical',
+                size: 20,
+                items: [
+                    {
+                        item: 'preview 1',
+                        size: 50
+                    },
+                    {
+                        item: 'preview 2',
+                        size: 50
                     }
                 ]
             }
         ]
-    }
-
-    let currentLayout = defaultLayout
-
-    function layoutChanged() {
-        ipcRenderer.send('set-setting', 'windowLayouts.control', currentLayout)
     }
 
     function getLayoutBlock(item) {
@@ -5397,58 +5384,47 @@ const interfaceItems = {
             block.maxWidth = element.maxWidth
             block.maxHeight = element.maxHeight
 
-            if (
-                typeof item.options === 'object' &&
-                typeof element.setOption === 'function'
-            ) {
-                for (let property in item.options) {
-                    element.setOption.call(
-                        null,
-                        property,
-                        item.options[property]
-                    )
-                }
+            if (typeof element.setOption === 'function') {
+                ipcRenderer.send(
+                    'get-setting',
+                    'controlWindow.' + item.item,
+                    {}
+                )
             }
 
             element.onOption = (property, value) => {
-                if (typeof item.options !== 'object' || item.options === null) {
-                    item.options = {}
-                }
-
-                item.options[property] = value
-                layoutChanged()
+                ipcRenderer.send(
+                    'set-setting',
+                    'controlWindow.' + item.item + '.' + property,
+                    value
+                )
             }
         }
-
-        block.onEvent('sizeChange', event => {
-            item.size = event.size
-
-            layoutChanged()
-        })
 
         return block
     }
 
-    let setup = false
+    layout.body.add(getLayoutBlock(defaultLayout))
 
-    ipcRenderer.on('setting', (event, key, interfaceLayout) => {
-        if (key !== 'windowLayouts.control') {
-            return false
+    ipcRenderer.on('setting', (event, key, interfaceOptions) => {
+        if (
+            key.startsWith('controlWindow.') &&
+            typeof interfaceOptions === 'object'
+        ) {
+            let item = key.slice(14)
+
+            if (interfaceItems.hasOwnProperty(item)) {
+                let itemKeys = Object.keys(interfaceOptions)
+
+                for (let i = 0; i < itemKeys.length; i++) {
+                    interfaceItems[item].setOption(
+                        itemKeys[i],
+                        interfaceOptions[itemKeys[i]]
+                    )
+                }
+            }
         }
-        if (setup) {
-            return false
-        }
-        setup = true
-
-        if (typeof interfaceLayout !== 'object' || interfaceLayout === null) {
-            interfaceLayout = defaultLayout
-        }
-
-        currentLayout = interfaceLayout
-
-        layout.body.add(getLayoutBlock(currentLayout))
     })
-    ipcRenderer.send('get-setting', 'windowLayouts.control', defaultLayout)
 }
 
 //inputs
