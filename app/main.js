@@ -2462,6 +2462,14 @@ ipcMain.on('close', event => {
 
 //Window messages
 {
+    let appDataPath = app.getPath('userData')
+    ipcMain.on('get-app-data-path', event => {
+        event.sender.send('app-data-path', appDataPath)
+    })
+    ipcMain.on('get-app-data-path-sync', event => {
+        event.returnValue = appDataPath
+    })
+
     ipcMain.on('open-window', (event, name, messageArray) => {
         openWindowAndSend(name, messageArray)
     })
