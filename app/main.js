@@ -2584,6 +2584,11 @@ ipcMain.on('close', event => {
                             displayIndex
                         ].window.webContents.send('display', data)
                     }
+
+                    display.outputDisplays[displayIndex].defaultDisplay = data
+                    display.outputDisplays[
+                        displayIndex
+                    ].defaultDisplay.transition = {}
                 }
             }
         }
