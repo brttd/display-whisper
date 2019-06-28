@@ -1,9 +1,9 @@
-const { remote, shell } = require('electron')
-
+const { ipcRenderer } = require('electron')
 const fs = require('fs')
 const path = require('path')
 
-let logPath = path.join(remote.app.getPath('userData'), 'log.txt')
+let filePath
+let logPath
 
 let copyButton = document.createElement('button')
 copyButton.textContent = 'Copy'
@@ -16,6 +16,11 @@ clearButton.textContent = 'Clear'
 
 let openButton = document.createElement('button')
 openButton.textContent = 'Open File'
+
+copyButton.disabled = true
+reloadButton.disabled = true
+clearButton.disabled = true
+openButton.disabled = true
 
 function loadLog() {
     fs.readFile(logPath, { encoding: 'utf8' }, (error, data) => {
@@ -58,8 +63,6 @@ copyButton.addEventListener('click', () => {
 reloadButton.addEventListener('click', loadLog)
 
 clearButton.addEventListener('click', () => {
-    let filePath = path.join(remote.app.getPath('userData'), 'log')
-
     let add = 1
     while (fs.existsSync(filePath + '-' + add.toString() + '.txt')) {
         add += 1
@@ -77,7 +80,7 @@ clearButton.addEventListener('click', () => {
 })
 
 openButton.addEventListener('click', () => {
-    shell.openExternal(logPath)
+    require('electron').shell.openExternal(logPath)
 })
 
 document.body.insertBefore(document.createElement('div'), log)
@@ -86,4 +89,15 @@ document.body.firstChild.appendChild(reloadButton)
 document.body.firstChild.appendChild(clearButton)
 document.body.firstChild.appendChild(openButton)
 
-loadLog()
+ipcRenderer.on('app-data-path', (e, appDataPath) => {
+    filePath = path.join(appDataPath, 'log')
+    logPath = filePath + '.txt'
+
+    loadLog()
+
+    copyButton.disabled = false
+    reloadButton.disabled = false
+    clearButton.disabled = false
+    openButton.disabled = false
+})
+ipcRenderer.send('get-app-data-path')
