@@ -596,6 +596,13 @@ function openDisplayWindow(displayIndex) {
         }
     })
 
+    if (settings.get('display.allWorkspaces', true)) {
+        //On MacOs, display outputs across all workspaces
+        displayWindow.setVisibleOnAllWorkspaces(true, {
+            visibleOnFullScreen: true
+        })
+    }
+
     display.outputDisplays[displayIndex].window = displayWindow
 
     displayWindow.on('close', () => {
@@ -2792,6 +2799,36 @@ function setupDisplays() {
 
         if (display.masterScale !== 'Custom') {
             updateMasterDisplay()
+        }
+    })
+
+    settings.listen('display.allWorkspaces', value => {
+        if (value) {
+            for (
+                let displayIndex = 0;
+                displayIndex < display.outputDisplays.length;
+                displayIndex++
+            ) {
+                if (display.outputDisplays[displayIndex].window) {
+                    display.outputDisplays[
+                        displayIndex
+                    ].window.setVisibleOnAllWorkspaces(true, {
+                        visibleOnFullScreen: true
+                    })
+                }
+            }
+        } else {
+            for (
+                let displayIndex = 0;
+                displayIndex < display.outputDisplays.length;
+                displayIndex++
+            ) {
+                if (display.outputDisplays[displayIndex].window) {
+                    display.outputDisplays[
+                        displayIndex
+                    ].window.setVisibleOnAllWorkspaces(false)
+                }
+            }
         }
     })
 

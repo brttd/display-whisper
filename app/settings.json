@@ -335,7 +335,13 @@
                     "default": false
                 },
                 "simpleFullscreen": {
-                    "description": "Use MacOS simple (Pre-Lion) fullscreen display mode",
+                    "description": "(MacOs) Use simple (Pre-Lion) fullscreen display mode",
+                    "type": "boolean",
+
+                    "default": true
+                },
+                "allWorkspaces": {
+                    "description": "(MacOs) Show display on all workspaces",
                     "type": "boolean",
 
                     "default": true
