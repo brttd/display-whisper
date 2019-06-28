@@ -702,11 +702,13 @@ const item_presentation = {
 
             focusedListIndex = listIndex
 
-            lists[focusedListIndex].itemsBlock.node.style.borderColor =
-                'hsl(200, 66%, 60%)'
+            if (lists.length > 1) {
+                lists[focusedListIndex].itemsBlock.node.style.borderColor =
+                    'hsl(200, 66%, 60%)'
 
-            lists[focusedListIndex].mainBlock.node.style.background =
-                'hsl(200, 60%, 90%)'
+                lists[focusedListIndex].mainBlock.node.style.background =
+                    'hsl(200, 60%, 90%)'
+            }
         }
     }
 
