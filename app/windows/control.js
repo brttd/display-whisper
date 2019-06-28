@@ -2724,14 +2724,11 @@ const item_presentation = {
             itemsBlock.items[i].size += extraSpace / lists.length
         }
 
-        if (focusedListIndex >= listIndex) {
-            if (focusedListIndex > listIndex) {
-                focusedListIndex -= 1
-                focusList(focusedListIndex)
-            } else {
-                focusList(focusedListIndex - 1)
-            }
+        if (focusedListIndex > listIndex) {
+            focusedListIndex -= 1
         }
+
+        focusList(Math.max(0, Math.min(lists.length, focusedListIndex)))
 
         outputsChanged()
 
