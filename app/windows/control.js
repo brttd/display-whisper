@@ -16,7 +16,7 @@ const richText = require('dw-rich-text')
 
 const items = require('dw-items')
 
-const appDataPath = electron.remote.app.getPath('userData')
+let appDataPath
 
 const lists = []
 
@@ -2833,7 +2833,8 @@ const item_presentation = {
     function autoSaveCheck() {
         if (
             lastEditTime >= lastAutoSaveTime &&
-            Date.now() - lastAutoSaveTime >= options.autoSaveInterval * 1000
+            Date.now() - lastAutoSaveTime >= options.autoSaveInterval * 1000 &&
+            appDataPath
         ) {
             fs.writeFile(
                 path.join(appDataPath, 'autosave.dpl'),
@@ -3141,7 +3142,7 @@ const item_presentation = {
         let canClose = false
 
         function finishClose() {
-            if (lastEditTime >= lastAutoSaveTime) {
+            if (lastEditTime >= lastAutoSaveTime && appDataPath) {
                 layout.showLoader(layout.body, 'Auto-Saving')
 
                 fs.writeFile(
@@ -3517,23 +3518,34 @@ const item_presentation = {
     })
 
     //Autosave
-    fs.readFile(path.join(appDataPath, 'autosave.dpl'), (error, data) => {
-        if (error) {
-            logger.error('Unable to load autosave:', error)
+    let loadAutosave = () => {
+        fs.readFile(path.join(appDataPath, 'autosave.dpl'), (error, data) => {
+            if (error) {
+                logger.error('Unable to load autosave:', error)
 
-            return false
-        }
+                return false
+            }
 
-        try {
-            data = JSON.parse(data)
-        } catch (error) {
-            logger.error('Unable to parse autosave:', error)
+            try {
+                data = JSON.parse(data)
+            } catch (error) {
+                logger.error('Unable to parse autosave:', error)
 
-            return false
-        }
+                return false
+            }
 
-        presentation.load(data)
+            presentation.load(data)
+        })
+
+        loadAutosave = () => {}
+    }
+    ipcRenderer.on('app-data-path', (e, path) => {
+        appDataPath = path
+
+        loadAutosave()
     })
+    ipcRenderer.send('get-app-data-path')
+
     autoSaveTimer = setInterval(autoSaveCheck, options.autoSaveInterval * 1000)
 }
 
