@@ -321,246 +321,6 @@ class EmptyDatabase {
         return base + ' (' + num.toString() + ')' + path.extname(name)
     }
 }
-class EmptyGroupDatabase extends EmptyDatabase {
-    /*
-    options:
-        minGroupLength (number):
-            Minimum amount of characters for a group. Cannot be less than 1.
-            Any save operations giving a group with less characters will not work.
-            1 by default.
-        maxGroupLength (number):
-            Maxmimum amount of characters for a group. Cannot be less than 1, or less than the minimum (If so, the minimum will be used instead).
-            Any save operations giving a group with more characters will not work.
-            If not specified, or 0, will be unbounded.
-    */
-    constructor(name, options) {
-        super(name, options)
-
-        //List of all groups in use
-        this._groups = []
-
-        //List of all IDs in use, per group
-        this._IDs = {}
-
-        //List of IDs not in use, per group
-        this._availableIDs = {}
-
-        //Highest ID in use, per group
-        this._highestID = {}
-
-        this.options.minGroupLength = 1
-        this.options.maxGroupLength = Infinity
-
-        if (isObject(options)) {
-            if (
-                typeof options.minGroupLength === 'number' &&
-                options.minGroupLength >= 0 &&
-                isFinite(options.minGroupLength)
-            ) {
-                this.options.minGroupLength = options.minGroupLength
-            }
-
-            if (
-                typeof options.maxGroupLength === 'number' &&
-                options.maxGroupLength > 0 &&
-                isFinite(options.maxGroupLength)
-            ) {
-                //If the min is higher, use that instead
-                this.options.maxGroupLength = Math.max(
-                    options.maxGroupLength,
-                    this.options.minGroupLength
-                )
-            }
-        }
-    }
-
-    _toGroup(name) {
-        name = path.basename(name, path.extname(name)).split(lastDash)
-
-        if (name.length === 3 && isFinite(parseInt(name[2]))) {
-            return {
-                group: name[0],
-                ID: parseInt(name[2])
-            }
-        }
-
-        return {
-            group: name[0]
-        }
-    }
-
-    _toName(group, ID, ext = this.options.extensions[0]) {
-        return group + '-' + ID.toString() + ext
-    }
-
-    validGroup(group) {
-        return (
-            typeof group === 'string' &&
-            group.length >= this.options.minGroupLength &&
-            group.length <= this.options.maxGroupLength
-        )
-    }
-    validID(group, ID) {
-        return (
-            typeof group === 'string' &&
-            typeof ID === 'number' &&
-            group.length >= this.options.minGroupLength &&
-            group.length <= this.options.maxGroupLength &&
-            ID >= minimumID &&
-            isFinite(ID)
-        )
-    }
-
-    //Removes the given ID from the given group, if present
-    //If no ID's in use in group, also removes group
-    _removeID(group, ID) {
-        if (!this.validID(group, ID) || !this._groups.includes(group)) {
-            return false
-        }
-
-        let index = this._IDs[group].indexOf(ID)
-
-        if (index === -1) {
-            return false
-        }
-
-        this._IDs[group].splice(index, 1)
-
-        //If it was the last ID, remove the whole group
-        if (this._IDs[group].length === 0) {
-            delete this._IDs[group]
-            delete this._availableIDs[group]
-            delete this._highestID[group]
-
-            this._groups.splice(this._groups.indexOf(group), 1)
-
-            return true
-        }
-
-        if (ID === this._highestID[group]) {
-            //If it was the highest, find the highest in the remaining ones
-            this._highestID[group] = Math.max(...this._IDs[group])
-
-            //Since it was the highest, ID+1 will be the highest available, which needs to be removed
-            this._availableIDs[group].splice(
-                this._availableIDs[group].indexOf(ID + 1),
-                1
-            )
-
-            //The ID above the new highest one needs to be made available
-            //(If not already there)
-            if (
-                !this._availableIDs[group].includes(this._highestID[group] + 1)
-            ) {
-                this._availableIDs[group].push(this._highestID[group] + 1)
-            }
-        } else {
-            //If it wasn't the highest, it needs to be made available
-            this._availableIDs[group].push(ID)
-        }
-    }
-    //Adds the ID to the list of useds IDs, adding group if needed, and updating available & highest IDs as neccesary
-    _addID(group, ID) {
-        if (!this.validID(group, ID)) {
-            return false
-        }
-
-        if (this._groups.includes(group)) {
-            let availableIndex = this._availableIDs[group].indexOf(ID)
-
-            if (availableIndex !== -1) {
-                //If it was available, then remove it
-                this._availableIDs[group].splice(availableIndex, 1)
-            }
-
-            if (!this._IDs[group].includes(ID)) {
-                this._IDs[group].push(ID)
-            }
-
-            if (ID > this._highestID[group]) {
-                //If it's the new highest, the one above needs to be made available
-                this._availableIDs[group].push(ID + 1)
-                //And every ID between the previous highest and the new ID needs to be available
-                for (let i = this._highestID[group] + 2; i < ID; i++) {
-                    this._availableIDs[group].push(i)
-                }
-
-                this._highestID[group] = ID
-            }
-        } else {
-            this._groups.push(group)
-
-            this._IDs[group] = [ID]
-            this._availableIDs[group] = [ID + 1]
-            this._highestID[group] = ID
-
-            for (let i = minimumID; i < ID; i++) {
-                this._availableIDs[group].push(i)
-            }
-        }
-    }
-
-    //If there is a file in the database using the given ID, in the given Group
-    has(group, ID) {
-        if (!this.validID(group, ID)) {
-            return false
-        }
-
-        return !(
-            this._groups.includes(group) &&
-            this._availableIDs[group].includes(ID)
-        )
-    }
-
-    //Get a unused ID from the given group
-    getUniqueID(group, ID) {
-        if (!this.validGroup(group)) {
-            return false
-        }
-
-        //If the ID is invalid, use the minimum ID
-        if (!this.validID(group, ID)) {
-            return this.getUniqueID(group, minimumID)
-        }
-
-        if (this._groups.includes(group)) {
-            if (
-                this._availableIDs[group].includes(ID) ||
-                ID > this._highestID[group]
-            ) {
-                return ID
-            }
-
-            return this._availableIDs[group][0]
-        } else {
-            return ID
-        }
-    }
-
-    //Returns full group-id.extension name, which is has an ID which is unused
-    getUniqueName(name) {
-        if (typeof name !== 'string') {
-            return false
-        }
-        let ext = path.extname(name)
-
-        name = this._toGroup(name)
-
-        if (!this.validGroup(name.group)) {
-            return false
-        }
-
-        if (!this.validID(name.group, name.ID)) {
-            name.ID = minimumID
-        }
-
-        return this._toName(
-            name.group,
-            this.getUniqueID(name.group, name.ID),
-            ext
-        )
-    }
-}
 
 class AgnosticDatabase extends EmptyDatabase {
     /*
@@ -1428,9 +1188,18 @@ class AgnosticDatabase extends EmptyDatabase {
     }
 }
 
-class GroupDatabase extends EmptyGroupDatabase {
+class GroupDatabase extends EmptyDatabase {
     /*
     options:
+        minGroupLength (number):
+            Minimum amount of characters for a group. Cannot be less than 1.
+            Any save operations giving a group with less characters will not work.
+            1 by default.
+        maxGroupLength (number):
+            Maxmimum amount of characters for a group. Cannot be less than 1, or less than the minimum (If so, the minimum will be used instead).
+            Any save operations giving a group with more characters will not work.
+            If not specified, or 0, will be unbounded.
+        
         load (boolean): Same as AgnosticDatabase load.
         parse (boolean): Same as AgnosticDatabase parse.
         transform (function): Same as AgnosticDatabase function.
@@ -1438,14 +1207,49 @@ class GroupDatabase extends EmptyGroupDatabase {
     constructor(name, options) {
         super(name, options)
 
+        //List of all groups in use
+        this._groups = []
+
+        //List of all IDs in use, per group
+        this._IDs = {}
+
+        //List of IDs not in use, per group
+        this._availableIDs = {}
+
+        //Highest ID in use, per group
+        this._highestID = {}
+
         //File content
         this._list = []
+
+        this.options.minGroupLength = 1
+        this.options.maxGroupLength = Infinity
 
         this.options.load = true
         this.options.parse = true
         this.options.transform = false
 
         if (isObject(options)) {
+            if (
+                typeof options.minGroupLength === 'number' &&
+                options.minGroupLength >= 0 &&
+                isFinite(options.minGroupLength)
+            ) {
+                this.options.minGroupLength = options.minGroupLength
+            }
+
+            if (
+                typeof options.maxGroupLength === 'number' &&
+                options.maxGroupLength > 0 &&
+                isFinite(options.maxGroupLength)
+            ) {
+                //If the min is higher, use that instead
+                this.options.maxGroupLength = Math.max(
+                    options.maxGroupLength,
+                    this.options.minGroupLength
+                )
+            }
+
             if (typeof options.load === 'boolean') {
                 this.options.load = options.load
             }
@@ -1470,6 +1274,25 @@ class GroupDatabase extends EmptyGroupDatabase {
         return this._list
     }
 
+    _toGroup(name) {
+        name = path.basename(name, path.extname(name)).split(lastDash)
+
+        if (name.length === 3 && isFinite(parseInt(name[2]))) {
+            return {
+                group: name[0],
+                ID: parseInt(name[2])
+            }
+        }
+
+        return {
+            group: name[0]
+        }
+    }
+
+    _toName(group, ID, ext = this.options.extensions[0]) {
+        return group + '-' + ID.toString() + ext
+    }
+
     //Removes the file from ._files, and the content from ._list, and uses the parent method ._removeID for removing the files group & ID
     _removeFile(filename) {
         let index = this._files.indexOf(filename)
@@ -1483,6 +1306,95 @@ class GroupDatabase extends EmptyGroupDatabase {
 
             filename = this._toGroup(filename)
             this._removeID(filename.group, filename.ID)
+        }
+    }
+
+    //Removes the given ID from the given group, if present
+    //If no ID's in use in group, also removes group
+    _removeID(group, ID) {
+        if (!this.validID(group, ID) || !this._groups.includes(group)) {
+            return false
+        }
+
+        let index = this._IDs[group].indexOf(ID)
+
+        if (index === -1) {
+            return false
+        }
+
+        this._IDs[group].splice(index, 1)
+
+        //If it was the last ID, remove the whole group
+        if (this._IDs[group].length === 0) {
+            delete this._IDs[group]
+            delete this._availableIDs[group]
+            delete this._highestID[group]
+
+            this._groups.splice(this._groups.indexOf(group), 1)
+
+            return true
+        }
+
+        if (ID === this._highestID[group]) {
+            //If it was the highest, find the highest in the remaining ones
+            this._highestID[group] = Math.max(...this._IDs[group])
+
+            //Since it was the highest, ID+1 will be the highest available, which needs to be removed
+            this._availableIDs[group].splice(
+                this._availableIDs[group].indexOf(ID + 1),
+                1
+            )
+
+            //The ID above the new highest one needs to be made available
+            //(If not already there)
+            if (
+                !this._availableIDs[group].includes(this._highestID[group] + 1)
+            ) {
+                this._availableIDs[group].push(this._highestID[group] + 1)
+            }
+        } else {
+            //If it wasn't the highest, it needs to be made available
+            this._availableIDs[group].push(ID)
+        }
+    }
+    //Adds the ID to the list of useds IDs, adding group if needed, and updating available & highest IDs as neccesary
+    _addID(group, ID) {
+        if (!this.validID(group, ID)) {
+            return false
+        }
+
+        if (this._groups.includes(group)) {
+            let availableIndex = this._availableIDs[group].indexOf(ID)
+
+            if (availableIndex !== -1) {
+                //If it was available, then remove it
+                this._availableIDs[group].splice(availableIndex, 1)
+            }
+
+            if (!this._IDs[group].includes(ID)) {
+                this._IDs[group].push(ID)
+            }
+
+            if (ID > this._highestID[group]) {
+                //If it's the new highest, the one above needs to be made available
+                this._availableIDs[group].push(ID + 1)
+                //And every ID between the previous highest and the new ID needs to be available
+                for (let i = this._highestID[group] + 2; i < ID; i++) {
+                    this._availableIDs[group].push(i)
+                }
+
+                this._highestID[group] = ID
+            }
+        } else {
+            this._groups.push(group)
+
+            this._IDs[group] = [ID]
+            this._availableIDs[group] = [ID + 1]
+            this._highestID[group] = ID
+
+            for (let i = minimumID; i < ID; i++) {
+                this._availableIDs[group].push(i)
+            }
         }
     }
 
@@ -1604,6 +1516,85 @@ class GroupDatabase extends EmptyGroupDatabase {
             {
                 parse: this.options.parse
             }
+        )
+    }
+
+    validGroup(group) {
+        return (
+            typeof group === 'string' &&
+            group.length >= this.options.minGroupLength &&
+            group.length <= this.options.maxGroupLength
+        )
+    }
+    validID(group, ID) {
+        return (
+            typeof group === 'string' &&
+            typeof ID === 'number' &&
+            group.length >= this.options.minGroupLength &&
+            group.length <= this.options.maxGroupLength &&
+            ID >= minimumID &&
+            isFinite(ID)
+        )
+    }
+
+    //If there is a file in the database using the given ID, in the given Group
+    has(group, ID) {
+        if (!this.validID(group, ID)) {
+            return false
+        }
+
+        return !(
+            this._groups.includes(group) &&
+            this._availableIDs[group].includes(ID)
+        )
+    }
+
+    //Get a unused ID from the given group
+    getUniqueID(group, ID) {
+        if (!this.validGroup(group)) {
+            return false
+        }
+
+        //If the ID is invalid, use the minimum ID
+        if (!this.validID(group, ID)) {
+            return this.getUniqueID(group, minimumID)
+        }
+
+        if (this._groups.includes(group)) {
+            if (
+                this._availableIDs[group].includes(ID) ||
+                ID > this._highestID[group]
+            ) {
+                return ID
+            }
+
+            return this._availableIDs[group][0]
+        } else {
+            return ID
+        }
+    }
+
+    //Returns full group-id.extension name, which is has an ID which is unused
+    getUniqueName(name) {
+        if (typeof name !== 'string') {
+            return false
+        }
+        let ext = path.extname(name)
+
+        name = this._toGroup(name)
+
+        if (!this.validGroup(name.group)) {
+            return false
+        }
+
+        if (!this.validID(name.group, name.ID)) {
+            name.ID = minimumID
+        }
+
+        return this._toName(
+            name.group,
+            this.getUniqueID(name.group, name.ID),
+            ext
         )
     }
 
