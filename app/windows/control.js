@@ -5427,18 +5427,16 @@ const interfaceItems = {
     })
 }
 
-//inputs
-{
-    ipcRenderer.on('setting', (event, key, value) => {
-        if (key === 'firstOpen' && value) {
-            layout.window.openWindow('help')
+//If first time opening application, show help window
+ipcRenderer.on('setting', (e, key, value) => {
+    if (key === 'firstOpen' && value) {
+        layout.window.openWindow('help')
 
-            ipcRenderer.send('set-setting', 'firstOpen', false)
-        }
-    })
+        ipcRenderer.send('set-setting', 'firstOpen', false)
+    }
+})
 
-    ipcRenderer.send('get-setting', 'firstOpen', true)
-}
+ipcRenderer.send('get-setting', 'firstOpen', true)
 
 ipcRenderer.on('update-available', (event, version) => {
     layout.dialog.showNotification(
