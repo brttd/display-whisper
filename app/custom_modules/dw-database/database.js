@@ -5,10 +5,9 @@ const path = require('path')
 
 const logger = require('dw-log')
 
+//sending a synchronous message to main process is 3x quicker than remote.app.getAppPath
 const dir = path.join(
-    (require('electron').app || require('electron').remote.app).getPath(
-        'userData'
-    ),
+    ipcRenderer.sendSync('get-app-data-path-sync'),
     'database'
 )
 
