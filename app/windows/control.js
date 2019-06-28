@@ -3264,6 +3264,7 @@ const item_presentation = {
                         for (let i = 0; i < lists.length; i++) {
                             updateAllItems(i)
                         }
+                        
                         break
                     case 'presentation.minTextSize':
                         if (
@@ -3277,6 +3278,7 @@ const item_presentation = {
                         for (let i = 0; i < lists.length; i++) {
                             updateAllItemErrorHighlights(i)
                         }
+
                         break
                     case 'presentation.autoMinimize':
                         if (value) {
@@ -3317,6 +3319,7 @@ const item_presentation = {
                                 scrollTo(i, lists[i].selected)
                             }
                         }
+
                         break
                     case 'presentation.autoSaveInterval':
                         if (
@@ -3355,6 +3358,11 @@ const item_presentation = {
 
                             updateRemoveButton()
                         }
+
+                        break
+                    case 'presentation.maxLists':
+                        addListButton.disabled = lists.length >= options.maxLists
+
                         break
                 }
             }
