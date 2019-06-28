@@ -2910,8 +2910,6 @@ const item_presentation = {
 
     //File functions
     function loadFile(file) {
-        app.addRecentDocument(file)
-
         fs.readFile(file, (error, data) => {
             if (error) {
                 if (error.code === 'ENOENT') {
