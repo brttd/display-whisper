@@ -7,7 +7,6 @@ if (typeof document !== 'object' || typeof window !== 'object') {
 document.body.style.opacity = 0
 
 const { remote, ipcRenderer } = require('electron')
-const { dialog, Menu, MenuItem } = remote
 
 const path = require('path')
 //fs module is only needed by certain layout items. To save importing without it being used, declare it globally but only import when required by an item
@@ -16725,6 +16724,8 @@ class BoxEdit {
 {
     exports.dialog = {}
 
+    const dialog = remote.dialog
+
     const notifContain = document.createElement('div')
     notifContain.className = 'notification'
     notifContain.style.top = '-50px'
@@ -17155,6 +17156,10 @@ class BoxEdit {
 
     exports.contextMenu = {}
     {
+        //Electron modules are only loaded if contextMenu.add is called
+        let Menu
+        let MenuItem
+
         //Item arrays, stored by context
         const menuItems = {}
         //Listener arrays, stored by context
@@ -17287,6 +17292,11 @@ class BoxEdit {
                 items === null
             ) {
                 return false
+            }
+
+            if (!Menu) {
+                Menu = remote.Menu
+                MenuItem = remote.MenuItem
             }
 
             if (!Array.isArray(items)) {
