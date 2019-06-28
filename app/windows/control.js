@@ -1,7 +1,4 @@
-const electron = require('electron')
-const { ipcRenderer } = electron
-
-const app = electron.remote.app
+const { ipcRenderer, shell } = require('electron')
 
 const fs = require('fs')
 const path = require('path')
@@ -5438,7 +5435,7 @@ ipcRenderer.on('setting', (e, key, value) => {
 
 ipcRenderer.send('get-setting', 'firstOpen', true)
 
-ipcRenderer.on('update-available', (event, version) => {
+ipcRenderer.on('update-available', (e, version) => {
     layout.dialog.showNotification(
         {
             autoHide: false,
@@ -5449,9 +5446,7 @@ ipcRenderer.on('update-available', (event, version) => {
                 ') available! Click to update.'
         },
         () => {
-            electron.shell.openExternal(
-                'https://display-whisper.brettdoyle.art/update/'
-            )
+            shell.openExternal('https://display-whisper.brettdoyle.art/update/')
         }
     )
 })
