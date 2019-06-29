@@ -810,7 +810,7 @@ const item_presentation = {
         //The scrollTo function waits for the end of an animation frame to actually update
         //This is because items may get maximized/minimized when going through the presentation
         //And their height only updates on an animation frame, so by waiting for the end of one, all items should be at the correct height when scrolling
-        layout.onFrame.end(updateScrollByListId.bind(lists[listIndex].id))
+        layout.onFrame.end(updateScrollByListId.bind(null, lists[listIndex].id))
     }
 
     function itemInOutput(listIndex, index) {
