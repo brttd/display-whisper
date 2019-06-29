@@ -693,8 +693,6 @@ function toggleBlank() {
     }
 
     blanked = !blanked
-
-    ipcRenderer.send('display-blank', blanked)
 }
 
 //Settings, keyboard shortcuts, etc
@@ -706,7 +704,7 @@ function toggleBlank() {
 
     let keyboardFunctions = {
         'control.keyboard.toggleBlank': () => {
-            toggleBlank()
+            ipcRenderer.send('presentation-command', 'toggle-blank')
         },
 
         'control.keyboard.playNext': () => {

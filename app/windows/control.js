@@ -3127,9 +3127,6 @@ const item_presentation = {
 
         ipcRenderer.send('display-blank', blankButton.active)
     })
-    ipcRenderer.on('display-blank', (event, blank) => {
-        blankButton.active = blank
-    })
 
     fitTextAllButton.onEvent('click', () => {
         for (let i = 0; i < lists.length; i++) {
@@ -3248,7 +3245,11 @@ const item_presentation = {
                 ipcRenderer.send('disable-display')
             },
 
-            'control.keyboard.toggleBlank': blankButton.click,
+            'control.keyboard.toggleBlank': () => {
+                if (display.activeScreens.length > 0) {
+                    blankButton.click()
+                }
+            },
 
             'control.keyboard.playNext': presentation.forward,
             'control.keyboard.playPrevious': presentation.back,
@@ -3528,7 +3529,11 @@ const item_presentation = {
             'select-next-item': presentation.selectItemForward,
             'select-previous-item': presentation.selectItemBackward,
 
-            'play-selected': presentation.playSelected
+            'play-selected': presentation.playSelected,
+
+            'toggle-blank': () => {
+                blankButton.click()
+            }
         }
 
         ipcRenderer.on('presentation', (e, argument) => {
