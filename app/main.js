@@ -710,6 +710,10 @@ function openDisplayWindow(displayIndex) {
             }
 
             displayWindow.show()
+        } else {
+            //If this window isn't connected to an output display,
+            //it won't ever be used and should be removed
+            displayWindow.destroy()
         }
     })
 
