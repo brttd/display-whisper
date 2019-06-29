@@ -685,6 +685,13 @@ function openDisplayWindow(displayIndex) {
         }
     )
 
+    //When the window first shows, it takes focus away from the control window
+    displayWindow.once('show', () => {
+        if (windows.control) {
+            windows.control.focus()
+        }
+    })
+
     displayWindow.webContents.on('did-finish-load', () => {
         displayWindow.webContents.send('display-info', getDisplayInfo())
 
