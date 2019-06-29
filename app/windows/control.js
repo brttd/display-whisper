@@ -1861,90 +1861,106 @@ const item_presentation = {
 
         updateRemoveButton()
 
-        let listIndex = lists.findIndex(list => list.id === history.id)
+        if (history.list) {
+            lists.splice(history.index, 0, history.list)
+            itemsBlock.add(history.list.mainBlock.parent, history.index)
 
-        if (listIndex < 0 || listIndex >= lists.length) {
-            return false
-        }
+            focusList(Math.max(0, Math.min(lists.length, focusedListIndex)))
 
-        if (
-            history.index >= 0 &&
-            history.index < lists[listIndex].list.length
-        ) {
-            let lastSelected = {
-                index: lists[listIndex].selected.index,
-                subIndex: lists[listIndex].selected.subIndex
-            }
+            outputsChanged()
 
-            if (history.index <= lists[listIndex].selected.index) {
-                if (
-                    lists[listIndex].selected.index <
-                    lists[listIndex].itemsBlock.items.length
-                ) {
-                    lists[listIndex].itemsBlock.items[
-                        lists[listIndex].selected.index
-                    ].selected = false
+            addListButton.disabled = lists.length >= options.maxLists
+
+            if (lists.length > 1) {
+                for (let i = 0; i < lists.length; i++) {
+                    lists[i].removeButton.disabled = false
                 }
-            }
-            if (history.index <= lists[listIndex].active.index) {
-                if (
-                    lists[listIndex].active.index <
-                    lists[listIndex].itemsBlock.items.length
-                ) {
-                    lists[listIndex].itemsBlock.items[
-                        lists[listIndex].active.index
-                    ].active = false
-                }
-            }
-
-            lists[listIndex].list.splice(history.index, 0, history.data)
-            lists[listIndex].itemsBlock.add(history.item, history.index)
-
-            if (history.index <= lists[listIndex].active.index) {
-                setActive(
-                    listIndex,
-                    {
-                        index: lists[listIndex].active.index + 1,
-                        subIndex: lists[listIndex].active.subIndex
-                    },
-                    false
-                )
-            }
-            if (history.index <= lastSelected.index) {
-                setSelected(
-                    listIndex,
-                    {
-                        index: lastSelected.index + 1,
-                        subIndex: lastSelected.subIndex
-                    },
-                    false
-                )
             }
         } else {
-            lists[listIndex].list.push(history.data)
-            lists[listIndex].itemsBlock.add(history.item)
+            let listIndex = lists.findIndex(list => list.id === history.listId)
 
-            history.index = lists[listIndex].list.length - 1
-        }
+            if (listIndex < 0 || listIndex >= lists.length) {
+                return false
+            }
 
-        updateItem(
-            Math.max(
-                0,
-                Math.min(lists[listIndex].list.length - 1, history.index)
+            if (
+                history.index >= 0 &&
+                history.index < lists[listIndex].list.length
+            ) {
+                let lastSelected = {
+                    index: lists[listIndex].selected.index,
+                    subIndex: lists[listIndex].selected.subIndex
+                }
+
+                if (history.index <= lists[listIndex].selected.index) {
+                    if (
+                        lists[listIndex].selected.index <
+                        lists[listIndex].itemsBlock.items.length
+                    ) {
+                        lists[listIndex].itemsBlock.items[
+                            lists[listIndex].selected.index
+                        ].selected = false
+                    }
+                }
+                if (history.index <= lists[listIndex].active.index) {
+                    if (
+                        lists[listIndex].active.index <
+                        lists[listIndex].itemsBlock.items.length
+                    ) {
+                        lists[listIndex].itemsBlock.items[
+                            lists[listIndex].active.index
+                        ].active = false
+                    }
+                }
+
+                lists[listIndex].list.splice(history.index, 0, history.data)
+                lists[listIndex].itemsBlock.add(history.item, history.index)
+
+                if (history.index <= lists[listIndex].active.index) {
+                    setActive(
+                        listIndex,
+                        {
+                            index: lists[listIndex].active.index + 1,
+                            subIndex: lists[listIndex].active.subIndex
+                        },
+                        false
+                    )
+                }
+                if (history.index <= lastSelected.index) {
+                    setSelected(
+                        listIndex,
+                        {
+                            index: lastSelected.index + 1,
+                            subIndex: lastSelected.subIndex
+                        },
+                        false
+                    )
+                }
+            } else {
+                lists[listIndex].list.push(history.data)
+                lists[listIndex].itemsBlock.add(history.item)
+
+                history.index = lists[listIndex].list.length - 1
+            }
+
+            updateItem(
+                Math.max(
+                    0,
+                    Math.min(lists[listIndex].list.length - 1, history.index)
+                )
             )
-        )
 
-        if (options.autoMinimize) {
-            history.item.minimize()
-        }
+            if (options.autoMinimize) {
+                history.item.minimize()
+            }
 
-        if (options.autoFitText) {
-            fitText(listIndex, lists[listIndex].list.indexOf(history.data))
+            if (options.autoFitText) {
+                fitText(listIndex, lists[listIndex].list.indexOf(history.data))
+            }
         }
 
         editHasOccured()
     }
-    presentation.undoRemove = undoRemove
 
     function beginFirst(listIndex) {
         if (
@@ -2706,9 +2722,22 @@ const item_presentation = {
 
         let removedList = lists.splice(listIndex, 1)[0]
 
+        addRemoveHistory({
+            list: removedList,
+
+            index: listIndex
+        })
+
+        if (removedList.timeout) {
+            clearTimeout(removedList.timeout)
+        }
+        removedList.timer.text = ''
+        removedList.timer.value = 0
+
         for (let i = 0; i < removedList.list.length; i++) {
             if (activeEditors.includes(removedList.list[i].id)) {
                 ipcRenderer.send('stop-edit', removedList.list[i].id)
+                removedList.itemsBlock.items[i].editActive = false
             }
         }
 
@@ -3056,11 +3085,11 @@ const item_presentation = {
     }
 
     //User list events
-    undoRemoveButton.onEvent('click', presentation.undoRemove)
+    undoRemoveButton.onEvent('click', undoRemove)
 
     layout.menu.onEvent('edit', item => {
         if (item.value === 'undo') {
-            presentation.undoRemove()
+            undoRemove()
         }
     })
 
