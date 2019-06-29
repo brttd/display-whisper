@@ -2593,7 +2593,9 @@ ipcMain.on('close', event => {
                         ].window.webContents.send('display', data)
                     }
 
-                    display.outputDisplays[displayIndex].defaultDisplay = Object.assign({}, data)
+                    display.outputDisplays[
+                        displayIndex
+                    ].defaultDisplay = Object.assign({}, data)
                     display.outputDisplays[
                         displayIndex
                     ].defaultDisplay.transition = {}
