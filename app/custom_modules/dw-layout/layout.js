@@ -8336,17 +8336,15 @@ exports.change = addStyles
                     this.addNode.firstChild
                 )
 
-                let lastIndex = this.options.addInput.indexOf(
-                    this.addSelectInput.value
-                )
-
-                if (lastIndex === -1) {
-                    lastIndex = 0
-                }
+                let lastValue = this.addSelectInput.value
 
                 this.addSelectInput.options = this.options.addInput
 
-                this.addSelectInput.index = lastIndex
+                if (this.options.addInput.includes(lastValue)) {
+                    this.addSelectInput.value = lastValue
+                } else {
+                    this.addSelectInput.value = this.options.addInput[0]
+                }
             } else {
                 if (this.addSelectInput.node.parentNode) {
                     this.addNode.removeChild(this.addSelectInput.node)
