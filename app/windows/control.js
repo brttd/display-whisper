@@ -2817,18 +2817,18 @@ const item_presentation = {
                     add(i, data.lists[i].list[j])
                 }
 
-                setActive(i, data.lists[i].active)
+                setActive(i, data.lists[i].active, true, false)
             }
-        } else {
+        } else if (Array.isArray(data.list)) {
+            for (let i = 0; i < data.list.length; i++) {
+                add(0, data.list[i])
+            }
+
+            setActive(0, data.active, true, false)
+        }
+
+        if (lists.length === 0) {
             addList()
-
-            if (Array.isArray(data.list)) {
-                for (let i = 0; i < data.list.length; i++) {
-                    add(0, data.list[i])
-                }
-            }
-
-            setActive(0, data.active)
         }
 
         loadingPresentation = false
