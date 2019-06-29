@@ -1254,6 +1254,7 @@ const item_presentation = {
 
         if (lists[listIndex].timeout) {
             clearTimeout(lists[listIndex].timeout)
+            lists[listIndex].timeout = false
         }
 
         if (typeof position.index !== 'number') {
@@ -2323,6 +2324,7 @@ const item_presentation = {
             for (let i = 0; i < lists.length; i++) {
                 if (lists[i].timeout) {
                     clearTimeout(lists[i].timeout)
+                    lists[i].timeout = false
                 }
 
                 lists[i].timer.text = ''
@@ -2633,7 +2635,7 @@ const item_presentation = {
             },
 
             //control properties + interface
-            timeout: null,
+            timeout: false,
 
             controlBlock: new layout.Block(
                 {
@@ -2730,6 +2732,7 @@ const item_presentation = {
 
         if (removedList.timeout) {
             clearTimeout(removedList.timeout)
+            removedList.timeout = false
         }
         removedList.timer.text = ''
         removedList.timer.value = 0
