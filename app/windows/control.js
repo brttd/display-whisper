@@ -583,6 +583,25 @@ const item_presentation = {
         lists[listIndex].itemsBlock.items[index].title =
             lists[listIndex].list[index].title
 
+        let prevSelection = {
+            index: lists[listIndex].selected.index,
+            subIndex: lists[listIndex].selected.subIndex
+        }
+
+        if (lists[listIndex].active.index === index) {
+            //Update active position of list, and only autoplay if the list is currently autoplaying
+            setActive(
+                listIndex,
+                lists[listIndex].active,
+                true,
+                lists[listIndex].timeout !== false
+            )
+            //Since the active position has been updated, selection also needs to be updated
+            setSelected(listIndex, prevSelection)
+        } else if (prevSelection.index === index) {
+            setSelected(listIndex, prevSelection)
+        }
+
         if (options.reduceTextSize) {
             reduceItemTextSize(listIndex, index, sections)
         }
