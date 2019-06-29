@@ -3287,7 +3287,7 @@ const item_presentation = {
                         for (let i = 0; i < lists.length; i++) {
                             updateAllItems(i)
                         }
-                        
+
                         break
                     case 'presentation.minTextSize':
                         if (
@@ -3384,7 +3384,8 @@ const item_presentation = {
 
                         break
                     case 'presentation.maxLists':
-                        addListButton.disabled = lists.length >= options.maxLists
+                        addListButton.disabled =
+                            lists.length >= options.maxLists
 
                         break
                 }
