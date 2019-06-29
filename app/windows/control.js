@@ -3568,7 +3568,7 @@ const item_presentation = {
         }
 
         //Enable/disable blank button
-        if (display.activeScreens.length > 0) {
+        if (display.activeScreens.length > invalidScreens.length) {
             blankButton.disabled = false
         } else {
             blankButton.active = false
