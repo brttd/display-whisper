@@ -3550,8 +3550,21 @@ const item_presentation = {
         display.screenCount = newDisplay.screenCount
         display.masterScreen = newDisplay.masterScreen
 
+        let invalidScreens = display.activeScreens.slice(0)
+
         for (let i = 0; i < lists.length; i++) {
             updateListScreenButtons(i)
+
+            for (let j = 0; j < lists[i].screens.length; j++) {
+                let index = invalidScreens.indexOf(lists[i].screens[j])
+                if (index !== -1) {
+                    invalidScreens.splice(index, 1)
+                }
+            }
+        }
+
+        for (let i = 0; i < invalidScreens.length; i++) {
+            ipcRenderer.send('disable-display-screen', invalidScreens[i])
         }
 
         //Enable/disable blank button
