@@ -1466,11 +1466,6 @@ function addScreenDisplayOutput(screenIndex) {
 
     updateOutputDisplay(display.outputDisplays.length - 1)
 
-    settings.set(
-        'display.defaultScreens',
-        display.outputDisplays.map(aDisplay => aDisplay.screen)
-    )
-
     if (display.masterScale === 'Custom') {
         sendToControlWindow('display-info', getDisplayInfo())
     } else {
@@ -1487,11 +1482,6 @@ function removeDisplayOutput(displayIndex) {
     if (removedDisplay.window) {
         removedDisplay.window.destroy()
     }
-
-    settings.set(
-        'display.defaultScreens',
-        display.outputDisplays.map(aDisplay => aDisplay.screen)
-    )
 
     if (display.masterScale === 'Custom') {
         sendToControlWindow('display-info', getDisplayInfo())
@@ -2704,13 +2694,6 @@ function setupDisplays() {
         'display.masterScale',
         display.masterScale
     )
-
-    let defaultScreens = settings.get('display.outputDisplays', [])
-    for (let i = 0; i < defaultScreens.length; i++) {
-        addScreenDisplayOutput(defaultScreens[i])
-    }
-
-    updateMasterDisplay()
 
     screen.on('display-added', (event, newDisplay) => {
         displays = screen.getAllDisplays()
