@@ -1892,27 +1892,47 @@ exports.change = addStyles
         }
 
         //Adds item child along with divider as neccesary, and updates size
-        add(item) {
+        add(item, index = this.items.length) {
             if (!validItem(item)) {
                 return false
             }
 
+            index *= 2
+
+            let newDivider = null
+
             if (this.items.length >= 1) {
-                let newDivider = new LayoutDivider({
+                newDivider = new LayoutDivider({
                     direction: this._direction,
                     small: this._small
                 })
 
-                newDivider.parent = this
-
-                this.items.push(newDivider)
-                this.node.appendChild(newDivider.node)
+                newDivider.parent = this                
             }
 
             item.parent = this
 
-            this.items.push(item)
-            this.node.appendChild(item.node)
+            if (index >= 0 && index < this.items.length) {
+
+                if (newDivider) {
+                    this.items.splice(index, 0, newDivider)
+                    this.node.insertBefore(newDivider.node, this.node.children[index])
+                }
+
+                this.items.splice(index , 0, item)
+                this.node.insertBefore(item.node, newDivider.node)
+
+                
+            } else {
+                if (newDivider) {
+                    this.items.push(newDivider)
+                    this.node.appendChild(newDivider.node)
+                }
+
+                this.items.push(item)
+                this.node.appendChild(item.node)
+            }
+            
 
             if (typeof item.onResize === 'function') {
                 this._itemResizeFunctions.push(item.onResize)
