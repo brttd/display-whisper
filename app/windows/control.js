@@ -1247,7 +1247,12 @@ const item_presentation = {
         updateDisplayPreviews(listIndex)
     }
 
-    function setActive(listIndex, position, updateScroll = true) {
+    function setActive(
+        listIndex,
+        position,
+        updateScroll = true,
+        autoPlay = true
+    ) {
         if (listIndex < 0 || listIndex >= lists.length) {
             return false
         }
@@ -1308,7 +1313,7 @@ const item_presentation = {
         if (
             lists[listIndex].output.active.autoPlay === true &&
             playMode !== 'manual' &&
-            !loadingPresentation
+            autoPlay
         ) {
             let time =
                 lists[listIndex].output.active.playTime +
