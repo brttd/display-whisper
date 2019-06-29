@@ -8056,12 +8056,7 @@ exports.change = addStyles
 
             this._selected = []
 
-            this.editButton = data.editButton
-            this.removeButton = data.removeButton
-            this.reorderable = data.reorderable
-            this.addInput = data.addInput
-
-            this.disabled = data.disabled
+            
 
             if (typeof data.select === 'boolean') {
                 this.options.select = data.select
@@ -8140,6 +8135,13 @@ exports.change = addStyles
                     this.add(oldValue, this.items.length, true)
                 })
             }
+
+            this.editButton = data.editButton
+            this.removeButton = data.removeButton
+            this.reorderable = data.reorderable
+            this.addInput = data.addInput
+
+            this.disabled = data.disabled
 
             this.client = {
                 top: 0,
