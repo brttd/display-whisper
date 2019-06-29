@@ -1,3 +1,5 @@
+Make control window focus when opening display window
+
 REQUIRED:
     Display window - Fix:
         Occasionally flashes white (Only when looping?).
