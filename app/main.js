@@ -2693,6 +2693,8 @@ function setupDisplays() {
         display.masterScale
     )
 
+    updateMasterDisplay()
+
     screen.on('display-added', (event, newDisplay) => {
         displays = screen.getAllDisplays()
 
