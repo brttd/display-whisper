@@ -1499,17 +1499,6 @@ function removeDisplayOutput(displayIndex) {
         updateMasterDisplay()
     }
 }
-function toggleScreenDisplayOutput(screenIndex) {
-    let displayIndex = display.outputDisplays.findIndex(
-        aDisplay => aDisplay.screen === screenIndex
-    )
-
-    if (displayIndex === -1) {
-        addScreenDisplayOutput(screenIndex)
-    } else {
-        removeDisplayOutput(displayIndex)
-    }
-}
 
 function isLatestVersion(callback) {
     if (typeof callback !== 'function') {
