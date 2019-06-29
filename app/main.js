@@ -2462,6 +2462,10 @@ ipcMain.on('close', event => {
         event.returnValue = appDataPath
     })
 
+    ipcMain.on('add-recent-document', (event, document) => {
+        app.addRecentDocument(document)
+    })
+
     ipcMain.on('open-window', (event, name, messageArray) => {
         openWindowAndSend(name, messageArray)
     })

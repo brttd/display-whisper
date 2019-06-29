@@ -2824,6 +2824,8 @@ const item_presentation = {
 
         if (typeof data.file === 'string') {
             file = data.file
+
+            ipcRenderer.send('add-recent-document', file)
         }
 
         loadingPresentation = true
