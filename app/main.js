@@ -814,13 +814,11 @@ function openControl() {
         //Control window is fully closed, so program shutdown logic starts
 
         for (
-            let displayIndex = 0;
-            displayIndex < display.outputDisplays.length;
-            displayIndex++
+            let displayIndex = display.outputDisplays.length - 1;
+            displayIndex >= 0;
+            displayIndex--
         ) {
-            if (display.outputDisplays[displayIndex].window) {
-                display.outputDisplays[displayIndex].window.destroy()
-            }
+            removeDisplayOutput(displayIndex)
         }
 
         //Wait until settings have been written
