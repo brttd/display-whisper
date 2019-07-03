@@ -2768,6 +2768,11 @@ const item_presentation = {
             }
         }
 
+        for (let i = removedList.screens.length - 1; i >= 0; i++) {
+            ipcRenderer.send('disable-display-screen', removedList.screens[i])
+            removedList.screens.pop()
+        }
+
         let extraSpace = removedList.mainBlock.parent.size
 
         itemsBlock.remove(removedList.mainBlock.parent)
