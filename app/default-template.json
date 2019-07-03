@@ -53,6 +53,35 @@
         "bottom": 99
     },
 
+    "text": {
+        "font": "Arial",
+        "size": 65,
+        "color": "black",
+
+        "lineHeight": 1.5,
+
+        "align": "center",
+
+        "y": "center",
+
+        "opacity": 100,
+
+        "top": 12,
+        "left": 10,
+        "right": 90,
+        "bottom": 88
+    },
+    "image": {
+        "scale": "fit",
+
+        "opacity": 100,
+
+        "top": 12,
+        "left": 10,
+        "right": 90,
+        "bottom": 88
+    },
+
     "background": "white",
     "backgroundImage": "",
     "backgroundScale": "fill",
