@@ -493,3 +493,5 @@ module.exports.template = {
     ],
     options: []
 }
+
+module.exports.name = 'Multi'

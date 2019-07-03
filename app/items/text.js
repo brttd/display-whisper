@@ -514,3 +514,5 @@ module.exports.template = {
         }
     ]
 }
+
+module.exports.name = 'Text'

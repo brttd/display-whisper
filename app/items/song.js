@@ -1160,3 +1160,5 @@ module.exports.template = {
         }
     ]
 }
+
+module.exports.name = 'Song'

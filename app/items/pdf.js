@@ -250,3 +250,5 @@ module.exports.template = {
     nodes: [],
     options: []
 }
+
+module.exports.name = 'PDF'
