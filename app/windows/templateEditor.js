@@ -470,7 +470,9 @@ function updateNodes() {
         }
 
         if (itemFormat.nodes[i].map) {
-            editNodes[i].edit(editor.data[itemFormat.nodes[i].map])
+            if (editor.data[itemFormat.nodes[i].map]) {
+                editNodes[i].edit(editor.data[itemFormat.nodes[i].map])
+            }
         } else {
             editNodes[i].edit(editor.data)
         }
