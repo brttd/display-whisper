@@ -30,13 +30,6 @@ $min-size: 24px;
     align-self: flex-start;
 }
 
-@mixin fonts {
-    font-size: $font-size;
-    font-family: $font-family;
-
-    line-height: 1.4em;
-}
-
 @mixin colors($options: null, $color: true) {
     @if $options == active {
         @if $color == true {

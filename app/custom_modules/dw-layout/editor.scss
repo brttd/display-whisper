@@ -15,10 +15,9 @@
         display: inline-block;
 
         .title {
-            display: block;
+            @include fonts;
 
-            font-size: $font-size;
-            font-family: $font-family;
+            display: block;
         }
     }
 

@@ -38,6 +38,8 @@
         padding-left: 1px;
 
         button {
+            @include fonts;
+
             position: relative;
             z-index: 1;
 
@@ -50,9 +52,6 @@
 
             border: 1px solid $bkg-main-dark;
             outline: none;
-
-            font-size: $font-size;
-            font-family: $font-family;
 
             &:hover {
                 background: mix($bkg-main, $bkg-active, 50%);
