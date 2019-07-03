@@ -19,9 +19,13 @@ const list = new layout.List({
     addInput: true
 })
 
-const itemsBar = new layout.Block(
-    { childSpacing: 8 },
-    { direction: 'horizontal' }
+const itemsBar = new layout.TabBlock(
+    {},
+    {
+        grow: false,
+        shrink: false,
+        align: 'stretch'
+    }
 )
 
 const displayEditor = new layout.DisplayEdit(
@@ -32,11 +36,16 @@ const displayEditor = new layout.DisplayEdit(
     }
 )
 
-const partsList = new layout.List({
-    reorderable: false,
-    editButton: false,
-    removeButton: false
-})
+const partsList = new layout.List(
+    {
+        reorderable: false,
+        editButton: false,
+        removeButton: false
+    },
+    {
+        borderTop: false
+    }
+)
 
 const textControl = new layout.TextStyleEdit({})
 const imageControl = new layout.ImageStyleEdit({
@@ -61,11 +70,6 @@ const removeButton = new layout.Button({
 colorControl.connect(displayEditor)
 
 {
-    layout.change(itemsBar, {
-        grow: false,
-        shrink: false,
-        padding: 0
-    })
     layout.change(propertiesBar, {
         direction: 'horizontal',
         grow: false,
@@ -144,17 +148,10 @@ colorControl.connect(displayEditor)
                                     items: [
                                         new layout.Block(
                                             {
-                                                childSpacing: 8,
-
-                                                items: [
-                                                    new layout.Text({
-                                                        text: 'Edit template as'
-                                                    }),
-                                                    itemsBar,
-                                                    partsList
-                                                ]
+                                                items: [itemsBar, partsList]
                                             },
                                             {
+                                                padding: 4,
                                                 direction: 'vertical'
                                             }
                                         )
@@ -625,17 +622,11 @@ function updateTemplateListAndSelect() {
 
 //items
 {
-    function itemButtonClick(event) {
-        event.from.active = true
+    let tabs = []
 
-        for (let i = 0; i < itemsBar.items.length; i++) {
-            if (itemsBar.items[i] !== event.from) {
-                itemsBar.items[i].active = false
-            }
-        }
-
-        switchFormat(event.from.text)
-    }
+    itemsBar.onEvent('switch', event => {
+        switchFormat(tabs.find(tab => tab.name === event.tab.name).item)
+    })
 
     function addItemFormat(name, data) {
         if (
@@ -767,25 +758,22 @@ function updateTemplateListAndSelect() {
                 }
             }
         }
-
-        let itemButton = new layout.Button({
-            text: name
-        })
-
-        itemButton.onEvent('click', itemButtonClick)
-
-        itemsBar.add(itemButton)
     }
 
     let dwItems = require('dw-items')
 
     for (let i = 0; i < dwItems.list.length; i++) {
         addItemFormat(dwItems.list[i], dwItems[dwItems.list[i]].template)
+
+        tabs.push({
+            name: dwItems[dwItems.list[i]].name,
+            item: dwItems.list[i]
+        })
     }
 
-    if (itemsBar.items.length > 0) {
-        itemsBar.items[0].click()
-    }
+    itemsBar.set(tabs)
+
+    itemsBar.tab = dwItems.list[0]
 }
 
 //selecting, deleting, & adding templates
