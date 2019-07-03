@@ -12734,6 +12734,8 @@ class BoxEdit {
 
             this.node.appendChild(this.text.node)
 
+            this.values.type = 'text'
+
             this.values.text = ''
             this.values.plainText = ''
 
@@ -12921,6 +12923,8 @@ class BoxEdit {
 
             this.node.appendChild(this.imageNode)
 
+            this.values.type = 'image'
+            
             this.values.url = ''
             this.values.database = false
             this.values.scale = ''
