@@ -12936,7 +12936,7 @@ class BoxEdit {
             this.node.appendChild(this.imageNode)
 
             this.values.type = 'image'
-            
+
             this.values.url = ''
             this.values.database = false
             this.values.scale = ''
