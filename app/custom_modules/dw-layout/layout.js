@@ -2134,6 +2134,7 @@ exports.change = addStyles
             if (
                 this._activeTabIndex >= 0 &&
                 this._activeTabIndex < this.tabs.length &&
+                this.tabs[this._activeTabIndex].content &&
                 typeof this.tabs[this._activeTabIndex].content.onResize ===
                     'function'
             ) {
@@ -2189,14 +2190,19 @@ exports.change = addStyles
                 this.tabsNode.children[this._activeTabIndex].classList.remove(
                     'active'
                 )
-                this.tabs[this._activeTabIndex].content.node.style.display =
-                    'none'
+                if (this.tabs[this._activeTabIndex].content) {
+                    this.tabs[this._activeTabIndex].content.node.style.display =
+                        'none'
+                }
             }
 
             this._activeTabIndex = index
 
             this.tabsNode.children[this._activeTabIndex].classList.add('active')
-            this.tabs[this._activeTabIndex].content.node.style.display = ''
+
+            if (this.tabs[this._activeTabIndex].content) {
+                this.tabs[this._activeTabIndex].content.node.style.display = ''
+            }
 
             this.checkResize()
 
@@ -2219,6 +2225,8 @@ exports.change = addStyles
                 return false
             }
 
+            this.contentNode.innerHTML = ''
+
             while (this.tabs.length > 0) {
                 this.contentNode.removeChild(this.contentNode.firstChild)
                 this.tabs.shift()
@@ -2230,18 +2238,22 @@ exports.change = addStyles
                     !Array.isArray(tabs[i]) &&
                     tabs[i] !== null
                 ) {
-                    if (
-                        validItem(tabs[i].content) &&
-                        typeof tabs[i].name === 'string'
-                    ) {
+                    if (typeof tabs[i].name === 'string') {
                         this.tabs.push({
-                            name: tabs[i].name,
-                            content: tabs[i].content
+                            name: tabs[i].name
                         })
 
-                        tabs[i].content.node.style.display = 'none'
+                        if (validItem(tabs[i].content)) {
+                            this.tabs[this.tabs.length - 1].content =
+                                tabs[i].content
+                            this.tabs[
+                                this.tabs.length - 1
+                            ].content.node.style.display = 'none'
 
-                        this.contentNode.appendChild(tabs[i].content.node)
+                            this.contentNode.appendChild(
+                                this.tabs[this.tabs.length - 1].content.node
+                            )
+                        }
 
                         if (
                             this.tabsNode.childElementCount < this.tabs.length
