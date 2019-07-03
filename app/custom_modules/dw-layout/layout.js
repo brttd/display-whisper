@@ -14033,6 +14033,7 @@ class BoxEdit {
                 this.toggleButton = new exports.Button({
                     icon: 'expand-y'
                 })
+                this.toggleButton.node.style.display = 'none'
 
                 this.activeButton = new exports.Button({
                     icon: 'play'
