@@ -1907,22 +1907,22 @@ exports.change = addStyles
                     small: this._small
                 })
 
-                newDivider.parent = this                
+                newDivider.parent = this
             }
 
             item.parent = this
 
             if (index >= 0 && index < this.items.length) {
-
                 if (newDivider) {
                     this.items.splice(index, 0, newDivider)
-                    this.node.insertBefore(newDivider.node, this.node.children[index])
+                    this.node.insertBefore(
+                        newDivider.node,
+                        this.node.children[index]
+                    )
                 }
 
-                this.items.splice(index , 0, item)
+                this.items.splice(index, 0, item)
                 this.node.insertBefore(item.node, newDivider.node)
-
-                
             } else {
                 if (newDivider) {
                     this.items.push(newDivider)
@@ -1932,7 +1932,6 @@ exports.change = addStyles
                 this.items.push(item)
                 this.node.appendChild(item.node)
             }
-            
 
             if (typeof item.onResize === 'function') {
                 this._itemResizeFunctions.push(item.onResize)
@@ -8055,8 +8054,6 @@ exports.change = addStyles
             this.items = []
 
             this._selected = []
-
-            
 
             if (typeof data.select === 'boolean') {
                 this.options.select = data.select
