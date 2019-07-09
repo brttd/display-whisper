@@ -4843,12 +4843,15 @@ const item_add = {
         })
 
         preview.onEvent('drag', () => {
-            let textSection = textEditor.getData()
-            textSection.name = 'Text 1'
             presentation.addDrop(
                 {
-                    itemType: 'text',
-                    sections: [textSection]
+                    itemType: 'multi',
+                    sections: [
+                        {
+                            name: 'Text 1',
+                            nodes: [textEditor.getData()]
+                        }
+                    ]
                 },
                 selectedTemplate
             )
@@ -4858,12 +4861,16 @@ const item_add = {
             if (item_add.options.tab !== 'Text') {
                 return false
             }
-            let textSection = textEditor.getData()
-            textSection.name = 'Text 1'
+
             presentation.addDrop(
                 {
-                    itemType: 'text',
-                    sections: [textSection]
+                    itemType: 'multi',
+                    sections: [
+                        {
+                            name: 'Text 1',
+                            nodes: [textEditor.getData()]
+                        }
+                    ]
                 },
                 selectedTemplate
             )
@@ -4873,12 +4880,15 @@ const item_add = {
             if (item_add.options.tab !== 'Text') {
                 return false
             }
-            let textSection = textEditor.getData()
-            textSection.name = 'Text 1'
             presentation.add(
                 {
-                    itemType: 'text',
-                    sections: [textSection]
+                    itemType: 'multi',
+                    sections: [
+                        {
+                            name: 'Text 1',
+                            nodes: [textEditor.getData()]
+                        }
+                    ]
                 },
                 selectedTemplate
             )
@@ -4970,20 +4980,31 @@ const item_add = {
         })
 
         imageMultiSelect.onEvent('open', event => {
-            let imageData = image.getData()
-            imageData.itemType = 'image'
-            imageData.database = false
+            let sections = []
 
             for (let i = 0; i < event.files.length; i++) {
+                let imageData = image.getData()
                 imageData.url = event.files[i]
 
-                presentation.add(imageData, selectedTemplate)
+                sections.push({
+                    name: 'Image ' + (i + 1).toString(),
+
+                    nodes: [imageData]
+                })
             }
+
+            presentation.add(
+                {
+                    itemType: 'multi',
+
+                    sections: sections
+                },
+                selectedTemplate
+            )
         })
 
         previewEditor.onEvent('drag', () => {
             let imageData = image.getData()
-            imageData.itemType = 'image'
             if (
                 imageData.url.startsWith('data:image\\png;base64') &&
                 !imageData.database
@@ -5005,12 +5026,35 @@ const item_add = {
                         }
                         if (answer === 'Yes') {
                             imageData.url = ''
-                            presentation.addDrop(imageData, selectedTemplate)
+
+                            presentation.addDrop(
+                                {
+                                    itemType: 'multi',
+                                    sections: [
+                                        {
+                                            name: 'Image',
+                                            nodes: [imageData]
+                                        }
+                                    ]
+                                },
+                                selectedTemplate
+                            )
                         }
                     }
                 )
             } else {
-                presentation.addDrop(imageData, selectedTemplate)
+                presentation.addDrop(
+                    {
+                        itemType: 'multi',
+                        sections: [
+                            {
+                                name: 'Image',
+                                nodes: [imageData]
+                            }
+                        ]
+                    },
+                    selectedTemplate
+                )
             }
         })
 
@@ -5020,7 +5064,7 @@ const item_add = {
             }
 
             let imageData = image.getData()
-            imageData.itemType = 'image'
+
             if (
                 imageData.url.startsWith('data:image\\png;base64') &&
                 !imageData.database
@@ -5042,12 +5086,34 @@ const item_add = {
                         }
                         if (answer === 'Yes') {
                             imageData.url = ''
-                            presentation.addDrop(imageData, selectedTemplate)
+                            presentation.addDrop(
+                                {
+                                    itemType: 'multi',
+                                    sections: [
+                                        {
+                                            name: 'Image',
+                                            nodes: [imageData]
+                                        }
+                                    ]
+                                },
+                                selectedTemplate
+                            )
                         }
                     }
                 )
             } else {
-                presentation.addDrop(imageData, selectedTemplate)
+                presentation.addDrop(
+                    {
+                        itemType: 'multi',
+                        sections: [
+                            {
+                                name: 'Image',
+                                nodes: [imageData]
+                            }
+                        ]
+                    },
+                    selectedTemplate
+                )
             }
         })
 
@@ -5056,7 +5122,7 @@ const item_add = {
                 return false
             }
             let imageData = image.getData()
-            imageData.itemType = 'image'
+
             if (
                 imageData.url.startsWith('data:image\\png;base64') &&
                 !imageData.database
@@ -5078,12 +5144,35 @@ const item_add = {
                         }
                         if (answer === 'Yes') {
                             imageData.url = ''
-                            presentation.add(imageData, selectedTemplate)
+
+                            presentation.add(
+                                {
+                                    itemType: 'multi',
+                                    sections: [
+                                        {
+                                            name: 'Image',
+                                            nodes: [imageData]
+                                        }
+                                    ]
+                                },
+                                selectedTemplate
+                            )
                         }
                     }
                 )
             } else {
-                presentation.add(imageData, selectedTemplate)
+                presentation.add(
+                    {
+                        itemType: 'multi',
+                        sections: [
+                            {
+                                name: 'Image',
+                                nodes: [imageData]
+                            }
+                        ]
+                    },
+                    selectedTemplate
+                )
             }
         })
 
