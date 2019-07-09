@@ -1059,7 +1059,6 @@ const item_presentation = {
                         subIndex: 0
                     }
                 }
-                //TODO: this should be += 1 ?
                 index += 1
             }
 
