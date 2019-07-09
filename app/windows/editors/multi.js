@@ -334,7 +334,7 @@ function showSection(index, nodeFocusIndex) {
             true
         )
     )
-    playControl.set(editor.data.sections[activeIndex])
+    playControl.edit(editor.data.sections[activeIndex])
 
     for (let i = 0; i < textNodeStorage.length; i++) {
         textNodeStorage[i].hide()

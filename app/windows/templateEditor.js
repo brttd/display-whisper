@@ -534,7 +534,7 @@ function updateAll() {
 
     displayEditor.set(editor.data)
 
-    playControl.set(editor.data)
+    playControl.edit(editor.data)
 
     updateOptions()
 }

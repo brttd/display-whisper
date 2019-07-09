@@ -751,7 +751,7 @@ function resetSong() {
 
     nameBox.value = authorBox.value = copyrightBox.value = textEditor.text = ''
 
-    playTimeEditor.set({ playTime: 0 })
+    playTimeEditor.edit({ playTime: 0 })
 
     sectionsEditor.clear()
     sectionsEditor.addInput = ''
@@ -946,7 +946,7 @@ function selectSection(name) {
     if (typeof editor.data.sections[currentSection] === 'object') {
         textEditor.text = editor.data.sections[currentSection].text
 
-        playTimeEditor.set({
+        playTimeEditor.edit({
             playTime: editor.data.sections[currentSection].playTime
         })
     }
@@ -1257,7 +1257,7 @@ function selectSection(name) {
             currentSection = ''
             textEditor.text = ''
 
-            playTimeEditor.set({ playTime: 0 })
+            playTimeEditor.edit({ playTime: 0 })
         }
 
         sectionsEditor.select(0)

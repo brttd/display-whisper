@@ -337,7 +337,7 @@ function update() {
         ]
     })
 
-    playControl.set(editor.data)
+    playControl.edit(editor.data)
 
     loadPDF()
 }

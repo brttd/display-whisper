@@ -589,7 +589,7 @@ function showSection(index) {
 
         sectionOverlayTextBox.edit(editor.data.sectionOverlay)
 
-        playControl.set(displaySections[activeIndex])
+        playControl.edit(displaySections[activeIndex])
 
         if (displaySections[activeIndex]._sectionName === introName) {
             contentTextBox.edit({ text: editor.data.intro.text })
@@ -621,7 +621,7 @@ function showSection(index) {
 
         showSectionOverlay.value = editor.data.sectionOverlay.show
 
-        playControl.set(displaySections[activeIndex])
+        playControl.edit(displaySections[activeIndex])
 
         endOverlayTextBox.hide()
 

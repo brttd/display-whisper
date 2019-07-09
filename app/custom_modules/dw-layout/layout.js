@@ -11203,7 +11203,7 @@ exports.change = addStyles
             }
         }
 
-        set(data) {
+        edit(data) {
             if (typeof data.playTime === 'number' && isFinite(data.playTime)) {
                 this.time.value = data.playTime / playTimeScale
             }
