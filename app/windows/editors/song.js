@@ -327,7 +327,8 @@ backgroundControl.connect(displayEditor)
                     ],
 
                     size: 90,
-                    direction: 'horizontal'
+                    direction: 'horizontal',
+                    small: true
                 }),
 
                 /* OK, Apply, Cancel */
@@ -358,7 +359,8 @@ backgroundControl.connect(displayEditor)
                 })
             ],
 
-            direction: 'vertical'
+            direction: 'vertical',
+            small: true
         })
     )
 }
