@@ -90,6 +90,7 @@ colorControl.connect(displayEditor)
     layout.body.add(
         new layout.LayoutBlock({
             items: [
+                /* Templates List */
                 new layout.LayoutBlock({
                     items: [list],
 
@@ -98,31 +99,34 @@ colorControl.connect(displayEditor)
                     maxWidth: 300,
                     minHeight: 200
                 }),
+
+                /* Display Editor + Editr + Format */
                 new layout.LayoutBlock({
                     items: [
-                        /* displayEditor controls */
+                        /* Display Editor */
                         new layout.LayoutBlock({
                             items: [
                                 new layout.Block(
                                     {
-                                        items: [colorControl, playControl],
+                                        items: [playControl, colorControl],
                                         childSpacing: 8
                                     },
                                     {
-                                        direction: 'vertical'
+                                        direction: 'horizontal'
                                     }
                                 )
                             ],
 
                             size: 20,
-                            minWidth: 284,
-                            minHeight: 116,
-                            maxHeight: 116
+                            minWidth: 615,
+                            minHeight: 62,
+                            maxHeight: 62
                         }),
-                        /* Node options + item options + displayEditor + item format + parts list*/
+
+                        /* Editor + Format */
                         new layout.LayoutBlock({
                             items: [
-                                /* Node options + item options + displayEditor */
+                                /* Editor */
                                 new layout.LayoutBlock({
                                     items: [
                                         new layout.Block(
@@ -130,10 +134,10 @@ colorControl.connect(displayEditor)
                                                 childSpacing: 8,
 
                                                 items: [
+                                                    propertiesBar,
+                                                    boxControl,
                                                     textControl,
                                                     imageControl,
-                                                    boxControl,
-                                                    propertiesBar,
                                                     displayEditor
                                                 ]
                                             },
@@ -143,12 +147,13 @@ colorControl.connect(displayEditor)
                                         )
                                     ],
 
-                                    size: 70,
+                                    size: 80,
 
-                                    minWidth: 395,
-                                    minHeight: 300
+                                    minWidth: 460,
+                                    minHeight: 425
                                 }),
-                                /* Item format + Parts list */
+
+                                /* Format */
                                 new layout.LayoutBlock({
                                     items: [
                                         new layout.Block(
@@ -162,7 +167,7 @@ colorControl.connect(displayEditor)
                                         )
                                     ],
 
-                                    size: 30,
+                                    size: 20,
 
                                     minWidth: 160,
                                     maxWidth: 160,
@@ -175,7 +180,8 @@ colorControl.connect(displayEditor)
                             direction: 'horizontal',
                             size: 40
                         }),
-                        /* Save button */
+
+                        /* Save, Remove */
                         new layout.LayoutBlock({
                             items: [
                                 new layout.Block(
