@@ -377,7 +377,13 @@ function showSection(index, nodeFocusIndex) {
     }
 
     if (editNodes.length > 0) {
-        editNodes[0].focus()
+        if (typeof nodeFocusIndex === 'number') {
+            editNodes[
+                Math.max(0, Math.min(nodeFocusIndex, editNodes.length - 1))
+            ].focus()
+        } else {
+            editNodes[0].focus()
+        }
     }
 }
 
