@@ -793,6 +793,9 @@ function updateSectionList() {
 
             newNode = editor.util.copyObj(editor.data.template.text)
             newNode.type = 'text'
+
+            newNode.text = ''
+            newNode.plainText = ''
         } else if (event.text === 'Image') {
             let index = -1
 
@@ -812,6 +815,9 @@ function updateSectionList() {
 
             newNode = editor.util.copyObj(editor.data.template.image)
             newNode.type = 'image'
+
+            newNode.url = ''
+            newNode.database = false
         }
 
         editNodes[editNodes.length - 1].edit(newNode)
