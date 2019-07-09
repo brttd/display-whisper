@@ -348,12 +348,23 @@ const item_presentation = {
         let listIndex = lists.findIndex(list => list.id === changedItem.listId)
 
         if (listIndex !== -1) {
-            updateItem(
-                listIndex,
-                lists[listIndex].list.findIndex(
-                    item => item.id === changedItem.id
-                )
+            let itemIndex = lists[listIndex].list.findIndex(
+                item => item.id === changedItem.id
             )
+
+            if (itemIndex === -1) {
+                return false
+            }
+
+            updateItem(listIndex, itemIndex)
+
+            if (
+                itemIndex !== lists[listIndex].active.index &&
+                itemIndex !== lists[listIndex].selected.index &&
+                options.autoMinimize
+            ) {
+                lists[listIndex].itemsBlock.items[itemIndex].minimize()
+            }
         }
     }
 
