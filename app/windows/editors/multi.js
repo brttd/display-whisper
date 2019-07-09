@@ -309,6 +309,14 @@ function onNodeChange(event) {
 }
 function onNodeFocus(event) {
     nodesEditor.select(editNodes.indexOf(event.from))
+
+    if (event.from.values.type === 'text') {
+        textControl.visible = true
+        imageControl.visible = false
+    } else if (event.from.values.type === 'image') {
+        textControl.visible = false
+        imageControl.visible = true
+    }
 }
 
 function addTextNode() {
