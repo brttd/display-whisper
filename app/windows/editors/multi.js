@@ -43,13 +43,18 @@ const applyTemplateButton = new layout.Button(
     }
 )
 
-const nodesEditor = new layout.List({
-    reorderable: true,
-    editButton: false,
-    removeButton: true,
+const nodesEditor = new layout.List(
+    {
+        reorderable: true,
+        editButton: false,
+        removeButton: true,
 
-    addInput: ['Text', 'Image']
-})
+        addInput: ['Text', 'Image']
+    },
+    {
+        border: false
+    }
+)
 
 const displayEditor = new layout.DisplayEdit(
     {},
@@ -122,9 +127,7 @@ layout.body.add(
                                             direction: 'horizontal',
                                             grow: false,
 
-                                            align: 'end',
-
-                                            padding: 0
+                                            align: 'end'
                                         }
                                     )
                                 ],
@@ -132,8 +135,8 @@ layout.body.add(
                                 size: 10,
 
                                 minWidth: 100,
-                                minHeight: 54,
-                                maxHeight: 54
+                                minHeight: 62,
+                                maxHeight: 62
                             }),
                             //Editor + Nodes list
                             new layout.LayoutBlock({
@@ -174,15 +177,18 @@ layout.body.add(
                                 ],
 
                                 size: 90,
-                                direction: 'horizontal'
+                                direction: 'horizontal',
+                                small: true
                             })
                         ],
 
-                        size: 80
+                        size: 80,
+                        small: true
                     })
                 ],
 
-                direction: 'horizontal'
+                direction: 'horizontal',
+                small: true
             }),
             //Disply, OK, Apply, Cancel
             new layout.LayoutBlock({
@@ -203,7 +209,9 @@ layout.body.add(
                 minHeight: 40,
                 maxHeight: 40
             })
-        ]
+        ],
+
+        small: true
     })
 )
 
