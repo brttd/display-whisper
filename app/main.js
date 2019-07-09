@@ -1643,6 +1643,8 @@ const appMenus = {
 
     const prebuiltMenus = {}
 
+    let addedDebug = false
+
     function onMenuClick(item) {
         if (typeof item.window === 'string') {
             openWindow(item.window)
@@ -2357,7 +2359,13 @@ const appMenus = {
     }
 
     settings.listen('debug.enable', value => {
+        if (addedDebug) {
+            return false
+        }
+
         if (value) {
+            addedDebug = true
+
             appMenus.main.append(items.debug)
 
             Menu.setApplicationMenu(appMenus.main)
