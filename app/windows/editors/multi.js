@@ -418,6 +418,9 @@ function showSection(index, nodeFocusIndex) {
         } else {
             editNodes[0].focus()
         }
+    } else {
+        //Remove focus from any currently focused edit node
+        playControl.focus()
     }
 }
 
