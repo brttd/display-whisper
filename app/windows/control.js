@@ -4812,16 +4812,12 @@ const item_add = {
                 align: 'stretch'
             }
         )
-        textBlock.add(styleEditor)
 
         const boxEditor = new layout.BoxStyleEdit({})
-
-        textBlock.add(boxEditor)
 
         const fitTextButton = new layout.Button({
             text: 'Scale Text'
         })
-        textBlock.add(fitTextButton)
 
         const preview = new layout.DisplayEdit(
             {},
@@ -4834,7 +4830,6 @@ const item_add = {
                 background: true
             }
         )
-        textBlock.add(preview)
 
         const textEditor = preview.add({
             type: 'text'
@@ -4842,6 +4837,11 @@ const item_add = {
 
         textEditor.connect(styleEditor)
         textEditor.connect(boxEditor)
+
+        textBlock.add(boxEditor)
+        textBlock.add(styleEditor)
+        textBlock.add(fitTextButton)
+        textBlock.add(preview)
 
         fitTextButton.onEvent('click', () => {
             textEditor.fit()
@@ -4933,9 +4933,6 @@ const item_add = {
             align: false
         })
 
-        imageBlock.add(imageEditor)
-        imageBlock.add(boxEditor)
-
         let previewEditor = new layout.DisplayEdit(
             {},
             {
@@ -4953,10 +4950,12 @@ const item_add = {
         image.url =
             'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAAAAABX3VL4AAAACXBIWXMAAAsTAAALEwEAmpwYAAAADklEQVQImWP+L8Uw8z8AB6wCtQYJB2cAAAAASUVORK5CYII='
 
-        imageBlock.add(previewEditor)
-
         imageEditor.connect(image)
         boxEditor.connect(image)
+
+        imageBlock.add(boxEditor)
+        imageBlock.add(imageEditor)
+        imageBlock.add(previewEditor)
 
         let imageMultiSelect = new layout.FileInput({
             open: true,
@@ -5227,8 +5226,8 @@ const item_add = {
             label: 'Background'
         })
 
-        pdfBlock.add(fileSelect)
         pdfBlock.add(backgroundEditor)
+        pdfBlock.add(fileSelect)
 
         let preview = new layout.Display(
             {},
