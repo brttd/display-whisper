@@ -48,7 +48,7 @@ const partsList = new layout.List(
         removeButton: false
     },
     {
-        borderTop: false
+        border: false
     }
 )
 
