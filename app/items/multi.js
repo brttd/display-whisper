@@ -494,4 +494,4 @@ module.exports.template = {
     options: []
 }
 
-module.exports.name = 'Multi'
+module.exports.name = 'Text & Image'
