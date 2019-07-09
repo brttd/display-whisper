@@ -51,6 +51,17 @@ const fileSelector = new layout.FileInput({
     read: false
 })
 
+const fileNameDisplay = new layout.Text(
+    {},
+    {
+        align: 'center',
+
+        overflow: 'hidden'
+    }
+)
+fileNameDisplay.node.style.wordBreak = 'keep-all'
+fileNameDisplay.node.style.textOverflow = 'ellipsis'
+
 const backgroundControl = new layout.ColorInput({
     label: 'Background'
 })
@@ -350,6 +361,8 @@ function update() {
     })
 
     playControl.edit(editor.data)
+
+    fileNameDisplay.text = editor.data.file
 
     loadPDF()
 }
