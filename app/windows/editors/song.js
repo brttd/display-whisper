@@ -83,9 +83,9 @@ const backgroundControl = new layout.BackgroundStyleEdit({})
 const playControl = new layout.PlayStyleEdit({})
 
 const showSectionOverlay = new layout.CheckboxInput({
-    label: 'Show Section Overlay'
+    label: 'Section Overlay'
 })
-const showEndOverlay = new layout.CheckboxInput({ label: 'Show End Overlay' })
+const showEndOverlay = new layout.CheckboxInput({ label: 'End Overlay' })
 const maxLines = new layout.NumberInput({
     value: 0,
     max: 100,
