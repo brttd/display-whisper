@@ -13028,33 +13028,19 @@ class BoxEdit {
         }
 
         edit(data, fromUser = false) {
+            let event = {}
+
             if (typeof data.url === 'string') {
                 this.values.url = data.url
                 this.imageNode.style.backgroundImage = formatUrl(data.url)
 
-                sendEventTo(
-                    {
-                        url: this.values.url,
-
-                        fromUser: fromUser,
-                        from: this
-                    },
-                    this.events.change
-                )
+                event.url = this.values.url
             }
 
             if (typeof data.database === 'boolean') {
                 this.values.database = data.database
 
-                sendEventTo(
-                    {
-                        database: this.values.database,
-
-                        fromUser: fromUser,
-                        from: this
-                    },
-                    this.events.change
-                )
+                event.database = this.values.database
             }
 
             if (
@@ -13072,15 +13058,14 @@ class BoxEdit {
                     this.imageNode.style.backgroundSize = '100% 100%'
                 }
 
-                sendEventTo(
-                    {
-                        scale: this.values.scale,
+                event.scale = this.values.scale
+            }
 
-                        fromUser: fromUser,
-                        from: this
-                    },
-                    this.events.change
-                )
+            if (Object.keys(event).length > 0) {
+                event.fromUser = fromUser
+                event.from = this
+    
+                sendEventTo(event, this.events.change)
             }
 
             super.edit(data, fromUser)
