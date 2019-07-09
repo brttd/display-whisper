@@ -214,6 +214,65 @@ backgroundControl.connect(displayEditor)
     layout.body.add(
         new layout.LayoutBlock({
             items: [
+                /* Songs + Templates */
+                new layout.LayoutBlock({
+                    items: [
+                        new layout.Block(
+                            {
+                                items: [
+                                    songsBlock,
+                                    new layout.Filler(),
+
+                                    fitTextButton,
+
+                                    new layout.Block(
+                                        {
+                                            items: [
+                                                new layout.Text({
+                                                    text: 'Templates'
+                                                }),
+                                                new layout.Block(
+                                                    {
+                                                        items: [
+                                                            templateSelector,
+                                                            applyTemplateButton
+                                                        ],
+                                                        childSpacing: 8
+                                                    },
+                                                    {
+                                                        direction: 'horizontal',
+                                                        padding: 0
+                                                    }
+                                                )
+                                            ],
+                                            childSpacing: 8
+                                        },
+                                        {
+                                            direction: 'vertical',
+                                            grow: false,
+
+                                            align: 'end',
+
+                                            padding: 0
+                                        }
+                                    )
+                                ]
+                            },
+                            {
+                                direction: 'horizontal',
+                                padding: 4
+                            }
+                        )
+                    ],
+
+                    size: 10,
+
+                    minWidth: 550,
+                    minHeight: 90,
+                    maxHeight: 90
+                }),
+
+                /* Sections + Editor */
                 new layout.LayoutBlock({
                     items: [
                         /* Sections */
@@ -221,131 +280,62 @@ backgroundControl.connect(displayEditor)
                             items: [playOrderEditor],
 
                             size: 20,
+
                             minWidth: 150,
                             maxWidth: 300,
                             minHeight: 200
                         }),
+
+                        /* Editor */
                         new layout.LayoutBlock({
                             items: [
-                                /* Songs + Templates */
-                                new layout.LayoutBlock({
-                                    items: [
-                                        new layout.Block(
-                                            {
-                                                items: [
-                                                    songsBlock,
-                                                    new layout.Filler(),
+                                new layout.Block(
+                                    {
+                                        items: [
+                                            new layout.Block(
+                                                {
+                                                    items: [
+                                                        playControl,
+                                                        backgroundControl,
+                                                        sectionsBar
+                                                    ],
+                                                    childSpacing: 8
+                                                },
+                                                {
+                                                    direction: 'horizontal',
+                                                    wrap: true,
 
-                                                    fitTextButton,
+                                                    grow: false,
+                                                    shrink: false,
 
-                                                    new layout.Block(
-                                                        {
-                                                            items: [
-                                                                new layout.Text(
-                                                                    {
-                                                                        text:
-                                                                            'Templates'
-                                                                    }
-                                                                ),
-                                                                new layout.Block(
-                                                                    {
-                                                                        items: [
-                                                                            templateSelector,
-                                                                            applyTemplateButton
-                                                                        ],
-                                                                        childSpacing: 8
-                                                                    },
-                                                                    {
-                                                                        direction:
-                                                                            'horizontal',
-                                                                        padding: 0
-                                                                    }
-                                                                )
-                                                            ],
-                                                            childSpacing: 8
-                                                        },
-                                                        {
-                                                            direction:
-                                                                'vertical',
-                                                            grow: false,
+                                                    padding: 0,
 
-                                                            align: 'end',
-
-                                                            padding: 0
-                                                        }
-                                                    )
-                                                ]
-                                            },
-                                            {
-                                                direction: 'horizontal',
-                                                padding: 4
-                                            }
-                                        )
-                                    ],
-
-                                    size: 20,
-                                    minWidth: 550,
-                                    minHeight: 90,
-                                    maxHeight: 90
-                                }),
-                                /* Editor */
-                                new layout.LayoutBlock({
-                                    items: [
-                                        new layout.Block(
-                                            {
-                                                items: [
-                                                    new layout.Block(
-                                                        {
-                                                            items: [
-                                                                playControl,
-                                                                backgroundControl,
-                                                                sectionsBar
-                                                            ],
-                                                            childSpacing: 8
-                                                        },
-                                                        {
-                                                            direction:
-                                                                'horizontal',
-                                                            wrap: true,
-
-                                                            grow: false,
-                                                            shrink: false,
-
-                                                            padding: 0,
-
-                                                            borderBottom: true,
-                                                            paddingBottom: 4,
-                                                            marginBottom: 4
-                                                        }
-                                                    ),
-                                                    boxControl,
-                                                    textControl,
-                                                    displayEditor
-                                                ],
-                                                childSpacing: 8
-                                            },
-                                            {
-                                                direction: 'vertical',
-                                                overflow: 'hidden'
-                                            }
-                                        )
-                                    ],
-
-                                    size: 70,
-                                    minWidth: 615,
-                                    minHeight: 400
-                                })
-                                /* OK, Apply, Cancel */
+                                                    borderBottom: true,
+                                                    paddingBottom: 4,
+                                                    marginBottom: 4
+                                                }
+                                            ),
+                                            boxControl,
+                                            textControl,
+                                            displayEditor
+                                        ],
+                                        childSpacing: 8
+                                    },
+                                    {
+                                        direction: 'vertical',
+                                        overflow: 'hidden'
+                                    }
+                                )
                             ],
 
-                            direction: 'vertical',
                             size: 80,
 
-                            small: true
+                            minWidth: 615,
+                            minHeight: 400
                         })
                     ],
 
-                    size: 90,
+                    size: 80,
                     direction: 'horizontal',
                     small: true
                 }),
@@ -372,6 +362,7 @@ backgroundControl.connect(displayEditor)
                     ],
 
                     size: 10,
+
                     minWidth: 30,
                     minHeight: 40,
                     maxHeight: 40
