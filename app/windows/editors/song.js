@@ -576,11 +576,11 @@ function showSection(index) {
         displaySections[activeIndex]._sectionName === outroName ||
         displaySections[activeIndex]._sectionName === blankName
     ) {
-        showEndOverlay.visible = false
+        showEndOverlay.disabled = true
         sectionOverlayTextBox.hide()
         endOverlayTextBox.hide()
 
-        showSectionOverlay.visible = false
+        showSectionOverlay.disabled = true
         maxLines.disabled = true
 
         displayEditor.edit(displaySections[activeIndex])
@@ -600,10 +600,9 @@ function showSection(index) {
         } else if (displaySections[activeIndex]._sectionName === blankName) {
             contentTextBox.hide()
             sectionOverlayTextBox.hide()
-            showSectionOverlay.value = false
         }
     } else {
-        showSectionOverlay.visible = true
+        showSectionOverlay.disabled = false
         maxLines.disabled = false
 
         displayEditor.edit(editor.data.template)
@@ -626,7 +625,7 @@ function showSection(index) {
         endOverlayTextBox.hide()
 
         if (isLastSongSection(activeIndex)) {
-            showEndOverlay.visible = true
+            showEndOverlay.disabled = false
 
             showEndOverlay.value = editor.data.endOverlay.show
 
@@ -634,7 +633,7 @@ function showSection(index) {
                 endOverlayTextBox.show()
             }
         } else {
-            showEndOverlay.visible = false
+            showEndOverlay.disabled = true
         }
     }
 
@@ -723,7 +722,7 @@ function updateSectionOverlayText() {
     ) {
         sectionOverlayTextBox.hide()
 
-        showSectionOverlay.visible = false
+        showSectionOverlay.disabled = true
 
         return false
     }
@@ -756,7 +755,7 @@ function updateEndOverlayText() {
         }
     } else {
         endOverlayTextBox.hide()
-        showEndOverlay.visible = false
+        showEndOverlay.disabled = true
     }
 }
 
