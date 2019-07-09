@@ -31,7 +31,7 @@ function updateDisplayPreviews(index) {
 
     for (let i = 0; i < displayPreviews.length; i++) {
         if (displayPreviews[i].index === index) {
-            displayPreviews[i].display.set(
+            displayPreviews[i].display.edit(
                 lists[index].output[displayPreviews[i].preview]
             )
         }
@@ -4838,8 +4838,8 @@ const item_add = {
         })
 
         templateSelect.onEvent('change', () => {
-            preview.set(selectedTemplate)
-            textEditor.set(selectedTemplate)
+            preview.edit(selectedTemplate)
+            textEditor.edit(selectedTemplate)
         })
 
         preview.onEvent('drag', () => {
@@ -5230,7 +5230,7 @@ const item_add = {
                 background: true
             }
         )
-        preview.set({
+        preview.edit({
             nodes: [
                 {
                     type: 'pdf',
@@ -5246,13 +5246,13 @@ const item_add = {
         pdfBlock.add(preview)
 
         templateSelect.onEvent('change', () => {
-            preview.update(selectedTemplate)
+            preview.edit(selectedTemplate)
 
             backgroundEditor.value = preview.display.background
         })
 
         backgroundEditor.onEvent('change', event => {
-            preview.update({
+            preview.edit({
                 background: event.value
             })
         })
@@ -5261,7 +5261,7 @@ const item_add = {
             if (event.filename) {
                 file = event.filename
 
-                preview.update({
+                preview.edit({
                     nodes: [
                         {
                             type: 'pdf',
@@ -5352,7 +5352,7 @@ const item_add = {
                     if (!err) {
                         file = value
 
-                        preview.update({
+                        preview.edit({
                             nodes: [
                                 {
                                     type: 'pdf',
@@ -5453,7 +5453,7 @@ class DisplayPreview {
                 this.input.value =
                     (this.index + 1).toString() + ' ' + this.preview
 
-                this.display.set(lists[this.index].output[this.preview])
+                this.display.edit(lists[this.index].output[this.preview])
 
                 this.saveOptions()
             }
@@ -5482,7 +5482,7 @@ class DisplayPreview {
         this.input.value = value
 
         if (!allOptions.includes(value)) {
-            this.display.set({
+            this.display.edit({
                 background: 'grey',
                 nodes: []
             })

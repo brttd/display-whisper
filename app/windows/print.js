@@ -801,7 +801,7 @@ function selectItem(index) {
         songOptionsBlock.visible = false
         textOptionsBlock.visible = true
 
-        textEditor.set(item.data)
+        textEditor.edit(item.data)
 
         textType.value = item.data.type
     } else {
@@ -855,7 +855,7 @@ function doUpdate() {
         }
     }
 
-    preview.set(allText)
+    preview.edit(allText)
 }
 //Updates the print preview
 function updatePreview() {
@@ -1132,7 +1132,7 @@ function updatePrintSettings() {
 
         songType.value = item.sections[event.index].type
 
-        songTextEditor.set(item.sections[event.index])
+        songTextEditor.edit(item.sections[event.index])
 
         songTextEditor.focus()
     })

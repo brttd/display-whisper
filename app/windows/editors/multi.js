@@ -325,7 +325,7 @@ function showSection(index, nodeFocusIndex) {
 
     activeIndex = index
 
-    displayEditor.set(
+    displayEditor.edit(
         editor.util.filterObj(
             editor.data.sections[activeIndex],
             {

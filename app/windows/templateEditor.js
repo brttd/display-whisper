@@ -532,7 +532,7 @@ function updateOptions() {
 function updateAll() {
     updateNodes()
 
-    displayEditor.set(editor.data)
+    displayEditor.edit(editor.data)
 
     playControl.edit(editor.data)
 

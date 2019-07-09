@@ -320,7 +320,7 @@ function loadPDF() {
 }
 
 function update() {
-    displayPreview.update({
+    displayPreview.edit({
         background: editor.data.background,
 
         nodes: [
@@ -355,7 +355,7 @@ let onChange = event => {
 }
 
 pageList.onEvent('select', event => {
-    displayPreview.update({
+    displayPreview.edit({
         nodes: [
             {
                 type: 'pdf',

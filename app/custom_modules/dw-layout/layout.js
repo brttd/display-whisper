@@ -7680,9 +7680,6 @@ exports.change = addStyles
                 sendEventTo(allChanges, this.events.change)
             }
         }
-        set(data = {}) {
-            this.edit(data)
-        }
 
         textEdit(command, arg, fromUser = false) {
             if (this.textNode) {
@@ -12382,7 +12379,7 @@ class BoxEdit {
                 this.writeContent
             )
 
-            this.set(data)
+            this.edit(data)
 
             this.updateDisplay()
 
@@ -12598,7 +12595,7 @@ class BoxEdit {
             exports.onFrame.end(this.writeNodes)
         }
 
-        set(data = {}) {
+        edit(data = {}) {
             if (typeof data.background === 'string') {
                 this.data.background = data.background
             }
@@ -12612,36 +12609,11 @@ class BoxEdit {
             }
 
             if (Array.isArray(data.nodes)) {
-                this.data.nodes = data.nodes
-
-                for (
-                    let i = 0;
-                    i < this.nodes.length && i < this.data.nodes.length;
-                    i++
-                ) {
-                    this.nodes[i].update(this.data.nodes[i])
+                //Remove extra nodes
+                if (this.data.nodes.length > data.nodes.length) {
+                    this.data.nodes.splice(data.nodes.length, this.data.nodes.length)
                 }
 
-                exports.onFrame.end(this.writeNodes)
-            }
-
-            exports.onFrame.end(this.writeContent)
-        }
-
-        update(data = {}) {
-            if (typeof data.background === 'string') {
-                this.data.background = data.background
-            }
-
-            if (typeof data.backgroundImage === 'string') {
-                this.data.backgroundImage = data.backgroundImage
-            }
-
-            if (typeof data.backgroundScale === 'string') {
-                this.data.backgroundScale = data.backgroundScale
-            }
-
-            if (Array.isArray(data.nodes)) {
                 //For each existing (displayed) node which is being changed
                 for (
                     let i = 0;
@@ -12651,7 +12623,7 @@ class BoxEdit {
                     this.nodes[i].update(data.nodes[i])
                 }
 
-                //For each existing (not displayed) node which is being changed
+                //For each existing node which is being changed
                 for (
                     let i = 0;
                     i < this.data.nodes.length && i < data.nodes.length;
@@ -12789,7 +12761,7 @@ class BoxEdit {
                 exports.contextMenu.enable('box-edit')
             })
 
-            this.set(data)
+            this.edit(data)
         }
 
         set displayScale(scale) {
@@ -12901,10 +12873,6 @@ class BoxEdit {
         textEdit() {
             this.text.textEdit(...arguments)
         }
-
-        set(data) {
-            this.edit(data)
-        }
     }
 
     class ImageBoxEdit extends BoxEdit {
@@ -12951,7 +12919,7 @@ class BoxEdit {
             this.values.database = false
             this.values.scale = ''
 
-            this.set(data)
+            this.edit(data)
 
             this.imageNode.addEventListener('click', () => {
                 this.focus(true)
@@ -13071,10 +13039,6 @@ class BoxEdit {
             }
 
             super.edit(data, fromUser)
-        }
-
-        set(data) {
-            this.edit(data)
         }
     }
 
@@ -13515,10 +13479,6 @@ class BoxEdit {
                     }
                 }
             }
-        }
-
-        set(data = {}) {
-            this.edit(data)
         }
     }
     exports.DisplayEdit = items.DisplayEdit = DisplayEdit
@@ -14825,7 +14785,7 @@ class BoxEdit {
         }
         set display(data) {
             this._display = data
-            this.displayItem.set(data)
+            this.displayItem.edit(data)
         }
 
         get active() {

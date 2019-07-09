@@ -68,12 +68,12 @@ Normal - <b><sub>Bold Sub</sub>Bold Super<sup>sup</sup></b>`,
         log.splice(0, log.length - 5)
 
         logOutput.text = log.map(item => item.toString()).join(' | ')
-        outputDisplay.update({ nodes: [{ size: size }] })
+        outputDisplay.edit({ nodes: [{ size: size }] })
     }
 
     textInput.onEvent('change', event => {
         if (event.fromUser) {
-            outputDisplay.update({
+            outputDisplay.edit({
                 nodes: [
                     objUtil.filterObj(
                         event,
