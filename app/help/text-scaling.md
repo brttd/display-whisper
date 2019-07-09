@@ -18,9 +18,9 @@ For songs, this is done independently on the **Intro**, **Outro**, **Section Ove
 Song content sizing is done for all sections, not just the ones currently in use.  
 A section not in the play-order with a large amount of text may cause the other sections to have a small text size!
 
-Song and text items will automatically fit & unify when added to the presentation, or when in a presentation being opened. This can be changed in the Preferences, under _Display_ > _Text Scaling_ > _Scale text & unify..._
+Song and text items will automatically fit & unify when added to the _Presentation_, or opening a file. This can be changed in the Preferences, under _Display_ > _Text Scaling_ > _Scale text & unify..._
 
 # Display Sizing
 If a section has too much text or its text size is too large to fit all of it in the text element, the text size will be scaled down to fit all text. This happens automatically to prevent any issues with parts of text not showing, and can be disabled in the Preferences, under _Display_ > _Text Scaling_ > _Always scale text which is too large_.
 
-Any sections in the presentation with too small text will be highlighted in red. This is too warn you that text may be illegible when displayed. The size at which the warning is shown can be changed in the Preferences, under _Display_ > _Text Scaling_ > _Minimum text size_.
+Any sections in the _Presentation_ with too small text will be highlighted in red. This is too warn you that text may be illegible when displayed. The size at which the warning is shown can be changed in the Preferences, under _Display_ > _Text Scaling_ > _Minimum text size_.

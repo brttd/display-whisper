@@ -2,13 +2,13 @@
 Song content (verses, choruses, etc) can be split into multiple parts, and sized using the same options as all Text items. More information is available in the [Text Sizing](#text-sizing) help.
 
 # Special Song Sections
-A song item in the presentation will show its content as listed in its play order. Songs items can also include special sections:
+A song item in the _Presentation_ will show its content as listed in its play order. Songs items can also include special sections:
 * **Blank** An empty section.
 * **Intro** An introductory section, normally showing the name and author of the song.
 * **Outro** A concluding section, normally showing the name, copyright, and author of the song.
 
 Each of these sections can be added or removed from the song item from within its editor.  
-When adding a song item to the presentation, these section can be automatically added to the start and end of the song.  
+When adding a song item to the _Presentation_, these section can be automatically added to the start and end of the song.  
 By default a **Blank** section will be added at the start and end. This can be changed in the Preferences, under _Songs_ > _Play Order_.  
 If **Add intro section to start** is enabled it will add the intro section to the start of the song. If **Add blank section to start** is enabled, the intro section will be added after the blank section.  
 If **Add outro section to end** is enabled it will add the outro section to the end of the song. If **Add blank section to end** is enabled, the outro section will be added before the blank section.
@@ -69,7 +69,7 @@ If no fallback is specified, then the referenced empty value is used.
 Space characters (**" "**) will be ignored when checking if a text expression value is empty or not.
 
 >**Note:**  
-To provide warning when a song in the presentation might be using a expression which references no actual text information, a notification is shown in the Control window when a song is added to the presentation, and it does not have any text for its name, author, or copyright. This can be changed in Preferences, under _Songs_ > _Missing Information_ > _Show warning..._  
+To provide warning when a song in the _Presentation_ might be using a expression which references no actual text information, a notification is shown in the Control window when a song is added to the _Presentation_, and it does not have any text for its name, author, or copyright. This can be changed in Preferences, under _Songs_ > _Missing Information_ > _Show warning..._  
 Another tool to fix songs with incomplete information is the [Check Songs](#checking-songs) tool. 
 
 # Viewing & Editing Songs

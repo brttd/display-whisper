@@ -9,19 +9,17 @@ The auto-save does not modify any presentation files you have saved. The auto-sa
 A presentation file will only be modified when you manually save the presentation to it.
 
 # Presentation Controls
-The _Presentation Controls_ in the Control window include a timer, buttons for moving through the presentation, and play options
-* ![play-first](#play-first) Move to start of presentation
-* ![play-last](#play-last) Move to end of presentation
+The _Presentation List Controls_ in the Control window include a timer, buttons for moving through the presentation, and play options
+* ![play-first](#play-first) Move to start of the _Presentation_ list
 * ![play-previous](#play-previous) Move to previous section
 * ![play-next](#play-next) Move to next section
-* **Blank** Makes the display black (Can only be used when one or more screen is used for display output)
-* **Shuffle** If enabled, when the presentation moves from one item to another, the next item will be chosen randomly. This happens when moving backwards and forwards through the presentation. Going forwards and backwards between sections within an item will behave as normal
-* **Loop** If enabled, advancing whilst at the end of the presentation will move to the first section in the presentation. Likewise going backwards when at the start will go to the last section
+* **Shuffle** If enabled, when a _Presentation_ list moves from one item to another, the next item will be chosen randomly. This happens when moving backwards and forwards through a _Presentation_ list. Going forwards and backwards between sections within an item will behave as normal
+* **Loop** If enabled, advancing whilst at the end of a _Presentation_ list will move to the first section in the list. Likewise going backwards when at the start will go to the last section
 * **Play Options**
-    * ***Auto*** Sections advance either when manually moving through the presentation, or when set to automatically advance
-    * ***Manual*** Sections will only advance when manually moving through the presentation. All options for automatic advancing will be ignored
+    * ***Auto*** Sections advance either when manually moving through a _Presentation_ list, or when set to automatically advance
+    * ***Manual*** Sections will only advance when manually moving through a _Presentation_ list. All options for automatic advancing will be ignored
 
-The presentation can also be controlled with keyboard shortcuts:
+The selected _Presentation_ list can also be controlled with keyboard shortcuts:
 * `control.keyboard.playNext` Display the next section
 * `control.keyboard.playPrevious` Display the previous section
 * `control.keyboard.selectNext` Select next section
@@ -37,7 +35,7 @@ The speed at which it is repeated is dependent on the OS keyboard settings.
 >**Note:**  
 Displaying a section will also select it.
 
-You can also reorder items in the presentation with keyboard shortcuts:
+You can also reorder items in a _Presentation_ list with keyboard shortcuts:
 * `control.keyboard.moveSelectedDown` Move the selected item down
 * `control.keyboard.moveSelectedUp` Move the selected item up
 * `control.keyboard.moveSelectedBottom` Move the selected item to the end
@@ -48,15 +46,7 @@ These, and all other keyboard shortcuts can be changed in the Preferences, under
 
 # Changing Display Output
 The _Display Menu_ in the Control window has buttons for enabling & disabling display output for each available screen.
-There are also 5 keyboard shortcuts:
 * `control.keyboard.disableDisplay` Turn off display output for all screens
-* `control.keyboard.toggleDisplayScreen1` Toggle display output for screen 1.
-* `control.keyboard.toggleDisplayScreen2` Toggle display output for screen 2.
-* `control.keyboard.toggleDisplayScreen3` Toggle display output for screen 3.
-* `control.keyboard.toggleDisplayScreen4` Toggle display output for screen 4.
-
->**Note:**  
-Using a keyboard shortcut for a screen which isn't available will have no effect.
 
 ## Display Size And Appearance
 Because multiple screens (each with a different size) can simultaneously be used for display output, there is one "master" display size used. All display outputs will scale from the master display size to fit their specific size.
@@ -82,8 +72,8 @@ If **Master display size** is set to ***Smallest*** or ***Largest*** then the sc
 
 
 # Previews
-The _Previews_ in the Control window can each be set to one of four options:
+The _Previews_ in the Control window can each be set to one of four options, for each list in the _Presentation_:
 * **Active** shows the currently displayed section
-* **Preview** shows the currently selected section
+* **Selected** shows the currently selected section
 * **Previous** shows the section before the displayed section
 * **Next** shows the section after the displayed section

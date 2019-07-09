@@ -1,9 +1,9 @@
 # About templates
-Templates are presets for the appearance of items, and can be used to apply a uniform appearance to presentation items.
+Templates are presets for the appearance of items, and can be used to apply a uniform appearance to _Presentation_ items.
 
-Because Songs, Text, and Image items do not all have the same options for appearance, templates have both universal and item specific options.
+Because Song, Text/Image, and PDF items do not all have the same options for appearance, templates have both universal and item specific options.
 
-When adding an item to the presentation, a template will be automatically applied to the new item. The template used can be changed with the option at the bottom of the _Add_ tab.  
+When adding an item to the _Presentation_, a template will be automatically applied to the new item. The template used can be changed with the option at the bottom of the _Add_ tab.  
 Items do not store what template was used when they were added. To change the appearance of the item to a different template, or re-apply a template, open the item editor and use the template _Apply_ option.
 
 # Template Editor
