@@ -12893,7 +12893,9 @@ class BoxEdit {
         }
 
         edit(data, fromUser = false) {
+            //the rich text item will emit it's own edit events for textual changes
             this.text.edit(data, fromUser)
+            //and the base boxEdit item will emit top/left/right/bottom/opacity changes
             super.edit(data, fromUser)
         }
         textEdit() {
