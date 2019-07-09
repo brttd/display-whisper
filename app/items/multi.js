@@ -253,20 +253,36 @@ module.exports = class Multi {
         if (this.data.sections.length === 0) {
             return 'Empty'
         } else {
-            let types = 'Blank'
-            let sections = this.data.sections.length.toString() + ' section'
+            let title = 'Blank'
 
             if (this.types.length > 0) {
-                types = this.types
+                title = this.types
                     .map(type => type.charAt(0).toUpperCase() + type.slice(1))
-                    .join(',  ')
+                    .join(' and ')
+
+                if (this.types.length > 2) {
+                    title =
+                        this.types
+                            .slice(0, this.types.length - 1)
+                            .map(
+                                type =>
+                                    type.charAt(0).toUpperCase() + type.slice(1)
+                            )
+                            .join(', ') +
+                        ' and ' +
+                        this.types[this.types.length - 1]
+                }
             }
 
             if (this.data.sections.length > 1) {
-                sections += 's'
+                title =
+                    this.data.sections.length.toString() +
+                    ' ' +
+                    title +
+                    ' sections'
             }
 
-            return types + ', ' + sections
+            return title
         }
     }
 
