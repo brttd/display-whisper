@@ -182,40 +182,18 @@ function getJson(file, callback = () => {}) {
     })
 }
 
-function moveToBuilds(source, version, callback = () => {}) {
-    execCommand('git checkout builds', '', error => {
+function zipBuilds(source, version, callback = () => {}) {
+    clearDirs([version], error => {
         if (error) {
             return callback(error)
         }
 
-        clearDirs([version, 'latest'], error => {
+        zipAll(source, version, error => {
             if (error) {
                 return callback(error)
             }
 
-            zipAll(source, version, error => {
-                if (error) {
-                    return callback(error)
-                }
-
-                ncp(version, 'latest', error => {
-                    if (error) {
-                        return callback(error)
-                    }
-
-                    fs.writeFile(
-                        'latest/info.json',
-                        JSON.stringify({ version: version }),
-                        error => {
-                            if (error) {
-                                return callback(error)
-                            }
-
-                            callback(null)
-                        }
-                    )
-                })
-            })
+            callback(null)
         })
     })
 }
@@ -271,10 +249,8 @@ execCommand('git pull', '', error => {
                                         return console.error(error)
                                     }
 
-                                    console.log(
-                                        'Zipping and moving to builds branch...'
-                                    )
-                                    moveToBuilds(outDir, app.version, error => {
+                                    console.log('Zipping...')
+                                    zipBuilds(outDir, app.version, error => {
                                         if (error) {
                                             return console.error(error)
                                         }
