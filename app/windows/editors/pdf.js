@@ -117,24 +117,36 @@ layout.body.add(
                             items: [
                                 new layout.Block(
                                     {
-                                        items: [
-                                            fileSelector,
-                                            backgroundControl
-                                        ],
-
+                                        items: [playControl, backgroundControl],
                                         childSpacing: 8
                                     },
                                     {
                                         direction: 'horizontal',
+                                        wrap: true,
+
+                                        grow: false,
+                                        shrink: false,
 
                                         padding: 0,
-                                        grow: false,
-                                        shrink: false
+
+                                        borderBottom: true,
+                                        paddingBottom: 4,
+                                        marginBottom: 4
                                     }
                                 ),
+                                new layout.Block(
+                                    {
+                                        items: [fileSelector, fileNameDisplay],
+                                        childSpacing: 8
+                                    },
+                                    {
+                                        direction: 'horizontal',
+                                        grow: false,
+                                        shrink: false,
 
-                                playControl,
-
+                                        padding: 0
+                                    }
+                                ),
                                 new layout.Block(
                                     {
                                         items: [displayPreview, pageList],
@@ -158,8 +170,8 @@ layout.body.add(
                 ],
 
                 size: 70,
-                minWidth: 450,
-                minHeight: 400
+                minWidth: 420,
+                minHeight: 300
             }),
             /* OK, Apply, Cancel */
             new layout.LayoutBlock({

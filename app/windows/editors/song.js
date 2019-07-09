@@ -167,8 +167,6 @@ backgroundControl.connect(displayEditor)
     layout.change(sectionsBar, {
         direction: 'horizontal',
 
-        size: '35px',
-
         grow: false,
         shrink: false,
 
@@ -296,11 +294,32 @@ backgroundControl.connect(displayEditor)
                                         new layout.Block(
                                             {
                                                 items: [
-                                                    textControl,
+                                                    new layout.Block(
+                                                        {
+                                                            items: [
+                                                                playControl,
+                                                                backgroundControl,
+                                                                sectionsBar
+                                                            ],
+                                                            childSpacing: 8
+                                                        },
+                                                        {
+                                                            direction:
+                                                                'horizontal',
+                                                            wrap: true,
+
+                                                            grow: false,
+                                                            shrink: false,
+
+                                                            padding: 0,
+
+                                                            borderBottom: true,
+                                                            paddingBottom: 4,
+                                                            marginBottom: 4
+                                                        }
+                                                    ),
                                                     boxControl,
-                                                    backgroundControl,
-                                                    playControl,
-                                                    sectionsBar,
+                                                    textControl,
                                                     displayEditor
                                                 ],
                                                 childSpacing: 8
@@ -313,7 +332,7 @@ backgroundControl.connect(displayEditor)
                                     ],
 
                                     size: 70,
-                                    minWidth: 500,
+                                    minWidth: 615,
                                     minHeight: 400
                                 })
                                 /* OK, Apply, Cancel */

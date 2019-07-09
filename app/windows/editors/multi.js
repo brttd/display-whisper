@@ -147,8 +147,29 @@ layout.body.add(
                                             new layout.Block(
                                                 {
                                                     items: [
-                                                        playControl,
-                                                        backgroundControl,
+                                                        new layout.Block(
+                                                            {
+                                                                items: [
+                                                                    playControl,
+                                                                    backgroundControl
+                                                                ],
+                                                                childSpacing: 8
+                                                            },
+                                                            {
+                                                                direction:
+                                                                    'horizontal',
+                                                                wrap: true,
+
+                                                                grow: false,
+                                                                shrink: false,
+
+                                                                padding: 0,
+
+                                                                borderBottom: true,
+                                                                paddingBottom: 4,
+                                                                marginBottom: 4
+                                                            }
+                                                        ),
                                                         boxControl,
                                                         textControl,
                                                         imageControl,
@@ -164,7 +185,7 @@ layout.body.add(
                                         ],
 
                                         size: 70,
-                                        minWidth: 570,
+                                        minWidth: 615,
                                         minHeight: 400
                                     }),
                                     //Nodes list
