@@ -3993,9 +3993,15 @@ const item_add = {
         ipcRenderer.send('get-setting', 'general.defaultTemplate')
     }
 
+    let setOptionListeners = []
+
     item_add.setOption = (name, value) => {
         if (name === 'tab') {
             tabBlock.tab = item_add.options.tab = value
+        } else {
+            for (let i = 0; i < setOptionListeners.length; i++) {
+                setOptionListeners[i](name, value)
+            }
         }
     }
 
@@ -4885,6 +4891,20 @@ const item_add = {
                 addButton.disabled = false
             }
         })
+
+        setOptionListeners.push((name, value) => {
+            if (name === 'text') {
+                textEditor.edit({ text: value })
+            }
+        })
+        textEditor.onEvent('change', event => {
+            if (
+                typeof event.text === 'string' &&
+                typeof item_add.onOption === 'function'
+            ) {
+                item_add.onOption.call(null, 'text', event.text)
+            }
+        })
     }
     //image add
     {
@@ -5074,6 +5094,24 @@ const item_add = {
                 addButton.disabled = false
             }
         })
+
+        setOptionListeners.push((name, value) => {
+            if (name === 'image') {
+                fs.access(value, fs.constants.R_OK, err => {
+                    if (!err) {
+                        image.edit({ url: value })
+                    }
+                })
+            }
+        })
+        image.onEvent('change', event => {
+            if (
+                typeof event.url === 'string' &&
+                typeof item_add.onOption === 'function'
+            ) {
+                item_add.onOption.call(null, 'image', event.url)
+            }
+        })
     }
     //pdf add
     {
@@ -5151,6 +5189,10 @@ const item_add = {
                 })
 
                 addButton.disabled = false
+
+                if (typeof item_add.onOption === 'function') {
+                    item_add.onOption.call(null, 'pdf', file)
+                }
             }
         })
 
@@ -5217,6 +5259,29 @@ const item_add = {
                 } else {
                     addButton.disabled = true
                 }
+            }
+        })
+
+        setOptionListeners.push((name, value) => {
+            if (name === 'pdf') {
+                fs.access(value, fs.constants.R_OK, err => {
+                    if (!err) {
+                        file = value
+
+                        preview.update({
+                            nodes: [
+                                {
+                                    type: 'pdf',
+
+                                    file: file,
+                                    page: 1
+                                }
+                            ]
+                        })
+
+                        addButton.disabled = false
+                    }
+                })
             }
         })
     }
