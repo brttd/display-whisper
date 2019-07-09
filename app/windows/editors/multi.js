@@ -179,7 +179,7 @@ layout.body.add(
                         size: 75,
 
                         minWidth: 615,
-                        minHeight: 400
+                        minHeight: 525
                     }),
 
                     /* Node List */

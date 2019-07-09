@@ -182,7 +182,7 @@ layout.body.add(
                 size: 70,
 
                 minWidth: 420,
-                minHeight: 300
+                minHeight: 270
             }),
 
             /* Display, OK, Apply, Cancel */
