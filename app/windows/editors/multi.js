@@ -26,10 +26,22 @@ const sectionEditor = new layout.List(
     }
 )
 
-const templateSelector = new layout.SelectInput({})
-const applyTemplateButton = new layout.Button({
-    text: 'Apply'
-})
+const templateSelector = new layout.SelectInput(
+    {
+        label: 'Templates'
+    },
+    {
+        margin: '4px'
+    }
+)
+const applyTemplateButton = new layout.Button(
+    {
+        text: 'Apply'
+    },
+    {
+        align: 'end'
+    }
+)
 
 const nodesEditor = new layout.List({
     reorderable: true,
@@ -96,13 +108,32 @@ layout.body.add(
                         items: [
                             //Templates
                             new layout.LayoutBlock({
-                                items: [],
+                                items: [
+                                    new layout.Block(
+                                        {
+                                            childSpacing: 8,
+
+                                            items: [
+                                                templateSelector,
+                                                applyTemplateButton
+                                            ]
+                                        },
+                                        {
+                                            direction: 'horizontal',
+                                            grow: false,
+
+                                            align: 'end',
+
+                                            padding: 0
+                                        }
+                                    )
+                                ],
 
                                 size: 10,
 
                                 minWidth: 100,
-                                minHeight: 66,
-                                maxHeight: 66
+                                minHeight: 54,
+                                maxHeight: 54
                             }),
                             //Editor + Nodes list
                             new layout.LayoutBlock({
