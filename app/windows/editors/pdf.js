@@ -181,6 +181,7 @@ layout.body.add(
 
                 size: 70,
 
+                //420x270 fits controls + 16:9 display with no wasted space
                 minWidth: 420,
                 minHeight: 270
             }),

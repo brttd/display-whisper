@@ -100,7 +100,7 @@ colorControl.connect(displayEditor)
                     minHeight: 200
                 }),
 
-                /* Display Editor + Editr + Format */
+                /* Display Editor + Editor + Format */
                 new layout.LayoutBlock({
                     items: [
                         /* Display Editor */
@@ -118,6 +118,8 @@ colorControl.connect(displayEditor)
                             ],
 
                             size: 20,
+
+                            //615x62 fits play controls + background controls with no wrapping
                             minWidth: 615,
                             minHeight: 62,
                             maxHeight: 62
@@ -149,6 +151,7 @@ colorControl.connect(displayEditor)
 
                                     size: 80,
 
+                                    //460x425 fits text controls + 16:9 display with no wasted space
                                     minWidth: 460,
                                     minHeight: 425
                                 }),
@@ -197,9 +200,10 @@ colorControl.connect(displayEditor)
                             ],
 
                             size: 10,
+
+                            minWidth: 80,
                             minHeight: 40,
-                            maxHeight: 40,
-                            minWidth: 80
+                            maxHeight: 40
                         })
                     ],
 

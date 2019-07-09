@@ -330,6 +330,7 @@ backgroundControl.connect(displayEditor)
 
                             size: 80,
 
+                            //615x557 fits controls + 16:9 display with no wasted space
                             minWidth: 615,
                             minHeight: 557
                         })
