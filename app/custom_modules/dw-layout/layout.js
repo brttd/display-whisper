@@ -5280,6 +5280,14 @@ exports.change = addStyles
     }
     exports.SelectInput = items.SelectInput = SelectInput
     itemStylesMap.SelectInput = {
+        margin: (item, value) => {
+            if (item.node.firstChild !== item.inputNode) {
+                item.node.firstChild.style.marginBottom = mapToPx(value)
+            }
+
+            return {}
+        },
+        
         width: item => {
             return {
                 node: item.inputNode
