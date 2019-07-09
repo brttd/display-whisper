@@ -267,6 +267,10 @@ function changeSectionNode(sectionIndex, nodeIndex, nodeChange) {
 }
 
 function onNodeChange(event) {
+    if (!event.fromUser) {
+        return false
+    }
+
     changeSectionNode(
         activeIndex,
         editNodes.indexOf(event.from),
