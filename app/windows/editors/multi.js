@@ -904,6 +904,10 @@ function updateSectionList() {
     })
 }
 
+fitTextButton.onEvent('click', () => {
+    //TODO
+})
+
 editor.onEvent('output', data => {
     ipcRenderer.send('edit', data)
 
