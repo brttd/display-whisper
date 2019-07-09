@@ -113,10 +113,12 @@ layout.body.add(
                 ],
 
                 size: 20,
+
                 minWidth: 100,
                 minHeight: 66,
                 maxHeight: 66
             }),
+
             /* Editor */
             new layout.LayoutBlock({
                 items: [
@@ -178,10 +180,12 @@ layout.body.add(
                 ],
 
                 size: 70,
+
                 minWidth: 420,
                 minHeight: 300
             }),
-            /* OK, Apply, Cancel */
+
+            /* Display, OK, Apply, Cancel */
             new layout.LayoutBlock({
                 items: [
                     new layout.Block(
@@ -200,6 +204,7 @@ layout.body.add(
                 ],
 
                 size: 10,
+
                 minWidth: 100,
                 minHeight: 40,
                 maxHeight: 40

@@ -340,7 +340,7 @@ backgroundControl.connect(displayEditor)
                     small: true
                 }),
 
-                /* OK, Apply, Cancel */
+                /* Display, OK, Apply, Cancel */
                 new layout.LayoutBlock({
                     items: [
                         new layout.Block(
