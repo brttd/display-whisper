@@ -4848,7 +4848,7 @@ const item_add = {
                     itemType: 'multi',
                     sections: [
                         {
-                            name: 'Text 1',
+                            name: 'Text',
                             nodes: [textEditor.getData()]
                         }
                     ]
@@ -4867,7 +4867,7 @@ const item_add = {
                     itemType: 'multi',
                     sections: [
                         {
-                            name: 'Text 1',
+                            name: 'Text',
                             nodes: [textEditor.getData()]
                         }
                     ]
@@ -4885,7 +4885,7 @@ const item_add = {
                     itemType: 'multi',
                     sections: [
                         {
-                            name: 'Text 1',
+                            name: 'Text',
                             nodes: [textEditor.getData()]
                         }
                     ]
