@@ -96,123 +96,109 @@ const cancelButton = new layout.Button({
 layout.body.add(
     new layout.LayoutBlock({
         items: [
+            /* Templates */
             new layout.LayoutBlock({
                 items: [
-                    //Sections
+                    new layout.Block(
+                        {
+                            childSpacing: 8,
+
+                            items: [templateSelector, applyTemplateButton]
+                        },
+                        {
+                            direction: 'horizontal',
+                            grow: false,
+
+                            align: 'end'
+                        }
+                    )
+                ],
+
+                size: 10,
+
+                minWidth: 100,
+                minHeight: 62,
+                maxHeight: 62
+            }),
+
+            /* Sections + Editor + Node List */
+            new layout.LayoutBlock({
+                items: [
+                    /* Sections */
                     new layout.LayoutBlock({
                         items: [sectionEditor],
 
-                        size: 20,
+                        size: 15,
 
                         minWidth: 120,
                         maxWidth: 200
                     }),
-                    //Templates, Editor
+
+                    /* Editor */
                     new layout.LayoutBlock({
                         items: [
-                            //Templates
-                            new layout.LayoutBlock({
-                                items: [
-                                    new layout.Block(
-                                        {
-                                            childSpacing: 8,
+                            new layout.Block(
+                                {
+                                    items: [
+                                        new layout.Block(
+                                            {
+                                                items: [
+                                                    playControl,
+                                                    backgroundControl
+                                                ],
+                                                childSpacing: 8
+                                            },
+                                            {
+                                                direction: 'horizontal',
+                                                wrap: true,
 
-                                            items: [
-                                                templateSelector,
-                                                applyTemplateButton
-                                            ]
-                                        },
-                                        {
-                                            direction: 'horizontal',
-                                            grow: false,
+                                                grow: false,
+                                                shrink: false,
 
-                                            align: 'end'
-                                        }
-                                    )
-                                ],
+                                                padding: 0,
 
-                                size: 10,
+                                                borderBottom: true,
+                                                paddingBottom: 4,
+                                                marginBottom: 4
+                                            }
+                                        ),
+                                        boxControl,
+                                        textControl,
+                                        imageControl,
+                                        displayEditor
+                                    ],
 
-                                minWidth: 100,
-                                minHeight: 62,
-                                maxHeight: 62
-                            }),
-                            //Editor + Nodes list
-                            new layout.LayoutBlock({
-                                items: [
-                                    //Editor
-                                    new layout.LayoutBlock({
-                                        items: [
-                                            new layout.Block(
-                                                {
-                                                    items: [
-                                                        new layout.Block(
-                                                            {
-                                                                items: [
-                                                                    playControl,
-                                                                    backgroundControl
-                                                                ],
-                                                                childSpacing: 8
-                                                            },
-                                                            {
-                                                                direction:
-                                                                    'horizontal',
-                                                                wrap: true,
-
-                                                                grow: false,
-                                                                shrink: false,
-
-                                                                padding: 0,
-
-                                                                borderBottom: true,
-                                                                paddingBottom: 4,
-                                                                marginBottom: 4
-                                                            }
-                                                        ),
-                                                        boxControl,
-                                                        textControl,
-                                                        imageControl,
-                                                        displayEditor
-                                                    ],
-
-                                                    childSpacing: 8
-                                                },
-                                                {
-                                                    direction: 'vertical'
-                                                }
-                                            )
-                                        ],
-
-                                        size: 70,
-                                        minWidth: 615,
-                                        minHeight: 400
-                                    }),
-                                    //Nodes list
-                                    new layout.LayoutBlock({
-                                        items: [nodesEditor],
-
-                                        size: 30,
-
-                                        minWidth: 120,
-                                        maxWidth: 120
-                                    })
-                                ],
-
-                                size: 90,
-                                direction: 'horizontal',
-                                small: true
-                            })
+                                    childSpacing: 8
+                                },
+                                {
+                                    direction: 'vertical'
+                                }
+                            )
                         ],
 
-                        size: 80,
-                        small: true
+                        size: 75,
+
+                        minWidth: 615,
+                        minHeight: 400
+                    }),
+
+                    /* Node List */
+                    new layout.LayoutBlock({
+                        items: [nodesEditor],
+
+                        size: 10,
+
+                        minWidth: 120,
+                        maxWidth: 120
                     })
                 ],
 
+                size: 80,
                 direction: 'horizontal',
                 small: true
             }),
-            //Disply, OK, Apply, Cancel
+
+            /* Display, OK, Apply, Cancel */
             new layout.LayoutBlock({
                 items: [
                     new layout.Block({
@@ -227,12 +213,15 @@ layout.body.add(
                     })
                 ],
 
+                size: 10,
+
                 minWidth: 70,
                 minHeight: 40,
                 maxHeight: 40
             })
         ],
 
+        direction: 'vertical',
         small: true
     })
 )
