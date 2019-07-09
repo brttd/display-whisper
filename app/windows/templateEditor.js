@@ -164,8 +164,8 @@ colorControl.connect(displayEditor)
 
                                     size: 30,
 
-                                    minWidth: 208,
-                                    maxWidth: 208,
+                                    minWidth: 160,
+                                    maxWidth: 160,
                                     minHeight: 100
                                 })
                             ],
