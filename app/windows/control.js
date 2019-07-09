@@ -5178,12 +5178,7 @@ const item_add = {
                             type: 'pdf',
 
                             file: file,
-                            page: 1,
-
-                            top: 0,
-                            left: 0,
-                            right: 100,
-                            bottom: 100
+                            page: 1
                         }
                     ]
                 })
