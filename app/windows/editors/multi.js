@@ -163,7 +163,9 @@ layout.body.add(
                                             )
                                         ],
 
-                                        size: 70
+                                        size: 70,
+                                        minWidth: 570,
+                                        minHeight: 400
                                     }),
                                     //Nodes list
                                     new layout.LayoutBlock({
