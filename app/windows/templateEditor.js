@@ -11,13 +11,18 @@ const Templates = new Database.Group('templates', {
 })
 const templateGroup = 't'
 
-const list = new layout.List({
-    reorderable: false,
-    removeButton: true,
-    editButton: true,
+const list = new layout.List(
+    {
+        reorderable: false,
+        removeButton: true,
+        editButton: true,
 
-    addInput: true
-})
+        addInput: true
+    },
+    {
+        border: false
+    }
+)
 
 const itemsBar = new layout.TabBlock(
     {},
@@ -197,7 +202,9 @@ colorControl.connect(displayEditor)
                     size: 70
                 })
             ],
-            direction: 'horizontal'
+
+            direction: 'horizontal',
+            small: true
         })
     )
 }
