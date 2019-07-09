@@ -78,9 +78,6 @@ const okButton = new layout.Button({ text: 'OK' })
 const applyButton = new layout.Button({ text: 'Apply' })
 const cancelButton = new layout.Button({ text: 'Cancel' })
 
-layout.change(layout.body, {
-    direction: 'vertical'
-})
 layout.body.add(
     new layout.LayoutBlock({
         items: [
