@@ -10763,7 +10763,6 @@ exports.change = addStyles
             item.left.node.style.marginRight = item.right.node.style.marginRight = item.top.node.style.marginRight = value
 
             item.y.node.firstChild.style.marginBottom = value
-            item.y.node.style.marginRight = value
 
             return {}
         }
