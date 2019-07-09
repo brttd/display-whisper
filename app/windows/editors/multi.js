@@ -358,6 +358,185 @@ function updateSectionList() {
     }
 }
 
+//Templates
+{
+    Templates.onEvent('update', () => {
+        let lastSelected = templateSelector.value
+
+        templateSelector.options = Templates.list.map(template => template.name)
+
+        if (templateSelector.options.includes(lastSelected)) {
+            templateSelector.value = lastSelected
+        } else {
+            templateSelector.index = 0
+        }
+    })
+
+    Templates.onEvent('error', error => {
+        layout.dialog.showNotification({
+            type: 'error',
+            autoHide: false,
+
+            message:
+                'There is an error with the Template database!\n' +
+                error.message
+        })
+    })
+
+    applyTemplateButton.onEvent('click', () => {
+        let template = Templates.list[templateSelector.index]
+
+        if (!template) {
+            layout.dialog.showNotification({
+                type: 'error',
+                message:
+                    'Unable to apply template! Could not find template with that name.'
+            })
+
+            logger.error(
+                "User tried to apply template which wasn't found!",
+                templateSelector.value
+            )
+
+            return false
+        }
+
+        template = editor.util.filterObj(
+            template,
+            {
+                ID: true,
+                _ID: true,
+                _filename: true,
+                _group: true,
+
+                group: true,
+                groupID: true,
+
+                name: true,
+
+                top: true,
+                left: true,
+                right: true,
+                bottom: true,
+
+                opacity: true,
+
+                font: true,
+                size: true,
+                color: true,
+
+                align: true,
+                y: true,
+
+                scale: true,
+
+                maxLines: true,
+                sectionOverlay: true,
+                endOverlay: true
+            },
+            true
+        )
+
+        let sectionChanges = editor.util.filterObj(
+            template,
+            {
+                text: true,
+                image: true
+            },
+            true
+        )
+
+        let textNodeChanges = editor.util.filterObj(
+            template.text,
+            {
+                text: true,
+                plainText: true,
+
+                top: true,
+                left: true,
+                right: true,
+                bottom: true
+            },
+            true
+        )
+        let imageNodeChanges = editor.util.filterObj(
+            template.image,
+            {
+                url: true,
+                database: true,
+
+                top: true,
+                left: true,
+                right: true,
+                bottom: true
+            },
+            true
+        )
+
+        let changes = {
+            template: template,
+
+            sections: []
+        }
+
+        for (let i = 0; i < editor.data.sections.length; i++) {
+            changes.sections.push(editor.util.copyObj(sectionChanges))
+            changes.sections[i].nodes = []
+
+            if (editor.data.sections[i].nodes.length === 1) {
+                if (editor.data.sections[i].nodes[0].type === 'text') {
+                    changes.sections[i].nodes.push(
+                        editor.util.copyObj(template.text)
+                    )
+                } else if (editor.data.sections[i].nodes[0].type === 'image') {
+                    changes.sections[i].nodes.push(
+                        editor.util.copyObj(template.image)
+                    )
+                } else {
+                    changes.sections[i].nodes.push({})
+                }
+            } else {
+                for (let j = 0; j < editor.data.sections[i].nodes.length; j++) {
+                    if (editor.data.sections[i].nodes[j].type === 'text') {
+                        changes.sections[i].nodes.push(
+                            editor.util.copyObj(textNodeChanges)
+                        )
+                    } else if (
+                        editor.data.sections[i].nodes[j].type === 'image'
+                    ) {
+                        changes.sections[i].nodes.push(
+                            editor.util.copyObj(imageNodeChanges)
+                        )
+                    } else {
+                        changes.sections[i].nodes.push({})
+                    }
+                }
+            }
+        }
+
+        editor.change(changes)
+
+        updateSectionList()
+    })
+
+    let defaultTemplateListenerFunc = (event, key, value) => {
+        if (key === 'general.defaultTemplate') {
+            ipcRenderer.removeListener('setting', defaultTemplateListenerFunc)
+
+            if (Templates.updating) {
+                Templates.onceEvent('update', () => {
+                    templateSelector.value = value
+                })
+            } else {
+                templateSelector.value = value
+            }
+        }
+    }
+
+    ipcRenderer.on('setting', defaultTemplateListenerFunc)
+    ipcRenderer.send('get-setting', 'general.defaultTemplate')
+}
+
 //Sections
 {
     sectionEditor.onEvent('select', event => {
