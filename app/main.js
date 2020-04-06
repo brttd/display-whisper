@@ -53,6 +53,11 @@ let display = {
     masterScreen: -1
 }
 
+//Screenshot window, if used
+let screenshotDisplay = null
+//list of callbacks, waiting for screenshot display to be usable
+let waitingForScreenshotDisplay = []
+
 //User settings
 //All logic is done inside the main JS script, so that there's a simple system for requesting & setting values, and sending updates to windows which requested values
 const settings = {}
@@ -1632,6 +1637,118 @@ function checkForUpdate() {
     })
 }
 
+function makeScreenshotDisplayAvailable() {
+    if (screenshotDisplay) {
+        screenshotDisplay.inUse = false
+    }
+
+    if (waitingForScreenshotDisplay.length > 0) {
+        waitingForScreenshotDisplay.shift().call(null)
+    }
+}
+
+function whenScreenshotDisplayAvailable(callback) {
+    waitingForScreenshotDisplay.push(callback)
+}
+
+function screenshotSlide(slide, callback) {
+    if (!screenshotDisplay) {
+        screenshotDisplay = new BrowserWindow({
+            width: display.bounds.width,
+            height: display.bounds.height,
+
+            show: false,
+            backgroundThrottling: false,
+            useContentSize: true,
+            frame: false,
+            enableLargerThanScreen: true,
+            skipTaskbar: true,
+
+            webPreferences: {
+                offscreen: true,
+                backgroundThrottling: false,
+
+                preload: path.join(appPath, 'windows/screenshot.js')
+            }
+        })
+
+        screenshotDisplay.inUse = true
+
+        whenScreenshotDisplayAvailable(
+            screenshotSlide.bind(null, slide, callback)
+        )
+
+        screenshotDisplay.once('ready-to-show', () => {
+            screenshotDisplay.webContents.send('display-info', getDisplayInfo())
+
+            //screenshotDisplay.show()
+            makeScreenshotDisplayAvailable()
+        })
+
+        screenshotDisplay.loadURL(
+            url.format({
+                protocol: 'file:',
+                slashes: true,
+                pathname: path.join(appPath, 'windows/display.html')
+            })
+        )
+
+        return
+    }
+
+    if (screenshotDisplay.inUse) {
+        whenScreenshotDisplayAvailable(
+            screenshotSlide.bind(null, slide, callback)
+        )
+
+        return
+    }
+
+    screenshotDisplay.inUse = true
+
+    let size = screenshotDisplay.getSize()
+
+    //Check the size of the window, if it's incorrect then resize it before proceeding
+    if (size[0] !== display.bounds.width || size[1] !== display.bounds.height) {
+        whenScreenshotDisplayAvailable(
+            screenshotSlide.bind(null, slide, callback)
+        )
+
+        screenshotDisplay.once('resize', () => {
+            screenshotDisplay.webContents.send('display-info', getDisplayInfo())
+
+            //screenshotDisplay.show()
+            makeScreenshotDisplayAvailable()
+        })
+
+        screenshotDisplay.setSize(display.bounds.width, display.bounds.height)
+
+        return
+    }
+
+    slide.transition = {}
+
+    //Send the slide to be displayed - handled by normal display.js window logic
+    screenshotDisplay.webContents.send('display', slide)
+    //Send a request to get a ping back after a frame is rendered - handled by screenshot.js
+    screenshotDisplay.webContents.send('request-frame-render')
+
+    ipcMain.once('frame-rendered', () => {
+        //Wait for 50 milliseconds before taking the screenshot
+        setTimeout(() => {
+            screenshotDisplay.capturePage(image => {
+                //And wait 50 milliseconds after taking it
+                //This seems to reduce possibility of two sequential screenshots having the same content
+                setTimeout(() => {
+                    callback(null, image)
+
+                    makeScreenshotDisplayAvailable()
+                }, 50)
+            })
+        }, 50)
+    })
+}
+
 //Application Menu
 const appMenus = {
     main: new Menu()
@@ -2556,6 +2673,69 @@ ipcMain.on('close', event => {
                 databaseName,
                 from,
                 changes
+            )
+        }
+    })
+
+    //Screenshot slides
+    ipcMain.on('screenshot-items', (event, slides) => {
+        let win = getWindowFromWebContents(event.sender)
+
+        if (Array.isArray(slides)) {
+            dialog.showOpenDialog(
+                win,
+                {
+                    title: 'Select Folder',
+                    buttonLabel: 'Select',
+                    message:
+                        'Note: any existing screenshots will be overwritten!',
+                    properties: ['openDirectory', 'createDirectory']
+                },
+                dirPath => {
+                    if (!dirPath) {
+                        return
+                    }
+
+                    dirPath = dirPath[0]
+
+                    let index = 0
+
+                    function screenshotNext() {
+                        if (slides.length === 0) {
+                            return
+                        }
+
+                        index += 1
+
+                        let slide = slides.shift()
+
+                        screenshotSlide(slide, (error, image) => {
+                            if (error) {
+                                logger.log('screenshotSlide returned error')
+                                screenshotNext()
+                            } else {
+                                fs.writeFile(
+                                    path.join(
+                                        dirPath,
+                                        'slide_' + index.toString() + '.png'
+                                    ),
+                                    image.toPNG(),
+                                    error => {
+                                        if (error) {
+                                            logger.log(
+                                                'screenshotSlide saving returned error'
+                                            )
+                                        }
+
+                                        screenshotNext()
+                                    }
+                                )
+                            }
+                        })
+                    }
+
+                    screenshotNext()
+                }
             )
         }
     })

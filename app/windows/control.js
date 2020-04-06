@@ -2500,6 +2500,30 @@ const item_presentation = {
         }
     }
 
+    function onListScreenshotButton(event) {
+        let listIndex = lists.findIndex(
+            list => list.topBlock === event.from.parent
+        )
+
+        if (listIndex >= 0 && listIndex < lists.length) {
+            let slides = []
+
+            for (let i = 0; i < lists[listIndex].itemsBlock.items.length; i++) {
+                for (
+                    let j = 0;
+                    j < lists[listIndex].itemsBlock.items[i].items.length;
+                    j++
+                ) {
+                    slides.push(
+                        lists[listIndex].itemsBlock.items[i].items[j].display
+                    )
+                }
+            }
+
+            ipcRenderer.send('screenshot-items', slides)
+        }
+    }
+
     function onListRemoveButton(event) {
         let listIndex = lists.findIndex(
             list => list.topBlock === event.from.parent
@@ -2610,6 +2634,13 @@ const item_presentation = {
                     grow: false
                 }
             ),
+            screenshotButton: new layout.Button({
+                icon: 'display',
+
+                onClick: onListScreenshotButton,
+
+                size: 'large'
+            }),
             removeButton: new layout.Button({
                 icon: 'remove',
 
@@ -2711,6 +2742,7 @@ const item_presentation = {
 
         newList.mainBlock.add(newList.topBlock)
         newList.topBlock.add(newList.screenBlock, 0)
+        newList.topBlock.add(newList.screenshotButton)
         newList.topBlock.add(newList.removeButton)
 
         newList.mainBlock.add(newList.itemsBlock)
